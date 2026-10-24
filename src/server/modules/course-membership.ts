@@ -59,8 +59,7 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
       if (existing) {
         await c("courseRequests").updateOne(
           { _id: existing._id, status: { $ne: "pending" } },
-          { $set: { status: "pending", updatedAt: timestamp },
-            $push: { history: event } },
+          { $set: { status: "pending", updatedAt: timestamp, history: [...(existing.history ?? []), event] } },
           { session },
         );
       } else {
@@ -135,8 +134,8 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
         if (member) {
           await c("enrollments").updateOne(
             { _id: member._id },
-            { $set: { status: "active", updatedAt: timestamp },
-              $push: { history: { status: "active", actorId: teacher._id, at: timestamp } } },
+            { $set: { status: "active", updatedAt: timestamp,
+                history: [...(member.history ?? []), { status: "active", actorId: teacher._id, at: timestamp }] } },
             { session },
           );
         } else {
@@ -158,8 +157,7 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
       const event = { status: next, actorId: teacher._id, at: timestamp };
       const result = await c("courseRequests").updateOne(
         { _id: rid, status: "pending" },
-        { $set: { status: next, updatedAt: timestamp },
-          $push: { history: event } },
+        { $set: { status: next, updatedAt: timestamp, history: [...(request!.history ?? []), event] } },
         { session },
       );
       if (result.modifiedCount !== 1) fail(409, "وضعیت درخواست تغییر کرده است");
@@ -184,8 +182,8 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
       const timestamp = now();
       const result = await c("enrollments").updateOne(
         { _id: eid, status: "active" },
-        { $set: { status: "revoked", updatedAt: timestamp },
-          $push: { history: { status: "revoked", actorId: actor._id, at: timestamp } } },
+        { $set: { status: "revoked", updatedAt: timestamp,
+            history: [...(enrollment!.history ?? []), { status: "revoked", actorId: actor._id, at: timestamp }] } },
         { session },
       );
       if (result.modifiedCount !== 1) fail(409, "عضویت قبلاً تغییر کرده است");
