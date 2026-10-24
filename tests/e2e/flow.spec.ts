@@ -650,7 +650,7 @@ test("teacher assigns one corrective practice from a student's wrong answer", as
   // Keep production login/register throttling intact. Earlier browser cases
   // may already have consumed the shared unauthenticated IP quota.
   async function authPost(
-    requester: typeof page.context().request,
+    requester: import("@playwright/test").APIRequestContext,
     endpoint: string,
     data: object,
   ) {
