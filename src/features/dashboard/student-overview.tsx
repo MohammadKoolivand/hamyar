@@ -150,7 +150,7 @@ export function StudentOverview({
           </p>
         </div>
         <Button variant="outline" onClick={() => setPage("courses")}>
-          درس‌های من <ArrowLeft size={16} aria-hidden />
+          مشاهده همه درس‌ها <ArrowLeft size={16} aria-hidden />
         </Button>
       </section>
       {!data ? (
