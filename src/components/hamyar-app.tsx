@@ -240,7 +240,7 @@ export default function HamyarApp() {
       ] as const);
   return (
     <div className="min-h-screen min-[651px]:grid min-[651px]:grid-cols-[180px_minmax(0,1fr)] min-[951px]:grid-cols-[240px_minmax(0,1fr)]">
-      <aside className="glass-sidebar mx-3 my-3 flex flex-col gap-7 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:px-6 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
+      <aside className="glass-sidebar max-w-96 mx-3 my-3 flex flex-col gap-7 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:px-6 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
         <div className="flex items-center gap-3 text-[23px] font-bold text-[#233b8f]">
           <span className="grid size-[46px] shrink-0 place-items-center rounded-[14px] bg-[#233b8f] text-white">
             <BookOpen />
@@ -292,7 +292,7 @@ export default function HamyarApp() {
           خروج
         </Button>
       </aside>
-      <main className="relative w-full min-w-0 max-w-[1300px] px-8 py-7 max-[950px]:p-6 max-[650px]:p-[18px] grid gap-[18px]">
+      <main className="relative w-full min-w-0 px-8 py-7 max-[950px]:p-6 max-[650px]:p-[18px] grid gap-[18px]">
         <header className="glass-header mb-6 flex items-center justify-between gap-3 p-4 sm:p-5 max-[650px]:mb-[22px] max-[650px]:[&_h1]:text-[22px]">
           <div>
             <small className="text-xs leading-loose text-slate-500">
