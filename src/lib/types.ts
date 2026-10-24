@@ -1,3 +1,30 @@
+export interface MembershipEvent {
+  status: string;
+  actorId: string;
+  at: string;
+}
+export interface CourseMembershipRequest {
+  _id: string;
+  courseId: string;
+  teacherId: string;
+  studentId: string;
+  status: "pending" | "approved" | "declined";
+  courseTitle: string;
+  subject: string;
+  studentName?: string;
+  studentEmail?: string;
+  history: MembershipEvent[];
+}
+export interface EnrollmentHistory {
+  _id: string;
+  courseId: string;
+  teacherId: string;
+  studentId: string;
+  status: "active" | "revoked";
+  courseTitle: string;
+  subject: string;
+  history: MembershipEvent[];
+}
 export interface Course {
   _id: string;
   teacherId: string;

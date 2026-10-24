@@ -20,6 +20,11 @@ export async function connect(
     ["hintReports", { hintId: 1, studentId: 1 }],
   ] as const)
     await db.collection(name).createIndex(keys, { unique: true });
+  await db.collection("courseJoinCodes").createIndex({ tokenHash: 1 }, { unique: true });
+  await db.collection("courseJoinCodes").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await db.collection("courseRequests").createIndex({ courseId: 1, studentId: 1 }, { unique: true });
+  await db.collection("courseRequests").createIndex({ teacherId: 1, status: 1, updatedAt: -1 });
+  await db.collection("courseRequests").createIndex({ studentId: 1, updatedAt: -1 });
   await db.collection("courses").createIndex({ teacherId: 1, status: 1 });
   await db.collection("enrollments").createIndex({ teacherId: 1, studentId: 1, status: 1 });
   await db.collection("enrollments").createIndex({ studentId: 1, status: 1 });

@@ -10,6 +10,7 @@ import { registerIdentity } from "./modules/identity";
 import { registerContent } from "./modules/content";
 import { registerMissions } from "./modules/missions";
 import { registerCourses } from "./modules/courses";
+import { registerCourseMembership } from "./modules/course-membership";
 import { registerStudentDashboard } from "./modules/student-dashboard";
 import { registerPractice } from "./modules/practice";
 import { registerAnalytics } from "./modules/analytics";
@@ -127,6 +128,7 @@ export async function buildApp(
   });
   registerIdentity(app, ctx);
   registerCourses(app, ctx);
+  registerCourseMembership(app, ctx);
   registerStudentDashboard(app, ctx);
   registerContent(app, ctx);
   registerAuthoring(app, ctx, questionGenerator);

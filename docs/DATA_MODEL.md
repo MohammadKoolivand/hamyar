@@ -63,3 +63,12 @@ learningEvidence uses attemptId as _id and stores assignment/student/teacher/que
 ## گزارش نمای درس دانش‌آموز
 
 مسیر خواندنی `GET /api/student/dashboard` به‌صورت غیرمخرب از `enrollments`، `courses`، `users` (فقط نام معلم)، `assignments`، `attempts` و `evaluations` محاسبه می‌شود. هیچ درصد پیشرفت یا نسخه موازی از نتایج در دیتابیس ذخیره نمی‌شود. `courseId` از منابع خود دانش‌آموز با عضویت معتبر تطبیق داده می‌شود؛ مأموریت‌های قدیمیِ فاقد درس، بی‌سند به درس‌های جاری الصاق نمی‌شوند. پاسخ‌های خصوصی و یادداشت‌های داوری در DTO منتشر نمی‌شوند. شاخص «تکمیل» بر اساس وضعیت مأموریت است؛ شاخص «درست مستقل/با کمک» از آخرین پاسخ و آخرین نتیجه ارزیابی آن آمده و ادعای mastery نیست.
+
+
+## مدیریت عضویت و چرخه تأیید درخواست
+
+- `courseJoinCodes`: `_id,courseId,teacherId,tokenHash,expiresAt(Date)`؛ ایندکس یکتا tokenHash و TTL انقضا. کد ۱۹۲بیتی به‌صورت تصادفی تولید می‌شود؛ فقط هش ذخیره می‌گردد و هنگام صدور دوباره، کد قبلی اتمیک باطل می‌شود.
+- `courseRequests`: `_id,courseId,teacherId,studentId,status(pending/approved/declined),createdAt,updatedAt,history[{status,actorId,at}]`؛ یکتا بر اساس `courseId+studentId`، شاخص خواندن برای معلم و دانش‌آموز. پس از رد یا لغو عضویت می‌توان درخواست جدید همان رکورد را به pending برگرداند و تاریخچه را حفظ کرد.
+- `enrollments` مانند قبل یکتا بر اساس `courseId+studentId` است و حالا `status:active|revoked` و `history` اختیاری دارد. ردیف‌های قبل از این تسک همچنان معتبرند؛ افزودن تاریخچه به آن‌ها هنگام تغییر وضعیت انجام می‌شود. رابطهٔ کلی teacher/student پس از لغو یک درس حذف نمی‌شود، زیرا ممکن است متعلق به درس یا دعوت دیگری هم باشد.
+- پایان عضویت تراکنشی است: حالت عضویت و تکلیف‌های ناتمامِ همان enrollment و وضعیت مأموریت‌های مربوط تغییر می‌کند، اما `attempts,evaluations,learningEvidence,hintEvents` پاک یا جابه‌جا نمی‌شوند. مأموریت‌های قدیمیِ بدون enrollmentId همچنان تحت جریان سازگار قبلی هستند.
+- نوشتن‌های چرخه عضویت، trail در `auditLogs` دارند؛ فیلدهای محرمانه مثل کد خام را در audit و لاگ‌ها قرار ندهید. حذف قانونی اطلاعات، پشتیبان‌ها و retention همچنان تسک مستقلی برای پایلوت است.

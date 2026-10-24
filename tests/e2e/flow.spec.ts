@@ -496,3 +496,58 @@ test("student registers without invitation and later joins teacher with existing
     await teacherContext.close();
   }
 });
+
+test("student requests a course, teacher approves, and leaving keeps history", async ({ page, browser }, testInfo) => {
+  const unique = Date.now() + "-" + Math.floor(Math.random() * 10000);
+  const teacherEmail = `course-teacher-${unique}@test.dev`;
+  const studentEmail = `course-student-${unique}@test.dev`;
+  await page.goto("/");
+  await page.getByRole("button", { name: "ثبت‌نام معلم" }).click();
+  await page.getByLabel("نام و نام خانوادگی").fill("معلم دوره");
+  await page.getByLabel("ایمیل", { exact: true }).fill(teacherEmail);
+  await page.getByLabel("رمز عبور").fill(pass);
+  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
+  await page.getByRole("button", { name: "ورود به همیار" }).click();
+  await page.getByRole("button", { name: "درس‌های من", exact: true }).click();
+  await page.getByLabel("نام درس").fill("ریاضی");
+  await page.getByLabel("عنوان دوره").fill("دوره درخواست عضویت");
+  await page.getByRole("button", { name: "ایجاد درس" }).click();
+  await page.getByRole("button", { name: "صدور / تغییر کد درخواست" }).click();
+  const code = (await page.getByTestId("course-join-code").innerText()).trim();
+  expect(code).toHaveLength(48);
+
+  const studentContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  try {
+    const student = await studentContext.newPage();
+    await student.goto("/");
+    await student.getByRole("button", { name: "ثبت‌نام دانش‌آموز" }).click();
+    await student.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز درخواست‌کننده");
+    await student.getByLabel("ایمیل", { exact: true }).fill(studentEmail);
+    await student.getByLabel("رمز عبور").fill(pass);
+    await student.getByRole("button", { name: "ساخت حساب", exact: true }).click();
+    await student.getByRole("button", { name: "ورود به همیار" }).click();
+    await student.getByRole("button", { name: "درس‌های من", exact: true }).click();
+    await student.getByLabel("کد درخواست عضویت").fill(code);
+    await student.getByRole("button", { name: "ارسال درخواست" }).click();
+    await expect(student.getByText("درخواست ثبت شد؛ منتظر تأیید معلم باشید.")).toBeVisible();
+    await expect(student.getByText("دوره درخواست عضویت · در انتظار تأیید")).toBeVisible();
+    await expect(student.getByRole("heading", { name: "دوره درخواست عضویت" })).toHaveCount(0);
+
+    await page.getByRole("button", { name: "نمای کلی", exact: true }).click();
+    await page.getByRole("button", { name: "درس‌های من", exact: true }).click();
+    await expect(page.getByText("دانش‌آموز درخواست‌کننده")).toBeVisible();
+    await page.getByRole("button", { name: "تأیید عضویت" }).click();
+    await expect(page.getByText("عضویت تأیید شد.")).toBeVisible();
+
+    await student.reload();
+    await student.getByRole("button", { name: "درس‌های من", exact: true }).click();
+    await expect(student.getByRole("heading", { name: "دوره درخواست عضویت" })).toBeVisible();
+    await student.screenshot({ path: testInfo.outputPath("course-membership-approved-mobile.png"), fullPage: true });
+    student.once("dialog", (dialog) => void dialog.accept());
+    await student.getByRole("button", { name: "خروج از درس" }).click();
+    await expect(student.getByRole("heading", { name: "تاریخچه عضویت‌های پایان‌یافته" })).toBeVisible();
+    await student.screenshot({ path: testInfo.outputPath("course-membership-ended-mobile.png"), fullPage: true });
+  } finally {
+    await studentContext.close();
+  }
+});
