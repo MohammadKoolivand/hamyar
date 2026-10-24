@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export function Brand({
   size = "md",
   showTagline = false,
@@ -10,7 +8,7 @@ export function Brand({
   const large = size === "lg";
   return (
     <div className="hy-brand flex min-w-0 items-center gap-3">
-      <Image
+      <img
         src="/icon.svg"
         width={large ? 72 : 52}
         height={large ? 72 : 52}
