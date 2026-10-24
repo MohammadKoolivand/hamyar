@@ -262,7 +262,10 @@ test("licensed local fonts load and layout uses Tailwind utilities", async ({
   });
   expect(fonts.every((count) => count > 0)).toBe(true);
   await expect(page.locator("main[style], main [style]")).toHaveCount(0);
-  await expect(page.locator("section").first()).toHaveClass(/backdrop-blur/);
+  const panel = page.locator(".glass-panel").first();
+  await expect(panel).toBeVisible();
+  const blur = await panel.evaluate((el) => getComputedStyle(el).backdropFilter);
+  expect(blur).toContain("blur(");
 });
 
 test("real AI question draft → teacher edit/approve or reject; parent read-only portal", async ({

@@ -25,10 +25,12 @@ Node.js 22+ و MongoDB replica set لازم است؛ برنامه روی MongoDB
 ```sh
 npm ci
 cp .env.example .env
+docker compose up -d mongo
+# After 'docker compose ps' shows mongo healthy:
 npm run dev
 ```
 
-آدرس: http://127.0.0.1:5174. MongoDB پیش‌فرض روی 27017؛ برای MongoDB دیگر MONGO_URL را در .env تنظیم کنید. برای نمونه مجزا:
+آدرس: http://127.0.0.1:5174. اسکریپت‌های dev/start از CLI رسمی Next.js استفاده می‌کنند؛ بارگذاری `.env` توسط خود Next.js انجام می‌شود و نباید گزینه `--env-file-if-exists` داخل NODE_OPTIONS قرار گیرد. MongoDB پیش‌فرض روی 27017؛ برای MongoDB دیگر MONGO_URL را در .env تنظیم کنید. برای نمونه مجزا:
 
 ```sh
 mkdir -p .data/mongo
@@ -40,6 +42,14 @@ mongod --dbpath .data/mongo --replSet hamyar-rs --bind_ip 127.0.0.1 --port 27019
 Docker اختیاری: `docker compose up -d mongo`.
 
 تولید: `npm run build` سپس `npm start`. در استقرار عمومی HTTPS و COOKIE_SECURE=true لازم است؛ APP_ORIGIN باید origin برنامه باشد.
+
+## عیب‌یابی اجرا روی مک
+
+- `npm run dev` اکنون قبل از اجرا آزادبودن پورت 5174 روی `127.0.0.1` را بررسی می‌کند و پیام راهنما می‌دهد. هیچ فرایندی را خودکار متوقف نمی‌کند.
+- اگر پورت اشغال است، ابتدا `lsof -nP -iTCP:5174 -sTCP:LISTEN` را اجرا کنید. اگر همان همیار از قبل اجراست، مرورگر را در `http://127.0.0.1:5174` باز کنید؛ وگرنه تنها پردازشی را که متعلق به شما و قابل‌توقف است با `kill <PID>` متوقف کنید.
+- اگر پس از اجرای مستقیم Next.js هنوز `NODE_OPTIONS` خطا می‌دهد، مقدار متغیر محیطی را در shell و فایل‌های پیکربندی بررسی کنید. به‌طور معمول `unset NODE_OPTIONS` و بازکردن یک ترمینال جدید کافی است؛ فلگ `--env-file-if-exists` را در `NODE_OPTIONS` قرار ندهید.
+- برای خطای اتصال MongoDB، `docker compose ps` باید وضعیت `healthy` را نشان دهد. MongoDB حتماً باید replica set باشد.
+- برای مرورگر تست Playwright روی دستگاهی که Chrome ندارد: `npx playwright install chromium`؛ در صورت تمایل `CHROME_PATH` را به باینری محلی تنظیم کنید.
 
 ## استفاده
 

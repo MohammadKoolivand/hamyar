@@ -1,0 +1,56 @@
+name: Verify HamYar runtime and light glass UI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TEST_MONGO_URL: mongodb://127.0.0.1:27017/?replicaSet=hamyar-rs
+      MONGO_DB: hamyar_ci_e2e
+      AI_PROVIDER: mock
+      APP_ORIGIN: http://127.0.0.1:5174
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Start MongoDB replica set
+        run: |
+          docker compose up -d mongo
+          for i in $(seq 1 60); do
+            if [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q mongo)")" = "healthy" ]; then
+              echo "Replica set healthy"; exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs mongo
+          exit 1
+      - run: cp .env.example .env
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - name: Validate UI and capture light glass screenshots
+        run: npm run test:e2e
+        env:
+          CI: "true"
+      - name: Upload Playwright screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hamyar-ui-evidence
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore

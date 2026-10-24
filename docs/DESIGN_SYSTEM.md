@@ -28,3 +28,7 @@ To verify: start a MongoDB replica set and Next.js server, run npm run typecheck
 Inspect saved screenshots for glass depth, light hero, mobile overflow and contrast.
 Also check Safari/Firefox, keyboard operation, reduced motion and WCAG contrast before public use.
 These instructions do not imply that browser tests have been executed.
+
+## Runtime/CI verification (2026-10-24)
+
+The standard Next.js CLI loads `.env` files; `npm run dev` and `npm start` no longer inject Node's `--env-file-if-exists` argument into Next workers. The dev script reports port collisions without killing any processes. CI tests both the CSS glass surface and the existing teacher/student flows with Playwright Chromium, and uploads screenshots/traces. CI visual assertions are not a substitute for a manual screenshot and contrast review. 
