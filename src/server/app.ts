@@ -9,6 +9,7 @@ import { requireTransactions, type WriteHooks } from "./transactions";
 import { registerIdentity } from "./modules/identity";
 import { registerContent } from "./modules/content";
 import { registerMissions } from "./modules/missions";
+import { registerRemediation } from "./modules/remediation";
 import { registerCourses } from "./modules/courses";
 import { registerClassGroups } from "./modules/class-groups";
 import { registerCourseMembership } from "./modules/course-membership";
@@ -135,6 +136,7 @@ export async function buildApp(
   registerContent(app, ctx);
   registerAuthoring(app, ctx, questionGenerator);
   registerMissions(app, ctx);
+  registerRemediation(app, ctx);
   registerPractice(app, ctx, provider);
   registerAnalytics(app, ctx, provider);
   registerLearning(app, ctx);

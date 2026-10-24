@@ -149,3 +149,9 @@ First-attempt independent success uses eligible supported/teacher-verified evalu
 - `POST /api/group-tasks/:tid/publish`: انتشار تراکنشی و idempotent با `Idempotency-Key` اختیاری؛ برای هر گیرنده یک `missionId` و `assignmentId` مستقل ایجاد می‌کند؛ اگر یکی از اعضا دیگر عضویت فعال نداشته باشد، کل انتشار با 409 رد می‌شود. تلاش مجدد موفق، رکوردهای تکراری نمی‌سازد.
 - `GET /api/group-tasks/:tid/report` فقط معلم مالک: آمار مستقل هر عضو شامل `assignmentId,studentId,studentName,state,total,answered,independent,assisted,pending`. در پاسخ هیچ جواب یا کلید تصحیح وجود ندارد؛ جزئیات کامل هر نفر از مسیر موجود `GET /api/assignments/:aid/report` با بررسی مالکیت قابل خواندن است.
 - دانش‌آموزان فقط assignment شخصی را از API قبلی می‌بینند. هیچ مسیر جدیدی برای دسترسی دانش‌آموز به فهرست کلاس یا نتایج افراد دیگر باز نشده است.
+
+## API تمرین تقویتی فردی
+
+- `GET /api/students/:sid/remediation-candidates?courseId=<uuid>` فقط معلم دارای رابطه با دانش‌آموز؛ `courseId` اختیاری است. بدون آن فقط مأموریت‌های بدون درس بررسی می‌شوند و با آن عضویت فعال در درس همان معلم لازم است. خروجی `{studentId,courseId,items:[{questionVersionId,statement,type,lastResult}]}` تا ۵۰ سؤالِ قابل پیشنهاد، بدون پاسخ مرجع یا متن پاسخ دانش‌آموز. مبنای انتخاب جدیدترین شواهد معتبر هر نسخه سؤال است؛ خطاهای اصلاح‌شده و در انتظار بررسی حذف می‌شوند.
+- `POST /api/students/:sid/remediation-missions` فقط معلم با `{title,courseId?,questionVersionIds:[1..10],policy}`. همه شناسه‌ها باید داخل پیشنهادهای معتبر همان دانش‌آموز و همان درس باشند. اگر عضویت یا شرایط شواهد تغییر کرده، 404/409 برمی‌گرداند. انتشار یک Mission و Assignment شخصی در تراکنش همراه audit انجام می‌شود و کلید Idempotency-Key از ساخت تکراری جلوگیری می‌کند. policy سنجش مستقل باید `maxHints=0` داشته باشد.
+- `GET /api/assignments` و `/api/assignments/:aid/report` بدون تغییر و با RBAC قبلی‌اند. نقش دانش‌آموز فقط تکلیف و نتایج خودش را مشاهده می‌کند. هیچ endpoint تولید آزاد سؤال یا انتشار خودکار مستقل از معلم ایجاد نشده است.

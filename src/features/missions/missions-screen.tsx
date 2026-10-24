@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { api } from "@/lib/api";
+import { IndividualRemediation } from "./individual-remediation";
 import { fa, stateLabel } from "@/lib/presentation";
 import type { User, Question, Assignment, Course, Enrollment } from "@/lib/types";
 import { ArrowLeft, Target, BarChart3 } from "lucide-react";
@@ -73,6 +74,14 @@ export function MissionsScreen({
     : students;
   return (
     <>
+      {teacher && (
+        <IndividualRemediation
+          students={students}
+          courses={courses}
+          enrollments={enrollments}
+          refresh={refresh}
+        />
+      )}
       {teacher && (
         <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
           <h2 className="text-[19px] font-bold">طراحی مأموریت تمرینی</h2>

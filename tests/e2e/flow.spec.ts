@@ -644,3 +644,84 @@ test("teacher publishes one group assignment to two students and sees separate r
     await Promise.all(contexts.map((c) => c.close()));
   }
 });
+
+test("teacher assigns one corrective practice from a student's wrong answer", async ({ page, browser }, testInfo) => {
+  const suffix = Date.now();
+  const teacherEmail = `remedial-teacher-${suffix}@test.dev`;
+  const studentEmail = `remedial-student-${suffix}@test.dev`;
+  const teacherApi = page.context().request;
+  expect((await teacherApi.post("/api/auth/register", {
+    data: { name: "معلم خصوصی", email: teacherEmail, password: pass, role: "teacher" },
+  })).ok()).toBe(true);
+  expect((await teacherApi.post("/api/auth/login", {
+    data: { email: teacherEmail, password: pass },
+  })).ok()).toBe(true);
+  const topicResponse = await teacherApi.post("/api/curriculum", {
+    data: { title: "تمرین اشتباهات", kind: "topic" },
+  });
+  expect(topicResponse.ok()).toBe(true);
+  const topic = await topicResponse.json();
+  const questionResponse = await teacherApi.post("/api/questions", {
+    data: { topicId: topic._id, statement: "حاصل دو به علاوه دو چیست؟",
+      type: "numeric", reference: "4", hints: ["اعداد را با هم جمع کن."] },
+  });
+  expect(questionResponse.ok()).toBe(true);
+  const question = await questionResponse.json();
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  try {
+    const studentApi = context.request;
+    const reg = await studentApi.post("/api/auth/register", {
+      data: { name: "دانش‌آموز خصوصی", email: studentEmail,
+        password: pass, role: "student" },
+    });
+    expect(reg.ok()).toBe(true);
+    const studentLogin = await studentApi.post("/api/auth/login", {
+      data: { email: studentEmail, password: pass },
+    });
+    expect(studentLogin.ok()).toBe(true);
+    const studentId = (await studentLogin.json())._id;
+    const invitation = await teacherApi.post("/api/invitations", {
+      data: { email: studentEmail },
+    });
+    expect(invitation.ok()).toBe(true);
+    const token = (await invitation.json()).token;
+    expect((await studentApi.post("/api/invitations/claim", { data: { token } })).ok()).toBe(true);
+    const missionResponse = await teacherApi.post("/api/missions", {
+      data: { title: "تمرین اولیه", studentId, questionVersionIds: [question._id],
+        policy: { maxAttempts: 3, maxHints: 2, independent: false } },
+    });
+    expect(missionResponse.ok()).toBe(true);
+    const mission = await missionResponse.json();
+    expect((await teacherApi.post("/api/missions/" + mission._id + "/publish", { data: {} })).ok()).toBe(true);
+    const before = await studentApi.get("/api/assignments");
+    expect(before.ok()).toBe(true);
+    const first = (await before.json()).find((a: { missionId: string }) => a.missionId === mission._id);
+    expect(first).toBeTruthy();
+    expect((await studentApi.post("/api/assignments/" + first._id + "/attempts", {
+      data: { questionId: question._id, answer: "3" },
+    })).ok()).toBe(true);
+
+    await page.goto("/");
+    await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
+    const form = page.getByTestId("individual-remediation");
+    await expect(form.getByRole("heading", { name: "تمرین تقویتی فردی از اشتباهات ثبت‌شده" })).toBeVisible();
+    await form.getByLabel("دانش‌آموز برای تمرین فردی").selectOption({ label: "دانش‌آموز خصوصی" });
+    await expect(form.getByText("حاصل دو به علاوه دو چیست؟")).toBeVisible();
+    await form.getByRole("checkbox", { name: /حاصل دو به علاوه دو چیست؟/ }).check();
+    await form.getByRole("button", { name: "انتشار تمرین تقویتی برای این دانش‌آموز" }).click();
+    await expect(form.getByText("تمرین تقویتی فقط برای این دانش‌آموز منتشر شد.")).toBeVisible();
+    await page.screenshot({ path: testInfo.outputPath("individual-remediation-teacher.png"), fullPage: true });
+
+    const studentPage = await context.newPage();
+    await studentPage.goto("/");
+    await studentPage.getByRole("button", { name: "مأموریت‌های من" }).click();
+    await expect(studentPage.getByText("تمرین تقویتی اختصاصی", { exact: true })).toBeVisible();
+    const after = await studentApi.get("/api/assignments");
+    const rem = (await after.json()).filter((a: { remediation?: boolean }) => a.remediation);
+    expect(rem).toHaveLength(1);
+    expect(rem[0].studentId).toBe(studentId);
+    await studentPage.screenshot({ path: testInfo.outputPath("individual-remediation-student-mobile.png"), fullPage: true });
+  } finally {
+    await context.close();
+  }
+});

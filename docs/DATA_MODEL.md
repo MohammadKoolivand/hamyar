@@ -76,3 +76,7 @@ learningEvidence uses attemptId as _id and stores assignment/student/teacher/que
 ## کلاس‌های گروهی
 
 classGroups نگهدارنده عنوان کلاس، شناسه درس، شناسه معلم و شناسه دانش‌آموزان است. groupTasks هر بار لیست گیرندگان را به‌صورت snapshot ثبت می‌کند. هنگام انتشار، برای هر گیرنده Mission و Assignment مجزا و دارای groupTaskId ایجاد می‌شود؛ تولید همگی در یک تراکنش رخ می‌دهد. نتایج و پاسخ‌های هر فرد مستقل از دیگران در مسیرهای جاری ثبت می‌شوند. فهرست گروه و گزارش تجمیعی فقط به معلم مالک داده می‌شود.
+
+## تمرین تقویتی فردی از شواهد
+
+این مسیر به مدل جدید مستقل برای «مجموعه سؤال» نیاز ندارد: از `assignments` مربوط به دانش‌آموز و معلم و `learningEvidence` ساخته‌شده پس از ارزیابی/بازبینی، آخرین نتیجه معتبر هر `questionVersionId` خوانده می‌شود. سؤال‌های پیشنهادی باید `ownerId` برابر شناسه معلم داشته باشند. نتیجه `incorrect/partially_correct` با `verified=true` قابل پیشنهاد است؛ پاسخ درست تازه‌تر، خطای اصلاح‌شده یا `pending_review` کنار گذاشته می‌شود. دامنه انتخاب یا `courseId` معتبر و دارای enrollment فعال است یا فقط مأموریت‌های legacy فاقد courseId. هنگام انتشار یک Mission و Assignment جدید با `remediation:true` و اختیاری `enrollmentId` ثبت می‌شود؛ رکوردهای قدیمی، پاسخ‌ها و history بدون تغییر می‌مانند. ایندکس خواندن `learningEvidence.teacherId+studentId+assignmentId+createdAt` اضافه شده است.

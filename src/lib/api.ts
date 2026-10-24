@@ -9,6 +9,7 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
       /\/assignments\/[^/]+\/(attempts|hints|complete)$/.test(path) ||
       /\/evaluations\/[^/]+\/review$/.test(path) ||
       /\/missions\/[^/]+\/(publish|cancel)$/.test(path) ||
+      /\/students\/[^/]+\/remediation-missions$/.test(path) ||
       /\/students\/[^/]+\/mastery\/[^/]+\/override$/.test(path));
   let storageKey: string | undefined, key: string | undefined;
   if (protectedMutation) {
