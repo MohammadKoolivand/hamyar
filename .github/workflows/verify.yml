@@ -27,7 +27,8 @@ jobs:
       - name: Start MongoDB replica set
         run: |
           docker compose up -d mongo
-          # MongoDB 8 image fails to launch on ubuntu-26.04 / Linux 6.19; pin ubuntu-24.04.\n          for i in $(seq 1 45); do
+          # MongoDB 8 cannot launch on Ubuntu 26.04 / Linux 6.19; pin Ubuntu 24.04.
+          for i in $(seq 1 45); do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q mongo)")" = "healthy" ]; then
               echo "Replica set healthy"; exit 0
             fi
