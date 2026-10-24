@@ -20,6 +20,8 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await expect(
     page.getByRole("heading", { name: "نمای کلی", exact: true }),
   ).toBeVisible();
+  await expect(page.locator(".glass-hero")).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("glass-teacher-dashboard.png"), fullPage: true });
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
@@ -79,6 +81,7 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await expect(
     sp.getByRole("heading", { name: "مسیر یادگیری من", exact: true }),
   ).toBeVisible();
+  await sp.screenshot({ path: testInfo.outputPath("glass-student-dashboard.png"), fullPage: true });
   await page.getByRole("button", { name: "به‌روزرسانی فهرست" }).click();
   await expect(page.getByRole("heading", { name: "آراد محمدی" })).toBeVisible();
   await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
@@ -92,12 +95,15 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await expect(
     page.getByRole("button", { name: "گزارش و شواهد" }),
   ).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("glass-teacher-missions.png"), fullPage: true });
   await sp.reload();
   await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
   await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
   await expect(
     sp.getByText("حاصل یک به علاوه یک چیست؟", { exact: true }),
   ).toBeVisible();
+  await expect(sp.locator(".practice-sheet")).toBeVisible();
+  await sp.screenshot({ path: testInfo.outputPath("glass-student-practice.png"), fullPage: true });
   await sp.getByLabel("پاسخ شما", { exact: true }).fill("1");
   // Unsaved input survives feature unmount and a full page reload.
   await sp
@@ -404,4 +410,19 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
   ).toBeVisible();
   await pc.close();
   await sc.close();
+});
+
+test("public login uses bright frosted-glass surfaces", async ({ page }, testInfo) => {
+  await page.goto("/");
+  const panel = page.locator(".glass-panel").first();
+  await expect(panel).toBeVisible();
+  const styles = await panel.evaluate((el) => {
+    const cs = getComputedStyle(el);
+    return { backdrop: cs.backdropFilter, background: cs.backgroundImage };
+  });
+  expect(styles.backdrop).toContain("blur(");
+  expect(styles.background).not.toBe("none");
+  const bodyBackground = await page.locator("body").evaluate((el) => getComputedStyle(el).backgroundImage);
+  expect(bodyBackground).toContain("radial-gradient");
+  await page.screenshot({ path: testInfo.outputPath("glass-login-desktop.png"), fullPage: true });
 });

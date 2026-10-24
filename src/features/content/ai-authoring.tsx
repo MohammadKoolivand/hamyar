@@ -53,7 +53,7 @@ export function AiAuthoring({
     }
   }
   return (
-    <section className="grid gap-4 rounded-3xl border border-[#19B7AE]/30 bg-white/80 p-5">
+    <section className="grid gap-4 glass-panel p-5">
       <h2 className="text-lg font-bold">
         تولید سؤال با هوش مصنوعی و بررسی معلم
       </h2>

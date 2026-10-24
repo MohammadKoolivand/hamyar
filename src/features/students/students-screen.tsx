@@ -27,7 +27,7 @@ export function StudentsScreen({
 }) {
   return (
     <div className="grid gap-[22px] min-[951px]:grid-cols-2">
-      <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+      <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <h2 className="text-[19px] font-bold">دعوت یک همراه جدید</h2>
         <p className="text-xs leading-loose text-slate-500">
           کد ۷۲ ساعت معتبر است. لینک را خودتان در اختیار دانش‌آموز قرار دهید.
@@ -51,7 +51,7 @@ export function StudentsScreen({
               dir="ltr"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+              className="w-full min-h-[46px] glass-field p-3"
             />
           </Field>
           <Button disabled={busy}>
@@ -60,7 +60,7 @@ export function StudentsScreen({
           </Button>
         </form>
         {inviteToken && (
-          <div className="rounded-[14px] bg-indigo-50 text-[#233b8f] p-3.5 leading-[1.9] grid gap-[18px]">
+          <div className="glass-note p-3.5 leading-[1.9] grid gap-[18px]">
             <small className="text-xs leading-loose text-slate-500">
               لینک دعوت (ارسال ایمیل انجام نمی‌شود)
             </small>
@@ -79,12 +79,12 @@ export function StudentsScreen({
           </div>
         )}
       </section>
-      <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+      <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <h2 className="text-[19px] font-bold">دانش‌آموزان شما</h2>
         {students.map((s) => (
           <div
             key={s._id}
-            className="grid gap-3 rounded-2xl border border-slate-200 p-[18px]"
+            className="grid gap-3 glass-option p-[18px]"
           >
             <h3 className="text-base font-bold">{s.name}</h3>
             <small dir="ltr" className="text-xs leading-loose text-slate-500">

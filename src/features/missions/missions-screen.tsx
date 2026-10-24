@@ -66,7 +66,7 @@ export function MissionsScreen({
   return (
     <>
       {teacher && (
-        <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+        <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
           <h2 className="text-[19px] font-bold">طراحی مأموریت تمرینی</h2>
           <form
             onSubmit={(e) => {
@@ -98,7 +98,7 @@ export function MissionsScreen({
                   required
                   value={missionTitle}
                   onChange={(e) => setMissionTitle(e.target.value)}
-                  className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                  className="w-full min-h-[46px] glass-field p-3"
                 />
               </Field>
               <Field title="دانش‌آموز">
@@ -106,7 +106,7 @@ export function MissionsScreen({
                   required
                   value={student}
                   onChange={(e) => setStudent(e.target.value)}
-                  className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                  className="w-full min-h-[46px] glass-field p-3"
                 >
                   <option value="">انتخاب دانش‌آموز</option>
                   {students.map((s) => (
@@ -123,7 +123,7 @@ export function MissionsScreen({
                   max={10}
                   value={maxAttempts}
                   onChange={(e) => setMaxAttempts(Number(e.target.value))}
-                  className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                  className="w-full min-h-[46px] glass-field p-3"
                 />
               </Field>
               <Field title="حداکثر راهنمایی هر سؤال">
@@ -134,7 +134,7 @@ export function MissionsScreen({
                   disabled={independent}
                   value={maxHints}
                   onChange={(e) => setMaxHints(Number(e.target.value))}
-                  className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                  className="w-full min-h-[46px] glass-field p-3"
                 />
               </Field>
             </div>
@@ -154,7 +154,7 @@ export function MissionsScreen({
                   setMaxHintLevel(Number(e.target.value));
                   setAllowFullSolution(false);
                 }}
-                className="min-h-11 rounded-xl border border-slate-300 bg-white/70 p-3"
+                className="min-h-11 glass-field p-3"
               >
                 {[
                   "بدون کمک",
@@ -183,7 +183,7 @@ export function MissionsScreen({
             {questions.map((q) => (
               <label
                 key={q._id}
-                className="flex-row items-center rounded-2xl border border-slate-200 p-[18px] flex gap-2 text-[13px] text-slate-600"
+                className="flex-row items-center glass-option p-[18px] flex gap-2 text-[13px] text-slate-600"
               >
                 <input
                   type="checkbox"
@@ -217,7 +217,7 @@ export function MissionsScreen({
             .map((d) => (
               <div
                 key={d._id}
-                className="rounded-2xl border border-slate-200 p-[18px] flex flex-wrap items-center gap-3"
+                className="glass-option p-[18px] flex flex-wrap items-center gap-3"
               >
                 <h3 className="text-base font-bold">{d.title}</h3>
                 <span className="inline-block rounded-full border border-[#19b7ae33] bg-[#19b7ae14] px-3 py-1.5 text-[11px] text-[#096c67]">
@@ -238,7 +238,7 @@ export function MissionsScreen({
             ))}
         </section>
       )}
-      <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+      <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <div className="flex flex-wrap items-center gap-3">
           <Target color="#19b7ae" />
           <h2 className="text-[19px] font-bold">مأموریت‌های منتشرشده</h2>
@@ -251,7 +251,7 @@ export function MissionsScreen({
         {assignments.map((a) => (
           <div
             key={a._id}
-            className="grid gap-3 rounded-2xl border border-slate-200 p-[18px]"
+            className="grid gap-3 glass-option p-[18px]"
           >
             <div className="flex flex-wrap items-center gap-3">
               <h3 className="text-base font-bold">{a.title}</h3>

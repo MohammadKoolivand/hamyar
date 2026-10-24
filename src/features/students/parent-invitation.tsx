@@ -64,7 +64,7 @@ export function ParentInvitation({ studentId }: { studentId: string }) {
       {token && (
         <p
           data-testid="parent-invitation-token"
-          className="mt-3 break-all rounded-xl bg-indigo-50 p-3 [direction:ltr]"
+          className="mt-3 break-all glass-note p-3 [direction:ltr]"
         >
           {location.origin}/?invite={token}
         </p>

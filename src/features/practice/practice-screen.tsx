@@ -45,7 +45,7 @@ export function PracticeScreen({
     ev = active.evaluations?.find((e) => e.attemptId === last?._id);
   return (
     <>
-      <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+      <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <div className="flex flex-wrap items-center gap-3">
           <span className="inline-block rounded-full border border-[#19b7ae33] bg-[#19b7ae14] px-3 py-1.5 text-[11px] text-[#096c67]">
             سؤال {fa(qi + 1)} از {fa(active.questions!.length)}
@@ -64,7 +64,7 @@ export function PracticeScreen({
           max={active.questions!.length}
           className="w-full accent-[#19b7ae]"
         />
-        <p className="py-6 text-[21px] leading-[2.2]">{q.statement}</p>
+        <p className="practice-sheet px-5 py-6 text-[21px] leading-[2.2] whitespace-pre-wrap">{q.statement}</p>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -95,7 +95,7 @@ export function PracticeScreen({
                     e.target.value,
                   );
                 }}
-                className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[46px] glass-field p-3"
               >
                 <option value="">انتخاب پاسخ</option>
                 {q.options.map((o) => (
@@ -114,7 +114,7 @@ export function PracticeScreen({
                   );
                 }}
                 placeholder="ابتدا خودت تلاش کن…"
-                className="w-full min-h-[100px] resize-y rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[100px] resize-y glass-field p-3"
               />
             )}
           </Field>
@@ -190,7 +190,7 @@ export function PracticeScreen({
           .map((h) => (
             <div
               key={h._id}
-              className="rounded-[14px] bg-indigo-50 text-[#233b8f] p-3.5 leading-[1.9]"
+              className="glass-note p-3.5 leading-[1.9]"
             >
               {h.text}
               <br />

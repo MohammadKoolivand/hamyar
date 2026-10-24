@@ -179,7 +179,7 @@ export default function HamyarApp() {
     return (
       <div
         role="status"
-        className="mx-auto my-[7vh] max-w-[1020px] rounded-[14px] bg-indigo-50 text-[#233b8f] p-3.5 leading-[1.9]"
+        className="mx-auto my-[7vh] max-w-[1020px] glass-note p-3.5 leading-[1.9]"
       >
         در حال اتصال به همیار…
       </div>
@@ -197,7 +197,7 @@ export default function HamyarApp() {
       {notice && (
         <div
           role="status"
-          className="rounded-[14px] bg-indigo-50 text-[#233b8f] p-3.5 leading-[1.9]"
+          className="glass-note p-3.5 leading-[1.9]"
         >
           {notice}
         </div>
@@ -240,7 +240,7 @@ export default function HamyarApp() {
       ] as const);
   return (
     <div className="min-h-screen min-[651px]:grid min-[651px]:grid-cols-[180px_minmax(0,1fr)] min-[951px]:grid-cols-[240px_minmax(0,1fr)]">
-      <aside className="flex flex-col gap-7 border-l border-slate-200 bg-white/55 px-6 py-8 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
+      <aside className="glass-sidebar mx-3 my-3 flex flex-col gap-7 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:px-6 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
         <div className="flex items-center gap-3 text-[23px] font-bold text-[#233b8f]">
           <span className="grid size-[46px] shrink-0 place-items-center rounded-[14px] bg-[#233b8f] text-white">
             <BookOpen />
@@ -271,7 +271,7 @@ export default function HamyarApp() {
           ))}
         </nav>
         <footer className="grid gap-[18px] mt-auto">
-          <div className="rounded-[14px] bg-indigo-50 text-[#233b8f] p-3.5 leading-[1.9]">
+          <div className="glass-note p-3.5 leading-[1.9]">
             <Sparkles size={18} />
             <small className="text-xs leading-loose text-slate-500">
               معلم آموزش می‌دهد،
@@ -292,8 +292,8 @@ export default function HamyarApp() {
           خروج
         </Button>
       </aside>
-      <main className="w-full min-w-0 max-w-[1300px] px-11 py-8 max-[950px]:p-6 max-[650px]:p-[18px] grid gap-[18px]">
-        <header className="mb-9 flex items-center justify-between max-[650px]:mb-[22px] max-[650px]:[&_h1]:text-[22px]">
+      <main className="relative w-full min-w-0 max-w-[1300px] px-8 py-7 max-[950px]:p-6 max-[650px]:p-[18px] grid gap-[18px]">
+        <header className="glass-header mb-6 flex items-center justify-between gap-3 p-4 sm:p-5 max-[650px]:mb-[22px] max-[650px]:[&_h1]:text-[22px]">
           <div>
             <small className="text-xs leading-loose text-slate-500">
               همیار / {teacher ? "پنل معلم" : "یادگیری"}

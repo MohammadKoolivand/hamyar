@@ -19,9 +19,9 @@ export function OverviewScreen({
 }) {
   return (
     <>
-      <section className="flex items-center justify-between gap-6 rounded-3xl bg-[linear-gradient(110deg,#233b8f,#304d9d)] p-8 text-white [&_p]:mt-3 [&_p]:leading-loose [&_p]:text-indigo-100 max-[650px]:p-6 max-[650px]:[&_svg]:hidden">
+      <section className="glass-hero flex items-center justify-between gap-6 p-8 [&_p]:mt-3 [&_p]:leading-loose max-[650px]:p-6 max-[650px]:[&_svg]:hidden">
         <div>
-          <span className="inline-block rounded-full border border-[#19b7ae33] px-3 py-1.5 text-[11px] bg-white/15 text-white">
+          <span className="glass-kicker inline-block px-3 py-1.5 text-[11px]">
             یادگیری، با شواهد واقعی
           </span>
           <h2 className="font-bold mt-[18px] text-[26px]">
@@ -59,7 +59,7 @@ export function OverviewScreen({
         ].map(([value, title]) => (
           <div
             key={title}
-            className="rounded-[20px] border border-slate-200 bg-white/70 p-[22px] [&_strong]:mt-2.5 [&_strong]:block [&_strong]:text-[28px] [&_strong]:text-[#233b8f] max-[650px]:p-4"
+            className="glass-stat p-[22px] [&_strong]:mt-2.5 [&_strong]:block [&_strong]:text-[28px] [&_strong]:text-[#233b8f] max-[650px]:p-4"
           >
             <small className="text-xs leading-loose text-slate-500">
               {title}
@@ -68,7 +68,7 @@ export function OverviewScreen({
           </div>
         ))}
       </div>
-      <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+      <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <div className="flex flex-wrap items-center gap-3">
           <Target color="#19b7ae" />
           <h2 className="text-[19px] font-bold">گام بعدی شما</h2>

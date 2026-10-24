@@ -20,9 +20,9 @@ export function MissionReport({
 }) {
   return (
     <>
-      <section className="flex items-center justify-between gap-6 rounded-3xl bg-[linear-gradient(110deg,#233b8f,#304d9d)] p-8 text-white [&_p]:mt-3 [&_p]:leading-loose [&_p]:text-indigo-100 max-[650px]:p-6 max-[650px]:[&_svg]:hidden">
+      <section className="glass-hero flex items-center justify-between gap-6 p-8 [&_p]:mt-3 [&_p]:leading-loose max-[650px]:p-6 max-[650px]:[&_svg]:hidden">
         <div>
-          <small className="text-xs leading-loose text-indigo-100">
+          <small className="text-xs leading-loose text-slate-500">
             گزارش مبتنی بر پاسخ‌های ثبت‌شده
           </small>
           <h2 className="font-bold mt-3 text-[25px]">{active.title}</h2>
@@ -42,14 +42,14 @@ export function MissionReport({
         ].map(([v, t]) => (
           <div
             key={t}
-            className="rounded-[20px] border border-slate-200 bg-white/70 p-[22px] [&_strong]:mt-2.5 [&_strong]:block [&_strong]:text-[28px] [&_strong]:text-[#233b8f] max-[650px]:p-4"
+            className="glass-stat p-[22px] [&_strong]:mt-2.5 [&_strong]:block [&_strong]:text-[28px] [&_strong]:text-[#233b8f] max-[650px]:p-4"
           >
             <small className="text-xs leading-loose text-slate-500">{t}</small>
             <strong>{fa(Number(v))}</strong>
           </div>
         ))}
       </div>
-      <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+      <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <h2 className="text-[19px] font-bold">استقلال در اولین تلاش</h2>
         <p>
           {report.independentSuccessRate === null
@@ -60,7 +60,7 @@ export function MissionReport({
           تعداد کم سؤال، نشانه قطعی تسلط نیست. پاسخ صحیح در تلاش‌های بعدی جدا از
           این شاخص محاسبه می‌شود.
         </small>
-        <div className="rounded-[14px] bg-indigo-50 text-[#233b8f] p-3.5 leading-[1.9]">
+        <div className="glass-note p-3.5 leading-[1.9]">
           <h3 className="text-base font-bold">
             {teacher ? "پیشنهاد برای جلسه بعد" : "گام بعدی پیشنهادی"}
           </h3>
@@ -70,7 +70,7 @@ export function MissionReport({
           </small>
         </div>
       </section>
-      <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+      <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <h2 className="text-[19px] font-bold">
           {teacher ? "شواهد تلاش‌ها و بازبینی" : "نتیجه سؤال‌ها"}
         </h2>
@@ -113,7 +113,7 @@ export function MissionReport({
                     {t.evaluation.reviews.map((review, i) => (
                       <div
                         key={i}
-                        className="rounded-[14px] bg-indigo-50 text-[#233b8f] p-3.5 leading-[1.9]"
+                        className="glass-note p-3.5 leading-[1.9]"
                       >
                         <p>{review.note}</p>
                         <small className="text-xs leading-loose text-slate-500">
@@ -163,7 +163,7 @@ function Review({
           <select
             value={result}
             onChange={(e) => setResult(e.target.value)}
-            className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+            className="w-full min-h-[46px] glass-field p-3"
           >
             <option value="correct">صحیح</option>
             <option value="incorrect">نادرست</option>
@@ -175,7 +175,7 @@ function Review({
             minLength={2}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+            className="w-full min-h-[46px] glass-field p-3"
           />
         </Field>
         <Button variant="outline" disabled={disabled}>

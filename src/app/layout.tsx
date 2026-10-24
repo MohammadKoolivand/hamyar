@@ -31,7 +31,7 @@ export default function RootLayout({
       dir="rtl"
       className={`${poppins.variable} ${persian.variable}`}
     >
-      <body className="min-h-screen bg-[#f8fafc] bg-[radial-gradient(ellipse_at_top_left,#19b7ae10,transparent_55%),radial-gradient(ellipse_at_bottom_right,#233b8f09,transparent_60%)] text-[#1f2937] [font-family:var(--font-latin),var(--font-persian),IRANSans,Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
+      <body className="hamyar-ambient min-h-screen text-[#1f2937] [font-family:var(--font-persian),var(--font-latin),Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
         {children}
       </body>
     </html>

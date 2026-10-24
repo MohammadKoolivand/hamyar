@@ -60,7 +60,7 @@ export function AuthScreen({
             </small>
           </div>
         </div>
-        <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+        <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
           <h2 className="text-[19px] font-bold">
             {mode === "login"
               ? "خوش آمدید"
@@ -80,7 +80,7 @@ export function AuthScreen({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   autoComplete="name"
-                  className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                  className="w-full min-h-[46px] glass-field p-3"
                 />
               </Field>
             )}
@@ -92,7 +92,7 @@ export function AuthScreen({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
-                className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[46px] glass-field p-3"
               />
             </Field>
             <Field title="رمز عبور (حداقل ۱۰ کاراکتر)">
@@ -105,7 +105,7 @@ export function AuthScreen({
                 autoComplete={
                   mode === "login" ? "current-password" : "new-password"
                 }
-                className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[46px] glass-field p-3"
               />
             </Field>
             {mode === "accept" && (
@@ -115,7 +115,7 @@ export function AuthScreen({
                   dir="ltr"
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
-                  className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                  className="w-full min-h-[46px] glass-field p-3"
                 />
               </Field>
             )}

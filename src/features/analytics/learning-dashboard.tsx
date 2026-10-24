@@ -134,7 +134,7 @@ export function LearningDashboard({
         <label className="grid gap-2 text-sm text-slate-600">
           دانش‌آموز برای تحلیل
           <select
-            className="min-h-11 rounded-xl border border-slate-300 bg-white/70 p-3"
+            className="min-h-11 glass-field p-3"
             value={sid}
             onChange={(e) => setSid(e.target.value)}
           >
@@ -171,7 +171,7 @@ export function LearningDashboard({
             ].map(([n, title]) => (
               <div
                 key={title}
-                className="rounded-2xl border border-white bg-white/80 p-5"
+                className="glass-card p-5"
               >
                 <p className="text-xs text-slate-500">{title}</p>
                 <strong className="mt-2 block text-2xl text-[#233B8F]">
@@ -180,7 +180,7 @@ export function LearningDashboard({
               </div>
             ))}
           </section>
-          <section className="grid gap-3 rounded-3xl border border-white bg-white/80 p-6 backdrop-blur-lg">
+          <section className="grid gap-3 glass-panel p-6">
             <h2 className="text-lg font-bold">مهارت‌ها و شواهد یادگیری</h2>
             <p className="text-sm text-slate-600">
               موفقیت مستقل در اولین تلاش: {percent(data.independentSuccessRate)}{" "}
@@ -255,7 +255,7 @@ export function LearningDashboard({
               </div>
             ))}
           </section>
-          <section className="grid gap-3 rounded-3xl border border-white bg-white/80 p-6 backdrop-blur-lg">
+          <section className="grid gap-3 glass-panel p-6">
             <h2 className="text-lg font-bold">دفترچه اشتباهات</h2>
             {!data.mistakes.length && (
               <p className="text-sm text-slate-500">
@@ -291,7 +291,7 @@ export function LearningDashboard({
               </article>
             ))}
           </section>
-          <section className="grid gap-3 rounded-3xl border border-white bg-white/80 p-6 backdrop-blur-lg">
+          <section className="grid gap-3 glass-panel p-6">
             <h2 className="text-lg font-bold">
               {me.role === "teacher" ? "پیشنهاد جلسه بعد" : "گام بعدی پیشنهادی"}
             </h2>
@@ -302,7 +302,7 @@ export function LearningDashboard({
             )}
             {data.recommendations.map((r) => (
               <div
-                className="grid gap-2 rounded-xl bg-indigo-50 p-4 text-sm text-[#233B8F]"
+                className="grid gap-2 glass-note p-4 text-sm text-[#233B8F]"
                 key={r.skillId}
               >
                 <p>
@@ -329,7 +329,7 @@ export function LearningDashboard({
             ))}
           </section>
           {me.role === "teacher" && (
-            <section className="grid gap-3 rounded-3xl border border-white bg-white/80 p-6">
+            <section className="grid gap-3 glass-panel p-6">
               <h2 className="text-lg font-bold">مقایسه مأموریت‌ها</h2>
               <p className="text-xs text-slate-500">
                 تفاوت موضوع و سختی سؤال‌ها می‌تواند مقایسه را محدود کند؛ این
@@ -376,7 +376,7 @@ function MasteryReview({
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="min-h-11 rounded-xl border border-slate-300 bg-white p-2"
+          className="min-h-11 glass-field p-2"
         >
           {Object.entries(labels)
             .filter(([k]) =>
@@ -402,7 +402,7 @@ function MasteryReview({
           minLength={3}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          className="min-h-11 rounded-xl border border-slate-300 bg-white p-2"
+          className="min-h-11 glass-field p-2"
         />
       </label>
       <Button disabled={busy}>ثبت تصمیم و تاریخچه</Button>

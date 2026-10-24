@@ -90,7 +90,7 @@ export function ContentScreen({
     <>
       <AiAuthoring nodes={nodes} onApproved={refresh} />
       <div className="grid gap-[22px] min-[951px]:grid-cols-2">
-        <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+        <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
           <h2 className="text-[19px] font-bold">ساختار آموزشی شما</h2>
           <form
             onSubmit={(e) => {
@@ -111,7 +111,7 @@ export function ContentScreen({
               <select
                 value={nodeKind}
                 onChange={(e) => setNodeKind(e.target.value)}
-                className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[46px] glass-field p-3"
               >
                 {[
                   ["system", "نظام آموزشی"],
@@ -135,14 +135,14 @@ export function ContentScreen({
                 required
                 value={nodeTitle}
                 onChange={(e) => setNodeTitle(e.target.value)}
-                className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[46px] glass-field p-3"
               />
             </Field>
             <Field title="زیرمجموعه (اختیاری)">
               <select
                 value={parent}
                 onChange={(e) => setParent(e.target.value)}
-                className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[46px] glass-field p-3"
               >
                 <option value="">مستقل</option>
                 {nodes.map((n) => (
@@ -167,7 +167,7 @@ export function ContentScreen({
             </div>
           ))}
         </section>
-        <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px]">
+        <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
           <h2 className="text-[19px] font-bold">افزودن سؤال تأییدشده</h2>
           <form
             onSubmit={(e) => {
@@ -233,7 +233,7 @@ export function ContentScreen({
                 required
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[46px] glass-field p-3"
               >
                 <option value="">انتخاب مبحث</option>
                 {nodes
@@ -277,14 +277,14 @@ export function ContentScreen({
                 required
                 value={statement}
                 onChange={(e) => setStatement(e.target.value)}
-                className="w-full min-h-[100px] resize-y rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[100px] resize-y glass-field p-3"
               />
             </Field>
             <Field title="روش پاسخ">
               <select
                 value={qtype}
                 onChange={(e) => setQtype(e.target.value)}
-                className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[46px] glass-field p-3"
               >
                 {[
                   ["numeric", "عددی قطعی"],
@@ -311,7 +311,7 @@ export function ContentScreen({
                     onChange={(e) =>
                       setAbsoluteTolerance(Number(e.target.value))
                     }
-                    className="min-h-11 rounded-xl border border-slate-300 bg-white/70 p-3"
+                    className="min-h-11 glass-field p-3"
                   />
                 </Field>
                 <Field title="تلورانس نسبی (۰ تا ۱)">
@@ -324,7 +324,7 @@ export function ContentScreen({
                     onChange={(e) =>
                       setRelativeTolerance(Number(e.target.value))
                     }
-                    className="min-h-11 rounded-xl border border-slate-300 bg-white/70 p-3"
+                    className="min-h-11 glass-field p-3"
                   />
                 </Field>
               </div>
@@ -337,7 +337,7 @@ export function ContentScreen({
                     onChange={(e) =>
                       setMathMode(e.target.value as "expression" | "equation")
                     }
-                    className="min-h-11 rounded-xl border border-slate-300 bg-white/70 p-3"
+                    className="min-h-11 glass-field p-3"
                   >
                     <option value="expression">
                       عبارت چندجمله‌ای / کسر عددی
@@ -351,7 +351,7 @@ export function ContentScreen({
                     value={mathVariables}
                     onChange={(e) => setMathVariables(e.target.value)}
                     dir="ltr"
-                    className="min-h-11 rounded-xl border border-slate-300 bg-white/70 p-3"
+                    className="min-h-11 glass-field p-3"
                   />
                 </Field>
                 <small className="text-xs text-slate-500">
@@ -365,7 +365,7 @@ export function ContentScreen({
                 <textarea
                   value={rubric}
                   onChange={(e) => setRubric(e.target.value)}
-                  className="min-h-24 rounded-xl border border-slate-300 bg-white/70 p-3"
+                  className="min-h-24 glass-field p-3"
                 />
               </Field>
             )}
@@ -375,7 +375,7 @@ export function ContentScreen({
                   required
                   value={options}
                   onChange={(e) => setOptions(e.target.value)}
-                  className="w-full min-h-[100px] resize-y rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                  className="w-full min-h-[100px] resize-y glass-field p-3"
                 />
               </Field>
             )}
@@ -384,21 +384,21 @@ export function ContentScreen({
                 required
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
-                className="w-full min-h-[100px] resize-y rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[100px] resize-y glass-field p-3"
               />
             </Field>
             <Field title="راهنمایی‌های تأییدشده (هر خط یک راهنما، حداکثر ۳)">
               <textarea
                 value={hints}
                 onChange={(e) => setHints(e.target.value)}
-                className="w-full min-h-[100px] resize-y rounded-xl border border-slate-300 bg-white/70 p-3 text-[#1f2937] focus:outline-2 focus:outline-offset-2 focus:outline-[#233b8f]"
+                className="w-full min-h-[100px] resize-y glass-field p-3"
               />
             </Field>
             <Field title="گزینه‌های راهنمایی سطح اول برای انتخاب همیار (اختیاری، هر خط یک راهنما)">
               <textarea
                 value={hintAlternatives}
                 onChange={(e) => setHintAlternatives(e.target.value)}
-                className="min-h-24 rounded-xl border border-slate-300 bg-white/70 p-3"
+                className="min-h-24 glass-field p-3"
               />
             </Field>
             <small className="text-xs leading-loose text-slate-500">
@@ -408,14 +408,14 @@ export function ContentScreen({
             <Button disabled={busy || !topic}>تأیید و ذخیره سؤال</Button>
           </form>
         </section>
-        <section className="rounded-3xl border border-white bg-white/80 p-[26px] shadow-[0_8px_40px_#233b8f06] backdrop-blur-[18px] max-[650px]:p-5 grid gap-[18px] col-span-full">
+        <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px] col-span-full">
           <h2 className="text-[19px] font-bold">
             بانک سؤال خصوصی · {fa(questions.length)} سؤال
           </h2>
           {questions.map((q) => (
             <div
               key={q._id}
-              className="grid gap-3 rounded-2xl border border-slate-200 p-[18px]"
+              className="grid gap-3 glass-option p-[18px]"
             >
               <p>{q.statement}</p>
               <small className="text-xs leading-loose text-slate-500">

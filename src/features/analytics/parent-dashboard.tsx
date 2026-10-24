@@ -25,7 +25,7 @@ export function ParentDashboard({
   }, []);
   return (
     <main className="mx-auto grid w-full max-w-6xl gap-5 p-5 sm:p-8">
-      <header className="flex flex-wrap items-center justify-between gap-4">
+      <header className="glass-header flex flex-wrap items-center justify-between gap-4 p-4 sm:p-6">
         <div>
           <h1 className="text-2xl font-bold text-[#233B8F]">پنل اولیا</h1>
           <p className="mt-2 text-sm">
@@ -39,7 +39,7 @@ export function ParentDashboard({
           خروج
         </Button>
       </header>
-      <p className="rounded-2xl border border-[#19B7AE]/30 bg-white/80 p-4 text-sm leading-loose">
+      <p className="glass-note p-4 text-sm leading-loose">
         این گزارش شواهد تمرین است و به‌تنهایی میزان توانایی یا ارزش فرزندتان را
         نشان نمی‌دهد. برای تفسیر و تصمیم آموزشی با معلم گفت‌وگو کنید. دسترسی
         اولیا فقط خواندنی و محدود به ارتباط آموزشی دعوت‌کننده است.
@@ -47,7 +47,7 @@ export function ParentDashboard({
       {error && <p role="alert">{error}</p>}
       <Field title="انتخاب فرزند">
         <select
-          className="rounded-xl border border-slate-300 bg-white p-3"
+          className="glass-field p-3"
           value={child}
           onChange={(e) => setChild(e.target.value)}
         >
