@@ -1,0 +1,37 @@
+/* global self, caches, URL, fetch */
+const CACHE = "hamyar-next-0b147fbc919f";
+const SHELL = ["/","/_next/static/TjyN7W2n7m1f0D4h9GfRK/_buildManifest.js","/_next/static/TjyN7W2n7m1f0D4h9GfRK/_clientMiddlewareManifest.js","/_next/static/TjyN7W2n7m1f0D4h9GfRK/_ssgManifest.js","/_next/static/chunks/0cz1d0mv5g_q7.js","/_next/static/chunks/0r-yur70-ku2o.js","/_next/static/chunks/0umf92h1sb77c.js","/_next/static/chunks/1rk2fuoc3dygr.js","/_next/static/chunks/2khxl0v1q4i6n.js","/_next/static/chunks/3cfn99dbrcvvp.js","/_next/static/chunks/3p80subolgjtm.css","/_next/static/chunks/turbopack-3-ry682tkyiqk.js","/_next/static/media/IRANSansXFaNum_Regular.p.1xhvlkhmphpns.ttf","/_next/static/media/Poppins_Regular.p.256lsa027nxlw.ttf","/icon.svg","/manifest.webmanifest"];
+self.addEventListener("install", (event) => {
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
+});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)),
+        ),
+      ),
+  );
+});
+// Authenticated responses and student data must never enter Cache Storage.
+self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+  if (
+    event.request.method !== "GET" ||
+    url.origin !== self.location.origin ||
+    url.pathname.startsWith("/api/")
+  )
+    return;
+  if (event.request.mode === "navigate") {
+    event.respondWith(fetch(event.request).catch(() => caches.match("/")));
+    return;
+  }
+  if (SHELL.includes(url.pathname))
+    event.respondWith(
+      caches
+        .match(event.request, { ignoreVary: true })
+        .then((cached) => cached || fetch(event.request)),
+    );
+});
