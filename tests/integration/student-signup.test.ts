@@ -68,7 +68,7 @@ test("independent student signs up without teacher, then claims email-bound invi
     );
     assert.equal(await f.c("users").countDocuments({ email }), 1);
     assert.equal(await f.c("relations").countDocuments({ studentId, teacherId: (await f.c("users").findOne({ email: "t@test.dev" }))!._id }), 1);
-    assert.equal((await f.request("/api/students", undefined, f.teacher)).json().some((u) => u._id === studentId), true);
+    assert.equal(((await f.request("/api/students", undefined, f.teacher)).json() as { _id: string }[]).some((u) => u._id === studentId), true);
 
     // A second teacher must be able to link the same existing account without
     // sharing the first teacher's content or creating a duplicate student.
