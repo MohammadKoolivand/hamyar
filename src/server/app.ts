@@ -10,6 +10,7 @@ import { registerIdentity } from "./modules/identity";
 import { registerContent } from "./modules/content";
 import { registerMissions } from "./modules/missions";
 import { registerCourses } from "./modules/courses";
+import { registerClassGroups } from "./modules/class-groups";
 import { registerCourseMembership } from "./modules/course-membership";
 import { registerStudentDashboard } from "./modules/student-dashboard";
 import { registerPractice } from "./modules/practice";
@@ -128,6 +129,7 @@ export async function buildApp(
   });
   registerIdentity(app, ctx);
   registerCourses(app, ctx);
+  registerClassGroups(app, ctx);
   registerCourseMembership(app, ctx);
   registerStudentDashboard(app, ctx);
   registerContent(app, ctx);

@@ -140,3 +140,12 @@ First-attempt independent success uses eligible supported/teacher-verified evalu
 - `POST /api/enrollments/:eid/leave` معلم مالک یا دانش‌آموز عضو، body `{}`؛ status عضویت به `revoked` تغییر می‌کند. مأموریت‌ها و تخصیص‌های منتشرشده/درحال‌انجام آن عضویت به `cancelled` تغییر می‌کنند تا ادامه تمرین یا ایجاد تکلیف جدید پس از خروج ممکن نباشد. پاسخ‌های قبلی و ارزیابی‌ها برای مشاهده تاریخی باقی می‌مانند. درخواست دوباره نیازمند تأیید مجدد است.
 - `GET /api/enrollment-history` فقط عضویت‌های همان معلم یا همان دانش‌آموز را با status و تاریخچه تغییرات نشان می‌دهد؛ والدین به این APIها دسترسی ندارند. قرارداد قدیمی دعوت ایمیلی و مأموریت بدون courseId حفظ شده است.
 - ورود کد جدید به معنی رضایت قانونی سرپرست کودک نیست. به‌خاطر حفاظت از داده‌های افراد کم‌سن، شرایط پایلوت عمومی هنوز برقرار نشده است.
+
+## Class Groups و Group Tasks
+
+- `GET /api/class-groups` فقط معلم: کلاس‌های خودش. `POST /api/class-groups`: `{courseId,title,studentIds[]}`؛ ۱ تا ۵۰ دانش‌آموز، شناسه‌های یکتا، عضویت فعال در درس متعلق به معلم لازم است.
+- `POST /api/class-groups/:gid/members`: `{studentIds[]}`؛ جایگزینی اعضای کلاس فقط توسط مالک، با اعتبارسنجی مجدد عضویت فعال در همان درس؛ تغییر بر گیرندگان Snapshot قبلی اثری ندارد.
+- `GET /api/group-tasks` فقط معلم: فهرست پیش‌نویس‌ها و مأموریت‌های منتشرشده. `POST /api/group-tasks`: `{groupId,title,questionVersionIds,policy}`؛ سؤال‌ها باید متعلق به معلم و policy همان `policySchema` باشند، لیست گیرندگان هنگام ایجاد پیش‌نویس ثابت می‌شود.
+- `POST /api/group-tasks/:tid/publish`: انتشار تراکنشی و idempotent با `Idempotency-Key` اختیاری؛ برای هر گیرنده یک `missionId` و `assignmentId` مستقل ایجاد می‌کند؛ اگر یکی از اعضا دیگر عضویت فعال نداشته باشد، کل انتشار با 409 رد می‌شود. تلاش مجدد موفق، رکوردهای تکراری نمی‌سازد.
+- `GET /api/group-tasks/:tid/report` فقط معلم مالک: آمار مستقل هر عضو شامل `assignmentId,studentId,studentName,state,total,answered,independent,assisted,pending`. در پاسخ هیچ جواب یا کلید تصحیح وجود ندارد؛ جزئیات کامل هر نفر از مسیر موجود `GET /api/assignments/:aid/report` با بررسی مالکیت قابل خواندن است.
+- دانش‌آموزان فقط assignment شخصی را از API قبلی می‌بینند. هیچ مسیر جدیدی برای دسترسی دانش‌آموز به فهرست کلاس یا نتایج افراد دیگر باز نشده است.

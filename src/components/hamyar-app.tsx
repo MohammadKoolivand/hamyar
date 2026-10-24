@@ -13,6 +13,7 @@ import {
   GraduationCap,
   BarChart3,
   BookOpenCheck,
+  UsersRound,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import type { User, Node, Question, Assignment, Report, Course, Enrollment, StudentDashboardData } from "@/lib/types";
@@ -29,6 +30,7 @@ import { MissionsScreen } from "@/features/missions/missions-screen";
 import { ParentDashboard } from "@/features/analytics/parent-dashboard";
 import { LearningDashboard } from "@/features/analytics/learning-dashboard";
 import { CoursesScreen } from "@/features/courses/courses-screen";
+import { ClassGroupsScreen } from "@/features/classes/class-groups-screen";
 export default function HamyarApp() {
   const [me, setMe] = useState<User | null>(null),
     [loading, setLoading] = useState(true),
@@ -259,6 +261,7 @@ export default function HamyarApp() {
         ["dashboard", "نمای کلی", LayoutDashboard],
         ["students", "دانش‌آموزان", Users],
         ["courses", "درس‌های من", BookOpenCheck],
+        ["classes", "کلاس‌های گروهی", UsersRound],
         ["content", "بانک سؤال و محتوا", Library],
         ["missions", "مأموریت‌ها", Target],
         ["learning", "یادگیری و مرور", BarChart3],
@@ -355,6 +358,17 @@ export default function HamyarApp() {
             assignments={assignments}
             students={students}
             refresh={() => refresh()}
+          />
+        )}
+        {teacher && page === "classes" && (
+          <ClassGroupsScreen
+            courses={courses}
+            enrollments={enrollments}
+            students={students}
+            questions={questions}
+            assignments={assignments}
+            refresh={() => refresh()}
+            showReport={showReport}
           />
         )}
         {page === "learning" && (

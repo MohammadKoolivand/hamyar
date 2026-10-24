@@ -25,6 +25,9 @@ export async function connect(
   await db.collection("courseRequests").createIndex({ courseId: 1, studentId: 1 }, { unique: true });
   await db.collection("courseRequests").createIndex({ teacherId: 1, status: 1, updatedAt: -1 });
   await db.collection("courseRequests").createIndex({ studentId: 1, updatedAt: -1 });
+  await db.collection("classGroups").createIndex({ teacherId: 1, courseId: 1 });
+  await db.collection("groupTasks").createIndex({ teacherId: 1, groupId: 1, createdAt: -1 });
+  await db.collection("assignments").createIndex({ groupTaskId: 1, studentId: 1 });
   await db.collection("courses").createIndex({ teacherId: 1, status: 1 });
   await db.collection("enrollments").createIndex({ teacherId: 1, studentId: 1, status: 1 });
   await db.collection("enrollments").createIndex({ studentId: 1, status: 1 });

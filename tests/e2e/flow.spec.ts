@@ -551,3 +551,96 @@ test("student requests a course, teacher approves, and leaving keeps history", a
     await studentContext.close();
   }
 });
+
+test("teacher publishes one group assignment to two students and sees separate reports", async ({ page, browser }, testInfo) => {
+  const stamp = Date.now();
+  const teacherEmail = `group-teacher-${stamp}@test.dev`;
+  const students = [
+    { email: `group-first-${stamp}@test.dev`, name: "دانش‌آموز اول" },
+    { email: `group-second-${stamp}@test.dev`, name: "دانش‌آموز دوم" },
+  ];
+  const req = page.context().request;
+  const register = await req.post("/api/auth/register", {
+    data: { email: teacherEmail, name: "معلم گروه", password: pass, role: "teacher" },
+  });
+  expect(register.ok()).toBe(true);
+  expect((await req.post("/api/auth/login", {
+    data: { email: teacherEmail, password: pass },
+  })).ok()).toBe(true);
+  const courseResponse = await req.post("/api/courses", {
+    data: { title: "ریاضی پایه دهم", subject: "ریاضی" },
+  });
+  expect(courseResponse.ok()).toBe(true);
+  const course = await courseResponse.json();
+  const topicResponse = await req.post("/api/curriculum", {
+    data: { title: "جمع گروهی", kind: "topic" },
+  });
+  expect(topicResponse.ok()).toBe(true);
+  const topic = await topicResponse.json();
+  const questionResponse = await req.post("/api/questions", {
+    data: { topicId: topic._id, statement: "حاصل یک به علاوه یک؟", type: "numeric",
+      reference: "2", hints: ["دو عدد را جمع کن."] },
+  });
+  expect(questionResponse.ok()).toBe(true);
+
+  const contexts = [];
+  try {
+    for (const person of students) {
+      const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      contexts.push(context);
+      const r = await context.request.post("/api/auth/register", {
+        data: { ...person, password: pass, role: "student" },
+      });
+      expect(r.ok()).toBe(true);
+      expect((await context.request.post("/api/auth/login", {
+        data: { email: person.email, password: pass },
+      })).ok()).toBe(true);
+      const invitation = await req.post("/api/invitations", {
+        data: { email: person.email, courseId: course._id },
+      });
+      expect(invitation.ok()).toBe(true);
+      const token = (await invitation.json()).token;
+      expect((await context.request.post("/api/invitations/claim", {
+        data: { token },
+      })).ok()).toBe(true);
+    }
+    await page.goto("/");
+    await page.getByRole("button", { name: "کلاس‌های گروهی" }).click();
+    await page.getByLabel("عنوان کلاس").fill("دهم الف");
+    await page.getByLabel("درس کلاس").selectOption({ label: "ریاضی پایه دهم" });
+    await page.getByRole("checkbox", { name: students[0].name }).check();
+    await page.getByRole("checkbox", { name: students[1].name }).check();
+    await page.getByRole("button", { name: "ایجاد کلاس" }).click();
+    await expect(page.getByRole("heading", { name: "دهم الف" })).toBeVisible();
+    await page.getByLabel("کلاس مقصد").selectOption({ label: "دهم الف" });
+    await page.getByLabel("عنوان مأموریت").fill("تکلیف گروهی ریاضی");
+    await page.getByRole("checkbox", { name: "حاصل یک به علاوه یک؟" }).check();
+    await page.getByRole("button", { name: "ساخت پیش‌نویس گروهی" }).click();
+    await page.getByRole("button", { name: "انتشار برای تمام اعضای کلاس" }).click();
+    await expect(page.getByText("مأموریت برای همه دانش‌آموزان کلاس منتشر شد.")).toBeVisible();
+
+    const firstPage = await contexts[0].newPage();
+    const secondPage = await contexts[1].newPage();
+    await firstPage.goto("/");
+    await secondPage.goto("/");
+    await firstPage.getByRole("button", { name: "مأموریت‌های من" }).click();
+    await secondPage.getByRole("button", { name: "مأموریت‌های من" }).click();
+    await expect(firstPage.getByText("تکلیف گروهی ریاضی")).toBeVisible();
+    await expect(secondPage.getByText("تکلیف گروهی ریاضی")).toBeVisible();
+    await firstPage.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
+    await firstPage.getByLabel("پاسخ شما").fill("2");
+    await firstPage.getByRole("button", { name: "ثبت و بررسی پاسخ" }).click();
+    await expect(firstPage.getByText("صحیح · بدون دریافت کمک")).toBeVisible();
+
+    await page.getByRole("button", { name: "نمایش / به‌روزرسانی گزارش گروه" }).click();
+    const report = page.getByTestId("class-group-report");
+    await expect(report).toBeVisible();
+    await expect(report.getByText(students[0].name)).toBeVisible();
+    await expect(report.getByText(students[1].name)).toBeVisible();
+    await expect(report.getByText("1/1 پاسخ", { exact: false })).toBeVisible();
+    await expect(report.getByText("0/1 پاسخ", { exact: false })).toBeVisible();
+    await page.screenshot({ path: testInfo.outputPath("teacher-class-group-report.png"), fullPage: true });
+  } finally {
+    await Promise.all(contexts.map((c) => c.close()));
+  }
+});

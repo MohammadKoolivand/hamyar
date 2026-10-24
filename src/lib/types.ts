@@ -25,6 +25,22 @@ export interface EnrollmentHistory {
   subject: string;
   history: MembershipEvent[];
 }
+export interface ClassGroup {
+  _id: string;
+  teacherId: string;
+  courseId: string;
+  title: string;
+  studentIds: string[];
+  createdAt: string;
+}
+export interface GroupTask {
+  _id: string;
+  groupId: string;
+  courseId: string;
+  title: string;
+  state: "draft" | "published";
+  studentIds: string[];
+}
 export interface Course {
   _id: string;
   teacherId: string;
@@ -118,6 +134,8 @@ export interface Attempt {
 }
 export interface Assignment {
   missionId: string;
+  groupTaskId?: string;
+  groupId?: string;
   courseId?: string;
   enrollmentId?: string;
   _id: string;
