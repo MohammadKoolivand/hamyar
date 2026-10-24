@@ -1,3 +1,11 @@
+# P0 engineering run
+
+Baseline `541ac2f1531686d1ade3cfa5503df90ae33526de`, clean working tree. Transaction/idempotency/state/security implementation in progress; final verification results will be updated after browser checks. Existing local database copied from standalone 27018 into empty replica set 27019 without changing source; read-only integrity audit reported 0 mismatches.
+
+The previous report below is a historical baseline; its standalone MongoDB and IRANSans distribution assumptions have been superseded by P0.
+
+---
+
 # گزارش کیفیت — ساختار نهایی
 
 ## دامنه

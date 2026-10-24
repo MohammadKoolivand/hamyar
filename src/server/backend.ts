@@ -1,4 +1,6 @@
+import { configuredQuestionGenerator } from "./ai/question-generator";
 import { buildApp } from "./app";
+import { configuredProvider } from "./ai/provider";
 import { connect } from "./db";
 import type { FastifyInstance } from "fastify";
 // A single pool and modular backend per Next Node.js process, including HMR.
@@ -8,11 +10,14 @@ const state = globalThis as typeof globalThis & {
 export function backend() {
   if (!state.hamyarBackend)
     state.hamyarBackend = (async () => {
-      if (process.env.AI_PROVIDER && process.env.AI_PROVIDER !== "mock")
-        throw new Error("Unsupported AI_PROVIDER");
       const { client, db } = await connect();
       try {
-        const app = await buildApp(db);
+        const app = await buildApp(
+          db,
+          configuredProvider(),
+          {},
+          configuredQuestionGenerator(),
+        );
         await app.ready();
         return app;
       } catch (error) {

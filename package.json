@@ -11,7 +11,17 @@
     "test": "node --import tsx --test tests/unit/*.test.ts tests/integration/*.test.ts",
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run build && npm test",
-    "format": "prettier --write src tests scripts docs *.json *.ts *.mjs"
+    "format": "prettier --write src tests scripts docs *.json *.ts *.mjs",
+    "audit:integrity": "node --env-file-if-exists=.env --import tsx scripts/audit-integrity.ts",
+    "migrate:replica": "node --env-file-if-exists=.env --import tsx scripts/copy-to-replica.ts",
+    "mongo:init": "node --env-file-if-exists=.env scripts/init-replica.mjs",
+    "smoke:ollama": "node --env-file-if-exists=.env --import tsx scripts/smoke-ollama.ts",
+    "rebuild:learning": "node --env-file-if-exists=.env --import tsx scripts/rebuild-learning.ts",
+    "verify:backup": "node --env-file-if-exists=.env --import tsx scripts/verify-backup.ts",
+    "ops:status": "node --env-file-if-exists=.env --import tsx scripts/check-runtime.ts",
+    "smoke:load": "node --env-file-if-exists=.env --import tsx scripts/load-health.ts",
+    "predev": "node scripts/prepare-font.mjs",
+    "prebuild": "node scripts/prepare-font.mjs"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
@@ -22,6 +32,7 @@
     "clsx": "^2.1.1",
     "fastify": "^5.6.0",
     "lucide-react": "^0.468.0",
+    "mathjs": "^15.2.0",
     "mongodb": "^6.20.0",
     "next": "^16.4.2",
     "postcss": "^8.5.31",

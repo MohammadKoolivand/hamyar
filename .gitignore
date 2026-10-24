@@ -8,3 +8,6 @@ playwright-report/
 
 .next/
 *.tsbuildinfo
+.private/
+
+src/assets/fonts/PersianLocal.ttf

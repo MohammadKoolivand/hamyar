@@ -8,12 +8,11 @@ const poppins = localFont({
   adjustFontFallback: false,
   weight: "400",
 });
-const iransans = localFont({
-  src: "../assets/fonts/IRANSansXFaNum-Regular.ttf",
+const persian = localFont({
+  src: "../assets/fonts/PersianLocal.ttf",
   variable: "--font-persian",
   display: "swap",
   adjustFontFallback: false,
-  weight: "400",
 });
 export const metadata: Metadata = {
   title: "همیار | تمرین آگاهانه",
@@ -30,9 +29,9 @@ export default function RootLayout({
     <html
       lang="fa"
       dir="rtl"
-      className={`${poppins.variable} ${iransans.variable}`}
+      className={`${poppins.variable} ${persian.variable}`}
     >
-      <body className="min-h-screen bg-[#f8fafc] bg-[radial-gradient(ellipse_at_top_left,#19b7ae10,transparent_55%),radial-gradient(ellipse_at_bottom_right,#233b8f09,transparent_60%)] text-[#1f2937] [font-family:var(--font-latin),var(--font-persian),Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
+      <body className="min-h-screen bg-[#f8fafc] bg-[radial-gradient(ellipse_at_top_left,#19b7ae10,transparent_55%),radial-gradient(ellipse_at_bottom_right,#233b8f09,transparent_60%)] text-[#1f2937] [font-family:var(--font-latin),var(--font-persian),IRANSans,Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
         {children}
       </body>
     </html>

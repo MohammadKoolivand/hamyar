@@ -34,9 +34,17 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     .selectOption({ label: "ریاضی آزمایشی (subject)" });
   await page.getByRole("button", { name: "افزودن به ساختار" }).click();
   await expect(page.getByLabel("عنوان", { exact: true })).toHaveValue("");
+  await page.getByLabel("نوع", { exact: true }).selectOption("skill");
+  await page.getByLabel("عنوان", { exact: true }).fill("حل مستقل");
+  await page
+    .getByLabel("زیرمجموعه")
+    .selectOption({ label: "جمع ساده (topic)" });
+  await page.getByRole("button", { name: "افزودن به ساختار" }).click();
+  await expect(page.getByLabel("عنوان", { exact: true })).toHaveValue("");
   await page
     .getByLabel("مبحث", { exact: true })
     .selectOption({ label: "جمع ساده" });
+  await page.getByLabel("حل مستقل", { exact: true }).check();
   await page.getByLabel("صورت سؤال").fill("حاصل یک به علاوه یک چیست؟");
   await page.getByLabel("پاسخ مرجع خصوصی").fill("2");
   await page
@@ -44,6 +52,13 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     .fill("از عدد یک، یک گام جلو برو.");
   await page.getByRole("button", { name: "تأیید و ذخیره سؤال" }).click();
   await expect(page.getByText("بانک سؤال خصوصی · ۱ سؤال")).toBeVisible();
+  await page.getByLabel("روش پاسخ").selectOption("symbolic");
+  await page.getByLabel("صورت سؤال").fill("عبارت هم‌ارز با x+x را بنویسید.");
+  await page.getByLabel("پاسخ مرجع خصوصی").fill("2*x");
+  await page.getByLabel("متغیرهای مجاز").fill("x");
+  await page.getByRole("button", { name: "تأیید و ذخیره سؤال" }).click();
+  await expect(page.getByText("بانک سؤال خصوصی · ۲ سؤال")).toBeVisible();
+
   await page.getByRole("button", { name: "دانش‌آموزان", exact: true }).click();
   await page.getByLabel("ایمیل دانش‌آموز").fill(student);
   await page.getByRole("button", { name: "ایجاد دعوت" }).click();
@@ -84,10 +99,33 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     sp.getByText("حاصل یک به علاوه یک چیست؟", { exact: true }),
   ).toBeVisible();
   await sp.getByLabel("پاسخ شما", { exact: true }).fill("1");
+  // Unsaved input survives feature unmount and a full page reload.
+  await sp
+    .getByRole("button", { name: "مسیر یادگیری من", exact: true })
+    .click();
+  await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
+  await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
+  await expect(sp.getByLabel("پاسخ شما", { exact: true })).toHaveValue("1");
+  await sp.reload();
+  await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
+  await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
+  await expect(sp.getByLabel("پاسخ شما", { exact: true })).toHaveValue("1");
+  await sp.setViewportSize({ width: 360, height: 800 });
+  expect(
+    await sp.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+  ).toBe(true);
+  await sp.getByLabel("پاسخ شما", { exact: true }).focus();
+  await sp.keyboard.press("Tab");
+  await expect(
+    sp.getByRole("button", { name: "ثبت و بررسی پاسخ" }),
+  ).toBeFocused();
+
   await sp.getByRole("button", { name: "ثبت و بررسی پاسخ" }).click();
   await expect(sp.getByText("نیازمند اصلاح · بدون دریافت کمک")).toBeVisible();
   await sp.getByRole("button", { name: "درخواست راهنمایی" }).click();
-  await expect(sp.getByText("از عدد یک، یک گام جلو برو.")).toBeVisible();
+  await expect(sp.getByText("از عدد یک، یک گام جلو برو.")).toBeVisible({
+    timeout: 35000,
+  });
   await sp.getByLabel("پاسخ شما", { exact: true }).fill("۲");
   await sp.getByRole("button", { name: "ثبت و بررسی پاسخ" }).click();
   await expect(sp.getByText("صحیح · با دریافت کمک")).toBeVisible();
@@ -116,7 +154,42 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     path: testInfo.outputPath("teacher-report-desktop.png"),
     fullPage: true,
   });
+  await sp.getByRole("button", { name: "یادگیری و مرور", exact: true }).click();
+  await expect(
+    sp.getByRole("heading", { name: "دفترچه اشتباهات", exact: true }),
+  ).toBeVisible();
+  await expect(
+    sp.getByRole("heading", { name: "حل مستقل", exact: true }),
+  ).toBeVisible();
+  await expect(sp.getByText("نیازمند تمرین", { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: "یادگیری و مرور", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "مقایسه مأموریت‌ها" }),
+  ).toBeVisible();
+  await page
+    .getByLabel("دلیل تصمیم معلم")
+    .fill("جلسه بعد یک سنجش مستقل دیگر لازم است.");
+  await page.getByRole("button", { name: "ثبت تصمیم و تاریخچه" }).click();
+  await expect(page.getByText("تصمیم معلم:", { exact: false })).toBeVisible();
   expect(errors).toEqual([]);
+  await page
+    .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
+    .click();
+  await page
+    .getByLabel("پاسخ مرجع خصوصی")
+    .fill("UNPUBLISHED_PRIVATE_REFERENCE");
+  await page.getByRole("button", { name: "خروج", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
+  await expect(page.getByLabel("ایمیل", { exact: true })).toHaveValue("");
+  await page.getByLabel("ایمیل", { exact: true }).fill(teacher);
+  await page.getByLabel("رمز عبور").fill(pass);
+  await page.getByRole("button", { name: "ورود به همیار" }).click();
+  await page
+    .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
+    .click();
+  await expect(page.getByLabel("پاسخ مرجع خصوصی")).toHaveValue("");
   await studentContext.close();
 });
 
@@ -166,22 +239,169 @@ test("Next Node.js API preserves private response and payload limits", async ({
   expect(oversized.status()).toBe(413);
 });
 
-test("local Persian and Latin fonts load and layout uses Tailwind utilities", async ({
+test("licensed local fonts load and layout uses Tailwind utilities", async ({
   page,
 }) => {
   await page.goto("/");
   await page.getByRole("heading", { name: "خوش آمدید" }).waitFor();
   const fonts = await page.evaluate(async () => {
     const style = getComputedStyle(document.documentElement);
-    const persian = style.getPropertyValue("--font-persian"),
-      latin = style.getPropertyValue("--font-latin");
+    const latin = style.getPropertyValue("--font-latin");
+    const persian = style.getPropertyValue("--font-persian");
     const loaded = await Promise.all([
-      document.fonts.load(`16px ${persian}`, "سلام"),
       document.fonts.load(`16px ${latin}`, "Hello"),
+      document.fonts.load(`16px ${persian}`, "سلام"),
     ]);
     return loaded.map((entries) => entries.length);
   });
   expect(fonts.every((count) => count > 0)).toBe(true);
   await expect(page.locator("main[style], main [style]")).toHaveCount(0);
   await expect(page.locator("section").first()).toHaveClass(/backdrop-blur/);
+});
+
+test("real AI question draft → teacher edit/approve or reject; parent read-only portal", async ({
+  page,
+  browser,
+  request,
+}) => {
+  test.setTimeout(180000);
+  const health = await request.get("/api/health");
+  test.skip(
+    !(await health.json()).ai.configured.startsWith("ollama"),
+    "Real authoring requires configured Ollama; never substitute mock",
+  );
+  const suffix = Date.now(),
+    teacher = `author${suffix}@test.dev`,
+    student = `child${suffix}@test.dev`,
+    parent = `parent${suffix}@test.dev`;
+  await page.goto("/");
+  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
+  await page.getByLabel("نام و نام خانوادگی").fill("معلم تولید سؤال");
+  await page.getByLabel("ایمیل", { exact: true }).fill(teacher);
+  await page.getByLabel("رمز عبور").fill(pass);
+  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
+  await page.getByRole("button", { name: "ورود به همیار" }).click();
+  await page
+    .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
+    .click();
+  await page.getByLabel("نوع", { exact: true }).selectOption("topic");
+  await page.getByLabel("عنوان", { exact: true }).fill("جمع در پایه دوم");
+  await page.getByRole("button", { name: "افزودن به ساختار" }).click();
+  await expect(page.getByLabel("عنوان", { exact: true })).toHaveValue("");
+  await page
+    .getByLabel("مبحث تولید سؤال")
+    .selectOption({ label: "جمع در پایه دوم" });
+  await page
+    .getByLabel("حوزه، پایه و هدف سؤال")
+    .fill(
+      "فقط یک سؤال جمع دو عدد تک‌رقمی مناسب پایه دوم ابتدایی ایران، پاسخ مرجع فقط یک عدد باشد.",
+    );
+  await page
+    .getByRole("button", { name: "تولید یک پیش‌نویس با مدل محلی" })
+    .click();
+  await expect(page.getByLabel("صورت سؤال پیشنهادی")).toBeVisible({
+    timeout: 100000,
+  });
+  await expect(page.getByText("بانک سؤال خصوصی · ۰ سؤال")).toBeVisible();
+  await page
+    .getByLabel("صورت سؤال پیشنهادی")
+    .fill("حاصل سه به اضافه چهار چیست؟");
+  await page.getByLabel("پاسخ مرجع پیشنهادی خصوصی").fill("7");
+  await page.getByRole("checkbox", { name: "صحت سؤال و پاسخ مرجع" }).check();
+  await page
+    .getByRole("button", { name: "تأیید و افزودن به بانک سؤال" })
+    .click();
+  await expect(page.getByText("بانک سؤال خصوصی · ۱ سؤال")).toBeVisible();
+  await page
+    .getByRole("button", { name: "تولید یک پیش‌نویس با مدل محلی" })
+    .click();
+  await expect(page.getByLabel("دلیل رد پیش‌نویس")).toBeVisible({
+    timeout: 100000,
+  });
+  await page
+    .getByLabel("دلیل رد پیش‌نویس")
+    .fill("نیاز به تناسب بیشتر با هدف آموزشی");
+  await page.getByRole("button", { name: "رد پیش‌نویس", exact: true }).click();
+  await expect(page.getByText("پیش‌نویس رد شد.")).toBeVisible();
+  await expect(page.getByText("بانک سؤال خصوصی · ۱ سؤال")).toBeVisible();
+  await page.getByRole("button", { name: "دانش‌آموزان", exact: true }).click();
+  await page.getByLabel("ایمیل دانش‌آموز", { exact: true }).fill(student);
+  await page.getByRole("button", { name: "ایجاد دعوت", exact: true }).click();
+  const token = await page.getByTestId("invitation-token").innerText();
+  const sc = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+    }),
+    sp = await sc.newPage();
+  await sp.goto(`/?invite=${token}`);
+  await sp.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز آزمایشی");
+  await sp.getByLabel("ایمیل", { exact: true }).fill(student);
+  await sp.getByLabel("رمز عبور").fill(pass);
+  await sp.getByRole("button", { name: "ساخت حساب", exact: true }).click();
+  await expect(sp.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
+  await page
+    .getByRole("button", { name: "به‌روزرسانی فهرست", exact: true })
+    .click();
+  await sp.getByRole("button", { name: "ورود به همیار" }).click();
+  await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
+  await page.getByLabel("عنوان مأموریت").fill("تمرین با سؤال تأییدشده");
+  await page
+    .getByLabel("دانش‌آموز", { exact: true })
+    .selectOption({ label: "دانش‌آموز آزمایشی" });
+  await page.getByText("حاصل سه به اضافه چهار چیست؟", { exact: true }).click();
+  await page.getByRole("button", { name: "ساخت پیش‌نویس مأموریت" }).click();
+  await page.getByRole("button", { name: "انتشار برای دانش‌آموز" }).click();
+  await expect(
+    page.getByRole("button", { name: "گزارش و شواهد" }),
+  ).toBeVisible();
+  await sp.reload();
+  await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
+  await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
+  await sp.getByLabel("پاسخ شما", { exact: true }).fill("7");
+  await sp.getByRole("button", { name: "ثبت و بررسی پاسخ" }).click();
+  await expect(sp.getByText("صحیح · بدون دریافت کمک")).toBeVisible();
+  await sp
+    .getByRole("button", { name: "پایان مأموریت و دریافت گزارش" })
+    .click();
+  await expect(
+    sp.getByRole("heading", { name: "استقلال در اولین تلاش" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "دانش‌آموزان", exact: true }).click();
+  await page.getByText("دسترسی اولیا", { exact: true }).click();
+  await page.getByLabel("ایمیل ولی دانش‌آموز").fill(parent);
+  await page.getByRole("button", { name: "ایجاد دعوت اولیا" }).click();
+  const invite = await page.getByTestId("parent-invitation-token").innerText();
+  const pc = await browser.newContext({
+      viewport: { width: 360, height: 800 },
+    }),
+    pp = await pc.newPage();
+  await pp.goto(invite);
+  await pp.getByLabel("نام و نام خانوادگی").fill("ولی آزمایشی");
+  await pp.getByLabel("ایمیل", { exact: true }).fill(parent);
+  await pp.getByLabel("رمز عبور").fill(pass);
+  await pp.getByRole("button", { name: "ساخت حساب", exact: true }).click();
+  await pp.getByRole("button", { name: "ورود به همیار" }).click();
+  await expect(pp.getByRole("heading", { name: "پنل اولیا" })).toBeVisible();
+  await expect(pp.getByLabel("انتخاب فرزند")).toHaveValue(/.+/);
+  await expect(
+    pp.getByRole("heading", { name: "دفترچه اشتباهات" }),
+  ).toBeVisible();
+  await expect(
+    pp.getByText("صحیح بدون کمک", { exact: true }).locator(".."),
+  ).toContainText("۱");
+  await expect(
+    pp.getByRole("button", { name: "ثبت و بررسی پاسخ" }),
+  ).toHaveCount(0);
+  expect(
+    await pp.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+  ).toBe(true);
+  await page.getByRole("button", { name: "به‌روزرسانی اولیا" }).click();
+  await page.getByRole("button", { name: "لغو دسترسی این ولی" }).click();
+  await pp.reload();
+  await expect(
+    pp.getByText(
+      "پس از پذیرش دعوت معتبر معلم، گزارش فرزند اینجا نمایش داده می‌شود.",
+    ),
+  ).toBeVisible();
+  await pc.close();
+  await sc.close();
 });

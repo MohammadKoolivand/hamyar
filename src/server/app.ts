@@ -5,21 +5,46 @@ import type { Db } from "mongodb";
 import { z } from "zod";
 import { MockProvider, type HintProvider } from "./domain";
 import { createContext } from "./context";
+import { requireTransactions, type WriteHooks } from "./transactions";
 import { registerIdentity } from "./modules/identity";
 import { registerContent } from "./modules/content";
 import { registerMissions } from "./modules/missions";
 import { registerPractice } from "./modules/practice";
 import { registerAnalytics } from "./modules/analytics";
+import { registerLearning } from "./modules/learning";
+import { registerAuthoring } from "./modules/authoring";
+import type { QuestionGenerator } from "./ai/question-generator";
 export async function buildApp(
   db: Db,
   provider: HintProvider = new MockProvider(),
+  hooks: WriteHooks = {},
+  questionGenerator?: QuestionGenerator,
 ) {
+  await requireTransactions(db);
   const app = Fastify({
-    logger: process.env.NODE_ENV !== "test",
+    logger:
+      process.env.NODE_ENV !== "test"
+        ? {
+            serializers: {
+              req: (r) => ({
+                method: r.method,
+                path: (r.url ?? "").split("?")[0],
+              }),
+              res: (r) => ({ statusCode: r.statusCode }),
+            },
+            redact: [
+              "req.headers.cookie",
+              "req.headers.authorization",
+              "body",
+              "password",
+              "token",
+            ],
+          }
+        : false,
     bodyLimit: 65536,
   });
   await app.register(cookie);
-  const ctx = createContext(db);
+  const ctx = createContext(db, hooks);
   await app.register(rateLimit, {
     max: 120,
     timeWindow: "1 minute",
@@ -42,6 +67,15 @@ export async function buildApp(
         .code(400)
         .send({ message: "اطلاعات ورودی معتبر نیست", issues: e.issues });
     const err = e as Error & { statusCode?: number; code?: number };
+    if (!err.statusCode || err.statusCode >= 500)
+      app.log.error(
+        {
+          requestId: _r.id,
+          route: _r.routeOptions.url,
+          event: "request_failed",
+        },
+        "Request failed; details withheld",
+      );
     reply.code(err.code === 11000 ? 409 : (err.statusCode ?? 500)).send({
       message:
         err.code === 11000
@@ -51,8 +85,21 @@ export async function buildApp(
             : "خطای داخلی؛ دوباره تلاش کنید",
     });
   });
-  app.addHook("onRequest", async (r) => {
-    if (!["GET", "HEAD", "OPTIONS"].includes(r.method) && r.headers.origin) {
+  const allowedOrigin = new URL(
+    process.env.APP_ORIGIN ?? "http://127.0.0.1:5174",
+  );
+  if (
+    process.env.NODE_ENV === "production" &&
+    allowedOrigin.protocol !== "https:" &&
+    !["127.0.0.1", "localhost", "[::1]"].includes(allowedOrigin.hostname)
+  )
+    throw new Error("Production APP_ORIGIN must use HTTPS");
+  app.addHook("onRequest", async (r, reply) => {
+    reply.header("X-Request-Id", r.id);
+    if (["GET", "HEAD", "OPTIONS"].includes(r.method)) return;
+    if (r.headers["sec-fetch-site"] === "cross-site")
+      fail(403, "درخواست بین‌سایتی مجاز نیست");
+    if (r.headers.origin) {
       let origin: URL;
       try {
         origin = new URL(r.headers.origin);
@@ -60,21 +107,28 @@ export async function buildApp(
         fail(403, "مبدأ نامعتبر است");
         return;
       }
-      if (
-        origin.host !== r.headers.host &&
-        origin.origin !== (process.env.APP_ORIGIN ?? "http://127.0.0.1:5174")
-      )
+      if (origin.origin !== allowedOrigin.origin)
         fail(403, "مبدأ درخواست مجاز نیست");
     }
   });
   app.get("/api/health", async () => {
     await db.command({ ping: 1 });
-    return { status: "ok", provider: provider.name };
+    return {
+      status: "ok",
+      provider: provider.name,
+      ai: provider.status?.() ?? {
+        configured: provider.name,
+        active: provider.name,
+        state: provider.name.includes("mock") ? "mock" : "configured",
+      },
+    };
   });
   registerIdentity(app, ctx);
   registerContent(app, ctx);
+  registerAuthoring(app, ctx, questionGenerator);
   registerMissions(app, ctx);
   registerPractice(app, ctx, provider);
   registerAnalytics(app, ctx, provider);
+  registerLearning(app, ctx);
   return app;
 }

@@ -1,9 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
 import { z } from "zod";
+import { persistQuestion, validateQuestion } from "./authoring";
 import { questionSchema } from "../domain";
 export function registerContent(app: FastifyInstance, ctx: Context) {
-  const { c, user, owned, id, fail } = ctx;
+  const { c, user, owned, id } = ctx;
   app.get("/api/curriculum", async (r) => {
     const u = await user(r, "teacher");
     return c("curriculum").find({ ownerId: u._id }).toArray();
@@ -39,28 +40,9 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
   app.post("/api/questions", async (r) => {
     const u = await user(r, "teacher"),
       b = questionSchema.parse(r.body);
-    const topic = await owned("curriculum", b.topicId, u._id);
-    if (topic.kind !== "topic") fail(400, "مبحث را انتخاب کنید");
-    for (const sid of b.skillIds) {
-      const skill = await owned("curriculum", sid, u._id);
-      if (skill.kind !== "skill") fail(400, "شناسه مهارت معتبر نیست");
-    }
-    const qid = id(),
-      vid = id();
-    await c("questions").insertOne({
-      _id: qid,
-      ownerId: u._id,
-      currentVersionId: vid,
-    });
-    const q = {
-      _id: vid,
-      questionId: qid,
-      ownerId: u._id,
-      version: 1,
-      verifiedBy: u._id,
-      ...b,
-    };
-    await c("questionVersions").insertOne(q);
-    return q;
+    await validateQuestion(ctx, u._id, b);
+    return ctx.atomic(r, u._id, "create-question", b, (session) =>
+      persistQuestion(ctx, u._id, b, session),
+    );
   });
 }

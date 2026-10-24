@@ -6,7 +6,8 @@ import { connect, collection } from "../../src/server/db";
 Object.assign(process.env, { NODE_ENV: "test" });
 test("real MongoDB: teacher → invitation → mission → practice → reports and isolation", async () => {
   const { client, db } = await connect(
-    process.env.TEST_MONGO_URL ?? "mongodb://127.0.0.1:27018",
+    process.env.TEST_MONGO_URL ??
+      "mongodb://127.0.0.1:27019/?replicaSet=hamyar-rs",
     "hamyar_test_" + randomUUID(),
   );
   const app = await buildApp(db);

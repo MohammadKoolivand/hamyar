@@ -1,13 +1,14 @@
 # HamYar — همیار
 
-Next.js تمام‌استک، TypeScript، Tailwind CSS و MongoDB. رابط فارسی RTL؛ فونت‌های محلی Poppins و IRANSans با next/font/local. یک برنامه Node.js، یک پایگاه داده، بدون monorepo یا سرور API جدا.
+Next.js تمام‌استک، TypeScript، Tailwind CSS و MongoDB. رابط فارسی RTL؛ Poppins محلی و IRANSans دارای لایسنس دستگاه با next/font/local و fallback فارسی. یک برنامه Node.js، یک پایگاه داده، بدون monorepo یا سرور API جدا.
 
 ## ساختار
 
 ```text
 src/
   app/             صفحات، layout و Route Handlerهای Next.js
-  components/      رابط کاربری و مؤلفه‌های ui
+  features/        صفحه‌ها و جریان‌های auth/content/missions/practice/analytics/parents
+  components/      orchestration و مؤلفه‌های ui
   server/          اتصال MongoDB، نشست، ارزیابی و ماژول‌های آموزشی
   lib/             نوع‌های مشترک
   assets/fonts/    فونت‌های محلی
@@ -19,7 +20,7 @@ docs/             PRD، معماری، قرارداد API و وضعیت اجرا
 
 ## اجرا
 
-Node.js 22+ و MongoDB لازم است.
+Node.js 22+ و MongoDB replica set لازم است؛ برنامه روی MongoDB standalone به‌صورت ناامن اجرا نمی‌شود.
 
 ```sh
 npm ci
@@ -31,10 +32,12 @@ npm run dev
 
 ```sh
 mkdir -p .data/mongo
-mongod --dbpath .data/mongo --bind_ip 127.0.0.1 --port 27018 --logpath .data/mongo.log
+mongod --dbpath .data/mongo --replSet hamyar-rs --bind_ip 127.0.0.1 --port 27019 --logpath .data/mongo.log
 ```
 
-در این حالت MONGO_URL=mongodb://127.0.0.1:27018 باشد. Docker اختیاری: `docker compose up -d mongo`.
+در این حالت MONGO_URL=mongodb://127.0.0.1:27019/?replicaSet=hamyar-rs باشد. برای MongoDB محلی تازه، پس از شروع mongod یک بار `npm run mongo:init` را با MONGO_URL درست اجرا کنید و تا primary شدن صبر کنید.
+
+Docker اختیاری: `docker compose up -d mongo`.
 
 تولید: `npm run build` سپس `npm start`. در استقرار عمومی HTTPS و COOKIE_SECURE=true لازم است؛ APP_ORIGIN باید origin برنامه باشد.
 
@@ -42,7 +45,7 @@ mongod --dbpath .data/mongo --bind_ip 127.0.0.1 --port 27018 --logpath .data/mon
 
 ثبت‌نام معلم ← ایجاد درس/مبحث و سؤال مرجع‌دار ← دعوت دانش‌آموز و انتقال لینک ← پذیرش و ورود دانش‌آموز ← ساخت و انتشار مأموریت ← تمرین و راهنمای مجاز ← گزارش هر دو نقش و بازبینی معلم.
 
-ایمیل دعوت ارسال نمی‌شود؛ لینک را معلم منتقل می‌کند. Mock Provider فقط راهنمایی‌های تأییدشده معلم را ارائه می‌دهد؛ مدل مولد متصل نیست. تشریحی به بررسی انسانی می‌رود. داده و آمار نمایشی وجود ندارد.
+ایمیل دعوت ارسال نمی‌شود؛ لینک را معلم منتقل می‌کند. Mock Provider فقط راهنمایی‌های تأییدشده معلم را ارائه می‌دهد. با AI_PROVIDER=ollama مدل محلی از گزینه‌های مجاز معلم انتخاب می‌کند؛ متن آزاد تولیدشده نمایش داده نمی‌شود. تشریحی به بررسی انسانی می‌رود. داده و آمار نمایشی وجود ندارد.
 
 استایل رابط فقط کلاس‌های Tailwind در JSX است. `src/app/globals.css` تنها شامل import ضروری Tailwind است؛ فونت‌ها با next/font/local ثبت می‌شوند. مؤلفه Button از الگوی shadcn/Radix استفاده می‌کند.
 
@@ -52,7 +55,7 @@ mongod --dbpath .data/mongo --bind_ip 127.0.0.1 --port 27018 --logpath .data/mon
 npm run typecheck
 npm run lint
 npm run build
-# MongoDB آزمایشی روشن باشد؛ پیش‌فرض 27018
+# MongoDB آزمایشی روشن باشد؛ پیش‌فرض replica set روی 27019
 npm test
 # برنامه Next.js روشن باشد
 npm run test:e2e
@@ -67,3 +70,23 @@ PWA فقط shell و asset عمومی را cache می‌کند؛ ثبت پاسخ 
 - [قرارداد API](docs/API_CONTRACT.md)
 - [برنامه اجرا](docs/IMPLEMENTATION_PLAN.md)
 - [گزارش کیفیت و محدودیت‌ها](docs/QUALITY_REPORT.md)
+
+## مهاجرت و یکپارچگی P0
+
+قبل از تغییر MongoDB قدیمی، نوشتن برنامه را متوقف و نسخه پشتیبان نگه دارید. `MIGRATION_SOURCE_URL=<old> MONGO_URL=<new replica> MONGO_DB=<name> npm run migrate:replica` فقط به مقصد کاملاً خالی کپی می‌کند و مبدأ را تغییر نمی‌دهد. کپی غیرتراکنشی است؛ در صورت قطع، مقصد ناقص را به‌عنوان معتبر استفاده نکنید. سپس `npm run audit:integrity` را اجرا کنید؛ مغایرت قدیمی برای بازبینی گزارش می‌شود و شواهد ساختگی/شماره‌گذاری مجدد تولید نمی‌شود.
+
+درخواست‌های حساس `Idempotency-Key` می‌پذیرند؛ رابط برای تلاش/کمک کلید را به intent و شمارنده تأییدشده متصل می‌کند. استفاده مجدد کلید با body متفاوت 409 می‌دهد. بدون کلید، هر درخواست برای سازگاری یک intent جدید است.
+
+مالک داشتن لایسنس IRANSans برای نسخه توسعه آزمایشی را اعلام کرد. فایل دستگاه در `.private/fonts/IRANSansXFaNum-Regular.ttf` (ignored) حفظ شده؛ predev/prebuild آن را به فایل تولیدی ignored کپی و با next/font/local در build همین دستگاه بارگذاری می‌کند. در checkout فاقد فایل مجاز، Poppins و fallback سیستمی استفاده می‌شوند. فایل IRANSans وارد Git نمی‌شود؛ حق بازتوزیع عمومی و تاریخچه قبلی مخزن جداگانه باید بررسی شوند. حذف تاریخچه یا push انجام نشده است.
+
+## همیار محلی
+
+برای مدل موجود روی Ollama، AI_PROVIDER=ollama و OLLAMA_MODEL=qwen2.5:3b را در .env تنظیم و برنامه را restart کنید. OLLAMA_BASE_URL پیش‌فرض http://127.0.0.1:11434 و AI_TIMEOUT_MS پیش‌فرض 30000 است. AI_FALLBACK=mock فقط در صورت انتخاب صریح شما در قطعی به راهنمای آزمایشی بازمی‌گردد؛ نوع واقعی هر رویداد در UI/metadata مشخص است. مدل باید از قبل نصب/سرویس در دسترس باشد؛ برنامه مدل یا اشتراک خریداری نمی‌کند. `node --import tsx scripts/smoke-ollama.ts` دو درخواست مصنوعی واقعی اجرا می‌کند؛ به داده دانش‌آموز دسترسی ندارد.
+
+## تولید سؤال و پنل اولیا
+
+معلم علاوه بر ورود دستی سؤال می‌تواند در بانک محتوا، مبحث و پایه/هدف را مشخص و یک پیش‌نویس با Ollama واقعی تولید کند. پیش‌نویس از بانک جداست؛ معلم متن، پاسخ و راهنماها را اصلاح و تأیید یا با دلیل رد می‌کند. فقط تأیید، نسخه سؤال قابل تخصیص می‌سازد. در حالت Mock تولید سؤال غیرفعال و صریح است؛ پاسخ ساختگی به‌عنوان AI نمایش داده نمی‌شود. AI_AUTHOR_TIMEOUT_MS و OLLAMA_AUTHOR_MODEL قابل تنظیم‌اند.
+
+در دانش‌آموزان ← دسترسی اولیا، معلم برای ولی همان دانش‌آموز دعوت جداگانه می‌سازد. ولی پس از پذیرش و ورود، گزارش خواندنی و شواهد یادگیری همان ارتباط را می‌بیند؛ امکان پاسخ، راهنمایی، تغییر نمره یا دیدن یادداشت خصوصی معلم ندارد. معلم می‌تواند این دسترسی را لغو کند. این اتصال فنی جایگزین احراز سرپرستی یا رضایت لازم برای پایلوت نیست.
+
+بازسازی افزایشی شواهد قبلی: `npm run rebuild:learning` فقط پس از توقف نوشتن؛ سپس `npm run audit:integrity`. ابزارهای عملیاتی: `npm run ops:status`، `npm run smoke:load` و `WRITES_PAUSED=true npm run verify:backup`؛ شرایط و محدودیت‌ها در [آمادگی پایلوت](docs/PILOT_READINESS.md) ثبت شده‌اند. محصول هنوز برای پایلوت با داده واقعی کودک آماده اعلام نشده است.

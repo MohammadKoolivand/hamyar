@@ -9,6 +9,7 @@ import {
 } from "node:crypto";
 import { z } from "zod";
 import { collection, type Row } from "./db";
+import { writes, type WriteHooks } from "./transactions";
 const id = () => randomUUID(),
   now = () => new Date().toISOString(),
   hash = (s: string) => createHash("sha256").update(s).digest("hex");
@@ -23,7 +24,7 @@ const fail = (status: number, message: string) => {
   throw Object.assign(new Error(message), { statusCode: status });
 };
 
-export function createContext(db: Db) {
+export function createContext(db: Db, hooks: WriteHooks = {}) {
   const c = (n: string) => collection(db, n);
   async function user(r: FastifyRequest, role?: string) {
     const token = r.cookies.session;
@@ -61,6 +62,20 @@ export function createContext(db: Db) {
   async function assignment(r: FastifyRequest, studentOnly = false) {
     const u = await user(r);
     const { aid } = r.params as { aid: string };
+    if (u!.role === "parent") {
+      if (studentOnly) fail(403, "دسترسی اولیا فقط برای مشاهده گزارش است");
+      const row = await c("assignments").findOne({ _id: aid });
+      if (
+        !row ||
+        !(await c("parentLinks").findOne({
+          parentId: u!._id,
+          studentId: row.studentId,
+          teacherId: row.teacherId,
+        }))
+      )
+        fail(404, "مأموریت یافت نشد");
+      return { u: u!, a: row! };
+    }
     const a = await c("assignments").findOne({
       _id: aid,
       ...(u.role === "student"
@@ -73,6 +88,7 @@ export function createContext(db: Db) {
     return { u, a: a! };
   }
   return {
+    ...writes(db, hooks),
     c,
     user,
     safe,

@@ -2,7 +2,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  role: "teacher" | "student";
+  role: "teacher" | "student" | "parent";
 }
 export interface Node {
   _id: string;
@@ -39,16 +39,29 @@ export interface Attempt {
   evaluation?: Evaluation;
 }
 export interface Assignment {
+  missionId: string;
   _id: string;
   title: string;
   state: string;
   studentId: string;
   questions?: Question[];
   progress: Record<string, { attempts: number; hints: number }>;
-  policy: { maxHints: number; maxAttempts: number; independent: boolean };
+  policy: {
+    maxHints: number;
+    maxAttempts: number;
+    independent: boolean;
+    maxHintLevel?: number;
+    allowFullSolution?: boolean;
+  };
   attempts?: Attempt[];
   evaluations?: Evaluation[];
-  hints?: { _id: string; questionVersionId: string; text: string }[];
+  hints?: {
+    _id: string;
+    questionVersionId: string;
+    text: string;
+    provider: string;
+    model?: string;
+  }[];
 }
 export interface Report {
   total: number;
@@ -62,4 +75,5 @@ export interface Report {
   evidence: Attempt[];
   recommendation: string;
   provider: string;
+  hintFeedback?: { _id: string; hintId: string; reason: string }[];
 }
