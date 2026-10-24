@@ -18,6 +18,7 @@ import { Button } from "./ui/button";
 import { Brand } from "./ui/brand";
 import type { User, Node, Question, Assignment, Report, Course, Enrollment, StudentDashboardData } from "@/lib/types";
 import { api } from "@/lib/api";
+import { assignmentFromSearch, pageFromPath, pathForPage } from "@/lib/app-routes";
 
 import { AuthScreen } from "@/features/auth/auth-screen";
 import { PracticeScreen } from "@/features/practice/practice-screen";
@@ -123,13 +124,62 @@ export default function HamyarApp() {
       setBusy(false);
     }
   }
+  function navigatePage(nextPage: string, assignmentId?: string, replace = false) {
+    const target = pathForPage(nextPage, assignmentId ?? active?._id);
+    const current = window.location.pathname + window.location.search;
+    if (current !== target) {
+      if (replace) window.history.replaceState(window.history.state, "", target);
+      else window.history.pushState(window.history.state, "", target);
+    }
+    setPage(nextPage);
+    setError("");
+  }
+
+  async function restoreLocation() {
+    const next = pageFromPath(window.location.pathname);
+    if (next !== "practice" && next !== "report") {
+      setPage(next);
+      return;
+    }
+    const assignmentId = assignmentFromSearch(window.location.search);
+    if (!assignmentId) {
+      window.history.replaceState(window.history.state, "", "/homeworks");
+      setPage("missions");
+      return;
+    }
+    try {
+      const detail = await api<Assignment>("/assignments/" + assignmentId);
+      setActive(detail);
+      setQi(0);
+      setAnswer(localStorage.getItem(
+        "draft:" + detail.studentId + ":" + detail._id + ":" + (detail.questions?.[0]?._id ?? ""),
+      ) ?? "");
+      if (next === "report") {
+        setReport(await api<Report>("/assignments/" + assignmentId + "/report"));
+      } else {
+        setReport(null);
+      }
+      setPage(next);
+    } catch {
+      // An expired/deleted or unauthorized deep link cannot show another user's data.
+      window.history.replaceState(window.history.state, "", "/homeworks");
+      setActive(null);
+      setReport(null);
+      setPage("missions");
+      setError("این تمرین یا گزارش در دسترس نیست.");
+    }
+  }
+
   useEffect(() => {
+    const handleHistory = () => { void restoreLocation(); };
+    window.addEventListener("popstate", handleHistory);
     api<User>("/auth/me")
       .then(async (u) => {
         setMe(u);
         await refresh(u);
+        await restoreLocation();
       })
-      .catch(() => {})
+      .catch(() => { setPage(pageFromPath(window.location.pathname)); })
       .finally(() => setLoading(false));
     const invitation = new URLSearchParams(window.location.search).get(
       "invite",
@@ -140,6 +190,7 @@ export default function HamyarApp() {
     }
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production")
       navigator.serviceWorker.register("/sw.js").catch(() => {});
+    return () => window.removeEventListener("popstate", handleHistory);
   }, []); // initial session hydration
   async function logout() {
     await api("/auth/logout", {});
@@ -179,6 +230,9 @@ export default function HamyarApp() {
       setMe(u);
       setPassword("");
       await refresh(u);
+      if (["practice", "report"].includes(pageFromPath(window.location.pathname))) {
+        await restoreLocation();
+      }
     });
   }
   async function open(a: Assignment) {
@@ -192,7 +246,7 @@ export default function HamyarApp() {
           "draft:" + me!._id + ":" + a._id + ":" + detail.questions![0]._id,
         ) ?? "",
       );
-      setPage("practice");
+      navigatePage("practice", detail._id);
     });
   }
   async function reloadActive() {
@@ -203,7 +257,7 @@ export default function HamyarApp() {
     await run(async () => {
       setActive(await api("/assignments/" + a._id));
       setReport(await api("/assignments/" + a._id + "/report"));
-      setPage("report");
+      navigatePage("report", a._id);
     });
   }
   if (loading)
@@ -273,20 +327,17 @@ export default function HamyarApp() {
         ["learning", "یادگیری و مرور", BarChart3],
       ] as const);
   return (
-    <div className="min-h-screen min-[651px]:grid min-[651px]:grid-cols-[180px_minmax(0,1fr)] min-[951px]:grid-cols-[240px_minmax(0,1fr)]">
-      <aside className="glass-sidebar min-w-0 mx-3 my-3 flex flex-col gap-6 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
+    <div className="min-h-screen min-[651px]:grid min-[651px]:grid-cols-[max-content_minmax(0,1fr)]">
+      <aside className="glass-sidebar min-w-0 min-[651px]:w-max min-[651px]:min-w-max mx-3 my-3 flex flex-col gap-6 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
         <Brand showTagline />
         <small className="text-xs leading-loose text-slate-500">
           {teacher ? "فضای کار معلم" : "فضای تمرین دانش‌آموز"}
         </small>
-        <nav className="grid gap-2">
+        <nav className="grid gap-2 min-[651px]:[&_button]:whitespace-nowrap">
           {nav.map(([key, title, Icon]) => (
             <button
               key={key}
-              onClick={() => {
-                setPage(key);
-                setError("");
-              }}
+              onClick={() => navigatePage(key)}
               data-active={page === key}
               className={clsx(
                 "hy-navigation-item flex w-full cursor-pointer items-center gap-3 rounded-[15px] p-2.5 text-right motion-reduce:transition-none max-[650px]:whitespace-nowrap",
@@ -325,8 +376,8 @@ export default function HamyarApp() {
           خروج
         </Button>
       </aside>
-      <main className="relative w-full min-w-0 px-8 py-7 max-[950px]:p-6 max-[650px]:p-[18px] grid gap-[18px]">
-        <header className="glass-header mb-6 flex items-center justify-between gap-3 p-4 sm:p-5 max-[650px]:mb-[22px] max-[650px]:[&_h1]:text-[22px]">
+      <main className="relative grid w-full min-w-0 content-start gap-[18px] px-8 py-7 max-[950px]:p-6 max-[650px]:p-[18px]">
+        <header className="glass-header mb-2 flex h-fit self-start items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-2.5 max-[650px]:mb-2 max-[650px]:[&_h1]:text-[22px]">
           <div>
             <small className="text-xs leading-loose text-slate-500">
               همیار / {teacher ? "پنل معلم" : "یادگیری"}
@@ -379,7 +430,7 @@ export default function HamyarApp() {
             teacher={true}
             assignments={assignments}
             students={students}
-            setPage={setPage}
+            setPage={navigatePage}
           />
         ) : (
           <StudentOverview
@@ -387,7 +438,7 @@ export default function HamyarApp() {
             data={studentDashboard}
             assignments={assignments}
             busy={busy}
-            setPage={setPage}
+            setPage={navigatePage}
             open={open}
             showReport={showReport}
             invitationToken={token}
@@ -503,7 +554,7 @@ export default function HamyarApp() {
             setActive={setActive}
             setReport={setReport}
             refresh={refresh}
-            setPage={setPage}
+            setPage={navigatePage}
           />
         )}
         {page === "report" && report && active && (

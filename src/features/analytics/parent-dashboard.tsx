@@ -25,8 +25,8 @@ export function ParentDashboard({
       .catch((e) => setError(e.message));
   }, []);
   return (
-    <main className="mx-auto grid w-full gap-5 p-5 sm:p-8">
-      <header className="glass-header flex flex-wrap items-center justify-between gap-4 p-4 sm:p-6">
+    <main className="mx-auto grid w-full content-start gap-5 p-5 sm:p-8">
+      <header className="glass-header flex h-fit self-start flex-wrap items-center justify-between gap-4 px-4 py-2 sm:px-6 sm:py-3">
         <div>
           <Brand showTagline />
           <h1 className="mt-3 text-2xl font-bold text-[#1F3F97]">پنل اولیا</h1>

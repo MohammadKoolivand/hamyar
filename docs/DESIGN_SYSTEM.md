@@ -58,3 +58,11 @@ GitHub Actions saves screenshots/traces as `hamyar-ui-evidence`. Verify visually
 ## Runtime notes
 
 Next.js loads environment variables itself; do not add `--env-file-if-exists` into `NODE_OPTIONS`. The CLI checks port 5174 before dev start, and does not automatically kill processes occupying it.
+
+## Page sizing and URL navigation (October 2026)
+
+Each tab has a directly resolvable Next.js URL: `/dashboard`, `/students`, `/courses`, `/classes`, `/content`, `/homeworks` (the individual/group assignment list), and `/learning`. Legacy `/` remains a working login/dashboard entrypoint; initial invitation URLs `/?invite=<token>` continue to work. `/practice?assignment=<uuid>` and `/report?assignment=<uuid>` restore an individually authorized assignment on reload; records are fetched from the protected API, never from the URL alone. An inaccessible or malformed assignment link falls back to `/homeworks`.
+
+Route names and mappings are defined once in `src/lib/app-routes.ts`; `src/app/[section]/page.tsx` makes deep routes resolvable on direct HTTP requests. Within the authenticated app, navigation updates browser history with the History API; popstate rehydrates the selected section. Internal teacher/student shortcuts and practice completion use the same navigation function. Browser back and forward must work after a hard refresh.
+
+App shell uses CSS Grid with `content-start` and the shared header uses `self-start h-fit` to prevent grid-track stretching. Header vertical padding is halved from `py-4/py-5` to `py-2/sm:py-2.5`. Parent header uses `py-2/sm:py-3`. At ≥651px, the side column sizes to `max-content`; the sidebar is `min-w-max` and navigation labels do not wrap. Below this breakpoint the sidebar takes the mobile width and navigation remains horizontally scrollable. Keep the 360/390px viewport overflow assertions.
