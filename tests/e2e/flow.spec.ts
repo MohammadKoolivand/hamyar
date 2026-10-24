@@ -646,16 +646,30 @@ test("teacher publishes one group assignment to two students and sees separate r
 });
 
 test("teacher assigns one corrective practice from a student's wrong answer", async ({ page, browser }, testInfo) => {
+  test.setTimeout(180_000);
+  // Keep production login/register throttling intact. Earlier browser cases
+  // may already have consumed the shared unauthenticated IP quota.
+  async function authPost(
+    requester: typeof page.context().request,
+    endpoint: string,
+    data: object,
+  ) {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const response = await requester.post(endpoint, { data });
+      if (response.status() !== 429) return response;
+      const delaySeconds = Number(response.headers()["retry-after"] ?? 60);
+      await new Promise<void>((resolve) =>
+        setTimeout(resolve, 1000 * Math.min(65, Math.max(1, delaySeconds + 1))),
+      );
+    }
+    throw new Error("Authentication rate-limit window did not reset");
+  }
   const suffix = Date.now();
   const teacherEmail = `remedial-teacher-${suffix}@test.dev`;
   const studentEmail = `remedial-student-${suffix}@test.dev`;
   const teacherApi = page.context().request;
-  expect((await teacherApi.post("/api/auth/register", {
-    data: { name: "معلم خصوصی", email: teacherEmail, password: pass, role: "teacher" },
-  })).ok()).toBe(true);
-  expect((await teacherApi.post("/api/auth/login", {
-    data: { email: teacherEmail, password: pass },
-  })).ok()).toBe(true);
+  expect((await authPost(teacherApi, "/api/auth/register", { name: "معلم خصوصی", email: teacherEmail, password: pass, role: "teacher" })).ok()).toBe(true);
+  expect((await authPost(teacherApi, "/api/auth/login", { email: teacherEmail, password: pass })).ok()).toBe(true);
   const topicResponse = await teacherApi.post("/api/curriculum", {
     data: { title: "تمرین اشتباهات", kind: "topic" },
   });
@@ -670,14 +684,10 @@ test("teacher assigns one corrective practice from a student's wrong answer", as
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   try {
     const studentApi = context.request;
-    const reg = await studentApi.post("/api/auth/register", {
-      data: { name: "دانش‌آموز خصوصی", email: studentEmail,
-        password: pass, role: "student" },
-    });
+    const reg = await authPost(studentApi, "/api/auth/register", { name: "دانش‌آموز خصوصی", email: studentEmail,
+        password: pass, role: "student" });
     expect(reg.ok()).toBe(true);
-    const studentLogin = await studentApi.post("/api/auth/login", {
-      data: { email: studentEmail, password: pass },
-    });
+    const studentLogin = await authPost(studentApi, "/api/auth/login", { email: studentEmail, password: pass });
     expect(studentLogin.ok()).toBe(true);
     const studentId = (await studentLogin.json())._id;
     const invitation = await teacherApi.post("/api/invitations", {
