@@ -1,6 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
 import { z } from "zod";
+import type { ClientSession } from "mongodb";
+import type { Row } from "../db";
 export function registerIdentity(app: FastifyInstance, ctx: Context) {
   const {
     c,
@@ -16,6 +18,28 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
     scryptSync,
     timingSafeEqual,
   } = ctx;
+  async function addEnrollment(inv: Row, studentId: string, session: ClientSession) {
+    // Legacy teacher-only invitations intentionally remain valid without a course.
+    if (!inv.courseId) return;
+    const course = await c("courses").findOne({
+      _id: inv.courseId,
+      teacherId: inv.teacherId,
+      status: "active",
+    }, { session });
+    if (!course) fail(404, "این درس دیگر در دسترس نیست");
+    await c("enrollments").updateOne(
+      { courseId: course!._id, studentId },
+      { $setOnInsert: {
+        _id: id(),
+        courseId: course!._id,
+        teacherId: inv.teacherId,
+        studentId,
+        status: "active",
+        createdAt: now(),
+      } },
+      { upsert: true, session },
+    );
+  }
   app.post(
     "/api/auth/register",
     { config: { rateLimit: { max: 10, timeWindow: "1 minute" } } },
@@ -92,6 +116,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
           email: z.email().transform((s) => s.toLowerCase()),
           role: z.enum(["student", "parent"]).default("student"),
           studentId: z.string().uuid().optional(),
+          courseId: z.string().uuid().optional(),
         })
         .parse(r.body);
     if (
@@ -103,12 +128,22 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
         })))
     )
       fail(404, "دانش‌آموز مرتبط یافت نشد");
+    if (b.courseId) {
+      if (b.role !== "student") fail(400, "دعوت اولیا به درس متصل نمی‌شود");
+      const course = await c("courses").findOne({
+        _id: b.courseId,
+        teacherId: u._id,
+        status: "active",
+      });
+      if (!course) fail(404, "درس پیدا نشد");
+    }
     const token = randomBytes(24).toString("hex");
     await c("invitations").insertOne({
       _id: id(),
       teacherId: u._id,
       role: b.role,
       ...(b.role === "parent" ? { studentId: b.studentId } : {}),
+      ...(b.role === "student" && b.courseId ? { courseId: b.courseId } : {}),
       email: b.email,
       tokenHash: hash(token),
       expiresAt: new Date(Date.now() + 72 * 3600000),
@@ -216,6 +251,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
             },
             { upsert: true, session },
           );
+          await addEnrollment(inv!, uid, session);
         }
         await c("auditLogs").insertOne(
           {
@@ -262,6 +298,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
         },
         { session, upsert: true },
       );
+      await addEnrollment(inv!, student._id, session);
       await c("auditLogs").insertOne(
         {
           _id: id(),

@@ -1,13 +1,15 @@
 "use client";
-import type React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { api } from "@/lib/api";
 import { fa, stateLabel } from "@/lib/presentation";
-import type { User, Question, Assignment } from "@/lib/types";
+import type { User, Question, Assignment, Course, Enrollment } from "@/lib/types";
 import { ArrowLeft, Target, BarChart3 } from "lucide-react";
 export function MissionsScreen({
   teacher,
+  courses,
+  enrollments,
   students,
   questions,
   assignments,
@@ -36,6 +38,8 @@ export function MissionsScreen({
   open,
 }: {
   teacher: boolean;
+  courses: Course[];
+  enrollments: Enrollment[];
   students: User[];
   questions: Question[];
   assignments: Assignment[];
@@ -63,6 +67,10 @@ export function MissionsScreen({
   showReport: (v: Assignment) => Promise<void>;
   open: (v: Assignment) => Promise<void>;
 }) {
+  const [courseId, setCourseId] = useState("");
+  const allowedStudents = courseId
+    ? students.filter((person) => enrollments.some((e) => e.courseId === courseId && e.studentId === person._id))
+    : students;
   return (
     <>
       {teacher && (
@@ -75,6 +83,7 @@ export function MissionsScreen({
                 await api("/missions", {
                   title: missionTitle,
                   studentId: student,
+                  ...(courseId ? { courseId } : {}),
                   questionVersionIds: selected,
                   policy: {
                     maxHints,
@@ -101,6 +110,15 @@ export function MissionsScreen({
                   className="w-full min-h-[46px] glass-field p-3"
                 />
               </Field>
+              {!!courses.length && (
+                <Field title="درس مأموریت">
+                  <select className="w-full min-h-[46px] glass-field p-3" value={courseId}
+                    onChange={(e) => { setCourseId(e.target.value); setStudent(""); }}>
+                    <option value="">بدون درس (مأموریت قدیمی)</option>
+                    {courses.map((c) => <option key={c._id} value={c._id}>{c.title} · {c.subject}</option>)}
+                  </select>
+                </Field>
+              )}
               <Field title="دانش‌آموز">
                 <select
                   required
@@ -109,7 +127,7 @@ export function MissionsScreen({
                   className="w-full min-h-[46px] glass-field p-3"
                 >
                   <option value="">انتخاب دانش‌آموز</option>
-                  {students.map((s) => (
+                  {allowedStudents.map((s) => (
                     <option key={s._id} value={s._id}>
                       {s.name}
                     </option>
@@ -263,6 +281,7 @@ export function MissionsScreen({
               {teacher
                 ? students.find((s) => s._id === a.studentId)?.name
                 : "تمرین زیر نظر معلم"}{" "}
+              {a.courseId ? " · " + (courses.find((c) => c._id === a.courseId)?.title ?? "درس") : ""}{" "}
               ·{" "}
               {a.policy.independent
                 ? "سنجش مستقل"

@@ -13,12 +13,16 @@ export async function connect(
     ["sessions", { tokenHash: 1 }],
     ["invitations", { tokenHash: 1 }],
     ["relations", { teacherId: 1, studentId: 1 }],
+    ["enrollments", { courseId: 1, studentId: 1 }],
     ["parentLinks", { parentId: 1, studentId: 1, teacherId: 1 }],
     ["assignments", { missionId: 1, studentId: 1 }],
     ["evaluations", { attemptId: 1 }],
     ["hintReports", { hintId: 1, studentId: 1 }],
   ] as const)
     await db.collection(name).createIndex(keys, { unique: true });
+  await db.collection("courses").createIndex({ teacherId: 1, status: 1 });
+  await db.collection("enrollments").createIndex({ teacherId: 1, studentId: 1, status: 1 });
+  await db.collection("enrollments").createIndex({ studentId: 1, status: 1 });
   await db
     .collection("sessions")
     .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });

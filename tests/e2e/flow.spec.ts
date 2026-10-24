@@ -460,8 +460,14 @@ test("student registers without invitation and later joins teacher with existing
     await teacherPage.getByLabel("رمز عبور").fill(pass);
     await teacherPage.getByRole("button", { name: "ساخت حساب", exact: true }).click();
     await teacherPage.getByRole("button", { name: "ورود به همیار" }).click();
+    await teacherPage.getByRole("button", { name: "درس‌های من", exact: true }).click();
+    await teacherPage.getByLabel("نام درس").fill("ریاضی");
+    await teacherPage.getByLabel("عنوان دوره").fill("ریاضی آزمایشی");
+    await teacherPage.getByRole("button", { name: "ایجاد درس" }).click();
+    await expect(teacherPage.getByRole("heading", { name: "ریاضی آزمایشی" })).toBeVisible();
     await teacherPage.getByRole("button", { name: "دانش‌آموزان", exact: true }).click();
     await teacherPage.getByLabel("ایمیل دانش‌آموز").fill(studentEmail);
+    await teacherPage.getByLabel("درس دعوت").selectOption({ label: "ریاضی آزمایشی · ریاضی" });
     await teacherPage.getByRole("button", { name: "ایجاد دعوت" }).click();
     const invite = await teacherPage.getByTestId("invitation-token").innerText();
 
@@ -473,6 +479,9 @@ test("student registers without invitation and later joins teacher with existing
     await page.reload();
     await expect(page.getByRole("heading", { name: "مسیر یادگیری من" })).toBeVisible();
     await expect(page.getByLabel("کد دعوت معلم")).toHaveValue("");
+    await page.getByRole("button", { name: "درس‌های من", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "ریاضی آزمایشی" })).toBeVisible();
+    await expect(page.getByText("معلم: معلم آزمایشی")).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath("student-after-teacher-link-mobile.png"), fullPage: true });
   } finally {
     await teacherContext.close();

@@ -51,3 +51,11 @@ learningEvidence uses attemptId as _id and stores assignment/student/teacher/que
 - questionVersions.origin برابر human یا ai_reviewed؛ در حالت دوم sourceDraftId و provenance مدل محفوظ است. verifiedBy/At همیشه تصویب انسانی است. ایجاد دستی هم question و version را تراکنشی می‌نویسد.
 - aiRequests.purpose=question_authoring و ownerId برای تولید بدون داده دانش‌آموز؛ usage ممکن است نامعلوم باشد. درخواست‌های generated که به draft متصل نیستند می‌توانند inference هم‌زمان بلااستفاده باشند؛ حذف/تسویه خودکار هنوز نداریم.
 - طرح حذف داده باید users/sessions/invitations/relations/parentLinks/assignments/attempts/evaluations/hintEvents/hintReports/learningEvidence/mistakeRecords/masteryRecords/masteryOverrides/operations/aiRequests/auditLogs/questionDrafts و backupها را با حدود مالکیت و حقوق طرف‌های دیگر لحاظ کند. هیچ TTL ساختگی برای پاسخ‌های آموزشی تعیین نشده است.
+
+## Course و Enrollment — مدل درس‌محور (۲ آبان ۱۴۰۵)
+
+- `courses`: `_id`، `teacherId`، `title`، `subject`، `status=active` و `createdAt`. این موجودیت با نود `curriculum.kind=course` فرق دارد: اولی رابطه آموزشی و دسترسی را تعریف می‌کند؛ دومی ساختار محتوای خصوصی معلم است. دوره‌های قدیمی بدون این شناسه همچنان معتبرند.
+- `enrollments`: `_id`، `courseId`، `teacherId`، `studentId`، `status=active`، `createdAt`. ایندکس یکتا روی `(courseId,studentId)` و ایندکس‌های خواندن برای هر معلم/دانش‌آموز.
+- دعوت دانش‌آموز می‌تواند `courseId` متعلق به معلم داشته باشد؛ هنگام قبول دعوت، ایجاد relation و enrollment و مصرف توکن در همان تراکنش انجام می‌شوند. دعوت فاقد courseId در مسیر قدیمی، تنها relation می‌سازد و کاربر بدون رضایت مجدد عضو هیچ درس جدیدی نمی‌شود.
+- `missions.courseId/enrollmentId` و `assignments.courseId/enrollmentId` برای مأموریت درس‌محور ذخیره می‌شوند؛ انتشار فقط با عضویت فعال ممکن است. اسناد قدیمی فاقد این کلیدها معتبرند. نمره‌ها/شواهد قدیمی بدون جعل منبع درس یا مهاجرت مخرب باقی می‌مانند.
+- عضویت در یک درس، دسترسی به سؤال‌ها، مأموریت‌ها یا گزارش‌های خصوصی معلم دیگر ایجاد نمی‌کند؛ گزارش‌های پیشرفته فیلترشده بر اساس درس و ابزار انتقال/لغو عضویت در مراحل بعد تعریف می‌شوند.

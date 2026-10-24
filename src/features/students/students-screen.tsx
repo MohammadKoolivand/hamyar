@@ -1,13 +1,15 @@
 "use client";
 import { ParentInvitation } from "./parent-invitation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { api } from "@/lib/api";
 
-import type { User } from "@/lib/types";
+import type { User, Course } from "@/lib/types";
 import { Plus } from "lucide-react";
 export function StudentsScreen({
   students,
+  courses,
   inviteEmail,
   inviteToken,
   busy,
@@ -17,6 +19,7 @@ export function StudentsScreen({
   setInviteToken,
 }: {
   students: User[];
+  courses: Course[];
   inviteEmail: string;
   inviteToken: string;
   busy: boolean;
@@ -25,6 +28,7 @@ export function StudentsScreen({
   setInviteEmail: (v: string) => void;
   setInviteToken: (v: string) => void;
 }) {
+  const [inviteCourseId, setInviteCourseId] = useState("");
   return (
     <div className="grid gap-[22px] min-[951px]:grid-cols-2">
       <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
@@ -38,6 +42,7 @@ export function StudentsScreen({
             run(async () => {
               const d = await api<{ token: string }>("/invitations", {
                 email: inviteEmail,
+                ...(inviteCourseId ? { courseId: inviteCourseId } : {}),
               });
               setInviteToken(d.token);
             });
@@ -54,6 +59,22 @@ export function StudentsScreen({
               className="w-full min-h-[46px] glass-field p-3"
             />
           </Field>
+          {!!courses.length && (
+            <Field title="درس دعوت">
+              <select
+                className="w-full min-h-[46px] glass-field p-3"
+                value={inviteCourseId}
+                onChange={(e) => setInviteCourseId(e.target.value)}
+              >
+                <option value="">بدون درس (دعوت قدیمی)</option>
+                {courses.map((course) => (
+                  <option key={course._id} value={course._id}>
+                    {course.title} · {course.subject}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
           <Button disabled={busy}>
             <Plus size={16} />
             ایجاد دعوت

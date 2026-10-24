@@ -1,3 +1,22 @@
+export interface Course {
+  _id: string;
+  teacherId: string;
+  title: string;
+  subject: string;
+  status: "active";
+  createdAt: string;
+}
+export interface Enrollment {
+  _id: string;
+  teacherId: string;
+  studentId: string;
+  courseId: string;
+  status: "active";
+  createdAt: string;
+  courseTitle: string;
+  subject: string;
+  teacherName?: string;
+}
 export interface User {
   _id: string;
   name: string;
@@ -40,6 +59,8 @@ export interface Attempt {
 }
 export interface Assignment {
   missionId: string;
+  courseId?: string;
+  enrollmentId?: string;
   _id: string;
   title: string;
   state: string;

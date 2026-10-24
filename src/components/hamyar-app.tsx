@@ -12,9 +12,10 @@ import {
   LogOut,
   GraduationCap,
   BarChart3,
+  BookOpenCheck,
 } from "lucide-react";
 import { Button } from "./ui/button";
-import type { User, Node, Question, Assignment, Report } from "@/lib/types";
+import type { User, Node, Question, Assignment, Report, Course, Enrollment } from "@/lib/types";
 import { api } from "@/lib/api";
 
 import { AuthScreen } from "@/features/auth/auth-screen";
@@ -26,6 +27,7 @@ import { ContentScreen } from "@/features/content/content-screen";
 import { MissionsScreen } from "@/features/missions/missions-screen";
 import { ParentDashboard } from "@/features/analytics/parent-dashboard";
 import { LearningDashboard } from "@/features/analytics/learning-dashboard";
+import { CoursesScreen } from "@/features/courses/courses-screen";
 export default function HamyarApp() {
   const [me, setMe] = useState<User | null>(null),
     [loading, setLoading] = useState(true),
@@ -33,6 +35,8 @@ export default function HamyarApp() {
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false),
     [page, setPage] = useState("dashboard");
+  const [courses, setCourses] = useState<Course[]>([]),
+    [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [students, setStudents] = useState<User[]>([]),
     [nodes, setNodes] = useState<Node[]>([]),
     [questions, setQuestions] = useState<Question[]>([]),
@@ -76,8 +80,15 @@ export default function HamyarApp() {
   const [qi, setQi] = useState(0),
     [answer, setAnswer] = useState("");
   async function refresh(u = me) {
-    if (!u) return;
-    setAssignments(await api("/assignments"));
+    if (!u || u.role === "parent") return;
+    const [nextAssignments, nextCourses, nextEnrollments] = await Promise.all([
+      api<Assignment[]>("/assignments"),
+      api<Course[]>("/courses"),
+      api<Enrollment[]>("/enrollments"),
+    ]);
+    setAssignments(nextAssignments);
+    setCourses(nextCourses);
+    setEnrollments(nextEnrollments);
     if (u.role === "teacher") {
       const [s, n, q, d] = await Promise.all([
         api<User[]>("/students"),
@@ -240,6 +251,7 @@ export default function HamyarApp() {
     ? ([
         ["dashboard", "نمای کلی", LayoutDashboard],
         ["students", "دانش‌آموزان", Users],
+        ["courses", "درس‌های من", BookOpenCheck],
         ["content", "بانک سؤال و محتوا", Library],
         ["missions", "مأموریت‌ها", Target],
         ["learning", "یادگیری و مرور", BarChart3],
@@ -247,6 +259,7 @@ export default function HamyarApp() {
     : ([
         ["dashboard", "مسیر یادگیری من", LayoutDashboard],
         ["missions", "مأموریت‌های من", Target],
+        ["courses", "درس‌های من", BookOpenCheck],
         ["learning", "یادگیری و مرور", BarChart3],
       ] as const);
   return (
@@ -327,6 +340,16 @@ export default function HamyarApp() {
           </div>
         </header>
         {feedback}
+        {page === "courses" && (
+          <CoursesScreen
+            teacher={teacher}
+            courses={courses}
+            enrollments={enrollments}
+            assignments={assignments}
+            students={students}
+            refresh={() => refresh()}
+          />
+        )}
         {page === "learning" && (
           <LearningDashboard me={me} students={students} />
         )}
@@ -350,6 +373,7 @@ export default function HamyarApp() {
         {page === "students" && teacher && (
           <StudentsScreen
             students={students}
+            courses={courses}
             inviteEmail={inviteEmail}
             inviteToken={inviteToken}
             busy={busy}
@@ -404,6 +428,8 @@ export default function HamyarApp() {
         {page === "missions" && (
           <MissionsScreen
             teacher={teacher}
+            courses={courses}
+            enrollments={enrollments}
             students={students}
             questions={questions}
             assignments={assignments}

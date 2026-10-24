@@ -17,6 +17,7 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
         .object({
           title: z.string().min(3).max(150),
           studentId: z.string().uuid(),
+          courseId: z.string().uuid().optional(),
           questionVersionIds: z.array(z.string().uuid()).min(1).max(30),
           policy: policySchema,
         })
@@ -30,12 +31,29 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
       }))
     )
       fail(404, "دانش‌آموز یافت نشد");
+    // New course-scoped missions require the student's active enrollment.
+    // Older teacher/student missions without courseId remain readable and valid.
+    const enrollment = b.courseId
+      ? await c("enrollments").findOne({
+          teacherId: u._id,
+          studentId: b.studentId,
+          courseId: b.courseId,
+          status: "active",
+        })
+      : null;
+    if (b.courseId) {
+      const course = await c("courses").findOne({
+        _id: b.courseId, teacherId: u._id, status: "active",
+      });
+      if (!course || !enrollment) fail(404, "عضویت معتبر در این درس پیدا نشد");
+    }
     for (const q of b.questionVersionIds)
       await owned("questionVersions", q, u._id);
     const row = {
       _id: id(),
       teacherId: u._id,
       ...b,
+      ...(enrollment ? { enrollmentId: enrollment._id } : {}),
       state: "draft",
       createdAt: now(),
     };
@@ -57,6 +75,19 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
         )
       )
         return { ok: true };
+      if (m!.courseId) {
+        const course = await c("courses").findOne({
+          _id: m!.courseId, teacherId: u._id, status: "active",
+        }, { session });
+        const enrollment = await c("enrollments").findOne({
+          _id: m!.enrollmentId,
+          courseId: m!.courseId,
+          studentId: m!.studentId,
+          teacherId: u._id,
+          status: "active",
+        }, { session });
+        if (!course || !enrollment) fail(409, "عضویت این درس دیگر معتبر نیست");
+      }
       transition(m!.state, "published");
       const progress = Object.fromEntries(
         m!.questionVersionIds.map((q: string) => [
@@ -70,6 +101,7 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
           missionId: mid,
           teacherId: u._id,
           studentId: m!.studentId,
+          ...(m!.courseId ? { courseId: m!.courseId, enrollmentId: m!.enrollmentId } : {}),
           title: m!.title,
           policy: m!.policy,
           questionVersionIds: m!.questionVersionIds,
