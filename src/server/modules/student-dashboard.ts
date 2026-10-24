@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
-import type { Row } from "../db";
+import type { Document } from "mongodb";
 
 // A student's own evidence-only dashboard. This is not a mastery score:
 // completion and correctness are distinct measurements and unknown remains unknown.
@@ -47,7 +47,7 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
           attemptId: { $in: attempts.map((a) => a._id) },
         }, { session }).project({ _id: 1, attemptId: 1, result: 1 }).toArray()
         : [];
-      const latest = new Map<string, Row>();
+      const latest = new Map<string, Document>();
       for (const attempt of attempts) {
         const key = attempt.assignmentId + ":" + attempt.questionVersionId;
         const prev = latest.get(key);
@@ -55,7 +55,7 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
       }
       const evaluationsByAttempt = new Map(evaluations.map((e) => [e.attemptId, e]));
 
-      function summarize(rows: Row[]) {
+      function summarize(rows: Document[]) {
         const ids = new Set(rows.map((a) => a._id));
         const relevant = [...latest.values()].filter((a) => ids.has(a.assignmentId));
         let correctIndependent = 0, correctAssisted = 0, pendingReview = 0, evaluatedQuestions = 0;
