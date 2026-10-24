@@ -15,13 +15,14 @@ import {
   BookOpenCheck,
 } from "lucide-react";
 import { Button } from "./ui/button";
-import type { User, Node, Question, Assignment, Report, Course, Enrollment } from "@/lib/types";
+import type { User, Node, Question, Assignment, Report, Course, Enrollment, StudentDashboardData } from "@/lib/types";
 import { api } from "@/lib/api";
 
 import { AuthScreen } from "@/features/auth/auth-screen";
 import { PracticeScreen } from "@/features/practice/practice-screen";
 import { MissionReport } from "@/features/analytics/mission-report";
 import { OverviewScreen } from "@/features/dashboard/dashboard-screen";
+import { StudentOverview } from "@/features/dashboard/student-overview";
 import { StudentsScreen } from "@/features/students/students-screen";
 import { ContentScreen } from "@/features/content/content-screen";
 import { MissionsScreen } from "@/features/missions/missions-screen";
@@ -37,6 +38,7 @@ export default function HamyarApp() {
     [page, setPage] = useState("dashboard");
   const [courses, setCourses] = useState<Course[]>([]),
     [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [studentDashboard, setStudentDashboard] = useState<StudentDashboardData | null>(null);
   const [students, setStudents] = useState<User[]>([]),
     [nodes, setNodes] = useState<Node[]>([]),
     [questions, setQuestions] = useState<Question[]>([]),
@@ -89,6 +91,11 @@ export default function HamyarApp() {
     setAssignments(nextAssignments);
     setCourses(nextCourses);
     setEnrollments(nextEnrollments);
+    if (u.role === "student") {
+      setStudentDashboard(await api<StudentDashboardData>("/student/dashboard"));
+    } else {
+      setStudentDashboard(null);
+    }
     if (u.role === "teacher") {
       const [s, n, q, d] = await Promise.all([
         api<User[]>("/students"),
@@ -353,13 +360,23 @@ export default function HamyarApp() {
         {page === "learning" && (
           <LearningDashboard me={me} students={students} />
         )}
-        {page === "dashboard" && (
+        {page === "dashboard" && (teacher ? (
           <OverviewScreen
             me={me}
-            teacher={teacher}
+            teacher={true}
             assignments={assignments}
             students={students}
             setPage={setPage}
+          />
+        ) : (
+          <StudentOverview
+            me={me}
+            data={studentDashboard}
+            assignments={assignments}
+            busy={busy}
+            setPage={setPage}
+            open={open}
+            showReport={showReport}
             invitationToken={token}
             onJoined={async () => {
               setToken("");
@@ -369,7 +386,7 @@ export default function HamyarApp() {
               await refresh();
             }}
           />
-        )}
+        ))}
         {page === "students" && teacher && (
           <StudentsScreen
             students={students}

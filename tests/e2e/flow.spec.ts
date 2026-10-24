@@ -97,6 +97,9 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   ).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("glass-teacher-missions.png"), fullPage: true });
   await sp.reload();
+  await expect(sp.getByTestId("legacy-missions")).toBeVisible();
+  await expect(sp.getByTestId("legacy-missions").getByText("اولین گام یادگیری")).toBeVisible();
+  await sp.screenshot({ path: testInfo.outputPath("student-dashboard-legacy-mobile.png"), fullPage: true });
   await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
   await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
   await expect(
@@ -478,6 +481,12 @@ test("student registers without invitation and later joins teacher with existing
     await expect(teacherPage.getByRole("heading", { name: "دانش‌آموز مستقل" })).toBeVisible();
     await page.reload();
     await expect(page.getByRole("heading", { name: "مسیر یادگیری من" })).toBeVisible();
+    await expect(page.getByTestId("student-course-card")).toHaveCount(1);
+    await expect(page.getByTestId("student-course-card").getByRole("heading", { name: "ریاضی آزمایشی" })).toBeVisible();
+    await page.getByLabel("نمایش درس").selectOption({ label: "ریاضی آزمایشی · معلم آزمایشی" });
+    await expect(page.getByTestId("student-course-card")).toHaveCount(1);
+    await expect(page.getByText("هنوز مأموریتی برای این درس منتشر نشده است.")).toBeVisible();
+    await page.screenshot({ path: testInfo.outputPath("student-dashboard-course-mobile.png"), fullPage: true });
     await expect(page.getByLabel("کد دعوت معلم")).toHaveValue("");
     await page.getByRole("button", { name: "درس‌های من", exact: true }).click();
     await expect(page.getByRole("heading", { name: "ریاضی آزمایشی" })).toBeVisible();

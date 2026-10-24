@@ -17,6 +17,38 @@ export interface Enrollment {
   subject: string;
   teacherName?: string;
 }
+export interface DashboardMission {
+  _id: string;
+  title: string;
+  state: string;
+  courseId: string | null;
+  createdAt: string;
+}
+export interface DashboardMetrics {
+  assignments: number;
+  completed: number;
+  awaitingReview: number;
+  inProgress: number;
+  cancelled: number;
+  assignedQuestions: number;
+  answeredQuestions: number;
+  evaluatedQuestions: number;
+  correctIndependent: number;
+  correctAssisted: number;
+  pendingReview: number;
+}
+export interface DashboardCourse extends DashboardMetrics {
+  courseId: string;
+  title: string;
+  subject: string;
+  teacherName: string;
+  missions: DashboardMission[];
+}
+export interface StudentDashboardData {
+  summary: DashboardMetrics & { activeCourses: number };
+  courses: DashboardCourse[];
+  legacy: DashboardMetrics & { missions: DashboardMission[] };
+}
 export interface User {
   _id: string;
   name: string;
