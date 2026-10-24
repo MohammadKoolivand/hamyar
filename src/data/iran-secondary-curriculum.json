@@ -1,0 +1,4765 @@
+{
+  "version": "ir-secondary-v3",
+  "books": [
+    {
+      "id": "riazi-7",
+      "grade": 7,
+      "title": "ریاضی هفتم",
+      "subject": "mathematics",
+      "tracks": ["common"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/555/C705.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C705",
+        "academicYear": "1405-1406",
+        "sha256": "bd29fabf28a0d9e36e18a47f4ad2940f901d85a8821c44ce09302fcfad847cb4",
+        "outlinePdfPages": [4, 5],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "راهبردهای حل مسئله",
+          "topics": [
+            {
+              "title": "راهبردهای حل مسئله",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "عددهای صحیح",
+          "topics": [
+            {
+              "title": "معرفی عددهای علامت دار",
+              "basis": "lesson"
+            },
+            {
+              "title": "جمع و تفریق عددهای صحیح (1)",
+              "basis": "lesson"
+            },
+            {
+              "title": "جمع و تفریق عددهای صحیح (2)",
+              "basis": "lesson"
+            },
+            {
+              "title": "ضرب و تقسیم عددهای صحیح",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "جبر و معادله",
+          "topics": [
+            {
+              "title": "الگوهای عددی",
+              "basis": "lesson"
+            },
+            {
+              "title": "عبارت های جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "مقدار عددی یک عبارت جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادله",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "هندسه و استدلال",
+          "topics": [
+            {
+              "title": "روابط بین پاره خط ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "روابط بین زاویه ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "تبدیلات هندسی (انتقال، تقارن، دوران)",
+              "basis": "lesson"
+            },
+            {
+              "title": "شکلهای مساوی (هم نهشت)",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "شمارنده ها و اعداد اول",
+          "topics": [
+            {
+              "title": "عدد اول",
+              "basis": "lesson"
+            },
+            {
+              "title": "شمارنده اول",
+              "basis": "lesson"
+            },
+            {
+              "title": "بزرگترین شمارنده مشترک",
+              "basis": "lesson"
+            },
+            {
+              "title": "کوچکترین مضرب مشترک",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "سطح و حجم",
+          "topics": [
+            {
+              "title": "حجم های هندسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "محاسبه حجم های منشوری",
+              "basis": "lesson"
+            },
+            {
+              "title": "مساحت جانبی و کل",
+              "basis": "lesson"
+            },
+            {
+              "title": "حجم و سطح",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "توان و جذر",
+          "topics": [
+            {
+              "title": "تعریف توان",
+              "basis": "lesson"
+            },
+            {
+              "title": "محاسبه عبارت توان دار",
+              "basis": "lesson"
+            },
+            {
+              "title": "ساده کردن عبارت های توان دار",
+              "basis": "lesson"
+            },
+            {
+              "title": "جذر و ریشه",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "بردار و مختصات",
+          "topics": [
+            {
+              "title": "پاره خط جهت دار",
+              "basis": "lesson"
+            },
+            {
+              "title": "بردارهای مساوی و قرینه",
+              "basis": "lesson"
+            },
+            {
+              "title": "مختصات",
+              "basis": "lesson"
+            },
+            {
+              "title": "بردار انتقال",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "آمار و احتمال",
+          "topics": [
+            {
+              "title": "جمع آوری و نمایش داده ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "نمودارها و تفسیر نتیجه ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "احتمال یا اندازه گیری شانس",
+              "basis": "lesson"
+            },
+            {
+              "title": "احتمال و تجربه",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "riazi-8",
+      "grade": 8,
+      "title": "ریاضی هشتم",
+      "subject": "mathematics",
+      "tracks": ["common"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/558/C805.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C805",
+        "academicYear": "1405-1406",
+        "sha256": "87390bc4093f55d2f1e8db8b4260a0a75820ecc0e671bc3c1213f234ca69ae8d",
+        "outlinePdfPages": [4, 5, 6],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "عددهای صحیح و گویا",
+          "topics": [
+            {
+              "title": "یادآوری عددهای صحیح",
+              "basis": "lesson"
+            },
+            {
+              "title": "معرفی عددهای گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "جمع و تفریق عددهای گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "ضرب و تقسیم عددهای گویا",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "عددهای اول",
+          "topics": [
+            {
+              "title": "یادآوری عددهای اول",
+              "basis": "lesson"
+            },
+            {
+              "title": "تعیین عددهای اول",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "چند ضلعیها",
+          "topics": [
+            {
+              "title": "چند ضلعیها و تقارن",
+              "basis": "lesson"
+            },
+            {
+              "title": "توازی و تعامد",
+              "basis": "lesson"
+            },
+            {
+              "title": "چهارضلعیها",
+              "basis": "lesson"
+            },
+            {
+              "title": "زاویههای داخلی",
+              "basis": "lesson"
+            },
+            {
+              "title": "زاویههای خارجی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "جبر و معادله",
+          "topics": [
+            {
+              "title": "ساده کردن عبارتهای جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "پیدا کردن مقدار یک عبارت جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "تجزیه عبارتهای جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادله",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "بردار و مختصات",
+          "topics": [
+            {
+              "title": "جمع بردارها",
+              "basis": "lesson"
+            },
+            {
+              "title": "ضرب عدد در بردار",
+              "basis": "lesson"
+            },
+            {
+              "title": "بردارهای واحد مختصات",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "مثلث",
+          "topics": [
+            {
+              "title": "رابطهٔ فیثاغورس",
+              "basis": "lesson"
+            },
+            {
+              "title": "شکلهای همنهشت",
+              "basis": "lesson"
+            },
+            {
+              "title": "مثلثهای همنهشت",
+              "basis": "lesson"
+            },
+            {
+              "title": "همنهشتی مثلثهای قائم الزاویه",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "توان و جذر",
+          "topics": [
+            {
+              "title": "توان",
+              "basis": "lesson"
+            },
+            {
+              "title": "تقسیم اعداد تواندار",
+              "basis": "lesson"
+            },
+            {
+              "title": "جذر تقریبی",
+              "basis": "lesson"
+            },
+            {
+              "title": "نمایش اعداد رادیکالی روی محور اعداد",
+              "basis": "lesson"
+            },
+            {
+              "title": "خواص ضرب و تقسیم رادیکالها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "آمار و احتمال",
+          "topics": [
+            {
+              "title": "دستهبندی دادهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "میانگین دادهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "احتمال یا اندازهگیری شانس",
+              "basis": "lesson"
+            },
+            {
+              "title": "بررسی حالتهای ممکن",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "دایره",
+          "topics": [
+            {
+              "title": "خط و دایره",
+              "basis": "lesson"
+            },
+            {
+              "title": "زاویههای مرکزی",
+              "basis": "lesson"
+            },
+            {
+              "title": "زاویههای محاطی",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "riazi-9",
+      "grade": 9,
+      "title": "ریاضی نهم",
+      "subject": "mathematics",
+      "tracks": ["common"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/556/C905.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C905",
+        "academicYear": "1405-1406",
+        "sha256": "8dcb86452aec1cb9ddcb7be86b1a398e1023788119647261bb1d0c59bb088592",
+        "outlinePdfPages": [4, 5, 6],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "مجموعهها",
+          "topics": [
+            {
+              "title": "معرفی مجموعه",
+              "basis": "lesson"
+            },
+            {
+              "title": "مجموعههای برابر و نمایش مجموعهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "اجتماع، اشتراک و تفاضل مجموعهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "مجموعهها و احتمال",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "عددهای حقیقی",
+          "topics": [
+            {
+              "title": "عددهای گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "عددهای حقیقی",
+              "basis": "lesson"
+            },
+            {
+              "title": "قدر مطلق و محاسبه تقریبی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "استدلال و اثبات در هندسه",
+          "topics": [
+            {
+              "title": "استدلال",
+              "basis": "lesson"
+            },
+            {
+              "title": "آشنایی با اثبات در هندسه",
+              "basis": "lesson"
+            },
+            {
+              "title": "همنهشتی مثلثها",
+              "basis": "lesson"
+            },
+            {
+              "title": "حل مسئله در هندسه",
+              "basis": "lesson"
+            },
+            {
+              "title": "شکلهای متشابه",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "توان و ریشه",
+          "topics": [
+            {
+              "title": "توان صحیح",
+              "basis": "lesson"
+            },
+            {
+              "title": "نماد علمی",
+              "basis": "lesson"
+            },
+            {
+              "title": "ریشه گیری",
+              "basis": "lesson"
+            },
+            {
+              "title": "جمع و تفریق رادیکالها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "عبارتهای جبری",
+          "topics": [
+            {
+              "title": "عبارتهای جبری و مفهوم اتحاد",
+              "basis": "lesson"
+            },
+            {
+              "title": "چند اتحاد دیگر، تجزیه و کاربردها",
+              "basis": "lesson"
+            },
+            {
+              "title": "نابرابری و نامعادلهها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "خط و معادلههای خطی",
+          "topics": [
+            {
+              "title": "معادله خط",
+              "basis": "lesson"
+            },
+            {
+              "title": "شیب خط و عرض از مبدأ",
+              "basis": "lesson"
+            },
+            {
+              "title": "دستگاه معادلهی خطی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "عبارتهای گویا",
+          "topics": [
+            {
+              "title": "معرفی و ساده کردن عبارتهای گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "محاسبات عبارتهای گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "تقسیم چند جملهایها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "حجم و مساحت",
+          "topics": [
+            {
+              "title": "حجم و مساحت کره",
+              "basis": "lesson"
+            },
+            {
+              "title": "حجم هرم و مخروط",
+              "basis": "lesson"
+            },
+            {
+              "title": "سطح و حجم",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "oloom-7",
+      "grade": 7,
+      "title": "فیزیک در علوم هفتم",
+      "subject": "physics",
+      "tracks": ["common"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/555/C706.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C706",
+        "academicYear": "1405-1406",
+        "sha256": "da0b1c4277debca47d87eee9215fa12a183b46afd209f5d6fa1822246c7486bd",
+        "outlinePdfPages": [6],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "تفکر و تجربه",
+          "topics": [
+            {
+              "title": "تفکر و تجربه",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "اندازه گیری در علوم تجربی و ابزارهای آن",
+          "topics": [
+            {
+              "title": "اندازه گیری در علوم تجربی و ابزارهای آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "انرژی و تبدیل های آن",
+          "topics": [
+            {
+              "title": "انرژی و تبدیل های آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "منابع انرژی",
+          "topics": [
+            {
+              "title": "منابع انرژی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 10,
+          "title": "گرما و بهینه سازی مصرف انرژی",
+          "topics": [
+            {
+              "title": "گرما و بهینه سازی مصرف انرژی",
+              "basis": "chapter"
+            }
+          ]
+        }
+      ],
+      "program": "regular",
+      "scope": "physics-extract"
+    },
+    {
+      "id": "oloom-8",
+      "grade": 8,
+      "title": "فیزیک در علوم هشتم",
+      "subject": "physics",
+      "tracks": ["common"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/558/C806.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C806",
+        "academicYear": "1405-1406",
+        "sha256": "b96cc6485a749e77c8034dfb84231645ac757ad2d991b0d9a25616142d6e2d1b",
+        "outlinePdfPages": [6],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 9,
+          "title": "الکتریسیته",
+          "topics": [
+            {
+              "title": "الکتریسیته",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 10,
+          "title": "مغناطیس",
+          "topics": [
+            {
+              "title": "مغناطیس",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 14,
+          "title": "نور و ویژگیهای آن",
+          "topics": [
+            {
+              "title": "نور و ویژگیهای آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 15,
+          "title": "شکست نور",
+          "topics": [
+            {
+              "title": "شکست نور",
+              "basis": "chapter"
+            }
+          ]
+        }
+      ],
+      "program": "regular",
+      "scope": "physics-extract"
+    },
+    {
+      "id": "oloom-9",
+      "grade": 9,
+      "title": "فیزیک در علوم نهم",
+      "subject": "physics",
+      "tracks": ["common"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/556/C906.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C906",
+        "academicYear": "1405-1406",
+        "sha256": "1bee9f617b3ae227ddd92470edee0d9689bed10e140ce3ebe6f04da0f362a057",
+        "outlinePdfPages": [5],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 4,
+          "title": "حرکت چیست",
+          "topics": [
+            {
+              "title": "حرکت چیست",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "نیرو",
+          "topics": [
+            {
+              "title": "نیرو",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "فشار و آثار آن",
+          "topics": [
+            {
+              "title": "فشار و آثار آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "ماشین ها",
+          "topics": [
+            {
+              "title": "ماشین ها",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 10,
+          "title": "نگاهی به فضا",
+          "topics": [
+            {
+              "title": "نگاهی به فضا",
+              "basis": "chapter"
+            }
+          ]
+        }
+      ],
+      "program": "regular",
+      "scope": "physics-extract"
+    },
+    {
+      "id": "riazi-10-nazari",
+      "grade": 10,
+      "title": "ریاضی (۱)",
+      "subject": "mathematics",
+      "tracks": ["mathematics", "experimental"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/40/C110211.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C110211",
+        "academicYear": "1405-1406",
+        "sha256": "e20ccb8cb88c75dab899ffb9c69801557e5327522044e97c0223840be83da59d",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "مجموعه، الگو و دنباله",
+          "topics": [
+            {
+              "title": "مجموعههای متناهی و نامتناهی",
+              "basis": "lesson"
+            },
+            {
+              "title": "متمم یک مجموعه",
+              "basis": "lesson"
+            },
+            {
+              "title": "الگو و دنباله",
+              "basis": "lesson"
+            },
+            {
+              "title": "دنبالههای حسابی و هندسی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "مثلثات",
+          "topics": [
+            {
+              "title": "نسبتهای مثلثاتی",
+              "basis": "lesson"
+            },
+            {
+              "title": "دایره مثلثاتی",
+              "basis": "lesson"
+            },
+            {
+              "title": "روابط بین نسبتهای مثلثاتی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "توانهای گویا و عبارتهای جبری",
+          "topics": [
+            {
+              "title": "ریشه و توان",
+              "basis": "lesson"
+            },
+            {
+              "title": "ريشه nام",
+              "basis": "lesson"
+            },
+            {
+              "title": "توانهای گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "عبارتهای جبری",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "معادلهها و نامعادلهها",
+          "topics": [
+            {
+              "title": "معادلۀ درجه دوم و روشهای مختلف حل آن",
+              "basis": "lesson"
+            },
+            {
+              "title": "سهمی",
+              "basis": "lesson"
+            },
+            {
+              "title": "تعیین علامت",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "تابع",
+          "topics": [
+            {
+              "title": "مفهوم تابع و بازنماییهای آن",
+              "basis": "lesson"
+            },
+            {
+              "title": "دامنه و برد توابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "انواع تابع",
+              "basis": "lesson",
+              "identityTitle": "انواع توابع",
+              "previousTitle": "انواع توابع"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "شمارش، بدون شمردن",
+          "topics": [
+            {
+              "title": "شمارش",
+              "basis": "lesson"
+            },
+            {
+              "title": "جایگشت",
+              "basis": "lesson"
+            },
+            {
+              "title": "ترکیب",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "آمار و احتمال",
+          "topics": [
+            {
+              "title": "احتمال یا اندازهگیری شانس",
+              "basis": "lesson"
+            },
+            {
+              "title": "مقدمهای بر علم آمار، جامعه و نمونه",
+              "basis": "lesson"
+            },
+            {
+              "title": "متغیر و انواع آن",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "hendese-10-riazi",
+      "grade": 10,
+      "title": "هندسه (۱)",
+      "subject": "mathematics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/29/C110213.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C110213",
+        "academicYear": "1405-1406",
+        "sha256": "8e54eff319c846d43f2b9fb158b9a9049f1d2731f1f888cc2f6ed34fd1ef231c",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "ترسیمهای هندسی و استدلال",
+          "topics": [
+            {
+              "title": "ترسیمهای هندسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "استدلال",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "قضیۀ تالس، تشابه و کاربردهای آن",
+          "topics": [
+            {
+              "title": "نسبت و تناسب در هندسه",
+              "basis": "lesson"
+            },
+            {
+              "title": "قضیۀ تالس",
+              "basis": "lesson"
+            },
+            {
+              "title": "تشابه مثلثها",
+              "basis": "lesson"
+            },
+            {
+              "title": "کاربردهایی از قضیۀ تالس و تشابه مثلثها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "چند ضلعیها",
+          "topics": [
+            {
+              "title": "چند ضلعیها و ویژگیهایی از آنها",
+              "basis": "lesson"
+            },
+            {
+              "title": "مساحت و کاربردهای آن",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "تجسم فضایی",
+          "topics": [
+            {
+              "title": "خط، نقطه و صفحه",
+              "basis": "lesson"
+            },
+            {
+              "title": "تفکر تجسمی",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "hesaban-11",
+      "grade": 11,
+      "title": "حسابان (۱)",
+      "subject": "mathematics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/30/C111214.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C111214",
+        "academicYear": "1405-1406",
+        "sha256": "90df61785a842f60bd2291c7c0c35d2d35b494843ec66fceab474da980337678",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "جبر و معادله",
+          "topics": [
+            {
+              "title": "مجموع جملات دنبالههای حسابی و هندسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادلات درجه دوم",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادلات گویا و گنگ",
+              "basis": "lesson"
+            },
+            {
+              "title": "قدر مطلق و ویژگیهای آن",
+              "basis": "lesson"
+            },
+            {
+              "title": "آشنایی با هندسه تحلیلی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "تابع",
+          "topics": [
+            {
+              "title": "آشنایی بیشتر با تابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "انواع توابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "وارون تابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "اعمال روی توابع",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "توابع نمایی و لگاریتمی",
+          "topics": [
+            {
+              "title": "تابع نمایی",
+              "basis": "lesson"
+            },
+            {
+              "title": "تابع لگاریتمی و لگاریتم",
+              "basis": "lesson"
+            },
+            {
+              "title": "ویژگیهای لگاریتم و حل معادلههای لگاریتمی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "مثلثات",
+          "topics": [
+            {
+              "title": "رادیان",
+              "basis": "lesson"
+            },
+            {
+              "title": "نسبتهای مثلثاتی برخی زوایا",
+              "basis": "lesson"
+            },
+            {
+              "title": "توابع مثلثاتی",
+              "basis": "lesson"
+            },
+            {
+              "title": "روابط مثلثاتی مجموع و تفاضل زوایا",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "حد و پیوستگی",
+          "topics": [
+            {
+              "title": "مفهوم حد و فرآیندهای حدی",
+              "basis": "lesson"
+            },
+            {
+              "title": "حدهای یک طرفه (حد چپ و حد راست)",
+              "basis": "lesson"
+            },
+            {
+              "title": "قضایای حد",
+              "basis": "lesson"
+            },
+            {
+              "title": "محاسبه حد توابع کسری",
+              "basis": "lesson"
+            },
+            {
+              "title": "پیوستگی",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "hesaban-12",
+      "grade": 12,
+      "title": "حسابان (۲)",
+      "subject": "mathematics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/711/C112214.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C112214",
+        "academicYear": "1405-1406",
+        "sha256": "fb73727412bfb20ab00e4e7957e8daf0dee871260b0a473c365c6f3ff9bdd0a7",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "تابع",
+          "topics": [
+            {
+              "title": "تبدیل نمودار توابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "تابع درجه سوم، توابع یکنوا و بخشپذیری و تقسیم",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "مثلثات",
+          "topics": [
+            {
+              "title": "تناوب و تانژانت",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادلات مثلثاتی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "حدهای نامتناهی- حد در بینهایت",
+          "topics": [
+            {
+              "title": "حدهای نامتناهی",
+              "basis": "lesson"
+            },
+            {
+              "title": "حد در بینهایت",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "مشتق",
+          "topics": [
+            {
+              "title": "آشنایی با مفهوم مشتق",
+              "basis": "lesson"
+            },
+            {
+              "title": "مشتق پذیری و پیوستگی",
+              "basis": "lesson"
+            },
+            {
+              "title": "آهنگ متوسط تغییر و آهنگ لحظهای تغییر",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "کاربردهای مشتق",
+          "topics": [
+            {
+              "title": "اکسترممهای یک تابع و توابع صعودی و نزولی",
+              "basis": "lesson"
+            },
+            {
+              "title": "جهت تقعر نمودار یک تابع و نقطۀ عطف آن",
+              "basis": "lesson"
+            },
+            {
+              "title": "رسم نمودار تابع",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "hendese-11-riazi",
+      "grade": 11,
+      "title": "هندسه (۲)",
+      "subject": "mathematics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/30/C111213.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C111213",
+        "academicYear": "1405-1406",
+        "sha256": "2bf760bf2263662b8f1426652c33e53531052e36d84fbb3023fe5aa5e150e421",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "دایره",
+          "topics": [
+            {
+              "title": "مفاهیم اولیه و زاویهها در دایره",
+              "basis": "lesson"
+            },
+            {
+              "title": "رابطههای طولی در دایره",
+              "basis": "lesson"
+            },
+            {
+              "title": "چند ضلعیهای محاطی و محیطی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "تبدیلهای هندسی و کاربردها",
+          "topics": [
+            {
+              "title": "تبدیلهای هندسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "کاربرد تبدیلها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "روابط طولی در مثلث",
+          "topics": [
+            {
+              "title": "قضیه سینوسها",
+              "basis": "lesson"
+            },
+            {
+              "title": "قضیه کسینوسها",
+              "basis": "lesson"
+            },
+            {
+              "title": "قضیه نیمسازهای زوایای داخلی و محاسبه طول نیمسازها",
+              "basis": "lesson"
+            },
+            {
+              "title": "قضیه هرون (محاسبۀ ارتفاعها و مساحت مثلث)",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "hendese-12",
+      "grade": 12,
+      "title": "هندسه (۳)",
+      "subject": "mathematics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/711/C112213.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C112213",
+        "academicYear": "1405-1406",
+        "sha256": "26e08c6f71d0d3689b0d6936579dca3863c2fd4b6cdd9b3c37775ef8bc9f9868",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "ماتریس و کاربردها",
+          "topics": [
+            {
+              "title": "ماتریس و اعمال روی ماتریسها",
+              "basis": "lesson"
+            },
+            {
+              "title": "وارون ماتریس و دترمینان",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "آشنایی با مقاطع مخروطی",
+          "topics": [
+            {
+              "title": "آشنایی با مقاطع مخروطی و مکان هندسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "دایره",
+              "basis": "lesson"
+            },
+            {
+              "title": "بیضی و سهمی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "بردارها",
+          "topics": [
+            {
+              "title": "معرفی فضای R3",
+              "basis": "lesson"
+            },
+            {
+              "title": "ضرب داخلی و ضرب خارجی بردارها",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "amar-11",
+      "grade": 11,
+      "title": "آمار و احتمال",
+      "subject": "mathematics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/30/C111215.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C111215",
+        "academicYear": "1405-1406",
+        "sha256": "003b007f79a49bacefbd9b7eaa5ef7063ca7a66ed6d73707349cd8e5256bf424",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "آشنایی با مبانی ریاضیات",
+          "topics": [
+            {
+              "title": "آشنایی با منطق ریاضی",
+              "basis": "lesson"
+            },
+            {
+              "title": "جبر مجموعه ها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "احتمال",
+          "topics": [
+            {
+              "title": "مبانی احتمال",
+              "basis": "lesson"
+            },
+            {
+              "title": "احتمال غیر هم شانس",
+              "basis": "lesson"
+            },
+            {
+              "title": "احتمال شرطی",
+              "basis": "lesson"
+            },
+            {
+              "title": "پیشامدهای مستقل و وابسته",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "آمار توصیفی",
+          "topics": [
+            {
+              "title": "توصیف و نمایش دادهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "معیارهای گرایش به مرکز",
+              "basis": "lesson"
+            },
+            {
+              "title": "معیارهای پراکندگی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "آمار استنباطی",
+          "topics": [
+            {
+              "title": "گردآوری دادهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "برآورد",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "riaziat-g12",
+      "grade": 12,
+      "title": "ریاضیات گسسته",
+      "subject": "mathematics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/711/C112215.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C112215",
+        "academicYear": "1405-1406",
+        "sha256": "e27c67f9473cee68e04b057989917bece4a0be9784abf3090a8e0a04d81d6b51",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "آشنایی با نظریه اعداد",
+          "topics": [
+            {
+              "title": "استدلال ریاضی",
+              "basis": "lesson"
+            },
+            {
+              "title": "بخشپذیری در اعداد صحیح",
+              "basis": "lesson"
+            },
+            {
+              "title": "همنهشتی در اعداد صحیح و کاربردها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "گراف و مدلسازی",
+          "topics": [
+            {
+              "title": "معرفی گراف",
+              "basis": "lesson"
+            },
+            {
+              "title": "مدلسازی با گراف",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "ترکیبیّات (شمارش)",
+          "topics": [
+            {
+              "title": "مباحثی در ترکیبیّات",
+              "basis": "lesson"
+            },
+            {
+              "title": "روشهایی برای شمارش",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "riazi-tajrobi-11",
+      "grade": 11,
+      "title": "ریاضی (۲)",
+      "subject": "mathematics",
+      "tracks": ["experimental"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/41/C111211.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C111211",
+        "academicYear": "1405-1406",
+        "sha256": "e5c287975ff848a499fc75ed4889120b1cd6aac6b9feb6357e083da3919185b1",
+        "outlinePdfPages": [5, 6],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "هندسۀ تحلیلی و جبر",
+          "topics": [
+            {
+              "title": "هندسه تحلیلی",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادلهٔ درجهٔ دوم و تابع درجه دوم",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادلات گویا و معادلات رادیکالی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "هندسه",
+          "topics": [
+            {
+              "title": "ترسیمهای هندسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "استدلال و قضیهٔ تالس",
+              "basis": "lesson"
+            },
+            {
+              "title": "تشابه مثلثها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "تابع",
+          "topics": [
+            {
+              "title": "آشنایی با برخی از انواع توابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "وارون یک تابع و تابع یک به یک",
+              "basis": "lesson"
+            },
+            {
+              "title": "اعمال جبری روی توابع",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "مثلثات",
+          "topics": [
+            {
+              "title": "واحدهای اندازه گیری زاویه",
+              "basis": "lesson"
+            },
+            {
+              "title": "روابط تکمیلی بین نسبتهای مثلثاتی",
+              "basis": "lesson"
+            },
+            {
+              "title": "توابع مثلثاتی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "توابع نمایی و لگاریتمی",
+          "topics": [
+            {
+              "title": "تابع نمایی و ویژگیهای آن",
+              "basis": "lesson"
+            },
+            {
+              "title": "تابع لگاریتمی و ویژگیهای آن",
+              "basis": "lesson"
+            },
+            {
+              "title": "نمودارها و کاربردهای توابع نمایی و لگاریتمی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "حد و پیوستگی",
+          "topics": [
+            {
+              "title": "فرایندهای حدی",
+              "basis": "lesson"
+            },
+            {
+              "title": "محاسبه حد توابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "پیوستگی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "آمار و احتمال",
+          "topics": [
+            {
+              "title": "احتمال شرطی و پیشامدهای مستقل",
+              "basis": "lesson"
+            },
+            {
+              "title": "آمار توصیفی",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "riazi-tajrobi-12",
+      "grade": 12,
+      "title": "ریاضی (۳)",
+      "subject": "mathematics",
+      "tracks": ["experimental"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/712/C112211.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C112211",
+        "academicYear": "1405-1406",
+        "sha256": "bc1b9a3e2e8934025c464672cf0678ffcd7bf20fa2ad39ff14cb397881b1209c",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "تابع",
+          "topics": [
+            {
+              "title": "توابع چند جملهای- توابع صعودی و نزولی",
+              "basis": "lesson"
+            },
+            {
+              "title": "ترکیب توابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "تابع وارون",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "مثلثات",
+          "topics": [
+            {
+              "title": "تناوب و تانژانت",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادلات مثلثاتی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "حد بینهایت و حد در بینهایت",
+          "topics": [
+            {
+              "title": "حد بینهایت",
+              "basis": "lesson"
+            },
+            {
+              "title": "حد در بینهایت",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "مشتق",
+          "topics": [
+            {
+              "title": "آشنایی با مفهوم مشتق",
+              "basis": "lesson"
+            },
+            {
+              "title": "مشتقپذیری و پیوستگی",
+              "basis": "lesson"
+            },
+            {
+              "title": "آهنگ تغییر",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "کاربرد مشتق",
+          "topics": [
+            {
+              "title": "اکسترممهای تابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "بهینه سازی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "هندسه",
+          "topics": [
+            {
+              "title": "تفکر تجسمی و آشنایی با مقاطع مخروطی",
+              "basis": "lesson"
+            },
+            {
+              "title": "دایره",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "احتمال",
+          "topics": [
+            {
+              "title": "قانون احتمال کل",
+              "basis": "lesson",
+              "identityTitle": "احتمال",
+              "previousTitle": "احتمال"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "riaziamar-10-nazari",
+      "grade": 10,
+      "title": "ریاضی و آمار (۱)",
+      "subject": "mathematics",
+      "tracks": ["humanities", "islamic"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/43/C110212.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C110212",
+        "academicYear": "1405-1406",
+        "sha256": "6bbf5d0d3bad06d733131cd2a06fc435b30f19e91d41e198cb440841b2692411",
+        "outlinePdfPages": [5, 6],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "معادله درجه دوم",
+          "topics": [
+            {
+              "title": "معادله و مسائل توصیفی",
+              "basis": "lesson"
+            },
+            {
+              "title": "حل معادلۀ درجۀ دوم و کاربردها",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادلههای شامل عبارتهای گویا",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "تابع",
+          "topics": [
+            {
+              "title": "مفهوم تابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "ضابطۀ جبری تابع",
+              "basis": "lesson"
+            },
+            {
+              "title": "نمودار تابع خطی",
+              "basis": "lesson"
+            },
+            {
+              "title": "رسم تابع درجۀ دوم",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "کار با دادههای آماری",
+          "topics": [
+            {
+              "title": "گردآوری دادهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "معیارهای گرایش به مرکز",
+              "basis": "lesson"
+            },
+            {
+              "title": "معیارهای پراکندگی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "نمایش دادهها",
+          "topics": [
+            {
+              "title": "نمودارهای یک متغیره",
+              "basis": "lesson"
+            },
+            {
+              "title": "نمودارهای چند متغیره",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "riazivamar-11-nazari",
+      "grade": 11,
+      "title": "ریاضی و آمار (۲)",
+      "subject": "mathematics",
+      "tracks": ["humanities", "islamic"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/44/C111212.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C111212",
+        "academicYear": "1405-1406",
+        "sha256": "7fbd04e832f5b4d63349969e0bea2b63d01d0a1efdeed9531fb66baeaf02f0a7",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "آشنایی با منطق و استدلال ریاضی",
+          "topics": [
+            {
+              "title": "گزارهها و ترکیبگزارهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "استدلال ریاضی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "تابع",
+          "topics": [
+            {
+              "title": "توابع ثابت، چندضابطهای و همانی",
+              "basis": "lesson"
+            },
+            {
+              "title": "توابع پلکانی و قدر مطلقی",
+              "basis": "lesson"
+            },
+            {
+              "title": "اعمال بر روی توابع",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "آمار",
+          "topics": [
+            {
+              "title": "شاخصهای آماری",
+              "basis": "lesson"
+            },
+            {
+              "title": "سریهای زمانی",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "amar-12",
+      "grade": 12,
+      "title": "ریاضی و آمار (۳)",
+      "subject": "mathematics",
+      "tracks": ["humanities", "islamic"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/710/C112212.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C112212",
+        "academicYear": "1405-1406",
+        "sha256": "5fd33d67a33f65939afb3007749bd0c0a6ee7596e1c8f3bd334e621d609aeeb7",
+        "outlinePdfPages": [5],
+        "coverage": "toc-lessons"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "آمار و احتمال",
+          "topics": [
+            {
+              "title": "شمارش",
+              "basis": "lesson"
+            },
+            {
+              "title": "احتمال",
+              "basis": "lesson"
+            },
+            {
+              "title": "چرخه آمار در حل مسائل",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "الگوهای خطی",
+          "topics": [
+            {
+              "title": "مدلسازی و دنباله",
+              "basis": "lesson"
+            },
+            {
+              "title": "دنبالههای حسابی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "الگوهای غیرخطی",
+          "topics": [
+            {
+              "title": "دنبالۀ هندسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "ریشه nاُم و توان گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "تابع نمایی",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "physics-10-riazi",
+      "grade": 10,
+      "title": "فیزیک (۱) ریاضی",
+      "subject": "physics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/30/C110209.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C110209",
+        "academicYear": "1405-1406",
+        "sha256": "f5dac24f02d77f5cc6d9e3c4f62c839b8d61d646ceff27f930707f38818837cd",
+        "outlinePdfPages": [5, 6],
+        "coverage": "toc-sections"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "فیزیک و اندازه گیری",
+          "topics": [
+            {
+              "title": "فیزیک؛ دانش بنیادی",
+              "basis": "lesson"
+            },
+            {
+              "title": "مدل سازی در فیزیک",
+              "basis": "lesson"
+            },
+            {
+              "title": "اندازهگیری و کمیتهای فیزیکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "اندازهگیری و دستگاه بینالمللی یکاها",
+              "basis": "lesson"
+            },
+            {
+              "title": "اندازهگیری و دقت وسیلههای اندازهگیری",
+              "basis": "lesson"
+            },
+            {
+              "title": "چگالی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "ویژگیهای فیزیکی مواد",
+          "topics": [
+            {
+              "title": "حالتهای ماده",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروهای بین مولکولی",
+              "basis": "lesson"
+            },
+            {
+              "title": "فشار در شارهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "شناوری",
+              "basis": "lesson"
+            },
+            {
+              "title": "شارۀ در حرکت و اصل برنولی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "کار، انرژی و توان",
+          "topics": [
+            {
+              "title": "انرژی جنبشی",
+              "basis": "lesson"
+            },
+            {
+              "title": "کار انجام شده توسط نیروی ثابت",
+              "basis": "lesson"
+            },
+            {
+              "title": "کار و انرژی جنبشی",
+              "basis": "lesson"
+            },
+            {
+              "title": "کار و انرژی پتانسیل",
+              "basis": "lesson"
+            },
+            {
+              "title": "پایستگی انرژی مکانیکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "کار و انرژی درونی",
+              "basis": "lesson"
+            },
+            {
+              "title": "توان",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "دما و گرما",
+          "topics": [
+            {
+              "title": "دما و دماسنجی",
+              "basis": "lesson"
+            },
+            {
+              "title": "انبساط گرمایی",
+              "basis": "lesson"
+            },
+            {
+              "title": "گرما",
+              "basis": "lesson"
+            },
+            {
+              "title": "تغییر حالتهای ماده",
+              "basis": "lesson"
+            },
+            {
+              "title": "روشهای انتقال گرما",
+              "basis": "lesson"
+            },
+            {
+              "title": "قوانین گازها",
+              "basis": "lesson",
+              "identityTitle": "قوانین گازها [فقط ریاضی]",
+              "previousTitle": "قوانین گازها [فقط ریاضی]"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "ترمودینامیک",
+          "topics": [
+            {
+              "title": "معادلۀ حالت و فرآیندهای ترمودینامیکی ایستاوار",
+              "basis": "lesson"
+            },
+            {
+              "title": "تبادل انرژی",
+              "basis": "lesson"
+            },
+            {
+              "title": "انرژی درونی و قانون اوّل ترمودینامیک",
+              "basis": "lesson"
+            },
+            {
+              "title": "برخی از فرآیندهای ترمودینامکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "چرخۀ ترمودینامیکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "ماشینهای گرمایی",
+              "basis": "lesson"
+            },
+            {
+              "title": "قانون دوم ترمودینامیک (به بیان ماشین گرمایی)",
+              "basis": "lesson"
+            },
+            {
+              "title": "قانون دوم ترمودینامیک و یخچالها",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "physics-10-tajrobi",
+      "grade": 10,
+      "title": "فیزیک (۱) تجربی",
+      "subject": "physics",
+      "tracks": ["experimental"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/40/C110214.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C110214",
+        "academicYear": "1405-1406",
+        "sha256": "5d8c8f85dc8b79e481694d559404fcf17eacaa1b51f93b746f6a755078a13db9",
+        "outlinePdfPages": [5, 6],
+        "coverage": "toc-sections"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "فیزیک و اندازه گیری",
+          "topics": [
+            {
+              "title": "فیزیک؛ دانش بنیادی",
+              "basis": "lesson"
+            },
+            {
+              "title": "مدل سازی در فیزیک",
+              "basis": "lesson"
+            },
+            {
+              "title": "اندازهگیری و کمیتهای فیزیکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "اندازهگیری و دستگاه بینالمللی یکاها",
+              "basis": "lesson"
+            },
+            {
+              "title": "اندازهگیری و دقت وسیلههای اندازهگیری",
+              "basis": "lesson"
+            },
+            {
+              "title": "چگالی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "ویژگیهای فیزیکی مواد",
+          "topics": [
+            {
+              "title": "حالتهای ماده",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروهای بین مولکولی",
+              "basis": "lesson"
+            },
+            {
+              "title": "فشار در شارهها",
+              "basis": "lesson"
+            },
+            {
+              "title": "شناوری",
+              "basis": "lesson"
+            },
+            {
+              "title": "شارۀ در حرکت و اصل برنولی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "کار، انرژی و توان",
+          "topics": [
+            {
+              "title": "انرژی جنبشی",
+              "basis": "lesson"
+            },
+            {
+              "title": "کار انجام شده توسط نیروی ثابت",
+              "basis": "lesson"
+            },
+            {
+              "title": "کار و انرژی جنبشی",
+              "basis": "lesson"
+            },
+            {
+              "title": "کار و انرژی پتانسیل",
+              "basis": "lesson"
+            },
+            {
+              "title": "پایستگی انرژی مکانیکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "کار و انرژی درونی",
+              "basis": "lesson"
+            },
+            {
+              "title": "توان",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "دما و گرما",
+          "topics": [
+            {
+              "title": "دما و دماسنجی",
+              "basis": "lesson"
+            },
+            {
+              "title": "انبساط گرمایی",
+              "basis": "lesson"
+            },
+            {
+              "title": "گرما",
+              "basis": "lesson"
+            },
+            {
+              "title": "تغییر حالتهای ماده",
+              "basis": "lesson"
+            },
+            {
+              "title": "روشهای انتقال گرما",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "physic-11-riazi",
+      "grade": 11,
+      "title": "فیزیک (۲) ریاضی",
+      "subject": "physics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/30/C111209.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C111209",
+        "academicYear": "1405-1406",
+        "sha256": "021e17e9a27c93f8b67daf9e9156c85defd9ffb1833db047f1644fdae9ae1022",
+        "outlinePdfPages": [5, 6],
+        "coverage": "toc-sections"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "الکتریسیتۀ ساکن",
+          "topics": [
+            {
+              "title": "بار الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "پایستگی و کوانتیده بودن بار الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "قانون کولن",
+              "basis": "lesson"
+            },
+            {
+              "title": "میدان الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "میدان الکتریکی حاصل از یک ذرۀ باردار",
+              "basis": "lesson"
+            },
+            {
+              "title": "خطوط میدان الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "انرژی پتانسیل الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "پتانسیل الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "میدان الکتریکی در داخل رساناها",
+              "basis": "lesson"
+            },
+            {
+              "title": "خازن",
+              "basis": "lesson"
+            },
+            {
+              "title": "خازن با دیالکتریک",
+              "basis": "lesson"
+            },
+            {
+              "title": "انرژی خازن",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "جریان الکتریکی و مدارهای جریان مستقیم",
+          "topics": [
+            {
+              "title": "جریان الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "مقاومت الکتریکی و قانون اهم",
+              "basis": "lesson"
+            },
+            {
+              "title": "عوامل مؤثر بر مقاومت الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروی محرکۀ الکتریکی و مدارها",
+              "basis": "lesson"
+            },
+            {
+              "title": "توان در مدارهای الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "ترکیب مقاومتها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "مغناطیس",
+          "topics": [
+            {
+              "title": "مغناطیس و قطبهای مغناطیسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "میدان مغناطیسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروی مغناطیسی وارد بر ذرۀ باردار متحرک در میدان مغناطیسى",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروی مغناطیسی وارد بر سیم حامل جریان",
+              "basis": "lesson"
+            },
+            {
+              "title": "میدان مغناطیسی حاصل از جریان الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "ویژگیهای مغناطیسی مواد",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "القای الکترومغناطیسی و جریان متناوب",
+          "topics": [
+            {
+              "title": "پدیدۀ القای الکترومغناطیسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "قانون القای الکترومغناطیسی فاراده",
+              "basis": "lesson"
+            },
+            {
+              "title": "قانون لنز",
+              "basis": "lesson"
+            },
+            {
+              "title": "القاگرها",
+              "basis": "lesson"
+            },
+            {
+              "title": "جریان متناوب",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "physic-tajrobi-11",
+      "grade": 11,
+      "title": "فیزیک (۲) تجربی",
+      "subject": "physics",
+      "tracks": ["experimental"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/41/C111244.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C111244",
+        "academicYear": "1405-1406",
+        "sha256": "2fbda9ed4bdedb20ee3182e39e0eb39c15f908770cd7de56fff3d91a6160aac4",
+        "outlinePdfPages": [5, 6],
+        "coverage": "toc-sections"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "الکتریسیتۀ ساکن",
+          "topics": [
+            {
+              "title": "بار الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "پایستگی و کوانتیده بودن بار الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "قانون کولن",
+              "basis": "lesson"
+            },
+            {
+              "title": "میدان الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "میدان الکتریکی حاصل از یک ذرهٔ باردار",
+              "basis": "lesson"
+            },
+            {
+              "title": "خطوط میدان الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "انرژی پتانسیل الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "پتانسیل الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "توزیع بار الکتریکی در اجسام رسانا",
+              "basis": "lesson"
+            },
+            {
+              "title": "خازن",
+              "basis": "lesson"
+            },
+            {
+              "title": "انرژی خازن",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "جریان الکتریکی و مدارهای جریان مستقیم",
+          "topics": [
+            {
+              "title": "جریان الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "مقاومت الکتریکی و قانون اهم",
+              "basis": "lesson"
+            },
+            {
+              "title": "عوامل مؤثر بر مقاومت الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروی محرکهٔ الکتریکی و مدارها",
+              "basis": "lesson"
+            },
+            {
+              "title": "توان در مدارهای الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "ترکیب مقاومت‌ها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "مغناطیس و القای الکترومغناطیسی",
+          "topics": [
+            {
+              "title": "مغناطیس و قطب‌های مغناطیسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "میدان مغناطیسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروی مغناطیسی وارد بر ذرّۀ باردار متحرک در میدان مغناطیسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروی مغناطیسی وارد بر سیم حامل جریان",
+              "basis": "lesson"
+            },
+            {
+              "title": "میدان مغناطیسی حاصل از جریان الکتریکی",
+              "basis": "lesson"
+            },
+            {
+              "title": "ویژگی‌های مغناطیسی مواد",
+              "basis": "lesson"
+            },
+            {
+              "title": "پدیدهٔ القای الکترومغناطیسی",
+              "basis": "lesson"
+            },
+            {
+              "title": "قانون القای الکترومغناطیسی فاراده",
+              "basis": "lesson"
+            },
+            {
+              "title": "قانون لنز",
+              "basis": "lesson"
+            },
+            {
+              "title": "القاگرها",
+              "basis": "lesson"
+            },
+            {
+              "title": "جریان متناوب",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "physic-r12",
+      "grade": 12,
+      "title": "فیزیک (۳) ریاضی",
+      "subject": "physics",
+      "tracks": ["mathematics"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/711/C112209.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C112209",
+        "academicYear": "1405-1406",
+        "sha256": "f103161cde97a272e1433ba429705ef95d307b1c05c2d16637119a981a253a2e",
+        "outlinePdfPages": [5, 6],
+        "coverage": "toc-sections"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "حرکت بر خط راست",
+          "topics": [
+            {
+              "title": "شناخت حرکت",
+              "basis": "lesson"
+            },
+            {
+              "title": "حرکت با سرعت ثابت",
+              "basis": "lesson"
+            },
+            {
+              "title": "حرکت با شتاب ثابت",
+              "basis": "lesson"
+            },
+            {
+              "title": "سقوط آزاد",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "دینامیک و حرکت دایرهای",
+          "topics": [
+            {
+              "title": "قوانین حرکت نیوتون",
+              "basis": "lesson"
+            },
+            {
+              "title": "معرفی برخی از نیروهای خاص",
+              "basis": "lesson"
+            },
+            {
+              "title": "تکانه و قانون دوم نیوتون",
+              "basis": "lesson"
+            },
+            {
+              "title": "حرکت دایرهای یکنواخت",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروی گرانشی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "نوسان و موج",
+          "topics": [
+            {
+              "title": "نوسان دورهای",
+              "basis": "lesson"
+            },
+            {
+              "title": "حرکت هماهنگ ساده",
+              "basis": "lesson"
+            },
+            {
+              "title": "انرژی در حرکت هماهنگ ساده",
+              "basis": "lesson"
+            },
+            {
+              "title": "تشدید",
+              "basis": "lesson"
+            },
+            {
+              "title": "موج و انواع آن",
+              "basis": "lesson"
+            },
+            {
+              "title": "مشخصههای موج",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "برهم کنشهای موج",
+          "topics": [
+            {
+              "title": "بازتاب موج",
+              "basis": "lesson"
+            },
+            {
+              "title": "شکست موج",
+              "basis": "lesson"
+            },
+            {
+              "title": "پراش موج",
+              "basis": "lesson"
+            },
+            {
+              "title": "تداخل امواج",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "آشنایی با فیزیک اتمی",
+          "topics": [
+            {
+              "title": "اثر فوتوالکتریک و فوتون",
+              "basis": "lesson"
+            },
+            {
+              "title": "طیف خطی",
+              "basis": "lesson"
+            },
+            {
+              "title": "مدل اتم رادرفورد- بور",
+              "basis": "lesson"
+            },
+            {
+              "title": "لیزر",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "آشنایی با فیزیک هستهای",
+          "topics": [
+            {
+              "title": "ساختار هسته",
+              "basis": "lesson"
+            },
+            {
+              "title": "پرتوزایی طبیعی و نیمه عمر",
+              "basis": "lesson"
+            },
+            {
+              "title": "شکافت هستهای",
+              "basis": "lesson"
+            },
+            {
+              "title": "گداخت (همجوشی) هستهای",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "physic-t12",
+      "grade": 12,
+      "title": "فیزیک (۳) تجربی",
+      "subject": "physics",
+      "tracks": ["experimental"],
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/712/C112244.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C112244",
+        "academicYear": "1405-1406",
+        "sha256": "25662ce9a7d292b0f70048a82b412e64ed9ac000add1f19730ba9c2b066ebc7e",
+        "outlinePdfPages": [5, 6],
+        "coverage": "toc-sections"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "حرکت بر خط راست",
+          "topics": [
+            {
+              "title": "شناخت حرکت",
+              "basis": "lesson"
+            },
+            {
+              "title": "حرکت با سرعت ثابت",
+              "basis": "lesson"
+            },
+            {
+              "title": "حرکت با شتاب ثابت",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "دینامیک",
+          "topics": [
+            {
+              "title": "قوانین حرکت نیوتون",
+              "basis": "lesson"
+            },
+            {
+              "title": "معرفی برخی از نیروهای خاص",
+              "basis": "lesson"
+            },
+            {
+              "title": "تکانه و قانون دوم نیوتون",
+              "basis": "lesson"
+            },
+            {
+              "title": "نیروی گرانشی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "نوسان و امواج",
+          "topics": [
+            {
+              "title": "نوسان دورهای",
+              "basis": "lesson"
+            },
+            {
+              "title": "حرکت هماهنگ ساده",
+              "basis": "lesson"
+            },
+            {
+              "title": "انرژی در حرکت هماهنگ ساده",
+              "basis": "lesson"
+            },
+            {
+              "title": "تشدید",
+              "basis": "lesson"
+            },
+            {
+              "title": "موج و انواع آن",
+              "basis": "lesson"
+            },
+            {
+              "title": "مشخصههای موج",
+              "basis": "lesson"
+            },
+            {
+              "title": "بازتاب موج",
+              "basis": "lesson"
+            },
+            {
+              "title": "شکست موج",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "آشنایی با فیزیک اتمی و هستهای",
+          "topics": [
+            {
+              "title": "اثر فوتوالکتریک و فوتون",
+              "basis": "lesson"
+            },
+            {
+              "title": "طیف خطی",
+              "basis": "lesson"
+            },
+            {
+              "title": "مدل اتم رادفورد- بور",
+              "basis": "lesson"
+            },
+            {
+              "title": "لیزر",
+              "basis": "lesson"
+            },
+            {
+              "title": "ساختار هسته",
+              "basis": "lesson"
+            },
+            {
+              "title": "پرتوزایی طبیعی و نیمه عمر",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ],
+      "program": "regular"
+    },
+    {
+      "id": "science-7",
+      "grade": 7,
+      "title": "علوم تجربی",
+      "subject": "science",
+      "tracks": ["common"],
+      "program": "regular",
+      "scope": "full-book",
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/555/C706.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C706",
+        "academicYear": "1405-1406",
+        "sha256": "da0b1c4277debca47d87eee9215fa12a183b46afd209f5d6fa1822246c7486bd",
+        "outlinePdfPages": [6],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "تفکر و تجربه",
+          "topics": [
+            {
+              "title": "کل فصل: تفکر و تجربه",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "اندازه‌گیری در علوم تجربی و ابزارهای آن",
+          "topics": [
+            {
+              "title": "کل فصل: اندازه‌گیری در علوم تجربی و ابزارهای آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "اتم‌ها؛ الفبای مواد",
+          "topics": [
+            {
+              "title": "کل فصل: اتم‌ها؛ الفبای مواد",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "مواد پیرامون ما",
+          "topics": [
+            {
+              "title": "کل فصل: مواد پیرامون ما",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "از معدن تا خانه",
+          "topics": [
+            {
+              "title": "کل فصل: از معدن تا خانه",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "سفر آب روی زمین",
+          "topics": [
+            {
+              "title": "کل فصل: سفر آب روی زمین",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "سفر آب درون زمین",
+          "topics": [
+            {
+              "title": "کل فصل: سفر آب درون زمین",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "انرژی و تبدیل‌های آن",
+          "topics": [
+            {
+              "title": "کل فصل: انرژی و تبدیل‌های آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "منابع انرژی",
+          "topics": [
+            {
+              "title": "کل فصل: منابع انرژی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 10,
+          "title": "گرما و بهینه‌سازی مصرف انرژی",
+          "topics": [
+            {
+              "title": "کل فصل: گرما و بهینه‌سازی مصرف انرژی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 11,
+          "title": "یاخته و سازمان‌بندی آن",
+          "topics": [
+            {
+              "title": "کل فصل: یاخته و سازمان‌بندی آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 12,
+          "title": "سفره سلامت",
+          "topics": [
+            {
+              "title": "کل فصل: سفره سلامت",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 13,
+          "title": "سفر غذا",
+          "topics": [
+            {
+              "title": "کل فصل: سفر غذا",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 14,
+          "title": "گردش مواد",
+          "topics": [
+            {
+              "title": "کل فصل: گردش مواد",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 15,
+          "title": "تبادل با محیط",
+          "topics": [
+            {
+              "title": "کل فصل: تبادل با محیط",
+              "basis": "chapter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "science-7-gifted",
+      "grade": 7,
+      "title": "علوم تجربی — محتوای تکمیلی استعدادهای درخشان",
+      "subject": "science",
+      "tracks": ["common"],
+      "program": "gifted",
+      "scope": "supplement",
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/555/C724.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C724",
+        "academicYear": "1405-1406",
+        "sha256": "4ce1fb26d06871e81a310534965d9dcc379484d49b473ecede9cd500063ce882",
+        "outlinePdfPages": [7, 15, 39, 90],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "تجربه و تفکر",
+          "topics": [
+            {
+              "title": "کل فصل: تجربه و تفکر",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "اندازه‌گیری در علوم و ابزارهای آن",
+          "topics": [
+            {
+              "title": "کل فصل: اندازه‌گیری در علوم و ابزارهای آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "اتم‌ها؛ الفبای مواد",
+          "topics": [
+            {
+              "title": "کل فصل: اتم‌ها؛ الفبای مواد",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "مواد پیرامون ما",
+          "topics": [
+            {
+              "title": "کل فصل: مواد پیرامون ما",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "از معدن تا خانه",
+          "topics": [
+            {
+              "title": "کل فصل: از معدن تا خانه",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "سفر آب روی زمین",
+          "topics": [
+            {
+              "title": "کل فصل: سفر آب روی زمین",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "سفر آب درون زمین",
+          "topics": [
+            {
+              "title": "کل فصل: سفر آب درون زمین",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "انرژی و تبدیل‌های آن",
+          "topics": [
+            {
+              "title": "کل فصل: انرژی و تبدیل‌های آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "منابع انرژی",
+          "topics": [
+            {
+              "title": "کل فصل: منابع انرژی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 10,
+          "title": "گرما و بهینه‌سازی مصرف انرژی",
+          "topics": [
+            {
+              "title": "کل فصل: گرما و بهینه‌سازی مصرف انرژی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 11,
+          "title": "سلول و سازمان‌بندی آن",
+          "topics": [
+            {
+              "title": "کل فصل: سلول و سازمان‌بندی آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 12,
+          "title": "سفره سلامت",
+          "topics": [
+            {
+              "title": "کل فصل: سفره سلامت",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 13,
+          "title": "سفر غذا",
+          "topics": [
+            {
+              "title": "کل فصل: سفر غذا",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 14,
+          "title": "گردش مواد",
+          "topics": [
+            {
+              "title": "کل فصل: گردش مواد",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 15,
+          "title": "تبادل مواد با محیط",
+          "topics": [
+            {
+              "title": "کل فصل: تبادل مواد با محیط",
+              "basis": "chapter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "science-8",
+      "grade": 8,
+      "title": "علوم تجربی",
+      "subject": "science",
+      "tracks": ["common"],
+      "program": "regular",
+      "scope": "full-book",
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/558/C806.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C806",
+        "academicYear": "1405-1406",
+        "sha256": "b96cc6485a749e77c8034dfb84231645ac757ad2d991b0d9a25616142d6e2d1b",
+        "outlinePdfPages": [6],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "مخلوط و جداسازی مواد",
+          "topics": [
+            {
+              "title": "کل فصل: مخلوط و جداسازی مواد",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "تغییرهای شیمیایی در خدمت زندگی",
+          "topics": [
+            {
+              "title": "کل فصل: تغییرهای شیمیایی در خدمت زندگی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "از درون اتم چه خبر",
+          "topics": [
+            {
+              "title": "کل فصل: از درون اتم چه خبر",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "تنظیم عصبی",
+          "topics": [
+            {
+              "title": "کل فصل: تنظیم عصبی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "حس و حرکت",
+          "topics": [
+            {
+              "title": "کل فصل: حس و حرکت",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "تنظیم هورمونی",
+          "topics": [
+            {
+              "title": "کل فصل: تنظیم هورمونی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "الفبای زیست‌فناوری",
+          "topics": [
+            {
+              "title": "کل فصل: الفبای زیست‌فناوری",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "تولیدمثل در جانداران",
+          "topics": [
+            {
+              "title": "کل فصل: تولیدمثل در جانداران",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "الکتریسیته",
+          "topics": [
+            {
+              "title": "کل فصل: الکتریسیته",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 10,
+          "title": "مغناطیس",
+          "topics": [
+            {
+              "title": "کل فصل: مغناطیس",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 11,
+          "title": "کانی‌ها",
+          "topics": [
+            {
+              "title": "کل فصل: کانی‌ها",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 12,
+          "title": "سنگ‌ها",
+          "topics": [
+            {
+              "title": "کل فصل: سنگ‌ها",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 13,
+          "title": "هوازدگی",
+          "topics": [
+            {
+              "title": "کل فصل: هوازدگی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 14,
+          "title": "نور و ویژگی‌های آن",
+          "topics": [
+            {
+              "title": "کل فصل: نور و ویژگی‌های آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 15,
+          "title": "شکست نور",
+          "topics": [
+            {
+              "title": "کل فصل: شکست نور",
+              "basis": "chapter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "science-8-gifted",
+      "grade": 8,
+      "title": "علوم تجربی — محتوای تکمیلی استعدادهای درخشان",
+      "subject": "science",
+      "tracks": ["common"],
+      "program": "gifted",
+      "scope": "supplement",
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/558/C824.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C824",
+        "academicYear": "1405-1406",
+        "sha256": "2098b313dfba1695029940db35aceb34099b81ff4589e2497b6550ab4e7cd7f2",
+        "outlinePdfPages": [8],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "مخلوط و جداسازی مواد",
+          "topics": [
+            {
+              "title": "کل فصل: مخلوط و جداسازی مواد",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "تغییرهای شیمیایی در خدمت زندگی",
+          "topics": [
+            {
+              "title": "کل فصل: تغییرهای شیمیایی در خدمت زندگی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "از درون اتم چه خبر",
+          "topics": [
+            {
+              "title": "کل فصل: از درون اتم چه خبر",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "تنظیم عصبی",
+          "topics": [
+            {
+              "title": "کل فصل: تنظیم عصبی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "حس و حرکت",
+          "topics": [
+            {
+              "title": "کل فصل: حس و حرکت",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "تنظیم هورمونی",
+          "topics": [
+            {
+              "title": "کل فصل: تنظیم هورمونی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "الفبای زیست‌فناوری",
+          "topics": [
+            {
+              "title": "کل فصل: الفبای زیست‌فناوری",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "تولیدمثل در جانداران",
+          "topics": [
+            {
+              "title": "کل فصل: تولیدمثل در جانداران",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "الکتریسیته",
+          "topics": [
+            {
+              "title": "کل فصل: الکتریسیته",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 10,
+          "title": "مغناطیس",
+          "topics": [
+            {
+              "title": "کل فصل: مغناطیس",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 11,
+          "title": "کانی‌ها",
+          "topics": [
+            {
+              "title": "کل فصل: کانی‌ها",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 12,
+          "title": "سنگ‌ها",
+          "topics": [
+            {
+              "title": "کل فصل: سنگ‌ها",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 13,
+          "title": "هوازدگی",
+          "topics": [
+            {
+              "title": "کل فصل: هوازدگی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 14,
+          "title": "نور و ویژگی‌های آن",
+          "topics": [
+            {
+              "title": "کل فصل: نور و ویژگی‌های آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 15,
+          "title": "شکست نور",
+          "topics": [
+            {
+              "title": "کل فصل: شکست نور",
+              "basis": "chapter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "science-9",
+      "grade": 9,
+      "title": "علوم تجربی",
+      "subject": "science",
+      "tracks": ["common"],
+      "program": "regular",
+      "scope": "full-book",
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/556/C906.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C906",
+        "academicYear": "1405-1406",
+        "sha256": "1bee9f617b3ae227ddd92470edee0d9689bed10e140ce3ebe6f04da0f362a057",
+        "outlinePdfPages": [5],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "مواد و نقش آنها در زندگی",
+          "topics": [
+            {
+              "title": "کل فصل: مواد و نقش آنها در زندگی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "رفتار اتم‌ها با یکدیگر",
+          "topics": [
+            {
+              "title": "کل فصل: رفتار اتم‌ها با یکدیگر",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "به دنبال محیطی بهتر برای زندگی",
+          "topics": [
+            {
+              "title": "کل فصل: به دنبال محیطی بهتر برای زندگی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "حرکت چیست",
+          "topics": [
+            {
+              "title": "کل فصل: حرکت چیست",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "نیرو",
+          "topics": [
+            {
+              "title": "کل فصل: نیرو",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "زمین‌ساخت ورقه‌ای",
+          "topics": [
+            {
+              "title": "کل فصل: زمین‌ساخت ورقه‌ای",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "آثاری از گذشته زمین",
+          "topics": [
+            {
+              "title": "کل فصل: آثاری از گذشته زمین",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "فشار و آثار آن",
+          "topics": [
+            {
+              "title": "کل فصل: فشار و آثار آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "ماشین‌ها",
+          "topics": [
+            {
+              "title": "کل فصل: ماشین‌ها",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 10,
+          "title": "نگاهی به فضا",
+          "topics": [
+            {
+              "title": "کل فصل: نگاهی به فضا",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 11,
+          "title": "گوناگونی جانداران",
+          "topics": [
+            {
+              "title": "کل فصل: گوناگونی جانداران",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 12,
+          "title": "دنیای گیاهان",
+          "topics": [
+            {
+              "title": "کل فصل: دنیای گیاهان",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 13,
+          "title": "جانوران بی‌مهره",
+          "topics": [
+            {
+              "title": "کل فصل: جانوران بی‌مهره",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 14,
+          "title": "جانوران مهره‌دار",
+          "topics": [
+            {
+              "title": "کل فصل: جانوران مهره‌دار",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 15,
+          "title": "باهم زیستن",
+          "topics": [
+            {
+              "title": "کل فصل: باهم زیستن",
+              "basis": "chapter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "science-9-gifted",
+      "grade": 9,
+      "title": "علوم تجربی — محتوای تکمیلی استعدادهای درخشان",
+      "subject": "science",
+      "tracks": ["common"],
+      "program": "gifted",
+      "scope": "supplement",
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/556/C924.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C924",
+        "academicYear": "1405-1406",
+        "sha256": "3a7603034fd12c2b0924d75709bd9c4f89ccdf479ef8c47cc79f87d677f1d891",
+        "outlinePdfPages": [7],
+        "coverage": "chapter-outline"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "مواد و نقش آنها در زندگی",
+          "topics": [
+            {
+              "title": "کل فصل: مواد و نقش آنها در زندگی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "رفتار اتم‌ها با یکدیگر",
+          "topics": [
+            {
+              "title": "کل فصل: رفتار اتم‌ها با یکدیگر",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "به دنبال محیطی بهتر برای زندگی",
+          "topics": [
+            {
+              "title": "کل فصل: به دنبال محیطی بهتر برای زندگی",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "حرکت چیست",
+          "topics": [
+            {
+              "title": "کل فصل: حرکت چیست",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "نیرو",
+          "topics": [
+            {
+              "title": "کل فصل: نیرو",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "فشار و آثار آن",
+          "topics": [
+            {
+              "title": "کل فصل: فشار و آثار آن",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "ماشین‌ها",
+          "topics": [
+            {
+              "title": "کل فصل: ماشین‌ها",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "نگاهی به فضا",
+          "topics": [
+            {
+              "title": "کل فصل: نگاهی به فضا",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "گوناگونی جانداران",
+          "topics": [
+            {
+              "title": "کل فصل: گوناگونی جانداران",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 10,
+          "title": "دنیای گیاهان",
+          "topics": [
+            {
+              "title": "کل فصل: دنیای گیاهان",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 11,
+          "title": "جانوران بی‌مهره",
+          "topics": [
+            {
+              "title": "کل فصل: جانوران بی‌مهره",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 12,
+          "title": "جانوران مهره‌دار",
+          "topics": [
+            {
+              "title": "کل فصل: جانوران مهره‌دار",
+              "basis": "chapter"
+            }
+          ]
+        },
+        {
+          "order": 13,
+          "title": "باهم زیستن",
+          "topics": [
+            {
+              "title": "کل فصل: باهم زیستن",
+              "basis": "chapter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "riazi-7-gifted",
+      "grade": 7,
+      "title": "ریاضیات — محتوای تکمیلی استعدادهای درخشان",
+      "subject": "mathematics",
+      "tracks": ["common"],
+      "program": "gifted",
+      "scope": "supplement",
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/555/C723.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C723",
+        "academicYear": "1405-1406",
+        "sha256": "1d86225c5b8ae43c274604933579a1f2f45ac01df4eccb337650a6c998573233",
+        "outlinePdfPages": [7, 8, 9],
+        "coverage": "toc-sections"
+      },
+      "chapters": [
+        {
+          "order": 0,
+          "title": "سرآغاز",
+          "topics": [
+            {
+              "title": "ترتیب چهار عمل اصلی در محاسبات",
+              "basis": "lesson"
+            },
+            {
+              "title": "کارگاه بازی: مثلث همرنگ",
+              "basis": "lesson"
+            },
+            {
+              "title": "جایزه نوبل و جایزه فیلدز",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 1,
+          "title": "راهبردهای حل مسئله",
+          "topics": [
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            },
+            {
+              "title": "مسئله‌ها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "عددهای صحیح",
+          "topics": [
+            {
+              "title": "معرفی عددهای علامت‌دار",
+              "basis": "lesson"
+            },
+            {
+              "title": "جمع و تفریق اعداد صحیح",
+              "basis": "lesson"
+            },
+            {
+              "title": "کارگاه بازی: دوز با اعداد صحیح",
+              "basis": "lesson"
+            },
+            {
+              "title": "ضرب و تقسیم اعداد صحیح",
+              "basis": "lesson"
+            },
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "جبر و معادله",
+          "topics": [
+            {
+              "title": "الگوهای عددی",
+              "basis": "lesson"
+            },
+            {
+              "title": "جانگهدار",
+              "basis": "lesson"
+            },
+            {
+              "title": "عبارت جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "مقدار عددی یک عبارت جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادله",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "هندسه و استدلال",
+          "topics": [
+            {
+              "title": "روابط بین پاره‌خط‌ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "روابط بین زاویه‌ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "تبدیل‌های هندسی و هم‌نهشت",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "شمارنده ها و اعداد اول",
+          "topics": [
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            },
+            {
+              "title": "عدد اول",
+              "basis": "lesson"
+            },
+            {
+              "title": "کارگاه بازی: شمارنده و هپ",
+              "basis": "lesson"
+            },
+            {
+              "title": "شمارنده",
+              "basis": "lesson"
+            },
+            {
+              "title": "مسابقه تیراندازی",
+              "basis": "lesson"
+            },
+            {
+              "title": "شمارنده اول",
+              "basis": "lesson"
+            },
+            {
+              "title": "بزرگ‌ترین شمارنده مشترک",
+              "basis": "lesson"
+            },
+            {
+              "title": "کوچک‌ترین مضرب مشترک",
+              "basis": "lesson"
+            },
+            {
+              "title": "کارگاه بازی: نقطه بذار، شلیک کن",
+              "basis": "lesson"
+            },
+            {
+              "title": "ارتباط ب.م.م و ک.م.م",
+              "basis": "lesson"
+            },
+            {
+              "title": "تمرین‌های تکمیلی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "سطح و حجم",
+          "topics": [
+            {
+              "title": "ریاضیات سیب‌زمینی",
+              "basis": "lesson"
+            },
+            {
+              "title": "مکعب",
+              "basis": "lesson"
+            },
+            {
+              "title": "چهاروجهی منتظم",
+              "basis": "lesson"
+            },
+            {
+              "title": "شهود فضایی",
+              "basis": "lesson"
+            },
+            {
+              "title": "محاسبه حجم‌های منشوری",
+              "basis": "lesson"
+            },
+            {
+              "title": "مساحت جانبی و کل",
+              "basis": "lesson"
+            },
+            {
+              "title": "حجم و سطح",
+              "basis": "lesson"
+            },
+            {
+              "title": "کارگاه ساخت حجم: دوازده‌وجهی منتظم",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "توان و جذر",
+          "topics": [
+            {
+              "title": "تعریف توان",
+              "basis": "lesson"
+            },
+            {
+              "title": "محاسبه یک عبارت توان‌دار",
+              "basis": "lesson"
+            },
+            {
+              "title": "ساده کردن عبارت‌های توان‌دار",
+              "basis": "lesson"
+            },
+            {
+              "title": "کاربردهایی از توان",
+              "basis": "lesson"
+            },
+            {
+              "title": "جذر و ریشه",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "بردار و مختصات",
+          "topics": [
+            {
+              "title": "کارگاه بازی: نبرد دریایی",
+              "basis": "lesson"
+            },
+            {
+              "title": "دریچه‌ای به روبوکاپ",
+              "basis": "lesson"
+            },
+            {
+              "title": "مختصات و تبدیل‌های هندسی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "آمار و احتمال",
+          "topics": [
+            {
+              "title": "نمودارها و تفسیر نتیجه‌ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "احتمال یا اندازه‌گیری شانس",
+              "basis": "lesson"
+            },
+            {
+              "title": "احتمال و تجربه",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "riazi-8-gifted",
+      "grade": 8,
+      "title": "ریاضیات — محتوای تکمیلی استعدادهای درخشان",
+      "subject": "mathematics",
+      "tracks": ["common"],
+      "program": "gifted",
+      "scope": "supplement",
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/558/C823.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C823",
+        "academicYear": "1405-1406",
+        "sha256": "5e9d6fa89b17daa3cb39be60f5ce6197ce50bee9b88cfbacba4d7c7760c88865",
+        "outlinePdfPages": [7, 8, 9],
+        "coverage": "toc-sections"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "عددهای صحیح و گویا",
+          "topics": [
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            },
+            {
+              "title": "یادآوری عددهای صحیح",
+              "basis": "lesson"
+            },
+            {
+              "title": "عددهای گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "دو مسئله واقعاً کاربردی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "عددهای اول",
+          "topics": [
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            },
+            {
+              "title": "یادآوری عددهای اول",
+              "basis": "lesson"
+            },
+            {
+              "title": "تعیین عددهای اول",
+              "basis": "lesson"
+            },
+            {
+              "title": "ماشین کانوی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "چند ضلعیها",
+          "topics": [
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            },
+            {
+              "title": "کارگاه بازی",
+              "basis": "lesson"
+            },
+            {
+              "title": "چندضلعی‌ها و تقارن",
+              "basis": "lesson"
+            },
+            {
+              "title": "توازی و تعامد",
+              "basis": "lesson"
+            },
+            {
+              "title": "چهارضلعی‌ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "زاویه‌های داخلی و خارجی",
+              "basis": "lesson"
+            },
+            {
+              "title": "کاشی‌کاری",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "جبر و معادله",
+          "topics": [
+            {
+              "title": "ساده کردن عبارت‌های جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "پیدا کردن مقدار یک عبارت جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "تجزیه عبارت‌های جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "معادله",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "بردار و مختصات",
+          "topics": [
+            {
+              "title": "کارگاه بازی",
+              "basis": "lesson"
+            },
+            {
+              "title": "دریچه‌ای به روبوکاپ",
+              "basis": "lesson"
+            },
+            {
+              "title": "کاربردهایی از بردارها",
+              "basis": "lesson"
+            },
+            {
+              "title": "بردار، رودخانه و غواص",
+              "basis": "lesson"
+            },
+            {
+              "title": "ریاضیات تخم‌مرغ",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "مثلث",
+          "topics": [
+            {
+              "title": "رابطه فیثاغورس",
+              "basis": "lesson"
+            },
+            {
+              "title": "هم‌نهشت",
+              "basis": "lesson"
+            },
+            {
+              "title": "مثلث‌های هم‌نهشت",
+              "basis": "lesson"
+            },
+            {
+              "title": "هم‌نهشت مثلث‌های قائم‌الزاویه",
+              "basis": "lesson"
+            },
+            {
+              "title": "تخیلات یک دانش‌آموز در کلاس ریاضی (۱)",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "توان و جذر",
+          "topics": [
+            {
+              "title": "توان",
+              "basis": "lesson"
+            },
+            {
+              "title": "اعداد رادیکالی",
+              "basis": "lesson"
+            },
+            {
+              "title": "تخیلات یک دانش‌آموز در کلاس ریاضی (۲)",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "آمار و احتمال",
+          "topics": [
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            },
+            {
+              "title": "دسته‌بندی داده‌ها و میانگین",
+              "basis": "lesson"
+            },
+            {
+              "title": "کارگاه بازی: حلقه شانس",
+              "basis": "lesson"
+            },
+            {
+              "title": "احتمال یا اندازه‌گیری شانس",
+              "basis": "lesson"
+            },
+            {
+              "title": "بررسی حالت‌های ممکن",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 9,
+          "title": "دایره",
+          "topics": [
+            {
+              "title": "خط و دایره",
+              "basis": "lesson"
+            },
+            {
+              "title": "زاویه مرکزی و زاویه محاطی",
+              "basis": "lesson"
+            },
+            {
+              "title": "کاربردهایی از دایره",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "riazi-9-gifted",
+      "grade": 9,
+      "title": "ریاضیات — محتوای تکمیلی استعدادهای درخشان",
+      "subject": "mathematics",
+      "tracks": ["common"],
+      "program": "gifted",
+      "scope": "supplement",
+      "source": {
+        "reference": "http://www.chap.sch.ir/",
+        "outlineUrl": "http://www.chap.sch.ir/sites/default/files/lbooks/1405-1406/556/C923.pdf",
+        "checkedAt": "2026-10-25",
+        "verification": "official-pdf-chapter-outline",
+        "officialEditionVerified": true,
+        "bookCode": "C923",
+        "academicYear": "1405-1406",
+        "sha256": "32346f70ae90683ae0abd0b75316eda9125773928f6c9fccdf20ffccbe90f7d5",
+        "outlinePdfPages": [9, 10, 11],
+        "coverage": "toc-sections"
+      },
+      "chapters": [
+        {
+          "order": 1,
+          "title": "مجموعهها",
+          "topics": [
+            {
+              "title": "یک گروه مجازی",
+              "basis": "lesson"
+            },
+            {
+              "title": "معرفی مجموعه",
+              "basis": "lesson"
+            },
+            {
+              "title": "مجموعه‌های برابر و زیرمجموعه",
+              "basis": "lesson"
+            },
+            {
+              "title": "نمایش مجموعه‌ها با نمادهای ریاضی",
+              "basis": "lesson"
+            },
+            {
+              "title": "اجتماع، اشتراک و تفاضل مجموعه‌ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "بیشمارش",
+              "basis": "lesson"
+            },
+            {
+              "title": "مجموعه و احتمال",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "عددهای حقیقی",
+          "topics": [
+            {
+              "title": "عددهای گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "اعداد حقیقی",
+              "basis": "lesson"
+            },
+            {
+              "title": "قدرمطلق و محاسبه تقریبی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "استدلال و اثبات در هندسه",
+          "topics": [
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            },
+            {
+              "title": "آشنایی با اثبات در هندسه",
+              "basis": "lesson"
+            },
+            {
+              "title": "هم‌نهشت مثلث‌ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "حل مسئله در هندسه",
+              "basis": "lesson"
+            },
+            {
+              "title": "شکل‌های متشابه",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "توان و ریشه",
+          "topics": [
+            {
+              "title": "توان صحیح",
+              "basis": "lesson"
+            },
+            {
+              "title": "پیدا کردن مقدار یک عبارت جبری",
+              "basis": "lesson"
+            },
+            {
+              "title": "نماد علمی",
+              "basis": "lesson"
+            },
+            {
+              "title": "ریشه‌گیری",
+              "basis": "lesson"
+            },
+            {
+              "title": "جمع و تفریق رادیکال‌ها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 5,
+          "title": "عبارتهای جبری",
+          "topics": [
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            },
+            {
+              "title": "چندجمله‌ای‌ها",
+              "basis": "lesson"
+            },
+            {
+              "title": "اتحاد و تجزیه",
+              "basis": "lesson"
+            },
+            {
+              "title": "نامعادله",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 6,
+          "title": "خط و معادلههای خطی",
+          "topics": [
+            {
+              "title": "شیب و معادله خط",
+              "basis": "lesson"
+            },
+            {
+              "title": "دستگاه معادله‌های خطی",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 7,
+          "title": "عبارتهای گویا",
+          "topics": [
+            {
+              "title": "گفت‌وگو",
+              "basis": "lesson"
+            },
+            {
+              "title": "ساده کردن عبارت‌های گویا",
+              "basis": "lesson"
+            },
+            {
+              "title": "تقسیم چندجمله‌ای‌ها",
+              "basis": "lesson"
+            }
+          ]
+        },
+        {
+          "order": 8,
+          "title": "حجم و مساحت",
+          "topics": [
+            {
+              "title": "حجم و سطح کره",
+              "basis": "lesson"
+            },
+            {
+              "title": "چندوجهی",
+              "basis": "lesson"
+            },
+            {
+              "title": "حجم هرم و مخروط",
+              "basis": "lesson"
+            },
+            {
+              "title": "سطح و حجم",
+              "basis": "lesson"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

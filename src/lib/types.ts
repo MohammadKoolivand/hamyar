@@ -1,3 +1,4 @@
+import type { QuestionVisual } from "./question-visuals";
 export interface MembershipEvent {
   status: string;
   actorId: string;
@@ -103,8 +104,16 @@ export interface Node {
   title: string;
   kind: string;
   parentId?: string;
+  catalogBookId?: string;
+  tracks?: string[];
 }
 export interface Question {
+  source?: import("./question-source").QuestionSource;
+  classification?: "topic" | "free";
+  difficulty?: "easy" | "medium" | "hard";
+  year?: number;
+  origin?: string;
+  visuals?: QuestionVisual[];
   _id: string;
   statement: string;
   type: string;

@@ -1,3 +1,5 @@
+import { visualKind } from "../../lib/question-visuals";
+import type { AvalaiClient } from "../ai/avalai";
 import type { FastifyInstance } from "fastify";
 import type { ClientSession } from "mongodb";
 import { z } from "zod";
@@ -9,8 +11,10 @@ export async function validateQuestion(
   ownerId: string,
   b: QuestionInput,
 ) {
-  const topic = await ctx.owned("curriculum", b.topicId, ownerId);
-  if (topic.kind !== "topic") ctx.fail(400, "مبحث را انتخاب کنید");
+  if (b.topicId) {
+    const topic = await ctx.owned("curriculum", b.topicId, ownerId);
+    if (topic.kind !== "topic") ctx.fail(400, "مبحث را انتخاب کنید");
+  }
   for (const sid of b.skillIds) {
     const s = await ctx.owned("curriculum", sid, ownerId);
     if (s.kind !== "skill") ctx.fail(400, "مهارت معتبر نیست");
@@ -46,6 +50,7 @@ export function registerAuthoring(
   app: FastifyInstance,
   ctx: Context,
   generator?: QuestionGenerator,
+  avalai?: AvalaiClient,
 ) {
   app.get("/api/question-drafts", async (r) => {
     const u = await ctx.user(r, "teacher");
@@ -65,6 +70,7 @@ export function registerAuthoring(
           topicId: z.string().uuid(),
           skillIds: z.array(z.string().uuid()).max(10).default([]),
           brief: z.string().trim().min(5).max(1000),
+          visualKind: visualKind.optional(),
           type: z.enum(["numeric", "choice", "short", "essay"]),
         })
         .parse(r.body);
@@ -84,10 +90,20 @@ export function registerAuthoring(
           return cached.response;
         }
       }
-      if (!generator)
+      const savedSettings = await ctx.c("aiSettings").findOne({ _id: u._id });
+      const useAvalai =
+        savedSettings?.provider === "avalai" || (!generator && avalai);
+      const selectedModel =
+        savedSettings?.model ?? process.env.AVALAI_AUTHOR_MODEL;
+      const selectedGenerator = useAvalai
+        ? selectedModel && avalai?.configured
+          ? avalai.generator(selectedModel)
+          : undefined
+        : generator;
+      if (!selectedGenerator)
         ctx.fail(
           503,
-          "تولید سؤال واقعی فعال نیست؛ Ollama را تنظیم کنید. حالت Mock سؤال تولید نمی‌کند.",
+          "تولید سؤال آماده نیست؛ مدل را در تنظیمات انتخاب کنید و اتصال AvvalAI را پیکربندی کنید.",
         );
       await validateQuestion(ctx, u._id, {
         ...b,
@@ -109,16 +125,18 @@ export function registerAuthoring(
         _id: requestId,
         ownerId: u._id,
         purpose: "question_authoring",
-        configuredProvider: "ollama",
+        configuredProvider: selectedGenerator!.provider ?? "configured",
+        ...(useAvalai ? { configuredModel: selectedModel } : {}),
         state: "pending",
         createdAt: ctx.now(),
       });
       try {
-        const output = await generator!.generate({
+        const output = await selectedGenerator!.generate({
           topic: topic.title,
           curriculum,
           brief: b.brief,
           type: b.type,
+          ...(b.visualKind ? { visualKind: b.visualKind } : {}),
         });
         await ctx.c("aiRequests").updateOne(
           { _id: requestId },
@@ -136,6 +154,9 @@ export function registerAuthoring(
         // with explicit correction flags; only approval may pass the full grading schema.
         const candidate = {
           ...output.question,
+          ...(b.visualKind && b.visualKind !== "none"
+            ? { visualKind: b.visualKind }
+            : {}),
           topicId: b.topicId,
           skillIds: b.skillIds,
           type: b.type,
@@ -216,13 +237,33 @@ export function registerAuthoring(
         if (!draft) ctx.fail(404, "پیش‌نویس یافت نشد");
         if (draft!.state !== "pending_review")
           ctx.fail(409, "این پیش‌نویس قبلاً تعیین تکلیف شده است");
-        const row = await persistQuestion(ctx, u._id, b.question, session, {
-          origin: "ai_reviewed",
-          sourceDraftId: did,
-          provider: draft!.provider,
-          model: draft!.model,
-          promptVersion: draft!.promptVersion,
+        const requiredKind = draft!.question.visualKind;
+        if (
+          requiredKind &&
+          requiredKind !== "none" &&
+          !b.question.visuals?.some((v) => v.kind === requiredKind)
+        )
+          ctx.fail(
+            400,
+            "محتوای تصویری درخواست‌شده باید پیش از تأیید اضافه شود",
+          );
+        const approvedQuestion = questionSchema.parse({
+          ...b.question,
+          ...(requiredKind ? { visualKind: requiredKind } : {}),
         });
+        const row = await persistQuestion(
+          ctx,
+          u._id,
+          approvedQuestion,
+          session,
+          {
+            origin: "ai_reviewed",
+            sourceDraftId: did,
+            provider: draft!.provider,
+            model: draft!.model,
+            promptVersion: draft!.promptVersion,
+          },
+        );
         await ctx.c("questionDrafts").updateOne(
           { _id: did },
           {

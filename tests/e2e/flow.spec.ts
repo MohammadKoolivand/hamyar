@@ -1,3 +1,4 @@
+import { chooseTopic, chooseParent } from "./curriculum-helpers";
 import { test, expect } from "@playwright/test";
 const pass = "StrongPass123!";
 test("UI: teacher creates content and invite; student solves; both see evidence", async ({
@@ -25,27 +26,28 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
+  await page.getByRole("button", { name: "منابع آموزشی", exact: true }).click();
+  await page.getByRole("heading", { name: "ساختار آموزشی شما", exact: true }).click();
   await page.getByLabel("نوع", { exact: true }).selectOption("subject");
   await page.getByLabel("عنوان", { exact: true }).fill("ریاضی آزمایشی");
   await page.getByRole("button", { name: "افزودن به ساختار" }).click();
   await expect(page.getByLabel("عنوان", { exact: true })).toHaveValue("");
   await page.getByLabel("نوع", { exact: true }).selectOption("topic");
   await page.getByLabel("عنوان", { exact: true }).fill("جمع ساده");
-  await page
-    .getByLabel("زیرمجموعه")
-    .selectOption({ label: "ریاضی آزمایشی (subject)" });
+  const structureNodes = await (await page.request.get("/api/curriculum")).json();
+  await chooseParent(page, structureNodes.find((n:{title:string})=>n.title==="ریاضی آزمایشی")._id);
   await page.getByRole("button", { name: "افزودن به ساختار" }).click();
   await expect(page.getByLabel("عنوان", { exact: true })).toHaveValue("");
   await page.getByLabel("نوع", { exact: true }).selectOption("skill");
   await page.getByLabel("عنوان", { exact: true }).fill("حل مستقل");
-  await page
-    .getByLabel("زیرمجموعه")
-    .selectOption({ label: "جمع ساده (topic)" });
+  const topicNodes = await (await page.request.get("/api/curriculum")).json();
+  const simpleTopic = topicNodes.find((n:{title:string})=>n.title==="جمع ساده");
+  await chooseParent(page,simpleTopic._id);
   await page.getByRole("button", { name: "افزودن به ساختار" }).click();
   await expect(page.getByLabel("عنوان", { exact: true })).toHaveValue("");
-  await page
-    .getByLabel("مبحث", { exact: true })
-    .selectOption({ label: "جمع ساده" });
+  await page.getByRole("link", {name:"بازگشت به بانک سؤال",exact:true}).click();
+  await page.getByRole("link", {name:"افزودن سؤال",exact:true}).click();
+  await chooseTopic(page,simpleTopic._id);
   await page.getByLabel("حل مستقل", { exact: true }).check();
   await page.getByLabel("صورت سؤال").fill("حاصل یک به علاوه یک چیست؟");
   await page.getByLabel("پاسخ مرجع خصوصی").fill("2");
@@ -186,6 +188,7 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
+  await page.getByRole("link", {name:"افزودن سؤال",exact:true}).click();
   await page
     .getByLabel("پاسخ مرجع خصوصی")
     .fill("UNPUBLISHED_PRIVATE_REFERENCE");
@@ -198,6 +201,7 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
+  await page.getByRole("link", {name:"افزودن سؤال",exact:true}).click();
   await expect(page.getByLabel("پاسخ مرجع خصوصی")).toHaveValue("");
   await studentContext.close();
 });
@@ -296,10 +300,18 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
+  await page.getByRole("button", { name: "منابع آموزشی", exact: true }).click();
+  await page.getByRole("heading", { name: "ساختار آموزشی شما", exact: true }).click();
   await page.getByLabel("نوع", { exact: true }).selectOption("topic");
   await page.getByLabel("عنوان", { exact: true }).fill("جمع در پایه دوم");
   await page.getByRole("button", { name: "افزودن به ساختار" }).click();
   await expect(page.getByLabel("عنوان", { exact: true })).toHaveValue("");
+  await page.getByRole("link", {name:"بازگشت به بانک سؤال",exact:true}).click();
+  await page.getByRole("link", {name:"افزودن سؤال",exact:true}).click();
+  await page.getByRole("button", {name:"با هوش مصنوعی",exact:true}).click();
+  await page.getByLabel("پایه تولید سؤال").selectOption("ungraded");
+  await page.getByLabel("درس یا کتاب تولید سؤال").selectOption("unassigned");
+  await page.getByLabel("فصل تولید سؤال").selectOption("unchaptered");
   await page
     .getByLabel("مبحث تولید سؤال")
     .selectOption({ label: "جمع در پایه دوم" });
@@ -309,7 +321,7 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
       "فقط یک سؤال جمع دو عدد تک‌رقمی مناسب پایه دوم ابتدایی ایران، پاسخ مرجع فقط یک عدد باشد.",
     );
   await page
-    .getByRole("button", { name: "تولید یک پیش‌نویس با مدل محلی" })
+    .getByRole("button", { name: "تولید پیش‌نویس سؤال" })
     .click();
   await expect(page.getByLabel("صورت سؤال پیشنهادی")).toBeVisible({
     timeout: 100000,
@@ -325,7 +337,7 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
     .click();
   await expect(page.getByText("بانک سؤال خصوصی · ۱ سؤال")).toBeVisible();
   await page
-    .getByRole("button", { name: "تولید یک پیش‌نویس با مدل محلی" })
+    .getByRole("button", { name: "تولید پیش‌نویس سؤال" })
     .click();
   await expect(page.getByLabel("دلیل رد پیش‌نویس")).toBeVisible({
     timeout: 100000,

@@ -1,5 +1,17 @@
 "use client";
+import { SourceEditor } from "./source-editor";
+import type { QuestionSource } from "@/lib/question-source";
 import { useEffect, useState } from "react";
+import { VisualEditor } from "./visual-editor";
+import {
+  QuestionPresentation,
+  MathText,
+} from "@/components/question-presentation";
+import {
+  questionVisualsSchema,
+  type QuestionVisual,
+} from "@/lib/question-visuals";
+import { TopicSelector } from "./topic-selector";
 import { api } from "@/lib/api";
 import type { Node } from "@/lib/types";
 import { Field } from "@/components/ui/field";
@@ -10,6 +22,11 @@ type QuestionDraft = {
   model: string;
   validationIssues?: string[];
   question: {
+    visuals?: QuestionVisual[];
+    visualKind?: string;
+    source?: QuestionSource;
+    difficulty?: string;
+    year?: number;
     topicId: string;
     skillIds: string[];
     statement: string;
@@ -32,13 +49,18 @@ export function AiAuthoring({
     [topic, setTopic] = useState(""),
     [brief, setBrief] = useState(""),
     [type, setType] = useState("numeric"),
+    [visualKind, setVisualKind] = useState("none"),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
+  const [authoringModel, setAuthoringModel] = useState("");
   const refresh = () =>
     api<QuestionDraft[]>("/question-drafts").then(setDrafts);
   useEffect(() => {
     refresh().catch((e) => setError(e.message));
+    api<{ model: string }>("/settings/authoring")
+      .then((s) => setAuthoringModel(s.model))
+      .catch((e) => setError(e.message));
   }, []);
   async function run(fn: () => Promise<void>) {
     setBusy(true);
@@ -53,15 +75,22 @@ export function AiAuthoring({
     }
   }
   return (
-    <section className="grid gap-4 glass-panel p-5">
-      <h2 className="text-lg font-bold">
-        تولید سؤال با هوش مصنوعی و بررسی معلم
-      </h2>
+    <section className="grid min-w-0 gap-5">
       <p className="text-sm leading-loose text-slate-600">
-        مدل محلی فقط پیش‌نویس می‌سازد. صحت، تناسب سنی و راهنماها را بررسی و
+        هوش مصنوعی فقط پیش‌نویس می‌سازد. صحت، تناسب سنی و راهنماها را بررسی و
         اصلاح کنید؛ پیش از تأیید شما هیچ پیش‌نویسی وارد بانک یا مأموریت نمی‌شود.
-        تولید واقعی به Ollama نیاز دارد.
+        مدل تولید سؤال را در تنظیمات AvvalAI انتخاب کنید.
       </p>
+      <p className="text-xs text-slate-500">
+        مدل انتخاب‌شده:{" "}
+        <span dir="ltr">{authoringModel || "هنوز انتخاب نشده"}</span>
+      </p>
+      <a
+        href="/settings"
+        className="text-sm text-[#233B8F] underline underline-offset-4"
+      >
+        انتخاب مدل AvvalAI در تنظیمات
+      </a>
       {error && (
         <p role="alert" className="text-rose-800">
           {error}
@@ -77,29 +106,19 @@ export function AiAuthoring({
               topicId: topic,
               type,
               brief,
+              visualKind,
             });
             await refresh();
             setNotice("پیش‌نویس برای بررسی آماده است.");
           });
         }}
       >
-        <Field title="مبحث تولید سؤال">
-          <select
-            className={input}
-            required
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-          >
-            <option value="">انتخاب مبحث</option>
-            {nodes
-              .filter((n) => n.kind === "topic")
-              .map((n) => (
-                <option key={n._id} value={n._id}>
-                  {n.title}
-                </option>
-              ))}
-          </select>
-        </Field>
+        <TopicSelector
+          nodes={nodes}
+          value={topic}
+          onChange={setTopic}
+          disabled={busy}
+        />
         <Field title="حوزه، پایه و هدف سؤال">
           <textarea
             className={input}
@@ -110,6 +129,18 @@ export function AiAuthoring({
             onChange={(e) => setBrief(e.target.value)}
             placeholder="پایه و سطح دشواری، هدف آموزشی و محدودیت‌های محتوا را بنویسید."
           />
+        </Field>
+        <Field title="محتوای سؤال تولیدی">
+          <select
+            className={input}
+            value={visualKind}
+            onChange={(e) => setVisualKind(e.target.value)}
+          >
+            <option value="none">متنی</option>
+            <option value="chart">دارای نمودار</option>
+            <option value="geometry">دارای شکل هندسی یا پیکان</option>
+            <option value="formula">دارای فرمول یا معادله</option>
+          </select>
         </Field>
         <Field title="نوع سؤال تولیدی">
           <select
@@ -123,8 +154,8 @@ export function AiAuthoring({
             <option value="essay">تشریحی با بررسی انسانی</option>
           </select>
         </Field>
-        <Button disabled={busy}>
-          {busy ? "در حال انجام…" : "تولید یک پیش‌نویس با مدل محلی"}
+        <Button disabled={busy || !topic}>
+          {busy ? "در حال انجام…" : "تولید پیش‌نویس سؤال"}
         </Button>
       </form>
       <h3 className="font-bold">صف بررسی سؤال‌های تولیدشده</h3>
@@ -170,7 +201,13 @@ function DraftReview({
   approve: (q: QuestionDraft["question"]) => Promise<void>;
   reject: (reason: string) => Promise<void>;
 }) {
-  const [q, setQ] = useState(draft.question),
+  const [q, setQ] = useState<QuestionDraft["question"]>({
+      ...draft.question,
+      source: draft.question.source ?? {
+        family: "practice" as const,
+        practice: "ai" as const,
+      },
+    }),
     [confirmed, setConfirmed] = useState(false),
     [reason, setReason] = useState("");
   return (
@@ -186,6 +223,17 @@ function DraftReview({
           نیازمند اصلاح پیش از تأیید: {draft.validationIssues.join("؛ ")}
         </p>
       )}
+      <div className="rounded-xl bg-slate-50 p-4">
+        <h4 className="mb-3 text-sm font-bold">
+          پیش‌نمایش سؤال برای دانش‌آموز
+        </h4>
+        <QuestionPresentation statement={q.statement} visuals={q.visuals} />
+        {q.options.map((option, i) => (
+          <p className="text-sm leading-7" key={i}>
+            {i + 1}. <MathText text={option} />
+          </p>
+        ))}
+      </div>
       <form
         className="grid gap-3"
         onSubmit={(e) => {
@@ -193,6 +241,42 @@ function DraftReview({
           void approve(q);
         }}
       >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field title="درجه سختی پیشنهادی">
+            <select
+              className={input}
+              value={q.difficulty ?? ""}
+              onChange={(e) =>
+                setQ({ ...q, difficulty: e.target.value || undefined })
+              }
+            >
+              <option value="">تعیین نشده</option>
+              <option value="easy">آسان</option>
+              <option value="medium">متوسط</option>
+              <option value="hard">سخت</option>
+            </select>
+          </Field>
+          <Field title="سال سؤال پیشنهادی (شمسی)">
+            <input
+              type="number"
+              min={1300}
+              max={1500}
+              className={input}
+              value={q.year ?? ""}
+              onChange={(e) =>
+                setQ({
+                  ...q,
+                  year: e.target.value ? Number(e.target.value) : undefined,
+                })
+              }
+            />
+          </Field>
+        </div>
+        <SourceEditor
+          value={q.source}
+          onChange={(source) => setQ({ ...q, source })}
+          disabled={busy}
+        />
         <Field title="صورت سؤال پیشنهادی">
           <textarea
             required
@@ -229,6 +313,14 @@ function DraftReview({
             }
           />
         </Field>
+        <VisualEditor
+          value={q.visuals ?? []}
+          onChange={(visuals) => {
+            setQ({ ...q, visuals });
+            setConfirmed(false);
+          }}
+          disabled={busy}
+        />
         <label className="flex items-start gap-2 text-sm leading-loose">
           <input
             required
@@ -239,7 +331,18 @@ function DraftReview({
           صحت سؤال و پاسخ مرجع، تناسب سنی و عدم افشای جواب در راهنماها را بررسی
           و تأیید می‌کنم.
         </label>
-        <Button disabled={busy || !confirmed}>
+        <Button
+          disabled={
+            busy ||
+            !confirmed ||
+            !questionVisualsSchema.safeParse(q.visuals ?? []).success ||
+            Boolean(
+              q.visualKind &&
+              q.visualKind !== "none" &&
+              !q.visuals?.some((v) => v.kind === q.visualKind),
+            )
+          }
+        >
           تأیید و افزودن به بانک سؤال
         </Button>
       </form>

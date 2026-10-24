@@ -42,6 +42,7 @@ export function registerPractice(
       questions: questions.map((q) => ({
         _id: q._id,
         statement: q.statement,
+        ...(q.visuals ? { visuals: q.visuals } : {}),
         type: q.type,
         options: q.options,
         skillIds: q.skillIds,

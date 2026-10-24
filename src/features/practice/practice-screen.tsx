@@ -1,4 +1,8 @@
 "use client";
+import {
+  QuestionPresentation,
+  MathText,
+} from "@/components/question-presentation";
 import { clsx } from "clsx";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -64,7 +68,21 @@ export function PracticeScreen({
           max={active.questions!.length}
           className="hy-practice-progress w-full accent-[#2EC8C3]"
         />
-        <p className="practice-sheet px-5 py-6 text-[21px] leading-[2.2] whitespace-pre-wrap">{q.statement}</p>
+        <div className="practice-sheet min-w-0 px-5 py-6">
+          <QuestionPresentation statement={q.statement} visuals={q.visuals} />
+        </div>
+        {q.type === "choice" && (
+          <div className="grid gap-2" aria-label="گزینه‌های سؤال">
+            {q.options.map((o, i) => (
+              <div
+                className="rounded-xl border border-slate-200 p-3 text-sm leading-7"
+                key={i}
+              >
+                {fa(i + 1)}. <MathText text={o} />
+              </div>
+            ))}
+          </div>
+        )}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -188,10 +206,7 @@ export function PracticeScreen({
         {active.hints
           ?.filter((h) => h.questionVersionId === q._id)
           .map((h) => (
-            <div
-              key={h._id}
-              className="glass-note p-3.5 leading-[1.9]"
-            >
+            <div key={h._id} className="glass-note p-3.5 leading-[1.9]">
               {h.text}
               <br />
               <Button

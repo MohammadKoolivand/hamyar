@@ -80,3 +80,27 @@ classGroups نگهدارنده عنوان کلاس، شناسه درس، شنا�
 ## تمرین تقویتی فردی از شواهد
 
 این مسیر به مدل جدید مستقل برای «مجموعه سؤال» نیاز ندارد: از `assignments` مربوط به دانش‌آموز و معلم و `learningEvidence` ساخته‌شده پس از ارزیابی/بازبینی، آخرین نتیجه معتبر هر `questionVersionId` خوانده می‌شود. سؤال‌های پیشنهادی باید `ownerId` برابر شناسه معلم داشته باشند. نتیجه `incorrect/partially_correct` با `verified=true` قابل پیشنهاد است؛ پاسخ درست تازه‌تر، خطای اصلاح‌شده یا `pending_review` کنار گذاشته می‌شود. دامنه انتخاب یا `courseId` معتبر و دارای enrollment فعال است یا فقط مأموریت‌های legacy فاقد courseId. هنگام انتشار یک Mission و Assignment جدید با `remediation:true` و اختیاری `enrollmentId` ثبت می‌شود؛ رکوردهای قدیمی، پاسخ‌ها و history بدون تغییر می‌مانند. ایندکس خواندن `learningEvidence.teacherId+studentId+assignmentId+createdAt` اضافه شده است.
+
+## Catalog curriculum additions
+
+curriculum nodes optionally carry catalogKey/catalogVersion/catalogBookId, order/sourceBasis and book source metadata. IDs are owner-scoped UUIDv5; $setOnInsert preserves existing titles and question references. Hierarchy is system → level → grade → course(book) → chapter → topic; the domain's generic kinds are unchanged. Dataset/version/source links live in src/data/iran-secondary-curriculum.json; officialEditionVerified=false is intentional while chap is unavailable. No destructive migration or cross-tenant seed occurs.
+
+نسخه دوم کاتالوگ نوع کتاب (`program`) را مستقل از رشته نگه می‌دارد؛ علوم کامل و گزیده فیزیک شناسه‌های جدا دارند. تکمیلی سمپاد کتاب مستقلی با شناسه مستقل است؛ ترتیب فصل می‌تواند صفر باشد. ورود مجدد همچنان فقط افزودنی است.
+
+در v3، `identityTitle` برای سه عنوان اصلاح‌شده، ورودی محاسبه UUID قبلی را نگه می‌دارد؛ `previousTitle` عنوان قدیمی مجاز برای اصلاح مشروط است. تغییر منبع رسمی و عنوان‌های شناخته‌شده در همان تراکنش import اعمال می‌شود. عنوان شخصی معلم بازنویسی نمی‌شود.
+
+
+`aiSettings`: `_id=teacherId` (منحصربه‌فرد)، `ownerId`، `provider:avalai`، `model` و `updatedAt`. داده اختصاصی معلم است؛ کلید API در این مجموعه ذخیره نمی‌شود. مدل و ارائه‌دهنده درخواست در aiRequests و questionDrafts ثبت می‌شوند؛ تغییر تنظیمات پیش‌نویس‌های قبلی را تغییر نمی‌دهد.
+
+
+### محتوای تصویری سؤال
+`visuals?: QuestionVisual[]` در سؤال، پیش‌نویس و نسخه ثابت ذخیره می‌شود؛ حداکثر ۳ مورد. نوع chart شامل caption، عنوان محور/واحد، بازه‌ها و تا ۴ سری با ۲ تا ۸۰ نقطه است. نوع geometry شامل caption و مختصات ۰..۱۰۰ برای نقطه/پاره‌خط/پیکان/دایره است؛ تعداد اجزا و خروج از صفحه کنترل می‌شود. نوع formula شامل caption و LaTeX محدود است. کد SVG/HTML یا URL به‌عنوان شکل پذیرفته نمی‌شود.
+`visualKind?: none|chart|geometry|formula` نیاز محتوایی درخواست تولید را نگه می‌دارد؛ نبود نوع خواسته‌شده مانع تأیید است. حذف این فیلد از payload تأیید نمی‌تواند الزام ذخیره‌شده پیش‌نویس را دور بزند. داده‌های قدیمی فاقد visuals معتبر می‌مانند و مهاجرت اجباری ندارند.
+
+### مشخصات بانک سؤال — ۲۰۲۶-۱۰-۲۵
+
+نسخه سؤال دارای `difficulty?` (easy/medium/hard)، `year?` (سال شمسی منبع سؤال) و `classification?` (topic/free) است. سؤال‌های قدیمی بدون classification مبحثی محسوب می‌شوند. سؤال آزاد topicId ندارد؛ برای این حالت skillIds خالی است و تحلیل مبتنی بر مهارت به آن مهارت ساختگی نسبت نمی‌دهد. سؤال آزاد همچنان با همان questionVersionId در مأموریت قابل تخصیص و ارزیابی است.
+
+منابع مشترک در collection موجود curriculum و با ownerId معلم باقی می‌مانند؛ `/resources` تنها محل UI برای افزودن کتاب رسمی و ساختار شخصی است. صفحه افزودن و فیلتر بانک از همان شناسه‌ها و روابط والد استفاده می‌کنند، کپی مستقلی از فهرست ساخته نمی‌شود.
+
+`questionVersions.source?` مشخصات منبع/آزمون را در همان نسخه ثابت نگهداری می‌کند. مدل source شامل family، administration و مشخصات اختیاری مرتبط با دسته است؛ هشت دسته رابط از این ابعاد استخراج می‌شوند. بنابراین هماهنگ کشوری با نهایی یکی نیست. نسخه‌های بدون source به «دسته‌بندی نشده» می‌روند و همچنان در «همه دسته‌ها» دیده می‌شوند. این مرحله مجموعه آزمون/PDF مستقل یا واردسازی فایل آرشیو ایجاد نمی‌کند.

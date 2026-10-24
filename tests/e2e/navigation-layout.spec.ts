@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("each navigation section resolves to a standalone URL on direct load", async ({ page }) => {
   const routes = [
     "/dashboard", "/homeworks", "/students", "/courses",
-    "/classes", "/content", "/learning", "/practice", "/report",
+    "/classes", "/content", "/content-new", "/resources", "/learning", "/practice", "/report",
   ];
   for (const route of routes) {
     await page.goto(route);
@@ -46,7 +46,7 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
 
   await page.getByRole("button", { name: "بانک سؤال و محتوا", exact: true }).click();
   await expect(page).toHaveURL(/\/content$/);
-  await expect(page.getByRole("heading", { name: "ساختار آموزشی شما" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "بانک سؤال‌های شما" })).toBeVisible();
 
   await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
   await expect(page).toHaveURL(/\/homeworks$/);
@@ -58,7 +58,7 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
 
   await page.goBack();
   await expect(page).toHaveURL(/\/content$/);
-  await expect(page.getByRole("heading", { name: "ساختار آموزشی شما" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "بانک سؤال‌های شما" })).toBeVisible();
 
   await page.goForward();
   await expect(page).toHaveURL(/\/homeworks$/);

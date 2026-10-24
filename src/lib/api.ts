@@ -3,7 +3,8 @@
 export async function api<T>(path: string, body?: unknown): Promise<T> {
   const protectedMutation =
     body !== undefined &&
-    (path === "/questions" ||
+    (path === "/curriculum/catalog/import" ||
+      path === "/questions" ||
       path === "/question-drafts/generate" ||
       /\/question-drafts\/[^/]+\/(approve|reject)$/.test(path) ||
       /\/assignments\/[^/]+\/(attempts|hints|complete)$/.test(path) ||

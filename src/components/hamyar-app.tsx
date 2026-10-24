@@ -13,12 +13,26 @@ import {
   BarChart3,
   BookOpenCheck,
   UsersRound,
+  Settings,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Brand } from "./ui/brand";
-import type { User, Node, Question, Assignment, Report, Course, Enrollment, StudentDashboardData } from "@/lib/types";
+import type {
+  User,
+  Node,
+  Question,
+  Assignment,
+  Report,
+  Course,
+  Enrollment,
+  StudentDashboardData,
+} from "@/lib/types";
 import { api } from "@/lib/api";
-import { assignmentFromSearch, pageFromPath, pathForPage } from "@/lib/app-routes";
+import {
+  assignmentFromSearch,
+  pageFromPath,
+  pathForPage,
+} from "@/lib/app-routes";
 
 import { AuthScreen } from "@/features/auth/auth-screen";
 import { PracticeScreen } from "@/features/practice/practice-screen";
@@ -26,6 +40,7 @@ import { MissionReport } from "@/features/analytics/mission-report";
 import { OverviewScreen } from "@/features/dashboard/dashboard-screen";
 import { StudentOverview } from "@/features/dashboard/student-overview";
 import { StudentsScreen } from "@/features/students/students-screen";
+import { AiSettingsScreen } from "@/features/settings/ai-settings-screen";
 import { ContentScreen } from "@/features/content/content-screen";
 import { MissionsScreen } from "@/features/missions/missions-screen";
 import { ParentDashboard } from "@/features/analytics/parent-dashboard";
@@ -41,7 +56,8 @@ export default function HamyarApp() {
     [page, setPage] = useState("dashboard");
   const [courses, setCourses] = useState<Course[]>([]),
     [enrollments, setEnrollments] = useState<Enrollment[]>([]);
-  const [studentDashboard, setStudentDashboard] = useState<StudentDashboardData | null>(null);
+  const [studentDashboard, setStudentDashboard] =
+    useState<StudentDashboardData | null>(null);
   const [students, setStudents] = useState<User[]>([]),
     [nodes, setNodes] = useState<Node[]>([]),
     [questions, setQuestions] = useState<Question[]>([]),
@@ -95,7 +111,9 @@ export default function HamyarApp() {
     setCourses(nextCourses);
     setEnrollments(nextEnrollments);
     if (u.role === "student") {
-      setStudentDashboard(await api<StudentDashboardData>("/student/dashboard"));
+      setStudentDashboard(
+        await api<StudentDashboardData>("/student/dashboard"),
+      );
     } else {
       setStudentDashboard(null);
     }
@@ -124,11 +142,16 @@ export default function HamyarApp() {
       setBusy(false);
     }
   }
-  function navigatePage(nextPage: string, assignmentId?: string, replace = false) {
+  function navigatePage(
+    nextPage: string,
+    assignmentId?: string,
+    replace = false,
+  ) {
     const target = pathForPage(nextPage, assignmentId ?? active?._id);
     const current = window.location.pathname + window.location.search;
     if (current !== target) {
-      if (replace) window.history.replaceState(window.history.state, "", target);
+      if (replace)
+        window.history.replaceState(window.history.state, "", target);
       else window.history.pushState(window.history.state, "", target);
     }
     setPage(nextPage);
@@ -151,11 +174,20 @@ export default function HamyarApp() {
       const detail = await api<Assignment>("/assignments/" + assignmentId);
       setActive(detail);
       setQi(0);
-      setAnswer(localStorage.getItem(
-        "draft:" + detail.studentId + ":" + detail._id + ":" + (detail.questions?.[0]?._id ?? ""),
-      ) ?? "");
+      setAnswer(
+        localStorage.getItem(
+          "draft:" +
+            detail.studentId +
+            ":" +
+            detail._id +
+            ":" +
+            (detail.questions?.[0]?._id ?? ""),
+        ) ?? "",
+      );
       if (next === "report") {
-        setReport(await api<Report>("/assignments/" + assignmentId + "/report"));
+        setReport(
+          await api<Report>("/assignments/" + assignmentId + "/report"),
+        );
       } else {
         setReport(null);
       }
@@ -171,7 +203,9 @@ export default function HamyarApp() {
   }
 
   useEffect(() => {
-    const handleHistory = () => { void restoreLocation(); };
+    const handleHistory = () => {
+      void restoreLocation();
+    };
     window.addEventListener("popstate", handleHistory);
     api<User>("/auth/me")
       .then(async (u) => {
@@ -179,7 +213,9 @@ export default function HamyarApp() {
         await refresh(u);
         await restoreLocation();
       })
-      .catch(() => { setPage(pageFromPath(window.location.pathname)); })
+      .catch(() => {
+        setPage(pageFromPath(window.location.pathname));
+      })
       .finally(() => setLoading(false));
     const invitation = new URLSearchParams(window.location.search).get(
       "invite",
@@ -212,7 +248,11 @@ export default function HamyarApp() {
           setToken("");
           const url = new URL(window.location.href);
           url.searchParams.delete("invite");
-          window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+          window.history.replaceState(
+            window.history.state,
+            "",
+            url.pathname + url.search + url.hash,
+          );
           setNotice("دعوت پذیرفته شد. اکنون با همان حساب وارد شوید.");
         } else {
           await api("/auth/register", {
@@ -230,7 +270,9 @@ export default function HamyarApp() {
       setMe(u);
       setPassword("");
       await refresh(u);
-      if (["practice", "report"].includes(pageFromPath(window.location.pathname))) {
+      if (
+        ["practice", "report"].includes(pageFromPath(window.location.pathname))
+      ) {
         await restoreLocation();
       }
     });
@@ -280,10 +322,7 @@ export default function HamyarApp() {
         </div>
       )}
       {notice && (
-        <div
-          role="status"
-          className="glass-note p-3.5 leading-[1.9]"
-        >
+        <div role="status" className="glass-note p-3.5 leading-[1.9]">
           {notice}
         </div>
       )}
@@ -317,8 +356,10 @@ export default function HamyarApp() {
         ["courses", "درس‌های من", BookOpenCheck],
         ["classes", "کلاس‌های گروهی", UsersRound],
         ["content", "بانک سؤال و محتوا", Library],
+        ["resources", "منابع آموزشی", BookOpenCheck],
         ["missions", "مأموریت‌ها", Target],
         ["learning", "یادگیری و مرور", BarChart3],
+        ["settings", "تنظیمات", Settings],
       ] as const)
     : ([
         ["dashboard", "مسیر یادگیری من", LayoutDashboard],
@@ -346,7 +387,15 @@ export default function HamyarApp() {
             >
               <span
                 className="hy-icon-container !size-9 !rounded-xl"
-                data-tone={key === "missions" ? "gold" : key === "students" ? "teal" : key === "learning" ? "purple" : "blue"}
+                data-tone={
+                  key === "missions"
+                    ? "gold"
+                    : key === "students"
+                      ? "teal"
+                      : key === "learning"
+                        ? "purple"
+                        : "blue"
+                }
               >
                 <Icon size={18} aria-hidden />
               </span>
@@ -384,7 +433,11 @@ export default function HamyarApp() {
             </small>
             <h1 className="text-[28px] font-bold text-[#17305E]">
               {nav.find((n) => n[0] === page)?.[1] ??
-                (page === "report" ? "گزارش عملکرد" : "محیط تمرین")}
+                (page === "content-new"
+                  ? "افزودن سؤال"
+                  : page === "report"
+                    ? "گزارش عملکرد"
+                    : "محیط تمرین")}
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -424,33 +477,38 @@ export default function HamyarApp() {
         {page === "learning" && (
           <LearningDashboard me={me} students={students} />
         )}
-        {page === "dashboard" && (teacher ? (
-          <OverviewScreen
-            me={me}
-            teacher={true}
-            assignments={assignments}
-            students={students}
-            setPage={navigatePage}
-          />
-        ) : (
-          <StudentOverview
-            me={me}
-            data={studentDashboard}
-            assignments={assignments}
-            busy={busy}
-            setPage={navigatePage}
-            open={open}
-            showReport={showReport}
-            invitationToken={token}
-            onJoined={async () => {
-              setToken("");
-              const url = new URL(window.location.href);
-              url.searchParams.delete("invite");
-              window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
-              await refresh();
-            }}
-          />
-        ))}
+        {page === "dashboard" &&
+          (teacher ? (
+            <OverviewScreen
+              me={me}
+              teacher={true}
+              assignments={assignments}
+              students={students}
+              setPage={navigatePage}
+            />
+          ) : (
+            <StudentOverview
+              me={me}
+              data={studentDashboard}
+              assignments={assignments}
+              busy={busy}
+              setPage={navigatePage}
+              open={open}
+              showReport={showReport}
+              invitationToken={token}
+              onJoined={async () => {
+                setToken("");
+                const url = new URL(window.location.href);
+                url.searchParams.delete("invite");
+                window.history.replaceState(
+                  window.history.state,
+                  "",
+                  url.pathname + url.search + url.hash,
+                );
+                await refresh();
+              }}
+            />
+          ))}
         {page === "students" && teacher && (
           <StudentsScreen
             students={students}
@@ -464,8 +522,17 @@ export default function HamyarApp() {
             setInviteToken={setInviteToken}
           />
         )}
-        {page === "content" && teacher && (
+        {page === "settings" && teacher && <AiSettingsScreen />}
+        {["content", "content-new", "resources"].includes(page) && teacher && (
           <ContentScreen
+            key={page}
+            view={
+              page === "resources"
+                ? "resources"
+                : page === "content-new"
+                  ? "add"
+                  : "bank"
+            }
             setNotice={setNotice}
             nodes={nodes}
             questions={questions}

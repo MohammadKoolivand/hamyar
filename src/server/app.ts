@@ -1,4 +1,6 @@
 import Fastify from "fastify";
+import { AvalaiClient } from "./ai/avalai";
+import { registerAiSettings } from "./modules/ai-settings";
 import cookie from "@fastify/cookie";
 import rateLimit from "@fastify/rate-limit";
 import type { Db } from "mongodb";
@@ -24,6 +26,7 @@ export async function buildApp(
   provider: HintProvider = new MockProvider(),
   hooks: WriteHooks = {},
   questionGenerator?: QuestionGenerator,
+  avalai = new AvalaiClient(),
 ) {
   await requireTransactions(db);
   const app = Fastify({
@@ -134,7 +137,8 @@ export async function buildApp(
   registerCourseMembership(app, ctx);
   registerStudentDashboard(app, ctx);
   registerContent(app, ctx);
-  registerAuthoring(app, ctx, questionGenerator);
+  registerAiSettings(app, ctx, avalai);
+  registerAuthoring(app, ctx, questionGenerator, avalai);
   registerMissions(app, ctx);
   registerRemediation(app, ctx);
   registerPractice(app, ctx, provider);

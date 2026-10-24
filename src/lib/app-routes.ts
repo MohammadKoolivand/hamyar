@@ -4,6 +4,9 @@ export const tabPaths = {
   courses: "/courses",
   classes: "/classes",
   content: "/content",
+  "content-new": "/content-new",
+  resources: "/resources",
+  settings: "/settings",
   missions: "/homeworks",
   learning: "/learning",
 } as const;

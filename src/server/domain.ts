@@ -1,12 +1,21 @@
+import { questionSourceSchema } from "../lib/question-source";
+import { questionVisualsSchema, visualKind } from "../lib/question-visuals";
+import { mathMarkup } from "../lib/math-render";
 import { z } from "zod";
 import { numericValue } from "./evaluation/numeric";
 
 export type { Result, EvaluationResult } from "./evaluation/types";
 export const questionSchema = z
   .object({
-    topicId: z.string().uuid(),
+    topicId: z.string().uuid().optional(),
+    classification: z.enum(["topic", "free"]).optional(),
+    source: questionSourceSchema.optional(),
+    difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+    year: z.number().int().min(1300).max(1500).optional(),
     skillIds: z.array(z.string().uuid()).max(10).default([]),
     statement: z.string().trim().min(3).max(5000),
+    visuals: questionVisualsSchema.optional(),
+    visualKind: visualKind.optional(),
     type: z.enum(["numeric", "choice", "short", "essay", "symbolic"]),
     reference: z.string().trim().min(1).max(2000),
     options: z.array(z.string().min(1)).max(8).default([]),
@@ -43,6 +52,32 @@ export const questionSchema = z
       .optional(),
   })
   .superRefine((q, c) => {
+    if (q.classification !== "free" && !q.topicId)
+      c.addIssue({ code: "custom", message: "مبحث را انتخاب کنید" });
+    if (q.classification === "free" && (q.topicId || q.skillIds.length))
+      c.addIssue({
+        code: "custom",
+        message: "سؤال آزاد نباید مبحث یا مهارت داشته باشد",
+      });
+    if (
+      q.visualKind &&
+      q.visualKind !== "none" &&
+      !q.visuals?.some((v) => v.kind === q.visualKind)
+    )
+      c.addIssue({
+        code: "custom",
+        message:
+          "محتوای تصویری درخواست‌شده وجود ندارد؛ نمودار، شکل یا فرمول را اضافه کنید",
+      });
+    for (const v of q.visuals ?? [])
+      if (v.kind === "formula") {
+        try {
+          mathMarkup(v.latex);
+        } catch {
+          c.addIssue({ code: "custom", message: "فرمول LaTeX معتبر نیست" });
+        }
+      }
+
     if (q.type === "symbolic" && !q.mathContext)
       c.addIssue({
         code: "custom",

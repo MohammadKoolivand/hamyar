@@ -1,3 +1,4 @@
+import type { AvalaiClient } from "../../src/server/ai/avalai";
 import { randomUUID } from "node:crypto";
 import assert from "node:assert/strict";
 import { connect, collection } from "../../src/server/db";
@@ -9,6 +10,7 @@ Object.assign(process.env, { NODE_ENV: "test" });
 export async function fixture(
   options: {
     hooks?: WriteHooks;
+    avalai?: AvalaiClient;
     questionGenerator?: QuestionGenerator;
     provider?: HintProvider;
     essay?: boolean;
@@ -26,6 +28,7 @@ export async function fixture(
     options.provider ?? new MockProvider(),
     options.hooks,
     options.questionGenerator,
+    options.avalai,
   );
   await app.ready();
   const request = (url: string, body?: object, cookie = "", key?: string) =>

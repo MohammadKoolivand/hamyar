@@ -16,7 +16,9 @@ export function backend() {
           db,
           configuredProvider(),
           {},
-          configuredQuestionGenerator(),
+          process.env.AI_AUTHOR_PROVIDER === "ollama"
+            ? configuredQuestionGenerator()
+            : undefined,
         );
         await app.ready();
         return app;
