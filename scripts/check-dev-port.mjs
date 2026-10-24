@@ -1,4 +1,6 @@
 import { createServer } from "node:net";
+import process from "node:process";
+import console from "node:console";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
