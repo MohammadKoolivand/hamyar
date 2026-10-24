@@ -27,7 +27,7 @@ All design tokens and reusable semantic classes live in `src/app/globals.css`. A
 
 ## Brand identity
 
-The original plain dark icon has been replaced with a new authored SVG mark at `public/icon.svg`: rounded ice-blue glass tile, indigo and teal open book, soft gold illumination, lavender star. The file is shared by the header/sidebar and authentication via `src/components/ui/brand.tsx`, and as the manifest icon. It scales without rasterizing. **Do not suggest this was an exact extraction from the reference infographic**: it is a vector interpretation of the requested visual mood.
+The original plain dark icon has been replaced with a new authored SVG mark at `public/icon.svg`: blue open book with a rising cyan/teal two-leaf sprout, matching the actual reference mark's silhouette. The file is shared by the header/sidebar and authentication via `src/components/ui/brand.tsx`, and as the manifest icon. It scales without rasterizing. **Do not suggest this was an exact extraction from the reference infographic**: it is a clean scalable vector redraw of the logo silhouette viewed in the reference.
 
 ## Primitive components
 

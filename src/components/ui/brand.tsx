@@ -24,7 +24,7 @@ export function Brand({
         </span>
         {showTagline && (
           <span className="mt-1 block text-xs text-[#5F7191]">
-            همراه روشن یادگیری
+            همراه مسیر یادگیری
           </span>
         )}
       </div>

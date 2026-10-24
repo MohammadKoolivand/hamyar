@@ -8,7 +8,7 @@ test("reference-inspired luminous glass identity is consistent on login and mobi
   await expect(mark).toHaveAttribute("src", /icon\.svg/);
   const icon = await page.request.get("/icon.svg");
   expect(icon.ok()).toBe(true);
-  expect(await icon.text()).toContain("#F4C15D");
+  expect(await icon.text()).toContain("#24BFB6");
 
   const visual = await page.evaluate(() => {
     const tokens = getComputedStyle(document.documentElement);

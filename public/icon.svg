@@ -1,29 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-labelledby="title desc">
-  <title id="title">نشان همیار</title>
-  <desc id="desc">کتاب باز آبی و فیروزه‌ای، خورشید کوچک طلایی و درخشش آموزشی</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-labelledby="hy-title hy-desc">
+  <title id="hy-title">نشان همیار</title>
+  <desc id="hy-desc">کتاب باز آبی که دو برگ فیروزه‌ای از میان آن رشد کرده‌اند</desc>
   <defs>
-    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#F6FDFF"/><stop offset=".58" stop-color="#ECF3FF"/><stop offset="1" stop-color="#DEF9F5"/>
+    <linearGradient id="hy-book-l" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#63A9EB"/><stop offset=".64" stop-color="#337BE3"/><stop offset="1" stop-color="#1F3F97"/>
     </linearGradient>
-    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#3566C1"/><stop offset="1" stop-color="#1F3F97"/>
+    <linearGradient id="hy-book-r" x1="1" y1="0" x2="0" y2="1">
+      <stop stop-color="#649EEB"/><stop offset="1" stop-color="#2B56B4"/>
     </linearGradient>
-    <linearGradient id="aqua" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#67D9D5"/><stop offset="1" stop-color="#19B5AB"/>
+    <linearGradient id="hy-leaf-l" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#57C9EE"/><stop offset="1" stop-color="#3DB7E9"/>
     </linearGradient>
-    <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
-      <feGaussianBlur stdDeviation="6"/>
-    </filter>
+    <linearGradient id="hy-leaf-r" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#58E0D4"/><stop offset="1" stop-color="#24BFB6"/>
+    </linearGradient>
   </defs>
-  <rect x="5" y="5" width="182" height="182" rx="50" fill="url(#tile)" stroke="#C9DDF5" stroke-width="2"/>
-  <ellipse cx="95" cy="144" rx="55" ry="16" fill="#82A8E5" opacity=".2" filter="url(#soft)"/>
-  <circle cx="146" cy="44" r="12" fill="#F4C15D" opacity=".95"/>
-  <path d="M146 25v7m0 24v7m-19-19h7m24 0h7" stroke="#F0B84D" stroke-width="3" stroke-linecap="round" opacity=".88"/>
-  <path d="M97 74c-15-16-37-21-60-16v73c25-3 45 3 60 17V74Z" fill="url(#ink)"/>
-  <path d="M97 74c16-16 37-21 59-16v73c-25-3-45 3-59 17V74Z" fill="url(#aqua)"/>
-  <path d="M97 74v74" stroke="#DCEBFF" stroke-width="5" stroke-linecap="round"/>
-  <path d="M50 75c13-1 23 1 33 7m-33 10c13-1 23 1 33 7m-33 10c13-1 23 1 33 7" fill="none" stroke="#F5FBFF" stroke-width="3.5" stroke-linecap="round" opacity=".83"/>
-  <path d="M112 82c10-6 20-8 31-7m-31 24c10-6 20-8 31-7m-31 24c10-6 20-8 31-7" fill="none" stroke="#F7FFFF" stroke-width="3.5" stroke-linecap="round" opacity=".84"/>
-  <path d="M34 141c23-4 43 1 63 18 20-17 41-22 62-18" fill="none" stroke="#274A96" stroke-width="5" stroke-linecap="round"/>
-  <path d="M43 43l3-9 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z" fill="#8C6AF3" opacity=".8"/>
+  <path d="M97 155C77 126 53 111 20 111V65C58 68 83 88 97 130Z" fill="url(#hy-book-l)"/>
+  <path d="M105 155C125 126 148 111 174 111V68C139 71 116 88 105 130Z" fill="url(#hy-book-r)"/>
+  <path d="M97 134C83 106 58 97 20 97v14c33 0 57 15 77 44Z" fill="#2557B3" opacity=".46"/>
+  <path d="M105 134c15-28 39-38 69-38v15c-26 0-49 15-69 44Z" fill="#2352AE" opacity=".4"/>
+  <path d="M100 111C97 82 89 63 71 43 55 25 61 16 72 17c20 2 34 27 33 57-1 13-2 25-5 37Z" fill="url(#hy-leaf-l)"/>
+  <path d="M101 114C100 88 112 63 122 51c13-16 25-11 25 6 0 23-20 43-46 57Z" fill="url(#hy-leaf-r)"/>
+  <path d="M101 99c4-18 10-29 21-43" fill="none" stroke="#20AFAE" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+  <path d="M100 128v28" stroke="#F6FBFF" stroke-width="5" stroke-linecap="round"/>
 </svg>
