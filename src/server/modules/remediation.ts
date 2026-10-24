@@ -31,7 +31,7 @@ export function registerRemediation(app: FastifyInstance, ctx: Context) {
         }, { session }),
       ]);
       if (!course || !enrollment) fail(404, "عضویت معتبر در درس یافت نشد");
-      enrollmentId = enrollment._id;
+      enrollmentId = enrollment!._id;
     }
     const assignments = await c("assignments").find({
       teacherId, studentId,
