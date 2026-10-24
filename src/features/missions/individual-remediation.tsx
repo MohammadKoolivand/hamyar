@@ -76,9 +76,18 @@ export function IndividualRemediation({
         },
       });
       setSelected([]);
+      setItems([]);
+      setLoading(true);
       await refresh();
+      const query = courseId ? "?courseId=" + encodeURIComponent(courseId) : "";
+      const current = await api<CandidateResult>(
+        "/students/" + studentId + "/remediation-candidates" + query,
+      );
+      setItems(current.items);
+      setLoading(false);
       setNotice("تمرین تقویتی فقط برای این دانش‌آموز منتشر شد.");
     } catch (err) {
+      setLoading(false);
       setError((err as Error).message);
     } finally {
       setBusy(false);
@@ -95,8 +104,8 @@ export function IndividualRemediation({
         <div>
           <h2 className="text-lg font-bold">تمرین تقویتی فردی از اشتباهات ثبت‌شده</h2>
           <p className="text-sm leading-loose text-slate-600">
-            فقط خطاهای دارای ارزیابی معتبر و هنوز اصلاح‌نشده پیشنهاد می‌شوند؛
-            شما سؤال‌ها را انتخاب و تمرین را تأیید می‌کنید.
+            فقط خطاهای دارای ارزیابی معتبر که هنوز اصلاح نشده‌اند و تمرین
+            تقویتیِ باز ندارند پیشنهاد می‌شوند؛ انتخاب و انتشار با معلم است.
           </p>
         </div>
       </div>
@@ -104,11 +113,20 @@ export function IndividualRemediation({
         <Field title="دانش‌آموز برای تمرین فردی">
           <select className="glass-field min-h-11 w-full p-3" value={studentId}
             onChange={(e) => {
-              setStudentId(e.target.value);
-              setCourseId("");
+              const nextStudent = e.target.value;
+              const firstCourse = courses.find((course) =>
+                enrollments.some((member) =>
+                  member.courseId === course._id && member.studentId === nextStudent,
+                ),
+              );
+              setStudentId(nextStudent);
+              // Modern course-based practice is the default. Legacy exercises
+              // remain available through the explicit "without course" option.
+              setCourseId(firstCourse?._id ?? "");
               setItems([]);
               setSelected([]);
-              setLoading(!!e.target.value);
+              setNotice("");
+              setLoading(!!nextStudent);
             }}>
             <option value="">انتخاب دانش‌آموز</option>
             {students.map((s) => <option key={s._id} value={s._id}>{s.name}</option>)}

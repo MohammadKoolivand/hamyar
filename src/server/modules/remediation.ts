@@ -46,9 +46,21 @@ export function registerRemediation(app: FastifyInstance, ctx: Context) {
     for (const e of evidence) {
       if (!latest.has(e.questionVersionId)) latest.set(e.questionVersionId, e);
     }
+    // Do not create another open follow-up for the same student, course and
+    // question. A completed or cancelled follow-up can be recommended again
+    // only if the newest verified evidence still indicates an error.
+    const openRemediations = await c("assignments").find({
+      teacherId, studentId, remediation: true,
+      ...(courseId ? { courseId } : { courseId: { $exists: false } }),
+      state: { $in: ["published", "in_progress", "submitted"] },
+    }, { session }).project({ questionVersionIds: 1 }).toArray();
+    const alreadyAssigned = new Set<string>(
+      openRemediations.flatMap((a) => a.questionVersionIds as string[]),
+    );
     const missed = [...latest.values()].filter((e) =>
       e.verified === true &&
-      ["incorrect", "partially_correct"].includes(e.result),
+      ["incorrect", "partially_correct"].includes(e.result) &&
+      !alreadyAssigned.has(e.questionVersionId),
     );
     if (!missed.length) return { enrollmentId, items: [] };
     const versions = await c("questionVersions").find({
