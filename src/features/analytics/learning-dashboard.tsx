@@ -174,7 +174,7 @@ export function LearningDashboard({
                 className="glass-card p-5"
               >
                 <p className="text-xs text-slate-500">{title}</p>
-                <strong className="mt-2 block text-2xl text-[#233B8F]">
+                <strong className="mt-2 block text-2xl text-[#1F3F97]">
                   {number(Number(n))}
                 </strong>
               </div>
@@ -273,7 +273,7 @@ export function LearningDashboard({
                     پاسخ ثبت‌شده: {item.sourceAnswer}
                   </p>
                 )}
-                <p className="text-sm text-[#233B8F]">
+                <p className="text-sm text-[#1F3F97]">
                   {labels[item.status] ?? item.status}
                 </p>
                 <p className="text-xs text-slate-500">
@@ -302,7 +302,7 @@ export function LearningDashboard({
             )}
             {data.recommendations.map((r) => (
               <div
-                className="grid gap-2 glass-note p-4 text-sm text-[#233B8F]"
+                className="grid gap-2 glass-note p-4 text-sm text-[#1F3F97]"
                 key={r.skillId}
               >
                 <p>

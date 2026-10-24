@@ -91,7 +91,7 @@ export function IndividualRemediation({
   return (
     <section className="glass-panel grid gap-4 p-6" data-testid="individual-remediation">
       <div className="flex items-center gap-3">
-        <ClipboardCheck size={24} color="#233B8F" aria-hidden />
+        <ClipboardCheck size={24} color="#1F3F97" aria-hidden />
         <div>
           <h2 className="text-lg font-bold">تمرین تقویتی فردی از اشتباهات ثبت‌شده</h2>
           <p className="text-sm leading-loose text-slate-600">
@@ -148,7 +148,7 @@ export function IndividualRemediation({
           </p>
           {items.map((q) => (
             <label className="glass-option flex items-start gap-3 p-3 text-sm" key={q.questionVersionId}>
-              <input type="checkbox" className="mt-1 size-5 shrink-0 accent-[#233B8F]"
+              <input type="checkbox" className="mt-1 size-5 shrink-0 accent-[#1F3F97]"
                 checked={selected.includes(q.questionVersionId)}
                 disabled={!selected.includes(q.questionVersionId) && selected.length >= 10}
                 onChange={(e) => setSelected(e.target.checked
@@ -162,7 +162,7 @@ export function IndividualRemediation({
             </label>
           ))}
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" className="size-5 accent-[#233B8F]" checked={independent}
+            <input type="checkbox" className="size-5 accent-[#1F3F97]" checked={independent}
               onChange={(e) => setIndependent(e.target.checked)} />
             سنجش مستقل (یک تلاش، بدون راهنمایی)
           </label>

@@ -42,7 +42,7 @@ export function StudentJoinTeacher({
   return (
     <section id="join-teacher" className="glass-panel grid gap-4 p-6 max-[650px]:p-5">
       <div className="flex items-center gap-3">
-        <Link2 size={21} color="#19b7ae" aria-hidden />
+        <Link2 size={21} color="#2ec8c3" aria-hidden />
         <h2 className="text-lg font-bold">اتصال به معلم</h2>
       </div>
       <p className="text-sm leading-loose text-slate-600">

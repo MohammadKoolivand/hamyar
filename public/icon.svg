@@ -1,1 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="48" fill="#233B8F"/><path d="M40 55h48q8 0 8 8v80q-12-12-56-12zm112 0h-48q-8 0-8 8v80q12-12 56-12z" fill="none" stroke="white" stroke-width="8"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-labelledby="title desc">
+  <title id="title">نشان همیار</title>
+  <desc id="desc">کتاب باز آبی و فیروزه‌ای، خورشید کوچک طلایی و درخشش آموزشی</desc>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#F6FDFF"/><stop offset=".58" stop-color="#ECF3FF"/><stop offset="1" stop-color="#DEF9F5"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#3566C1"/><stop offset="1" stop-color="#1F3F97"/>
+    </linearGradient>
+    <linearGradient id="aqua" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#67D9D5"/><stop offset="1" stop-color="#19B5AB"/>
+    </linearGradient>
+    <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+  <rect x="5" y="5" width="182" height="182" rx="50" fill="url(#tile)" stroke="#C9DDF5" stroke-width="2"/>
+  <ellipse cx="95" cy="144" rx="55" ry="16" fill="#82A8E5" opacity=".2" filter="url(#soft)"/>
+  <circle cx="146" cy="44" r="12" fill="#F4C15D" opacity=".95"/>
+  <path d="M146 25v7m0 24v7m-19-19h7m24 0h7" stroke="#F0B84D" stroke-width="3" stroke-linecap="round" opacity=".88"/>
+  <path d="M97 74c-15-16-37-21-60-16v73c25-3 45 3 60 17V74Z" fill="url(#ink)"/>
+  <path d="M97 74c16-16 37-21 59-16v73c-25-3-45 3-59 17V74Z" fill="url(#aqua)"/>
+  <path d="M97 74v74" stroke="#DCEBFF" stroke-width="5" stroke-linecap="round"/>
+  <path d="M50 75c13-1 23 1 33 7m-33 10c13-1 23 1 33 7m-33 10c13-1 23 1 33 7" fill="none" stroke="#F5FBFF" stroke-width="3.5" stroke-linecap="round" opacity=".83"/>
+  <path d="M112 82c10-6 20-8 31-7m-31 24c10-6 20-8 31-7m-31 24c10-6 20-8 31-7" fill="none" stroke="#F7FFFF" stroke-width="3.5" stroke-linecap="round" opacity=".84"/>
+  <path d="M34 141c23-4 43 1 63 18 20-17 41-22 62-18" fill="none" stroke="#274A96" stroke-width="5" stroke-linecap="round"/>
+  <path d="M43 43l3-9 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z" fill="#8C6AF3" opacity=".8"/>
+</svg>

@@ -170,7 +170,7 @@ export function MissionsScreen({
                 type="checkbox"
                 checked={independent}
                 onChange={(e) => setIndependent(e.target.checked)}
-                className="size-5 min-h-5 shrink-0 cursor-pointer accent-[#233b8f]"
+                className="size-5 min-h-5 shrink-0 cursor-pointer accent-[#1f3f97]"
               />
               سنجش مستقل (راهنمایی در سرور غیرفعال می‌شود)
             </label>
@@ -222,7 +222,7 @@ export function MissionsScreen({
                         : selected.filter((x) => x !== q._id),
                     )
                   }
-                  className="size-5 min-h-5 shrink-0 cursor-pointer accent-[#233b8f]"
+                  className="size-5 min-h-5 shrink-0 cursor-pointer accent-[#1f3f97]"
                 />
                 {q.statement}
               </label>
@@ -247,7 +247,7 @@ export function MissionsScreen({
                 className="glass-option p-[18px] flex flex-wrap items-center gap-3"
               >
                 <h3 className="text-base font-bold">{d.title}</h3>
-                <span className="inline-block rounded-full border border-[#19b7ae33] bg-[#19b7ae14] px-3 py-1.5 text-[11px] text-[#096c67]">
+                <span className="inline-block rounded-full border border-[#2ec8c333] bg-[#2ec8c314] px-3 py-1.5 text-[11px] text-[#08746f]">
                   پیش‌نویس
                 </span>
                 <Button
@@ -267,7 +267,7 @@ export function MissionsScreen({
       )}
       <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <div className="flex flex-wrap items-center gap-3">
-          <Target color="#19b7ae" />
+          <Target color="#2ec8c3" />
           <h2 className="text-[19px] font-bold">مأموریت‌های منتشرشده</h2>
         </div>
         {!assignments.length && (
@@ -282,7 +282,7 @@ export function MissionsScreen({
           >
             <div className="flex flex-wrap items-center gap-3">
               <h3 className="text-base font-bold">{a.title}</h3>
-              <span className="inline-block rounded-full border border-[#19b7ae33] bg-[#19b7ae14] px-3 py-1.5 text-[11px] text-[#096c67]">
+              <span className="inline-block rounded-full border border-[#2ec8c333] bg-[#2ec8c314] px-3 py-1.5 text-[11px] text-[#08746f]">
                 {stateLabel[a.state]}
               </span>
             </div>

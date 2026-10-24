@@ -54,7 +54,7 @@ export function StudentOverview({
     return (
       <div key={mission._id} className="glass-option flex flex-wrap items-center justify-between gap-3 p-3">
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-[#1f2937]">{mission.title}</p>
+          <p className="font-medium text-[#17305e]">{mission.title}</p>
           <p className="mt-1 text-xs text-slate-600">{state}</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -101,7 +101,7 @@ export function StudentOverview({
             aria-valuemax={Math.max(1, course.assignments)}
             className="h-2.5 overflow-hidden rounded-full bg-[#E9EEF7]"
           >
-            <div className="h-full rounded-full bg-[#19B7AE]" style={{ width: percentage + "%" }} />
+            <div className="h-full rounded-full bg-[#2EC8C3]" style={{ width: percentage + "%" }} />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
@@ -144,7 +144,7 @@ export function StudentOverview({
       <section className="glass-hero flex flex-wrap items-center justify-between gap-5 p-6 sm:p-8">
         <div className="grid gap-3">
           <span className="glass-kicker w-fit px-3 py-1.5 text-xs">یادگیری، قدم به قدم</span>
-          <h2 className="text-[24px] font-bold text-[#1f2937]">سلام {me.name}، خوش آمدی</h2>
+          <h2 className="text-[24px] font-bold text-[#17305e]">سلام {me.name}، خوش آمدی</h2>
           <p className="max-w-2xl text-sm leading-loose text-slate-600">
             مأموریت‌های همه معلم‌ها را یکجا ببین و پیشرفت تمرین در هر درس را جداگانه دنبال کن.
           </p>
@@ -165,9 +165,9 @@ export function StudentOverview({
               { label: "در انتظار بررسی", value: data.summary.awaitingReview, icon: ClipboardList },
             ].map((item) => (
               <div key={item.label} className="glass-stat grid gap-2 p-4">
-                <item.icon size={20} color="#233B8F" aria-hidden />
+                <item.icon size={20} color="#1F3F97" aria-hidden />
                 <p className="text-xs text-slate-600">{item.label}</p>
-                <strong className="text-2xl text-[#233B8F]">{count(item.value)}</strong>
+                <strong className="text-2xl text-[#1F3F97]">{count(item.value)}</strong>
               </div>
             ))}
           </section>

@@ -157,7 +157,7 @@ export function ContentScreen({
           <div className="my-2 h-px bg-slate-200" />
           {nodes.map((n) => (
             <div key={n._id} className="flex flex-wrap items-center gap-3">
-              <span className="inline-block rounded-full border border-[#19b7ae33] bg-[#19b7ae14] px-3 py-1.5 text-[11px] text-[#096c67]">
+              <span className="inline-block rounded-full border border-[#2ec8c333] bg-[#2ec8c314] px-3 py-1.5 text-[11px] text-[#08746f]">
                 {n.kind}
               </span>
               {n.title}
@@ -265,7 +265,7 @@ export function ContentScreen({
                               : skillIds.filter((s) => s !== n._id),
                           )
                         }
-                        className="size-5 min-h-5 shrink-0 cursor-pointer accent-[#233b8f]"
+                        className="size-5 min-h-5 shrink-0 cursor-pointer accent-[#1f3f97]"
                       />
                       {n.title}
                     </label>

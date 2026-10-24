@@ -3,7 +3,6 @@ import { clsx } from "clsx";
 
 import React, { useState, useEffect, type FormEvent } from "react";
 import {
-  BookOpen,
   Sparkles,
   LayoutDashboard,
   Users,
@@ -16,6 +15,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { Button } from "./ui/button";
+import { Brand } from "./ui/brand";
 import type { User, Node, Question, Assignment, Report, Course, Enrollment, StudentDashboardData } from "@/lib/types";
 import { api } from "@/lib/api";
 
@@ -274,17 +274,12 @@ export default function HamyarApp() {
       ] as const);
   return (
     <div className="min-h-screen min-[651px]:grid min-[651px]:grid-cols-[180px_minmax(0,1fr)] min-[951px]:grid-cols-[240px_minmax(0,1fr)]">
-      <aside className="glass-sidebar min-w-0 mx-3 my-3 flex flex-col gap-7 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
-        <div className="flex items-center gap-3 text-[23px] font-bold text-[#233b8f]">
-          <span className="grid size-[46px] shrink-0 place-items-center rounded-[14px] bg-[#233b8f] text-white">
-            <BookOpen />
-          </span>
-          همیار
-        </div>
+      <aside className="glass-sidebar min-w-0 mx-3 my-3 flex flex-col gap-6 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
+        <Brand showTagline />
         <small className="text-xs leading-loose text-slate-500">
           {teacher ? "فضای کار معلم" : "فضای تمرین دانش‌آموز"}
         </small>
-        <nav className="grid gap-[18px]">
+        <nav className="grid gap-2">
           {nav.map(([key, title, Icon]) => (
             <button
               key={key}
@@ -292,14 +287,18 @@ export default function HamyarApp() {
                 setPage(key);
                 setError("");
               }}
+              data-active={page === key}
               className={clsx(
-                "flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 p-3.5 text-right motion-reduce:transition-none max-[650px]:whitespace-nowrap",
-                page === key
-                  ? "bg-[#233b8f0d] text-[#233b8f] font-bold"
-                  : "text-slate-500",
+                "hy-navigation-item flex w-full cursor-pointer items-center gap-3 rounded-[15px] p-2.5 text-right motion-reduce:transition-none max-[650px]:whitespace-nowrap",
+                page === key && "font-bold",
               )}
             >
-              <Icon size={19} />
+              <span
+                className="hy-icon-container !size-9 !rounded-xl"
+                data-tone={key === "missions" ? "gold" : key === "students" ? "teal" : key === "learning" ? "purple" : "blue"}
+              >
+                <Icon size={18} aria-hidden />
+              </span>
               {title}
             </button>
           ))}
@@ -332,13 +331,13 @@ export default function HamyarApp() {
             <small className="text-xs leading-loose text-slate-500">
               همیار / {teacher ? "پنل معلم" : "یادگیری"}
             </small>
-            <h1 className="text-[28px] font-bold">
+            <h1 className="text-[28px] font-bold text-[#17305E]">
               {nav.find((n) => n[0] === page)?.[1] ??
                 (page === "report" ? "گزارش عملکرد" : "محیط تمرین")}
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <span className="grid size-[46px] shrink-0 place-items-center rounded-[14px] bg-[#e8edf9] text-[#233b8f]">
+            <span className="hy-icon-container !size-[46px]" data-tone="purple">
               <GraduationCap />
             </span>
             <div>

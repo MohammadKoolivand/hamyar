@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description: "همیار تمرین و تحلیل یادگیری تحت هدایت معلم",
   manifest: "/manifest.webmanifest",
 };
-export const viewport: Viewport = { themeColor: "#233B8F" };
+export const viewport: Viewport = { themeColor: "#F8FBFF" };
 export default function RootLayout({
   children,
 }: {
@@ -31,7 +31,7 @@ export default function RootLayout({
       dir="rtl"
       className={`${poppins.variable} ${persian.variable}`}
     >
-      <body className="hamyar-ambient min-h-screen text-[#1f2937] [font-family:var(--font-persian),var(--font-latin),Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
+      <body className="hamyar-ambient min-h-screen text-[#17305E] [font-family:var(--font-persian),var(--font-latin),Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
         {children}
       </body>
     </html>

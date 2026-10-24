@@ -68,7 +68,7 @@ export function OverviewScreen({
         ].map(([value, title]) => (
           <div
             key={title}
-            className="glass-stat p-[22px] [&_strong]:mt-2.5 [&_strong]:block [&_strong]:text-[28px] [&_strong]:text-[#233b8f] max-[650px]:p-4"
+            className="glass-stat p-[22px] [&_strong]:mt-2.5 [&_strong]:block [&_strong]:text-[28px] [&_strong]:text-[#1f3f97] max-[650px]:p-4"
           >
             <small className="text-xs leading-loose text-slate-500">
               {title}
@@ -79,7 +79,7 @@ export function OverviewScreen({
       </div>
       <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <div className="flex flex-wrap items-center gap-3">
-          <Target color="#19b7ae" />
+          <Target color="#2ec8c3" />
           <h2 className="text-[19px] font-bold">گام بعدی شما</h2>
         </div>
         <p className="text-xs leading-loose text-slate-500">

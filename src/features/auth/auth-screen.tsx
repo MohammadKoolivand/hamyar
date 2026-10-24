@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import { BookOpen, ShieldCheck, ArrowLeft } from "lucide-react";
+import { GraduationCap, Sparkles, ShieldCheck, ArrowLeft } from "lucide-react";
+import { Brand } from "@/components/ui/brand";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 export function AuthScreen({
@@ -33,19 +34,14 @@ export function AuthScreen({
   setToken: (value: string) => void;
 }) {
   return (
-    <main className="mx-auto my-[7vh] max-w-[1020px] p-6">
-      <div className="flex items-center gap-3 text-[23px] font-bold text-[#233b8f]">
-        <span className="grid size-[46px] shrink-0 place-items-center rounded-[14px] bg-[#233b8f] text-white">
-          <BookOpen />
-        </span>
-        همیار
-      </div>
-      <div className="grid items-center gap-11 min-[651px]:grid-cols-2 max-[650px]:gap-[15px]">
-        <div className="p-10 leading-[2.5] max-[650px]:p-2 [&_h1]:text-[38px] [&_h1]:leading-[1.7] max-[650px]:[&_h1]:text-[27px]">
-          <span className="inline-block rounded-full border border-[#19b7ae33] bg-[#19b7ae14] px-3 py-1.5 text-[11px] text-[#096c67]">
+    <main className="mx-auto my-[5vh] max-w-[1120px] p-5 sm:p-8">
+      <div className="mb-7"><Brand size="lg" showTagline /></div>
+      <div className="grid items-stretch gap-6 min-[751px]:grid-cols-[1.05fr_1fr] max-[750px]:gap-5">
+        <div className="glass-hero flex min-w-0 flex-col justify-center gap-4 p-8 leading-[2.2] sm:p-11 [&_h1]:text-[37px] [&_h1]:leading-[1.7] max-[650px]:[&_h1]:text-[27px]">
+          <span className="glass-kicker inline-block w-fit px-4 py-1.5 text-xs">
             فضایی برای تمرین آگاهانه
           </span>
-          <h1 className="text-[28px] font-bold">
+          <h1 className="font-bold text-[#17305E]">
             هر تمرین، یک قدم
             <br />
             به یادگیری مستقل.
@@ -53,14 +49,18 @@ export function AuthScreen({
           <p className="text-xs leading-loose text-slate-500">
             معلم آموزش می‌دهد، همیار تمرین را همراهی می‌کند.
           </p>
-          <div className="flex flex-wrap items-center gap-3">
-            <ShieldCheck color="#19B7AE" />
+          <div className="flex items-center gap-3">
+            <span className="hy-icon-container" data-tone="teal"><ShieldCheck size={22} aria-hidden /></span>
             <small className="text-xs leading-loose text-slate-500">
               مسیر یادگیری زیر نظر معلم شما
             </small>
           </div>
+          <div className="mt-3 flex items-center gap-3" aria-hidden>
+            <span className="hy-icon-container !size-14" data-tone="purple"><GraduationCap size={29} /></span>
+            <span className="hy-icon-container !size-14" data-tone="gold"><Sparkles size={27} /></span>
+          </div>
         </div>
-        <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
+        <section className="glass-panel min-w-0 p-7 max-[650px]:p-5 grid gap-[18px]">
           <h2 className="text-[19px] font-bold">
             {mode === "login"
               ? "خوش آمدید"

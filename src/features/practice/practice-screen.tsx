@@ -62,7 +62,7 @@ export function PracticeScreen({
               .length
           }
           max={active.questions!.length}
-          className="w-full accent-[#19b7ae]"
+          className="hy-practice-progress w-full accent-[#2EC8C3]"
         />
         <p className="practice-sheet px-5 py-6 text-[21px] leading-[2.2] whitespace-pre-wrap">{q.statement}</p>
         <form
@@ -177,8 +177,8 @@ export function PracticeScreen({
             className={clsx(
               "rounded-[14px] p-3.5 leading-[1.9]",
               ev.result === "incorrect"
-                ? "bg-rose-50 text-rose-800"
-                : "bg-indigo-50 text-[#233b8f]",
+                ? "hy-status-error"
+                : "hy-status-success",
             )}
           >
             {stateLabel[ev.result]} ·{" "}

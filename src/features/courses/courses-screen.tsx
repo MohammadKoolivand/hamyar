@@ -207,7 +207,7 @@ export function CoursesScreen({
             return (
               <article className="glass-card grid gap-3 p-5" key={course._id}>
                 <div className="flex items-center gap-3">
-                  <span className="grid size-10 place-items-center rounded-xl bg-[#19B7AE15] text-[#096c67]"><BookOpen size={20}/></span>
+                  <span className="grid size-10 place-items-center rounded-xl bg-[#2EC8C315] text-[#08746f]"><BookOpen size={20}/></span>
                   <div>
                     <p className="text-xs text-slate-500">{course.subject}</p>
                     <h3 className="font-bold">{course.title}</h3>

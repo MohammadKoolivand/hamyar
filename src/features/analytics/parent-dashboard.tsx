@@ -5,6 +5,7 @@ import type { User } from "@/lib/types";
 import { LearningDashboard } from "./learning-dashboard";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
+import { Brand } from "@/components/ui/brand";
 export function ParentDashboard({
   me,
   onLogout,
@@ -27,7 +28,8 @@ export function ParentDashboard({
     <main className="mx-auto grid w-full gap-5 p-5 sm:p-8">
       <header className="glass-header flex flex-wrap items-center justify-between gap-4 p-4 sm:p-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#233B8F]">پنل اولیا</h1>
+          <Brand showTagline />
+          <h1 className="mt-3 text-2xl font-bold text-[#1F3F97]">پنل اولیا</h1>
           <p className="mt-2 text-sm">
             {me.name}، روند تمرین فرزندتان را دنبال کنید.
           </p>

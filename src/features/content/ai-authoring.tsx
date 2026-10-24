@@ -20,7 +20,7 @@ type QuestionDraft = {
   };
 };
 const input =
-  "w-full rounded-xl border border-slate-300 bg-white p-3 focus:outline-2 focus:outline-[#233B8F]";
+  "w-full rounded-xl border border-slate-300 bg-white p-3 focus:outline-2 focus:outline-[#1F3F97]";
 export function AiAuthoring({
   nodes,
   onApproved,

@@ -42,7 +42,7 @@ export function MissionReport({
         ].map(([v, t]) => (
           <div
             key={t}
-            className="glass-stat p-[22px] [&_strong]:mt-2.5 [&_strong]:block [&_strong]:text-[28px] [&_strong]:text-[#233b8f] max-[650px]:p-4"
+            className="glass-stat p-[22px] [&_strong]:mt-2.5 [&_strong]:block [&_strong]:text-[28px] [&_strong]:text-[#1f3f97] max-[650px]:p-4"
           >
             <small className="text-xs leading-loose text-slate-500">{t}</small>
             <strong>{fa(Number(v))}</strong>

@@ -102,7 +102,7 @@ export function ClassGroupsScreen({
       <div className="grid gap-2" aria-label="دانش‌آموزان کلاس">
         {eligible(course).map((person) => (
           <label key={person._id} className="glass-option flex items-center gap-3 p-3 text-sm">
-            <input type="checkbox" className="size-5 accent-[#233b8f]"
+            <input type="checkbox" className="size-5 accent-[#1f3f97]"
               checked={chosen.includes(person._id)}
               onChange={(e) => onChange(e.target.checked
                 ? [...chosen, person._id]
@@ -124,7 +124,7 @@ export function ClassGroupsScreen({
     return (
       <div key={group._id} className="glass-card grid gap-3 p-5">
         <div className="flex items-center gap-2">
-          <UsersRound size={20} className="text-[#233b8f]" aria-hidden />
+          <UsersRound size={20} className="text-[#1f3f97]" aria-hidden />
           <h3 className="font-bold">{group.title}</h3>
         </div>
         <p className="text-xs text-slate-600">
@@ -137,7 +137,7 @@ export function ClassGroupsScreen({
           <p className="text-xs text-amber-800">یک یا چند عضو از درس خارج شده‌اند؛ قبل از انتشار فهرست را اصلاح کنید.</p>
         )}
         <details className="grid gap-3">
-          <summary className="cursor-pointer text-sm font-medium text-[#233b8f]">ویرایش اعضای کلاس</summary>
+          <summary className="cursor-pointer text-sm font-medium text-[#1f3f97]">ویرایش اعضای کلاس</summary>
           <div className="mt-3 grid gap-3">
             {studentPicker(group.courseId, groupEdits[group._id] ?? group.studentIds,
               (ids) => setGroupEdits((previous) => ({ ...previous, [group._id]: ids })))}
@@ -236,7 +236,7 @@ export function ClassGroupsScreen({
             <strong className="text-sm">سؤال‌های مأموریت</strong>
             {questions.map((q) => (
               <label key={q._id} className="glass-option flex items-center gap-3 p-3 text-sm">
-                <input type="checkbox" className="size-5 accent-[#233b8f]" checked={selectedQuestions.includes(q._id)}
+                <input type="checkbox" className="size-5 accent-[#1f3f97]" checked={selectedQuestions.includes(q._id)}
                   onChange={(e) => setSelectedQuestions(e.target.checked
                     ? [...selectedQuestions, q._id]
                     : selectedQuestions.filter((v) => v !== q._id))} />
@@ -259,7 +259,7 @@ export function ClassGroupsScreen({
           </div>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={independent} onChange={(e) => setIndependent(e.target.checked)}
-              className="size-5 accent-[#233b8f]" /> سنجش مستقل بدون راهنمایی
+              className="size-5 accent-[#1f3f97]" /> سنجش مستقل بدون راهنمایی
           </label>
           <Button disabled={busy || !taskGroup || !selectedQuestions.length} type="submit">
             ساخت پیش‌نویس گروهی
