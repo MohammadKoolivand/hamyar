@@ -153,7 +153,6 @@ export default function HamyarApp() {
           setNotice("حساب ساخته شد. اکنون وارد شوید.");
         }
         setMode("login");
-        setPassword("");
         return;
       }
       const u = await api<User>("/auth/login", { email, password });
