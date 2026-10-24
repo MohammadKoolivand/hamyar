@@ -65,11 +65,17 @@ export function AuthScreen({
             {mode === "login"
               ? "خوش آمدید"
               : mode === "register"
-                ? "شروع همراهی به‌عنوان معلم"
-                : "پذیرش دعوت دانش‌آموز یا اولیا"}
+                ? "ساخت حساب معلم"
+                : mode === "register-student"
+                  ? "ساخت حساب دانش‌آموز"
+                  : "پذیرش دعوت دانش‌آموز یا اولیا"}
           </h2>
           <p className="text-xs leading-loose text-slate-500">
-            برای ادامه مسیر یادگیری وارد حساب خود شوید.
+            {mode === "register-student"
+              ? "برای ساخت حساب نیازی به کد دعوت معلم نیست. بعداً از پنل خودتان می‌توانید به معلم متصل شوید."
+              : mode === "accept"
+                ? "با کد دعوت می‌توانید یک حساب جدید بسازید یا حساب موجود را با همان رمز به معلم متصل کنید."
+                : "برای ادامه مسیر یادگیری وارد حساب خود شوید."}
           </p>
           {feedback}
           <form onSubmit={auth} className="grid gap-[18px]">
@@ -126,18 +132,25 @@ export function AuthScreen({
           </form>
           <div className="flex flex-wrap items-center gap-3">
             <Button
+              type="button"
               variant="outline"
-              onClick={() =>
-                setMode(mode === "register" ? "login" : "register")
-              }
+              onClick={() => setMode(mode === "register" ? "login" : "register")}
             >
-              {mode === "register" ? "ورود" : "ثبت‌نام معلم"}
+              {mode === "register" ? "بازگشت به ورود" : "ثبت‌نام معلم"}
             </Button>
             <Button
+              type="button"
+              variant="outline"
+              onClick={() => setMode(mode === "register-student" ? "login" : "register-student")}
+            >
+              {mode === "register-student" ? "بازگشت به ورود" : "ثبت‌نام دانش‌آموز"}
+            </Button>
+            <Button
+              type="button"
               variant="outline"
               onClick={() => setMode(mode === "accept" ? "login" : "accept")}
             >
-              {mode === "accept" ? "ورود" : "پذیرش دعوت"}
+              {mode === "accept" ? "بازگشت به ورود" : "پذیرش دعوت"}
             </Button>
           </div>
           <small className="text-xs leading-loose text-slate-500">

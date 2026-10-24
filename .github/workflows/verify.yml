@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       TEST_MONGO_URL: mongodb://127.0.0.1:27017/?replicaSet=hamyar-rs
@@ -27,7 +27,7 @@ jobs:
       - name: Start MongoDB replica set
         run: |
           docker compose up -d mongo
-          for i in $(seq 1 60); do
+          # MongoDB 8 image fails to launch on ubuntu-26.04 / Linux 6.19; pin ubuntu-24.04.\n          for i in $(seq 1 45); do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q mongo)")" = "healthy" ]; then
               echo "Replica set healthy"; exit 0
             fi

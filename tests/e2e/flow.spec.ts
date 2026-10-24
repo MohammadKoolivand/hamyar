@@ -429,3 +429,52 @@ test("public login uses bright frosted-glass surfaces", async ({ page }, testInf
   expect(bodyBackground).toContain("radial-gradient");
   await page.screenshot({ path: testInfo.outputPath("glass-login-desktop.png"), fullPage: true });
 });
+
+test("student registers without invitation and later joins teacher with existing account", async ({ page, browser }, testInfo) => {
+  const suffix = Date.now();
+  const studentEmail = `standalone-${suffix}@test.dev`;
+  const teacherEmail = `mentor-${suffix}@test.dev`;
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "ثبت‌نام دانش‌آموز" }).click();
+  await expect(page.getByRole("heading", { name: "ساخت حساب دانش‌آموز" })).toBeVisible();
+  await expect(page.getByLabel("کد دعوت معلم")).toHaveCount(0);
+  await page.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز مستقل");
+  await page.getByLabel("ایمیل", { exact: true }).fill(studentEmail);
+  await page.getByLabel("رمز عبور").fill(pass);
+  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
+  await page.getByRole("button", { name: "ورود به همیار" }).click();
+  await expect(page.getByRole("heading", { name: "مسیر یادگیری من" })).toBeVisible();
+  await expect(page.getByText("هنوز مأموریتی نداری.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "اتصال به معلم" })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("independent-student-mobile.png"), fullPage: true });
+
+  const teacherContext = await browser.newContext();
+  try {
+    const teacherPage = await teacherContext.newPage();
+    await teacherPage.goto("/");
+    await teacherPage.getByRole("button", { name: "ثبت‌نام معلم" }).click();
+    await teacherPage.getByLabel("نام و نام خانوادگی").fill("معلم آزمایشی");
+    await teacherPage.getByLabel("ایمیل", { exact: true }).fill(teacherEmail);
+    await teacherPage.getByLabel("رمز عبور").fill(pass);
+    await teacherPage.getByRole("button", { name: "ساخت حساب", exact: true }).click();
+    await teacherPage.getByRole("button", { name: "ورود به همیار" }).click();
+    await teacherPage.getByRole("button", { name: "دانش‌آموزان", exact: true }).click();
+    await teacherPage.getByLabel("ایمیل دانش‌آموز").fill(studentEmail);
+    await teacherPage.getByRole("button", { name: "ایجاد دعوت" }).click();
+    const invite = await teacherPage.getByTestId("invitation-token").innerText();
+
+    await page.getByLabel("کد دعوت معلم").fill(invite);
+    await page.getByRole("button", { name: "اتصال به معلم", exact: true }).click();
+    await expect(page.getByRole("status").getByText("اتصال به معلم انجام شد.", { exact: false })).toBeVisible();
+    await teacherPage.getByRole("button", { name: "به‌روزرسانی فهرست" }).click();
+    await expect(teacherPage.getByRole("heading", { name: "دانش‌آموز مستقل" })).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole("heading", { name: "مسیر یادگیری من" })).toBeVisible();
+    await expect(page.getByLabel("کد دعوت معلم")).toHaveValue("");
+    await page.screenshot({ path: testInfo.outputPath("student-after-teacher-link-mobile.png"), fullPage: true });
+  } finally {
+    await teacherContext.close();
+  }
+});

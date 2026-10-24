@@ -40,3 +40,7 @@ WRITES_PAUSED=true npm run verify:backup
 منابع قالب استقرار: [Next.js self-hosting](https://nextjs.org/docs/app/guides/self-hosting)، [Caddy reverse proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy)، [Caddy HTTPS](https://caddyserver.com/docs/quick-starts/reverse-proxy). این سند تفسیر یا تأیید حقوقی مقررات ایران ارائه نمی‌کند.
 
 اولویت بعدی P5: تصمیم نگهداری و احراز/رضایت، سپس برش اجرایی consent/revocation/recovery/deletion با تست؛ تا آن زمان آمادگی پایلوت با کودکان تأیید نشده است.
+
+## یادداشت ثبت‌نام مستقل (۲ آبان ۱۴۰۵)
+
+حساب دانش‌آموز اکنون می‌تواند بدون دعوت ساخته شود، اما ثبت‌نام آزاد **به معنی احراز سن، رضایت سرپرست یا مجازبودن پایلوت با داده واقعی کودک نیست**. تا تعریف و اجرای فرایند معتبر رضایت، احراز/بازیابی/حذف و سیاست نگهداری، فقط حساب آزمایشی و داده مصنوعی مجاز است. معلم با دعوت محدود به ایمیل حساب متصل می‌شود؛ این ارتباط مجوز مشاهده داده سایر معلمان نیست.

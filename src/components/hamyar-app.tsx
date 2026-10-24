@@ -136,12 +136,24 @@ export default function HamyarApp() {
     e.preventDefault();
     await run(async () => {
       if (mode !== "login") {
-        await api(
-          mode === "register" ? "/auth/register" : "/invitations/accept",
-          { name, email, password, token },
-        );
+        if (mode === "accept") {
+          await api("/invitations/accept", { name, email, password, token });
+          setToken("");
+          const url = new URL(window.location.href);
+          url.searchParams.delete("invite");
+          window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+          setNotice("دعوت پذیرفته شد. اکنون با همان حساب وارد شوید.");
+        } else {
+          await api("/auth/register", {
+            name,
+            email,
+            password,
+            role: mode === "register-student" ? "student" : "teacher",
+          });
+          setNotice("حساب ساخته شد. اکنون وارد شوید.");
+        }
         setMode("login");
-        setNotice("حساب ساخته شد. اکنون وارد شوید.");
+        setPassword("");
         return;
       }
       const u = await api<User>("/auth/login", { email, password });
@@ -326,6 +338,14 @@ export default function HamyarApp() {
             assignments={assignments}
             students={students}
             setPage={setPage}
+            invitationToken={token}
+            onJoined={async () => {
+              setToken("");
+              const url = new URL(window.location.href);
+              url.searchParams.delete("invite");
+              window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+              await refresh();
+            }}
           />
         )}
         {page === "students" && teacher && (

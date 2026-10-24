@@ -5,7 +5,7 @@ Base `/api`، JSON، نشست `session` در cookie با HttpOnly و SameSite St
 | Method/path                     | نقش                          | Body                                        | Response                                                                            |
 | ------------------------------- | ---------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------- |
 | GET /health                     | عمومی                        | —                                           | status,provider؛ ping واقعی Mongo                                                   |
-| POST /auth/register             | عمومی                        | name,email,password (10–128)                | message؛ نقش همیشه teacher                                                          |
+| POST /auth/register             | عمومی                        | name,email,password (10–128),role?:teacher\|student | message؛ role پیش‌فرض teacher برای سازگاری؛ parent/admin از ثبت‌نام عمومی ممنوع                                                          |
 | POST /auth/login                | عمومی                        | email,password                              | User DTO + session cookie                                                           |
 | GET /auth/me                    | واردشده                      | —                                           | User DTO: _id,name,email,role                                                       |
 | POST /auth/logout               | عمومی                        | {}                                          | ok؛ حذف نشست                                                                        |
@@ -103,3 +103,12 @@ First-attempt independent success uses eligible supported/teacher-verified evalu
 | POST /question-drafts/:did/reject        | معلم مالک         | {reason:3..1000 chars}؛ هیچ سؤال بانکی ایجاد نمی‌شود؛ approved قابل رد نیست                                                                                            |
 
 ایجاد دستی سؤال، generate/approve/reject و revoke از Idempotency-Key پشتیبانی می‌کنند؛ پاسخ پذیرفته‌شده با کلید ثابت تکرار می‌شود و body متفاوت 409 است. mutationهای UI تألیف کلید retry دارند. reference در draft خصوصی معلم است؛ نمایش آن برای بررسی انسانی عمدی است. مدل تولید سؤال از هیچ endpoint خودکار publish یا assign استفاده نمی‌کند. API احراز سرپرستی، رضایت، حذف حساب و بازیابی رمز هنوز پیاده نشده‌اند؛ این‌ها قابلیت تکمیل‌شده نیستند.
+
+
+## ثبت‌نام مستقل دانش‌آموز و اتصال به معلم
+
+- `POST /api/auth/register` اکنون `role?: "teacher" | "student"` را می‌پذیرد. اگر role حذف شود، برای سازگاری با کلاینت‌های قدیمی teacher ایجاد می‌شود. نقش parent فقط از دعوت موجود مجاز است؛ admin قابل ثبت‌نام عمومی نیست.
+- دانش‌آموز تازه ثبت‌نام‌شده می‌تواند بدون ارتباط با معلم وارد پنل شود. `GET /api/assignments` برای حساب بدون تکلیف آرایه خالی است. تا ایجاد رابطه و انتشار مأموریت، دسترسی به بانک خصوصی معلم یا تمرین مستقل عمومی وجود ندارد.
+- `POST /api/invitations/claim` نیازمند نشست معتبر student و body برابر `{token:string}` است. توکن فقط برای ایمیل همان حساب، دعوت student، وضعیت استفاده‌نشده و انقضای معتبر پذیرفته می‌شود. توکن و رابطه در تراکنش ثبت می‌شوند، حساب جدید ساخته نمی‌شود؛ پاسخ موفق `{message}` است. تکرار توکن مصرف‌شده یا دعوت نامعتبر 400 می‌دهد، نقش‌های دیگر 403.
+- `POST /api/invitations/accept` قبلی برای دانش‌آموز فاقد حساب و دعوت اولیا بدون تغییر باقی مانده و از حساب‌های student موجود همراه با رمز معتبر نیز پشتیبانی می‌کند.
+- دعوت دانش‌آموز برای ارتباط با معلم است، **نه تأیید هویت/سن یا رضایت سرپرست**. استفاده عمومی با داده واقعی کودکان همچنان مجاز اعلام نشده است.

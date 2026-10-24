@@ -21,7 +21,12 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
     { config: { rateLimit: { max: 10, timeWindow: "1 minute" } } },
     async (r) => {
       const b = credentials
-        .extend({ name: z.string().min(2).max(100) })
+        .extend({
+          name: z.string().trim().min(2).max(100),
+          // Legacy teacher registrations without a role remain supported.
+          // Roles cannot be escalated through public registration.
+          role: z.enum(["teacher", "student"]).default("teacher"),
+        })
         .parse(r.body);
       const salt = randomBytes(16).toString("hex");
       const uid = id();
@@ -29,7 +34,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
         _id: uid,
         name: b.name,
         email: b.email,
-        role: "teacher",
+        role: b.role,
         passwordHash:
           salt + ":" + scryptSync(b.password, salt, 64).toString("hex"),
       });
@@ -226,6 +231,50 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
       });
     },
   );
+  // An existing, signed-in student can accept a teacher's email-bound
+  // invitation without creating another account or re-entering a password.
+  app.post("/api/invitations/claim", async (r) => {
+    const student = await user(r, "student");
+    const { token } = z
+      .object({ token: z.string().min(20).max(100) })
+      .parse(r.body);
+    return ctx.transaction(async (session) => {
+      const inv = await c("invitations").findOneAndUpdate(
+        {
+          tokenHash: hash(token),
+          email: student.email,
+          role: "student",
+          usedAt: null,
+          expiresAt: { $gt: new Date() },
+        },
+        { $set: { usedAt: now() } },
+        { returnDocument: "after", session },
+      );
+      if (!inv) fail(400, "دعوت نامعتبر یا منقضی شده");
+      await c("relations").updateOne(
+        { teacherId: inv!.teacherId, studentId: student._id },
+        {
+          $setOnInsert: {
+            _id: id(),
+            teacherId: inv!.teacherId,
+            studentId: student._id,
+          },
+        },
+        { session, upsert: true },
+      );
+      await c("auditLogs").insertOne(
+        {
+          _id: id(),
+          actorId: student._id,
+          action: "claim_teacher_invitation",
+          resourceId: inv!._id,
+          createdAt: now(),
+        },
+        { session },
+      );
+      return { message: "اتصال به معلم انجام شد" };
+    });
+  });
   app.get("/api/students/:sid/parents", async (r) => {
     const u = await user(r, "teacher"),
       { sid } = r.params as { sid: string };

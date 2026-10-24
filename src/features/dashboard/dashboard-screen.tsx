@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { StudentJoinTeacher } from "@/features/students/join-teacher";
 
 import { fa } from "@/lib/presentation";
 import type { User, Assignment } from "@/lib/types";
@@ -10,12 +11,16 @@ export function OverviewScreen({
   assignments,
   students,
   setPage,
+  invitationToken,
+  onJoined,
 }: {
   me: User;
   teacher: boolean;
   assignments: Assignment[];
   students: User[];
   setPage: (v: string) => void;
+  invitationToken?: string;
+  onJoined?: () => Promise<void>;
 }) {
   return (
     <>
@@ -30,12 +35,16 @@ export function OverviewScreen({
           <p>
             {teacher
               ? "از اولین تمرین تا تصمیم بهتر برای جلسه بعد، همراه شما هستیم."
-              : "با تمرین‌های معلمت شروع کن؛ برای فکرکردن و تلاش‌کردن وقت داری."}
+              : assignments.length
+                ? "با مأموریت‌های معلم‌هایت شروع کن؛ برای فکرکردن و تلاش‌کردن وقت داری."
+                : "حسابت آماده است. برای دریافت مأموریت از معلم، کد دعوت او را وارد کن."}
           </p>
-          <Button variant="outline" onClick={() => setPage("missions")}>
-            مشاهده مأموریت‌ها
-            <ArrowLeft size={16} />
-          </Button>
+          {(teacher || assignments.length > 0) && (
+            <Button variant="outline" onClick={() => setPage("missions")}>
+              مشاهده مأموریت‌ها
+              <ArrowLeft size={16} />
+            </Button>
+          )}
         </div>
         <BookOpen size={110} strokeWidth={1} />
       </section>
@@ -76,16 +85,23 @@ export function OverviewScreen({
         <p className="text-xs leading-loose text-slate-500">
           {teacher
             ? "ابتدا درس و مبحث را بسازید، سؤال معتبر اضافه کنید و دانش‌آموزتان را دعوت کنید."
-            : "مأموریت‌های منتشرشده معلم در این بخش آماده شروع هستند."}
+            : assignments.length
+              ? "مأموریت‌های منتشرشده معلم در این بخش آماده شروع هستند."
+              : "هنوز مأموریتی نداری. با اتصال به معلم می‌توانی تمرین‌های او را دریافت کنی."}
         </p>
-        <Button
-          onClick={() => setPage(teacher ? "content" : "missions")}
-          className="justify-self-start"
-        >
-          {teacher ? "آماده‌سازی محتوا" : "شروع تمرین"}
-          <ArrowLeft size={16} />
-        </Button>
+        {(teacher || assignments.length > 0) && (
+          <Button
+            onClick={() => setPage(teacher ? "content" : "missions")}
+            className="justify-self-start"
+          >
+            {teacher ? "آماده‌سازی محتوا" : "شروع تمرین"}
+            <ArrowLeft size={16} />
+          </Button>
+        )}
       </section>
+      {!teacher && onJoined && (
+        <StudentJoinTeacher invitationToken={invitationToken} onJoined={onJoined} />
+      )}
     </>
   );
 }
