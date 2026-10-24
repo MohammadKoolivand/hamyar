@@ -92,21 +92,21 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
     });
     if (!group) fail(404, "کلاس یافت نشد");
     const course = await c("courses").findOne({
-      _id: group.courseId, teacherId: teacher._id, status: "active",
+      _id: group!.courseId, teacherId: teacher._id, status: "active",
     });
     if (!course) fail(404, "درس یافت نشد");
-    await validMembers(group.courseId, teacher._id, group.studentIds);
+    await validMembers(group!.courseId, teacher._id, group!.studentIds);
     for (const q of body.questionVersionIds) await owned("questionVersions", q, teacher._id);
     const task = {
-      _id: id(), teacherId: teacher._id, groupId: group._id,
-      courseId: group.courseId, title: body.title,
-      studentIds: [...group.studentIds],
+      _id: id(), teacherId: teacher._id, groupId: group!._id,
+      courseId: group!.courseId, title: body.title,
+      studentIds: [...group!.studentIds],
       questionVersionIds: body.questionVersionIds, policy: body.policy,
       state: "draft", createdAt: now(),
     };
     await c("groupTasks").insertOne(task);
-    return { _id: task._id, groupId: task.groupId, courseId: task.courseId,
-      title: task.title, state: task.state, studentIds: task.studentIds };
+    return { _id: task!._id, groupId: task!.groupId, courseId: task!.courseId,
+      title: task!.title, state: task!.state, studentIds: task!.studentIds };
   });
 
   app.post("/api/group-tasks/:tid/publish", async (r) => {
@@ -117,47 +117,47 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
         _id: tid, teacherId: teacher._id,
       }, { session });
       if (!task) fail(404, "مأموریت گروهی یافت نشد");
-      if (task.state === "published") return { ok: true };
-      if (task.state !== "draft") fail(409, "این مأموریت قابل انتشار نیست");
+      if (task!.state === "published") return { ok: true };
+      if (task!.state !== "draft") fail(409, "این مأموریت قابل انتشار نیست");
       const course = await c("courses").findOne({
-        _id: task.courseId, teacherId: teacher._id, status: "active",
+        _id: task!.courseId, teacherId: teacher._id, status: "active",
       }, { session });
       if (!course) fail(409, "درس غیرفعال است");
       const enrollmentIds = await validMembers(
-        task.courseId, teacher._id, task.studentIds, session,
+        task!.courseId, teacher._id, task!.studentIds, session,
       );
       const questions = await c("questionVersions").countDocuments({
-        _id: { $in: task.questionVersionIds }, ownerId: teacher._id,
+        _id: { $in: task!.questionVersionIds }, ownerId: teacher._id,
       }, { session });
-      if (questions !== task.questionVersionIds.length) fail(409, "برخی سؤال‌ها دیگر معتبر نیستند");
+      if (questions !== task!.questionVersionIds.length) fail(409, "برخی سؤال‌ها دیگر معتبر نیستند");
       const timestamp = now();
-      for (const studentId of task.studentIds as string[]) {
+      for (const studentId of task!.studentIds as string[]) {
         const missionId = id();
         const assignmentId = id();
         const enrollmentId = enrollmentIds.get(studentId);
         const progress = Object.fromEntries(
-          (task.questionVersionIds as string[]).map((questionId) =>
+          (task!.questionVersionIds as string[]).map((questionId) =>
             [questionId, { attempts: 0, hints: 0 }]),
         );
         await c("missions").insertOne({
           _id: missionId, teacherId: teacher._id, studentId,
-          courseId: task.courseId, enrollmentId, groupId: task.groupId,
-          groupTaskId: task._id, title: task.title,
-          questionVersionIds: task.questionVersionIds,
-          policy: task.policy, state: "published", createdAt: timestamp,
+          courseId: task!.courseId, enrollmentId, groupId: task!.groupId,
+          groupTaskId: task!._id, title: task!.title,
+          questionVersionIds: task!.questionVersionIds,
+          policy: task!.policy, state: "published", createdAt: timestamp,
         }, { session });
         await c("assignments").insertOne({
           _id: assignmentId, missionId, teacherId: teacher._id, studentId,
-          courseId: task.courseId, enrollmentId, groupId: task.groupId,
-          groupTaskId: task._id, title: task.title,
-          questionVersionIds: task.questionVersionIds,
-          policy: task.policy, state: "published",
+          courseId: task!.courseId, enrollmentId, groupId: task!.groupId,
+          groupTaskId: task!._id, title: task!.title,
+          questionVersionIds: task!.questionVersionIds,
+          policy: task!.policy, state: "published",
           createdAt: timestamp, progress, revision: 0,
         }, { session });
       }
       await ctx.boundary("after_group_assignment_insert");
       await c("groupTasks").updateOne(
-        { _id: task._id, state: "draft" },
+        { _id: task!._id, state: "draft" },
         { $set: { state: "published", publishedAt: timestamp } },
         { session },
       );
@@ -202,8 +202,8 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
     }).project({ _id: 1, name: 1 }).toArray();
     const names = new Map(people.map((p) => [p._id, p.name as string]));
     return {
-      _id: task._id, title: task.title, state: task.state,
-      recipients: task.studentIds.length,
+      _id: task!._id, title: task!.title, state: task!.state,
+      recipients: task!.studentIds.length,
       students: assignments.map((a) => {
         const evidence = [...latest.values()].filter((t) => t.assignmentId === a._id);
         return {
