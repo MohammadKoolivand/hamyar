@@ -11,6 +11,8 @@ import {
   sourceSummary,
 } from "@/lib/question-source";
 import { MAX_MISSION_QUESTIONS } from "@/lib/mission-limits";
+import { api } from "@/lib/api";
+import { difficultyLabels } from "@/lib/difficulty";
 import { fa } from "@/lib/presentation";
 import type { Question } from "@/lib/types";
 
@@ -32,6 +34,9 @@ export function QuestionPicker({
   onChange: (ids: string[]) => void;
   disabled?: boolean;
 }) {
+  const [difficulty, setDifficulty] = useState("medium");
+  const [count, setCount] = useState(20);
+  const [selecting, setSelecting] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [type, setType] = useState("");
@@ -143,6 +148,64 @@ export function QuestionPicker({
           />
         </Field>
       </div>
+      <div className="glass-note grid gap-3 p-4 sm:grid-cols-3">
+        <Field title="سختی تمرین پیشنهادی">
+          <select
+            className="glass-field min-h-11 w-full p-3"
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+          >
+            {Object.entries(difficultyLabels).map(([v, label]) => (
+              <option key={v} value={v}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field title="تعداد سؤال تمرین">
+          <input
+            className="glass-field min-h-11 w-full p-3"
+            type="number"
+            min={1}
+            max={MAX_MISSION_QUESTIONS}
+            value={count}
+            onChange={(e) => setCount(Number(e.target.value))}
+          />
+        </Field>
+        <Button
+          type="button"
+          disabled={
+            disabled ||
+            selecting ||
+            !visible.length ||
+            !Number.isInteger(count) ||
+            count < 1 ||
+            count > MAX_MISSION_QUESTIONS
+          }
+          onClick={async () => {
+            setSelecting(true);
+            setError("");
+            try {
+              const result = await api<{ questionVersionIds: string[] }>(
+                "/questions/select",
+                { candidateIds: visible.map((q) => q._id), difficulty, count },
+              );
+              select(result.questionVersionIds);
+            } catch (e) {
+              setError((e as Error).message);
+            } finally {
+              setSelecting(false);
+            }
+          }}
+        >
+          انتخاب خودکار با تعداد و سختی
+        </Button>
+        <p className="text-xs leading-6 text-slate-500 sm:col-span-3">
+          از نتایج همین فیلترها، سؤال‌های بدون تکرار انتخاب و جایگزین انتخاب
+          فعلی می‌شوند. اگر بانک کافی نباشد خطا نمایش داده می‌شود؛ سؤال تازه
+          تولید نمی‌شود.
+        </p>
+      </div>
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"
@@ -204,7 +267,15 @@ export function QuestionPicker({
                 }
                 className="size-5 shrink-0 accent-[#233B8F]"
               />
-              <span className="line-clamp-2 min-w-0">{q.statement}</span>
+              <span className="min-w-0">
+                <span className="line-clamp-2">{q.statement}</span>
+                <span className="text-xs text-teal-700">
+                  {q.difficulty
+                    ? difficultyLabels[q.difficulty]
+                    : "سختی نامشخص"}
+                  {q.difficultyAssessment?.needsReview ? " · برآورد اولیه" : ""}
+                </span>
+              </span>
             </label>
             <Button
               type="button"

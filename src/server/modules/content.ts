@@ -1,3 +1,7 @@
+import { randomInt } from "node:crypto";
+import { difficultySchema } from "../../lib/difficulty";
+import { MAX_MISSION_QUESTIONS } from "../../lib/mission-limits";
+import { difficultyMetadata } from "../../lib/difficulty";
 import { Binary } from "mongodb";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
@@ -151,6 +155,92 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       ])
       .toArray();
   });
+  app.post("/api/questions/select", async (r) => {
+    const u = await user(r, "teacher");
+    const b = z
+      .object({
+        candidateIds: z.array(z.uuid()).min(1).max(5000),
+        difficulty: difficultySchema,
+        count: z.number().int().min(1).max(MAX_MISSION_QUESTIONS),
+      })
+      .parse(r.body);
+    const current = await c("questions")
+      .find({ ownerId: u._id, currentVersionId: { $in: b.candidateIds } })
+      .project({ currentVersionId: 1 })
+      .toArray();
+    const candidates = await c("questionVersions")
+      .find({
+        ownerId: u._id,
+        _id: { $in: current.map((q) => q.currentVersionId) },
+        difficulty: b.difficulty,
+      })
+      .project({ _id: 1 })
+      .toArray();
+    if (candidates.length < b.count)
+      ctx.fail(
+        400,
+        `فقط ${candidates.length} سؤال با این سختی و فیلترها موجود است؛ تعداد درخواستی را کم کنید.`,
+      );
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = randomInt(i + 1);
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    return {
+      questionVersionIds: candidates.slice(0, b.count).map((q) => q._id),
+      available: candidates.length,
+    };
+  });
+  app.post("/api/questions/difficulty-batch", async (r) => {
+    const u = await user(r, "teacher");
+    const b = z
+      .object({
+        questionVersionIds: z.array(z.uuid()).min(1).max(500),
+        difficulty: difficultySchema,
+      })
+      .parse(r.body);
+    const ids = [...new Set(b.questionVersionIds)];
+    return ctx.atomic(
+      r,
+      u._id,
+      "question-difficulty-batch",
+      b,
+      async (session) => {
+        const rows = await c("questionVersions").countDocuments(
+          { _id: { $in: ids }, ownerId: u._id },
+          { session },
+        );
+        if (rows !== ids.length)
+          ctx.fail(404, "سؤال متعلق به شما نیست یا یافت نشد");
+        await c("questionVersions").updateMany(
+          { _id: { $in: ids }, ownerId: u._id },
+          {
+            $set: {
+              difficulty: b.difficulty,
+              difficultyAssessment: {
+                method: "teacher_selected",
+                needsReview: false,
+                assessedAt: ctx.now(),
+                assessedBy: u._id,
+              },
+            },
+          },
+          { session },
+        );
+        await c("auditLogs").insertOne(
+          {
+            _id: id(),
+            actorId: u._id,
+            action: "set_question_difficulty",
+            resourceIds: ids,
+            difficulty: b.difficulty,
+            createdAt: ctx.now(),
+          },
+          { session },
+        );
+        return { updated: ids.length };
+      },
+    );
+  });
   app.get("/api/questions/:vid", async (r) => {
     const u = await user(r, "teacher");
     return owned("questionVersions", (r.params as { vid: string }).vid, u._id);
@@ -190,6 +280,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         // Whitelisted provenance: the previous immutable version retains original review evidence.
         const row = {
           ...b,
+          ...difficultyMetadata(b),
           _id: nextId,
           questionId: previous!.questionId,
           ownerId: u._id,

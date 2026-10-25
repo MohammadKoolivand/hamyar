@@ -54,6 +54,8 @@ export function AiAuthoring({
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
+  const [batchCount, setBatchCount] = useState(1);
+  const [targetDifficulty, setTargetDifficulty] = useState("medium");
   const [authoringModel, setAuthoringModel] = useState("");
   const refresh = () =>
     api<QuestionDraft[]>("/question-drafts").then(setDrafts);
@@ -103,14 +105,27 @@ export function AiAuthoring({
         onSubmit={(e) => {
           e.preventDefault();
           void run(async () => {
-            await api("/question-drafts/generate", {
-              topicId: topic,
-              type,
-              brief,
-              visualKind,
-            });
-            await refresh();
-            setNotice("پیش‌نویس برای بررسی آماده است.");
+            let completed = 0;
+            try {
+              for (let i = 0; i < batchCount; i++) {
+                await api("/question-drafts/generate", {
+                  topicId: topic,
+                  type,
+                  brief:
+                    batchCount > 1
+                      ? `${brief}\nسؤال ${i + 1} از مجموعهٔ ${batchCount} سوالی؛ یک سؤال مستقل و متفاوت طراحی کن.`
+                      : brief,
+                  difficulty: targetDifficulty,
+                  visualKind,
+                });
+                completed++;
+                setNotice(
+                  `${completed} از ${batchCount} پیش‌نویس تولید شد؛ تأیید معلم لازم است.`,
+                );
+              }
+            } finally {
+              await refresh();
+            }
           });
         }}
       >
@@ -120,6 +135,35 @@ export function AiAuthoring({
           onChange={setTopic}
           disabled={busy}
         />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field title="تعداد سؤال تولیدی">
+            <input
+              className={input}
+              required
+              type="number"
+              min={1}
+              max={5}
+              value={batchCount}
+              onChange={(e) => setBatchCount(Number(e.target.value))}
+            />
+          </Field>
+          <Field title="درجه سختی هدف">
+            <select
+              className={input}
+              value={targetDifficulty}
+              onChange={(e) => setTargetDifficulty(e.target.value)}
+            >
+              <option value="easy">آسان</option>
+              <option value="medium">متوسط</option>
+              <option value="hard">سخت</option>
+            </select>
+          </Field>
+        </div>
+        <p className="text-xs text-slate-500">
+          هر بار تا ۵ پیش‌نویس با مدل تنظیم‌شده تولید می‌شود؛ هزینهٔ هر درخواست
+          جداست و ورود به بانک نیازمند تأیید شماست. در صورت توقف، موارد تولیدشده
+          در صف بررسی می‌مانند.
+        </p>
         <Field title="حوزه، پایه و هدف سؤال">
           <textarea
             className={input}

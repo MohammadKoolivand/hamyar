@@ -118,6 +118,11 @@ export interface Question {
   source?: import("./question-source").QuestionSource;
   classification?: "topic" | "free";
   difficulty?: "easy" | "medium" | "hard";
+  difficultyAssessment?: {
+    method: string;
+    needsReview: boolean;
+    reason?: string;
+  };
   year?: number;
   origin?: string;
   visuals?: QuestionVisual[];

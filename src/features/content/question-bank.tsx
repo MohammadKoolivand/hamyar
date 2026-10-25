@@ -8,6 +8,7 @@ import {
 } from "@/lib/question-source";
 import { QuestionEditor } from "./question-editor";
 import { Button } from "@/components/ui/button";
+import { api } from "@/lib/api";
 import { useState } from "react";
 import { AppLink as Link } from "@/components/app-link";
 import { Plus, LibraryBig, Search, SlidersHorizontal } from "lucide-react";
@@ -39,6 +40,10 @@ export function QuestionBank({
   questions: Question[];
   onSaved: () => Promise<unknown> | void;
 }) {
+  const [bulkDifficulty, setBulkDifficulty] = useState("medium");
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkNotice, setBulkNotice] = useState("");
+  const [bulkError, setBulkError] = useState("");
   const [cropOpen, setCropOpen] = useState(false);
   const [editing, setEditing] = useState<string>();
   const [guidedOnly, setGuidedOnly] = useState(false);
@@ -491,6 +496,57 @@ export function QuestionBank({
             </Link>
           </div>
         )}
+        <div className="glass-note flex flex-wrap items-end gap-3 p-4">
+          <Field title="تعیین گروهی سختی نتایج فیلترشده">
+            <select
+              className={selectStyle}
+              value={bulkDifficulty}
+              onChange={(e) => setBulkDifficulty(e.target.value)}
+            >
+              {Object.entries(difficultyLabels).map(([v, label]) => (
+                <option key={v} value={v}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Button
+            type="button"
+            disabled={bulkBusy || !visible.length || visible.length > 500}
+            onClick={async () => {
+              setBulkBusy(true);
+              setBulkError("");
+              setBulkNotice("");
+              try {
+                const result = await api<{ updated: number }>(
+                  "/questions/difficulty-batch",
+                  {
+                    questionVersionIds: visible.map((q) => q._id),
+                    difficulty: bulkDifficulty,
+                  },
+                );
+                await onSaved();
+                setBulkNotice(`سختی ${fa(result.updated)} سؤال ذخیره شد.`);
+              } catch (e) {
+                setBulkError((e as Error).message);
+              } finally {
+                setBulkBusy(false);
+              }
+            }}
+          >
+            اعمال روی {fa(visible.length)} سؤال فیلترشده
+          </Button>
+          <p className="w-full text-xs text-slate-500">
+            این تغییر شامل همهٔ صفحه‌های نتیجه است؛ برای بیش از ۵۰۰ سؤال فیلتر
+            را محدود کنید.
+          </p>
+          {bulkNotice && <p role="status">{bulkNotice}</p>}
+          {bulkError && (
+            <p role="alert" className="text-rose-700">
+              {bulkError}
+            </p>
+          )}
+        </div>
         <PagedList items={visible} label="بانک سؤال">
           {(q, i) => {
             const c = q.topicId ? byTopic.get(q.topicId) : undefined;
@@ -512,6 +568,14 @@ export function QuestionBank({
                       ? difficultyLabels[q.difficulty]
                       : "تعیین نشده"}
                   </span>
+                  {q.difficultyAssessment?.needsReview && (
+                    <span
+                      className="text-amber-700"
+                      title={q.difficultyAssessment.reason}
+                    >
+                      برآورد اولیه · قابل اصلاح
+                    </span>
+                  )}
                   <span className="text-slate-500">
                     سال:{" "}
                     {q.year

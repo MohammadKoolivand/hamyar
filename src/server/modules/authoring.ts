@@ -1,3 +1,5 @@
+import { difficultySchema, difficultyLabels } from "../../lib/difficulty";
+import { difficultyMetadata } from "../../lib/difficulty";
 import { visualKind } from "../../lib/question-visuals";
 import type { AvalaiClient } from "../ai/avalai";
 import type { FastifyInstance } from "fastify";
@@ -43,6 +45,7 @@ export async function persistQuestion(
     verifiedBy: ownerId,
     verifiedAt: ctx.now(),
     ...b,
+    ...difficultyMetadata(b),
     ...provenance,
   };
   await ctx.c("questionVersions").insertOne(row, { session });
@@ -73,6 +76,7 @@ export function registerAuthoring(
           topicId: z.string().uuid(),
           skillIds: z.array(z.string().uuid()).max(10).default([]),
           brief: z.string().trim().min(5).max(1000),
+          difficulty: difficultySchema.optional(),
           visualKind: visualKind.optional(),
           type: z.enum(["numeric", "choice", "short", "essay"]),
         })
@@ -137,7 +141,9 @@ export function registerAuthoring(
         const output = await selectedGenerator!.generate({
           topic: topic.title,
           curriculum,
-          brief: b.brief,
+          brief: b.difficulty
+            ? `${b.brief}\nدرجه سختی هدف: ${difficultyLabels[b.difficulty]}. سؤال متناسب با این سطح طراحی کن.`
+            : b.brief,
           type: b.type,
           ...(b.visualKind ? { visualKind: b.visualKind } : {}),
         });
@@ -157,6 +163,7 @@ export function registerAuthoring(
         // with explicit correction flags; only approval may pass the full grading schema.
         const candidate = {
           ...output.question,
+          ...(b.difficulty ? { difficulty: b.difficulty } : {}),
           ...(b.visualKind && b.visualKind !== "none"
             ? { visualKind: b.visualKind }
             : {}),
