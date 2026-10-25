@@ -528,7 +528,7 @@ export default function HamyarApp() {
           />
         )}
         {page === "settings" && teacher && <AiSettingsScreen />}
-        {page === "exam-import" && teacher && <ExamImportScreen />}
+        {page === "exam-import" && teacher && <ExamImportScreen nodes={nodes} />}
         {["content", "content-new", "resources"].includes(page) && teacher && (
           <ContentScreen
             key={page}

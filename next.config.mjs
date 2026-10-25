@@ -7,5 +7,6 @@ export default {
     "fastify",
     "@fastify/cookie",
     "@fastify/rate-limit",
+    "pdfjs-dist",
   ],
 };

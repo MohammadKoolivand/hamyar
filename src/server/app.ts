@@ -10,6 +10,7 @@ import { createContext } from "./context";
 import { requireTransactions, type WriteHooks } from "./transactions";
 import { registerIdentity } from "./modules/identity";
 import { registerContent } from "./modules/content";
+import { registerExams } from "./modules/exams";
 import { registerMissions } from "./modules/missions";
 import { registerRemediation } from "./modules/remediation";
 import { registerCourses } from "./modules/courses";
@@ -137,6 +138,7 @@ export async function buildApp(
   registerCourseMembership(app, ctx);
   registerStudentDashboard(app, ctx);
   registerContent(app, ctx);
+  registerExams(app, ctx);
   registerAiSettings(app, ctx, avalai);
   registerAuthoring(app, ctx, questionGenerator, avalai);
   registerMissions(app, ctx);
