@@ -47,7 +47,7 @@ export function AuthScreen({
             به یادگیری مستقل.
           </h1>
           <p className="text-xs leading-loose text-slate-500">
-            معلم آموزش می‌دهد، همیار تمرین را همراهی می‌کند.
+            معلم آموزش می‌دهد، هدهد تمرین را همراهی می‌کند.
           </p>
           <div className="flex items-center gap-3">
             <span className="hy-icon-container" data-tone="teal"><ShieldCheck size={22} aria-hidden /></span>
@@ -126,7 +126,7 @@ export function AuthScreen({
               </Field>
             )}
             <Button disabled={busy}>
-              {mode === "login" ? "ورود به همیار" : "ساخت حساب"}
+              {mode === "login" ? "ورود به هدهد" : "ساخت حساب"}
               <ArrowLeft size={16} />
             </Button>
           </form>
@@ -154,7 +154,7 @@ export function AuthScreen({
             </Button>
           </div>
           <small className="text-xs leading-loose text-slate-500">
-            نسخه توسعه محلی · همیار آزمایشی با راهنمایی تأییدشده معلم
+            نسخه توسعه محلی · هدهد آزمایشی با راهنمایی تأییدشده معلم
           </small>
         </section>
       </div>

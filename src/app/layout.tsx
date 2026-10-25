@@ -15,8 +15,8 @@ const persian = localFont({
   adjustFontFallback: false,
 });
 export const metadata: Metadata = {
-  title: "همیار | تمرین آگاهانه",
-  description: "همیار تمرین و تحلیل یادگیری تحت هدایت معلم",
+  title: "هدهد | راهنمای هوشمند یادگیری",
+  description: "هدهد، راهنمای هوشمند تمرین و تحلیل پیشرفت یادگیری تحت هدایت معلم",
   manifest: "/manifest.webmanifest",
 };
 export const viewport: Viewport = { themeColor: "#F8FBFF" };

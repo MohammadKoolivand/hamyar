@@ -165,6 +165,12 @@ export function QuestionBank({
             منابع آموزشی
           </Link>
           <Link
+            href="/exam-import"
+            className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm text-[#233B8F]"
+          >
+            ورود آزمون از PDF
+          </Link>
+          <Link
             href="/content-new"
             className="flex items-center gap-2 rounded-xl bg-[#233B8F] px-5 py-3 text-sm font-medium text-white shadow-lg shadow-blue-900/10"
           >
