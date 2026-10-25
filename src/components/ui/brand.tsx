@@ -18,11 +18,11 @@ export function Brand({
       />
       <div className="min-w-0">
         <span className={`hy-brand-wordmark block font-bold leading-tight ${large ? "text-[32px]" : "text-[25px]"}`}>
-          همیار
+          هدهد
         </span>
         {showTagline && (
           <span className="mt-1 block text-xs text-[#5F7191]">
-            همراه مسیر یادگیری
+            راهنمای هوشمند یادگیری
           </span>
         )}
       </div>

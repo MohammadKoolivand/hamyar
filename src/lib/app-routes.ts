@@ -5,6 +5,7 @@ export const tabPaths = {
   classes: "/classes",
   content: "/content",
   "content-new": "/content-new",
+  "exam-import": "/exam-import",
   resources: "/resources",
   settings: "/settings",
   missions: "/homeworks",

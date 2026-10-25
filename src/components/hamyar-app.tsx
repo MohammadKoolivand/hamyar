@@ -12,6 +12,7 @@ import {
   GraduationCap,
   BarChart3,
   BookOpenCheck,
+  FileUp,
   UsersRound,
   Settings,
 } from "lucide-react";
@@ -42,6 +43,7 @@ import { StudentOverview } from "@/features/dashboard/student-overview";
 import { StudentsScreen } from "@/features/students/students-screen";
 import { AiSettingsScreen } from "@/features/settings/ai-settings-screen";
 import { ContentScreen } from "@/features/content/content-screen";
+import { ExamImportScreen } from "@/features/content/exam-import-screen";
 import { MissionsScreen } from "@/features/missions/missions-screen";
 import { ParentDashboard } from "@/features/analytics/parent-dashboard";
 import { LearningDashboard } from "@/features/analytics/learning-dashboard";
@@ -356,6 +358,7 @@ export default function HamyarApp() {
         ["courses", "درس‌های من", BookOpenCheck],
         ["classes", "کلاس‌های گروهی", UsersRound],
         ["content", "بانک سؤال و محتوا", Library],
+        ["exam-import", "ورود آزمون", FileUp],
         ["resources", "منابع آموزشی", BookOpenCheck],
         ["missions", "مأموریت‌ها", Target],
         ["learning", "یادگیری و مرور", BarChart3],
@@ -409,7 +412,7 @@ export default function HamyarApp() {
             <small className="text-xs leading-loose text-slate-500">
               معلم آموزش می‌دهد،
               <br />
-              همیار همراهی می‌کند.
+              هدهد راهنمایی می‌کند.
             </small>
           </div>
         </footer>
@@ -429,12 +432,14 @@ export default function HamyarApp() {
         <header className="glass-header mb-2 flex h-fit self-start items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-2.5 max-[650px]:mb-2 max-[650px]:[&_h1]:text-[22px]">
           <div>
             <small className="text-xs leading-loose text-slate-500">
-              همیار / {teacher ? "پنل معلم" : "یادگیری"}
+              هدهد / {teacher ? "پنل معلم" : "یادگیری"}
             </small>
             <h1 className="text-[28px] font-bold text-[#17305E]">
               {nav.find((n) => n[0] === page)?.[1] ??
-                (page === "content-new"
-                  ? "افزودن سؤال"
+                (page === "exam-import"
+                  ? "ورود آزمون"
+                  : page === "content-new"
+                    ? "افزودن سؤال"
                   : page === "report"
                     ? "گزارش عملکرد"
                     : "محیط تمرین")}
@@ -523,6 +528,7 @@ export default function HamyarApp() {
           />
         )}
         {page === "settings" && teacher && <AiSettingsScreen />}
+        {page === "exam-import" && teacher && <ExamImportScreen />}
         {["content", "content-new", "resources"].includes(page) && teacher && (
           <ContentScreen
             key={page}
