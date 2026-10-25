@@ -46,6 +46,13 @@ function provenance(meta: z.infer<typeof examMetadataSchema>, number: number | n
 }
 
 export function registerExams(app: FastifyInstance, ctx: Context) {
+  // Run this before CPU-heavy parsing in the multipart route.
+  app.post("/api/exams/upload-permission", {
+    config: { rateLimit: { max: 2, timeWindow: "1 minute" } },
+  }, async (r) => {
+    await ctx.user(r, "teacher");
+    return { ok: true };
+  });
   app.post("/api/exams/import", {
     bodyLimit: 750000,
     config: { rateLimit: { max: 3, timeWindow: "1 minute" } },

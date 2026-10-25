@@ -43,6 +43,14 @@ export async function POST(request: Request) {
     const auth = await app.inject({ method: "GET", url: "/api/auth/me", headers: { cookie } });
     if (auth.statusCode !== 200) throw new InputError("ابتدا وارد حساب شوید", 401);
     if (auth.json().role !== "teacher") throw new InputError("فقط معلم می‌تواند آزمون وارد کند", 403);
+    const gate = await app.inject({
+      method: "POST", url: "/api/exams/upload-permission",
+      headers: { cookie, origin: allowed },
+      payload: {},
+    });
+    if (gate.statusCode !== 200)
+      throw new InputError(gate.statusCode === 429 ? "تعداد درخواست‌های آپلود بیش از حد مجاز است" : "اجازه آپلود صادر نشد", gate.statusCode);
+
     const length = Number(request.headers.get("content-length"));
     if (Number.isFinite(length) && length > MAX_UPLOAD_BYTES)
       throw new InputError("حجم فایل‌ها بیش از حد مجاز است", 413);
@@ -50,7 +58,7 @@ export async function POST(request: Request) {
     const formRequest = new Request("http://local.invalid", {
       method: "POST",
       headers: { "content-type": type },
-      body: bytes,
+      body: new Uint8Array(bytes).buffer,
     });
     const form = await formRequest.formData();
     const raw = form.get("metadata");

@@ -21,9 +21,10 @@ export async function pdfPages(file: File) {
     data: bytes, isEvalSupported: false, useSystemFonts: false,
     disableFontFace: true, stopAtErrors: true,
   });
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new PdfInputError("پردازش PDF بیش از حد طول کشید.")), 30000),
-  );
+  let deadline: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    deadline = setTimeout(() => reject(new PdfInputError("پردازش PDF بیش از حد طول کشید.")), 30000);
+  });
   try {
     const document = await Promise.race([loading.promise, timeout]);
     if (document.numPages > 40)
@@ -54,6 +55,7 @@ export async function pdfPages(file: File) {
     if (error instanceof PdfInputError) throw error;
     throw new PdfInputError("PDF قابل خواندن نیست؛ فایل را بررسی کنید.");
   } finally {
+    if (deadline) clearTimeout(deadline);
     await loading.destroy().catch(() => {});
   }
 }

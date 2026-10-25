@@ -59,11 +59,15 @@ export function ExamImportScreen({ nodes }: { nodes: Node[] }) {
       (file.type !== "" && !["application/pdf", "application/octet-stream"].includes(file.type)))) {
       setError("فقط PDF با حجم حداکثر ۱۰ مگابایت مجاز است.");
       e.target.value = "";
+      if (which === "questions") setQuestionsPdf(null);
+      else setAnswersPdf(null);
       return;
     }
     if (file && (await file.slice(0, 5).text()) !== "%PDF-") {
       setError("امضای PDF معتبر نیست.");
       e.target.value = "";
+      if (which === "questions") setQuestionsPdf(null);
+      else setAnswersPdf(null);
       return;
     }
     if (which === "questions") setQuestionsPdf(file);
