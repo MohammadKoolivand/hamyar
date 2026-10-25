@@ -9,6 +9,7 @@ export const examImportSchema = z.object({
   track: z.string().trim().max(100).optional(),
   year: z.number().int().min(1300).max(1500).optional(),
   source: questionSourceSchema,
+  ocrLanguage: z.enum(["fas", "eng", "fas+eng"]).default("fas"),
 });
 export const examDraftSchema = z.object({
   statement: z.string().trim().min(3).max(5000),
@@ -23,19 +24,41 @@ export const examDraftSchema = z.object({
 });
 export type ExamMetadata = z.infer<typeof examImportSchema>;
 export interface ExamFile {
+  id?: string;
   name: string;
   size: number;
   sha256: string;
 }
 export interface ExamImport extends ExamMetadata {
   _id: string;
-  state: "collecting" | "review";
+  state: "collecting" | "processing" | "failed" | "review";
   revision: number;
   createdAt: string;
   files?: { question?: ExamFile; answer?: ExamFile };
   questionText?: string;
   answerText?: string;
   extractionNotice?: string;
+  sourceExpiresAt?: string;
+  sourceDeletedAt?: string;
+  job?: {
+    _id: string;
+    state: string;
+    stage: string;
+    attempts: number;
+    processedPage?: number;
+    errorMessage?: string;
+  };
+  statistics?: {
+    pages: number;
+    answerPages: number;
+    questions: number;
+    fourOptions: number;
+    keys: number;
+    matched: number;
+    needsReview: number;
+    unmatchedKeys: unknown[];
+    keyWarnings: string[];
+  };
 }
 export interface ExamImportItem {
   _id: string;
@@ -52,6 +75,26 @@ export interface ExamImportItem {
     difficulty?: "easy" | "medium" | "hard";
     visuals?: import("./question-visuals").QuestionVisual[];
   };
+  extraction?: {
+    regions: {
+      page: number;
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }[];
+    method: string;
+    confidence: number | null;
+    warnings: string[];
+    answerMatch: {
+      status: string;
+      option: number | null;
+      matches: { page: number; number: number; option: number }[];
+      warnings: string[];
+    };
+  };
+  deferred?: boolean;
+  updatedAt?: string;
   originalNumber?: number | null;
   questionVersionId?: string;
 }

@@ -1,0 +1,167 @@
+{
+  "measuredAt": "2026-10-25T14:28:45.680Z",
+  "dataset": "Seven original synthetic PDF fixtures; 2 Persian arithmetic questions, 1 science question, text/scan/hybrid and table/image/conflicting keys. Not representative of national exams.",
+  "definitions": {
+    "questionDetectionRecall": "correctly detected labeled question numbers / expected questions",
+    "optionExtractionAccuracy": "exact normalized option text at correct question and option index / labeled options",
+    "keyAccuracy": "correct extracted number-option pairs / extracted pairs (precision)",
+    "keyRecall": "correct extracted number-option pairs / expected pairs",
+    "matchingAccuracy": "correct automatic matches by real question number / labeled questions",
+    "ocrCharacterErrorRate": "Levenshtein distance of normalized full scanned-page text to manually authored reference / reference characters; includes punctuation and reading order",
+    "millisecondsPerPage": "wall clock local extraction+render+OCR / page count"
+  },
+  "matchingAccuracy": 1,
+  "generalExamAccuracy": "Not measured",
+  "rows": [
+    {
+      "fixture": "text-fa",
+      "pages": 1,
+      "methods": [
+        "text"
+      ],
+      "millisecondsPerPage": 200,
+      "questionDetectionRecall": 1,
+      "optionExtractionAccuracy": 1,
+      "keyAccuracy": null,
+      "keyRecall": null,
+      "ocrCharacterErrorRate": null,
+      "questions": [
+        12,
+        19
+      ],
+      "keyEntries": 0,
+      "reviewWarnings": 3
+    },
+    {
+      "fixture": "scan-fa",
+      "pages": 1,
+      "methods": [
+        "ocr"
+      ],
+      "millisecondsPerPage": 551,
+      "questionDetectionRecall": 1,
+      "optionExtractionAccuracy": 1,
+      "keyAccuracy": null,
+      "keyRecall": null,
+      "ocrCharacterErrorRate": 0.03333333333333333,
+      "questions": [
+        12,
+        19
+      ],
+      "keyEntries": 0,
+      "reviewWarnings": 5
+    },
+    {
+      "fixture": "mixed-fa",
+      "pages": 1,
+      "methods": [
+        "hybrid"
+      ],
+      "millisecondsPerPage": 313,
+      "questionDetectionRecall": 1,
+      "optionExtractionAccuracy": 0.75,
+      "keyAccuracy": null,
+      "keyRecall": null,
+      "ocrCharacterErrorRate": null,
+      "questions": [
+        12,
+        2,
+        4,
+        19
+      ],
+      "keyEntries": 0,
+      "reviewWarnings": 14
+    },
+    {
+      "fixture": "science",
+      "pages": 1,
+      "methods": [
+        "text"
+      ],
+      "millisecondsPerPage": 115,
+      "questionDetectionRecall": 1,
+      "optionExtractionAccuracy": 1,
+      "keyAccuracy": null,
+      "keyRecall": null,
+      "ocrCharacterErrorRate": null,
+      "questions": [
+        31
+      ],
+      "keyEntries": 0,
+      "reviewWarnings": 2
+    },
+    {
+      "fixture": "key-table",
+      "pages": 1,
+      "methods": [
+        "text"
+      ],
+      "millisecondsPerPage": 103,
+      "questionDetectionRecall": null,
+      "optionExtractionAccuracy": null,
+      "keyAccuracy": 1,
+      "keyRecall": 1,
+      "ocrCharacterErrorRate": null,
+      "questions": [
+        12,
+        19
+      ],
+      "keyEntries": 2,
+      "reviewWarnings": 4
+    },
+    {
+      "fixture": "key-image",
+      "pages": 1,
+      "methods": [
+        "ocr"
+      ],
+      "millisecondsPerPage": 399,
+      "questionDetectionRecall": null,
+      "optionExtractionAccuracy": null,
+      "keyAccuracy": 0,
+      "keyRecall": 0,
+      "ocrCharacterErrorRate": null,
+      "questions": [
+        null
+      ],
+      "keyEntries": 0,
+      "reviewWarnings": 2
+    },
+    {
+      "fixture": "key-partial",
+      "pages": 1,
+      "methods": [
+        "ocr"
+      ],
+      "millisecondsPerPage": 313,
+      "questionDetectionRecall": null,
+      "optionExtractionAccuracy": null,
+      "keyAccuracy": null,
+      "keyRecall": null,
+      "ocrCharacterErrorRate": null,
+      "questions": [
+        12,
+        12,
+        77
+      ],
+      "keyEntries": 2,
+      "reviewWarnings": 12
+    }
+  ],
+  "versions": {
+    "engine": "Tesseract 5.x",
+    "modelVersion": "tessdata_fast 4.1.0",
+    "files": [
+      {
+        "name": "fas.traineddata",
+        "sha256": "db1c0a91208aff00d3cf1ed2c1d23f76419afd5f024688b4f71adc3f2ce4a505",
+        "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/4.1.0/fas.traineddata"
+      },
+      {
+        "name": "eng.traineddata",
+        "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+        "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/4.1.0/eng.traineddata"
+      }
+    ]
+  }
+}

@@ -35,7 +35,9 @@ export function AuthScreen({
 }) {
   return (
     <main className="mx-auto my-[5vh] max-w-[1120px] p-5 sm:p-8">
-      <div className="mb-7"><Brand size="lg" showTagline /></div>
+      <div className="mb-7">
+        <Brand size="lg" showTagline />
+      </div>
       <div className="grid items-stretch gap-6 min-[751px]:grid-cols-[1.05fr_1fr] max-[750px]:gap-5">
         <div className="glass-hero flex min-w-0 flex-col justify-center gap-4 p-8 leading-[2.2] sm:p-11 [&_h1]:text-[37px] [&_h1]:leading-[1.7] max-[650px]:[&_h1]:text-[27px]">
           <span className="glass-kicker inline-block w-fit px-4 py-1.5 text-xs">
@@ -50,14 +52,20 @@ export function AuthScreen({
             معلم آموزش می‌دهد، هدهد تمرین را همراهی می‌کند.
           </p>
           <div className="flex items-center gap-3">
-            <span className="hy-icon-container" data-tone="teal"><ShieldCheck size={22} aria-hidden /></span>
+            <span className="hy-icon-container" data-tone="teal">
+              <ShieldCheck size={22} aria-hidden />
+            </span>
             <small className="text-xs leading-loose text-slate-500">
               مسیر یادگیری زیر نظر معلم شما
             </small>
           </div>
           <div className="mt-3 flex items-center gap-3" aria-hidden>
-            <span className="hy-icon-container !size-14" data-tone="purple"><GraduationCap size={29} /></span>
-            <span className="hy-icon-container !size-14" data-tone="gold"><Sparkles size={27} /></span>
+            <span className="hy-icon-container !size-14" data-tone="purple">
+              <GraduationCap size={29} />
+            </span>
+            <span className="hy-icon-container !size-14" data-tone="gold">
+              <Sparkles size={27} />
+            </span>
           </div>
         </div>
         <section className="glass-panel min-w-0 p-7 max-[650px]:p-5 grid gap-[18px]">
@@ -90,14 +98,22 @@ export function AuthScreen({
                 />
               </Field>
             )}
-            <Field title="ایمیل">
+            <Field
+              title={
+                mode === "accept"
+                  ? "شماره موبایل دعوت‌شده"
+                  : mode === "login"
+                    ? "ایمیل یا شماره موبایل"
+                    : "ایمیل یا شماره موبایل"
+              }
+            >
               <input
                 required
-                type="email"
+                type={mode === "accept" ? "tel" : "text"}
                 dir="ltr"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
+                autoComplete={mode === "accept" ? "tel" : "username"}
                 className="w-full min-h-[46px] glass-field p-3"
               />
             </Field>
@@ -134,16 +150,24 @@ export function AuthScreen({
             <Button
               type="button"
               variant="outline"
-              onClick={() => setMode(mode === "register" ? "login" : "register")}
+              onClick={() =>
+                setMode(mode === "register" ? "login" : "register")
+              }
             >
               {mode === "register" ? "بازگشت به ورود" : "ثبت‌نام معلم"}
             </Button>
             <Button
               type="button"
               variant="outline"
-              onClick={() => setMode(mode === "register-student" ? "login" : "register-student")}
+              onClick={() =>
+                setMode(
+                  mode === "register-student" ? "login" : "register-student",
+                )
+              }
             >
-              {mode === "register-student" ? "بازگشت به ورود" : "ثبت‌نام دانش‌آموز"}
+              {mode === "register-student"
+                ? "بازگشت به ورود"
+                : "ثبت‌نام دانش‌آموز"}
             </Button>
             <Button
               type="button"

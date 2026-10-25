@@ -7,7 +7,7 @@ test("question collection filters, pages, modal and bulk add preserve all select
   await page.getByLabel("نام و نام خانوادگی").fill("معلم صفحه‌بندی");
   const stamp = Date.now();
   await page
-    .getByLabel("ایمیل", { exact: true })
+    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
     .fill(`pages-${stamp}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();

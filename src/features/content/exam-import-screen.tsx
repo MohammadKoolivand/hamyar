@@ -42,12 +42,24 @@ export function ExamImportScreen({
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
+  const [ocrLanguage, setOcrLanguage] = useState("fas");
   const [manual, setManual] = useState("");
+  const [reviewFilter, setReviewFilter] = useState("pending");
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [bulkConfirmed, setBulkConfirmed] = useState(false);
+  useEffect(() => {
+    if (!exam || exam.state !== "processing") return;
+    const timer = setInterval(() => {
+      void load(exam._id).catch(() => {});
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [exam?._id, exam?.state]);
   async function loadList() {
     setList(await api<ExamImport[]>("/exam-imports"));
   }
   async function load(id: string) {
     setExam(await api<Detail>(`/exam-imports/${id}`));
+    history.replaceState(null, "", `/exam-import?exam=${id}`);
   }
   async function run(work: () => Promise<void>) {
     setBusy(true);
@@ -63,6 +75,9 @@ export function ExamImportScreen({
   }
   useEffect(() => {
     let alive = true;
+    const restored = new URLSearchParams(location.search).get("exam");
+    if (restored && /^[a-f0-9-]{36}$/.test(restored))
+      void load(restored).catch((e) => setError(e.message));
     api<ExamImport[]>("/exam-imports")
       .then((rows) => {
         if (alive) setList(rows);
@@ -166,6 +181,7 @@ export function ExamImportScreen({
                   ...(track ? { track } : {}),
                   ...(year ? { year: Number(year) } : {}),
                   source,
+                  ocrLanguage,
                 });
                 await load(row._id);
                 await loadList();
@@ -174,6 +190,17 @@ export function ExamImportScreen({
           >
             <h3 className="font-bold">آزمون جدید</h3>
             <div className="grid gap-4 sm:grid-cols-2">
+              <Field title="زبان OCR">
+                <select
+                  className={style}
+                  value={ocrLanguage}
+                  onChange={(e) => setOcrLanguage(e.target.value)}
+                >
+                  <option value="fas">فارسی</option>
+                  <option value="eng">انگلیسی</option>
+                  <option value="fas+eng">فارسی و انگلیسی</option>
+                </select>
+              </Field>
               <Field title="عنوان آزمون">
                 <input
                   required
@@ -270,6 +297,7 @@ export function ExamImportScreen({
                 disabled={busy}
                 onClick={() => {
                   setExam(null);
+                  history.replaceState(null, "", "/exam-import");
                   void run(loadList);
                 }}
               >
@@ -285,6 +313,12 @@ export function ExamImportScreen({
               {(["question", "answer"] as const).map((kind) => (
                 <div
                   key={kind}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (exam.state === "collecting")
+                      void upload(e.dataTransfer.files[0] ?? null, kind);
+                  }}
                   className="grid min-w-0 gap-3 rounded-xl border border-dashed border-slate-300 p-4"
                 >
                   <span className="flex items-center gap-2 text-sm font-bold">
@@ -293,6 +327,25 @@ export function ExamImportScreen({
                       ? "دفترچه سؤال‌ها (الزامی)"
                       : "پاسخ‌نامه (اختیاری)"}
                   </span>
+                  {exam.state === "collecting" && exam.files?.[kind] && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={busy}
+                      onClick={() =>
+                        void run(async () => {
+                          const result = await fetch(
+                            `/api/exam-imports/${exam._id}/files/${kind}`,
+                            { method: "DELETE" },
+                          );
+                          if (!result.ok) throw new Error("حذف فایل انجام نشد");
+                          await load(exam._id);
+                        })
+                      }
+                    >
+                      حذف فایل انتخاب‌شده
+                    </Button>
+                  )}
                   {exam.state === "collecting" && (
                     <input
                       aria-label={
@@ -339,6 +392,130 @@ export function ExamImportScreen({
                   ? "در حال انجام…"
                   : "استخراج متن و ایجاد پیش‌نویس سؤال‌ها"}
               </Button>
+            )}
+            {exam.state === "processing" && (
+              <div
+                role="status"
+                className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 text-sm leading-7"
+              >
+                پردازش در صف پایدار سرور · مرحله: {exam.job?.stage ?? "queued"}
+                {exam.job?.processedPage
+                  ? ` · صفحه ${fa(exam.job.processedPage)}`
+                  : ""}
+                <p>
+                  می‌توانید صفحه را ببندید؛ پردازش در worker مستقل ادامه می‌یابد
+                  و نتیجه اینجا باقی می‌ماند.
+                </p>
+              </div>
+            )}
+            {exam.state === "failed" && (
+              <div role="alert" className="rounded-xl bg-rose-50 p-4 text-sm">
+                <p>{exam.job?.errorMessage ?? "پردازش ناموفق بود"}</p>
+                <Button
+                  type="button"
+                  disabled={busy || (exam.job?.attempts ?? 3) >= 3}
+                  onClick={() =>
+                    void run(async () => {
+                      await api(`/exam-imports/${exam._id}/retry`, {});
+                      await load(exam._id);
+                    })
+                  }
+                >
+                  تلاش مجدد پردازش
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() =>
+                    void run(async () => {
+                      await api(`/exam-imports/${exam._id}/manual-review`, {});
+                      await load(exam._id);
+                    })
+                  }
+                >
+                  ادامه با ورود دستی
+                </Button>
+              </div>
+            )}
+            {exam.statistics && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {[
+                  ["صفحات دفترچه", exam.statistics.pages],
+                  ["سؤال‌ها", exam.statistics.questions],
+                  ["چهارگزینه‌ای کامل", exam.statistics.fourOptions],
+                  ["کلید استخراج‌شده", exam.statistics.keys],
+                  ["تطبیق شماره معتبر", exam.statistics.matched],
+                  ["نیازمند بازبینی", exam.statistics.needsReview],
+                ].map(([label, count]) => (
+                  <div key={String(label)} className="glass-option p-3">
+                    <p className="text-xs text-slate-500">{label}</p>
+                    <strong className="text-xl text-[#233B8F]">
+                      {fa(Number(count))}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            )}
+            {exam.statistics?.keyWarnings.map((w) => (
+              <p key={w} className="text-sm text-amber-800">
+                {w}
+              </p>
+            ))}
+            {!!exam.statistics?.unmatchedKeys.length && (
+              <p className="text-sm text-amber-800">
+                {fa(exam.statistics.unmatchedKeys.length)} پاسخ کلید، سؤال
+                متناظر ندارد.
+              </p>
+            )}
+            {exam.state === "review" && (
+              <>
+                <details>
+                  <summary className="cursor-pointer text-sm text-[#233B8F]">
+                    مشاهده اصل صفحه پاسخ‌نامه
+                  </summary>
+                  {exam.files?.answer && !exam.sourceDeletedAt && (
+                    <a
+                      href={`/api/exam-imports/${exam._id}/pages/answer/1`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm underline"
+                    >
+                      بازکردن تصویر اصلی پاسخ‌نامه (صفحه اول)
+                    </a>
+                  )}
+                </details>
+                <p className="text-xs text-slate-500">
+                  منبع تا{" "}
+                  {exam.sourceExpiresAt
+                    ? new Date(exam.sourceExpiresAt).toLocaleDateString("fa-IR")
+                    : "پایان دوره نگهداری"}{" "}
+                  نگهداری می‌شود. پس از حذف، پیش‌نویس‌ها باقی می‌مانند؛ تصاویرِ
+                  سؤال‌های منتشرشده مستقل حفظ می‌شوند.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={busy || !!exam.sourceDeletedAt}
+                  onClick={() => {
+                    if (
+                      confirm(
+                        "اصل PDF و تصاویر موقت حذف شوند؟ سؤالات بانک حفظ خواهند شد.",
+                      )
+                    )
+                      void run(async () => {
+                        const res = await fetch(
+                          `/api/exam-imports/${exam._id}/files`,
+                          { method: "DELETE" },
+                        );
+                        if (!res.ok) throw new Error("حذف فایل انجام نشد");
+                        await load(exam._id);
+                      });
+                  }}
+                >
+                  حذف فایل‌های موقت منبع
+                </Button>
+              </>
             )}
             {exam.state === "review" && (
               <p className="rounded-xl bg-amber-50 p-4 text-sm leading-8 text-amber-900">
@@ -405,10 +582,78 @@ export function ExamImportScreen({
                     پیش‌نویسی استخراج نشد؛ از فرم بالا سؤال دستی اضافه کنید.
                   </p>
                 )}
-                <PagedList items={exam.items} label="سؤال‌های آزمون">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Field title="فیلتر بازبینی">
+                    <select
+                      className={style}
+                      value={reviewFilter}
+                      onChange={(e) => setReviewFilter(e.target.value)}
+                    >
+                      <option value="all">همه</option>
+                      <option value="pending">در انتظار</option>
+                      <option value="problems">دارای هشدار</option>
+                      <option value="deferred">بازبینی بعدی</option>
+                      <option value="approved">تأییدشده</option>
+                      <option value="rejected">ردشده</option>
+                    </select>
+                  </Field>
+                  <label className="text-sm">
+                    <input
+                      type="checkbox"
+                      checked={bulkConfirmed}
+                      onChange={(e) => setBulkConfirmed(e.target.checked)}
+                    />{" "}
+                    متن، شکل، گزینه و کلید همهٔ موارد انتخاب‌شده را بررسی
+                    کرده‌ام.
+                  </label>
+                  <Button
+                    type="button"
+                    disabled={busy || !bulkConfirmed || !selectedItems.length}
+                    onClick={() =>
+                      void run(async () => {
+                        const result = await api<{
+                          approved: string[];
+                          failed: { id: string; reason: string }[];
+                        }>(`/exam-imports/${exam._id}/approve-batch`, {
+                          itemIds: selectedItems,
+                          confirmed: true,
+                        });
+                        setSelectedItems([]);
+                        setBulkConfirmed(false);
+                        await load(exam._id);
+                        await onApproved();
+                        setNotice(
+                          `${fa(result.approved.length)} تأیید شد؛ ${fa(result.failed.length)} مورد معتبر نبود و در بازبینی ماند.`,
+                        );
+                      })
+                    }
+                  >
+                    تأیید گروهی موارد معتبر (حداکثر ۵۰)
+                  </Button>
+                </div>
+                <PagedList
+                  items={exam.items.filter((i) =>
+                    reviewFilter === "all" || reviewFilter === "problems"
+                      ? reviewFilter === "all" ||
+                        !!i.extraction?.warnings.length
+                      : reviewFilter === "deferred"
+                        ? !!i.deferred
+                        : i.state === reviewFilter,
+                  )}
+                  label="سؤال‌های آزمون"
+                >
                   {(item, index) => (
                     <ReviewItem
-                      key={item._id}
+                      key={`${item._id}-${item.updatedAt ?? ""}`}
+                      selected={selectedItems.includes(item._id)}
+                      onSelected={(checked) => {
+                        setBulkConfirmed(false);
+                        setSelectedItems((old) =>
+                          checked
+                            ? [...new Set([...old, item._id])]
+                            : old.filter((id) => id !== item._id),
+                        );
+                      }}
                       item={item}
                       index={index}
                       nodes={nodes}
@@ -440,17 +685,22 @@ export function ExamImportScreen({
 }
 function ReviewItem({
   item,
+  selected,
+  onSelected,
   index,
   nodes,
   busy,
   review,
 }: {
   item: ExamImportItem;
+  selected: boolean;
+  onSelected: (value: boolean) => void;
   index: number;
   nodes: Node[];
   busy: boolean;
   review: (body: unknown) => Promise<void>;
 }) {
+  const [sourceZoom, setSourceZoom] = useState(false);
   const [q, setQ] = useState(item.question),
     [confirmed, setConfirmed] = useState(false),
     [reason, setReason] = useState(""),
@@ -476,181 +726,261 @@ function ReviewItem({
       <summary className="cursor-pointer font-bold">
         پیش‌نویس سؤال {fa(index + 1)} · نیازمند بررسی
       </summary>
-      <form
-        className="mt-5 grid gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void review({
-            action: "approve",
-            confirmed: true,
-            question: q,
-            ...(originalNumber
-              ? { originalNumber: Number(originalNumber) }
-              : {}),
-          });
-        }}
-      >
-        <Field title={`صورت سؤال ${index + 1}`}>
-          <textarea
-            required
-            minLength={3}
-            maxLength={5000}
-            className={`${style} min-h-28`}
-            value={q.statement}
-            onChange={(e) => {
-              setQ({ ...q, statement: e.target.value });
-              setConfirmed(false);
-            }}
-          />
-        </Field>
-        <Field title={`شماره سؤال در دفترچه ${index + 1} (اختیاری)`}>
-          <input
-            type="number"
-            min={1}
-            max={10000}
-            className={style}
-            value={originalNumber}
-            onChange={(e) => {
-              setOriginalNumber(e.target.value);
-              setConfirmed(false);
-            }}
-          />
-        </Field>
-        <Field title={`روش پاسخ سؤال ${index + 1}`}>
-          <select
-            className={style}
-            value={q.type}
-            onChange={(e) => {
-              setQ({ ...q, type: e.target.value });
-              setConfirmed(false);
-            }}
-          >
-            <option value="essay">تشریحی با بررسی معلم</option>
-            <option value="numeric">عددی</option>
-            <option value="choice">چندگزینه‌ای</option>
-            <option value="short">پاسخ کوتاه</option>
-          </select>
-        </Field>
-        {q.type === "choice" && (
-          <Field title={`گزینه‌های سؤال ${index + 1} (هر خط یک گزینه)`}>
-            <textarea
-              className={style}
-              value={q.options.join("\n")}
-              onChange={(e) => {
-                setQ({
-                  ...q,
-                  options: e.target.value.split("\n").filter(Boolean),
-                });
-                setConfirmed(false);
-              }}
-            />
-          </Field>
-        )}
-        <Field title={`پاسخ مرجع سؤال ${index + 1}`}>
-          <textarea
-            required
-            maxLength={2000}
-            className={`${style} min-h-20`}
-            value={q.reference}
-            onChange={(e) => {
-              setQ({ ...q, reference: e.target.value });
-              setConfirmed(false);
-            }}
-          />
-        </Field>
-        <Field title={`درجه سختی سؤال ${index + 1}`}>
-          <select
-            className={style}
-            value={q.difficulty ?? ""}
-            onChange={(e) =>
-              setQ({
-                ...q,
-                difficulty: (e.target.value ||
-                  undefined) as typeof q.difficulty,
-              })
-            }
-          >
-            <option value="">تعیین نشده</option>
-            <option value="easy">آسان</option>
-            <option value="medium">متوسط</option>
-            <option value="hard">سخت</option>
-          </select>
-        </Field>
+      <div className="mt-4 grid gap-3">
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
-            checked={q.classification === "topic"}
-            onChange={(e) => {
-              setQ({
-                ...q,
-                classification: e.target.checked ? "topic" : "free",
-                topicId: undefined,
-              });
-              setConfirmed(false);
-            }}
+            checked={selected}
+            onChange={(e) => onSelected(e.target.checked)}
           />
-          اتصال این سؤال به مبحث درسی
+          انتخاب برای بررسی گروهی
         </label>
-        {q.classification === "topic" && (
-          <TopicSelector
-            context={`سؤال ${index + 1}`}
-            nodes={nodes}
-            value={q.topicId ?? ""}
-            onChange={(topicId) => {
-              setQ({ ...q, topicId: topicId || undefined });
-              setConfirmed(false);
-            }}
-          />
+        {item.extraction && (
+          <>
+            <p className="text-xs text-slate-500">
+              روش: {item.extraction.method} · اطمینان OCR:{" "}
+              {item.extraction.confidence === null
+                ? "محاسبه نشده"
+                : `${item.extraction.confidence.toFixed(1)} از ۱۰۰`}{" "}
+              · تطبیق: {item.extraction.answerMatch.status}
+            </p>
+            {item.extraction.regions.map((region, i) => (
+              <a
+                key={`page-${i}`}
+                className="text-xs text-blue-700 underline"
+                target="_blank"
+                rel="noreferrer"
+                href={`/api/exam-imports/${item.examId}/pages/question/${region.page}`}
+              >
+                اصل کامل صفحه {fa(region.page)}
+              </a>
+            ))}
+            {item.extraction.warnings.map((w) => (
+              <p
+                key={w}
+                className="rounded-lg bg-amber-50/60 p-2 text-xs text-amber-800"
+              >
+                {w}
+              </p>
+            ))}
+            {item.extraction.answerMatch.matches.map((match, i) => (
+              <a
+                key={i}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-blue-700 underline"
+                href={`/api/exam-imports/${item.examId}/pages/answer/${match.page}`}
+              >
+                کلید سؤال {fa(match.number)}، گزینه {fa(match.option)}؛ صفحه{" "}
+                {fa(match.page)}
+              </a>
+            ))}
+          </>
         )}
-        <details>
-          <summary className="cursor-pointer text-sm text-[#233B8F]">
-            افزودن یا اصلاح نمودار، شکل و فرمول
-          </summary>
-          <div className="mt-3">
-            <VisualEditor
-              value={q.visuals ?? []}
-              disabled={busy}
-              onChange={(visuals) => {
-                setQ({ ...q, visuals });
-                setConfirmed(false);
-              }}
-            />
+      </div>
+      <div className="mt-4 grid min-w-0 gap-5 lg:grid-cols-2">
+        <div className="min-w-0 space-y-3 lg:sticky lg:top-3 lg:self-start">
+          <h4 className="text-sm font-bold">اصل سؤال از PDF</h4>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setSourceZoom(!sourceZoom)}
+          >
+            {sourceZoom ? "اندازه عادی" : "بزرگ‌نمایی تصویر"}
+          </Button>
+          <div className="max-h-[70vh] overflow-auto rounded-xl border border-blue-100 bg-white p-3">
+            <div className={sourceZoom ? "min-w-[1100px]" : ""}>
+              <QuestionPresentation
+                statement="تصویر منبع؛ فرمول‌ها را با متن مقابل تطبیق دهید"
+                visuals={item.question.visuals}
+              />
+            </div>
           </div>
-        </details>
-        <div className="rounded-xl bg-slate-50 p-4">
-          <p className="mb-3 text-xs text-slate-500">پیش‌نمایش دانش‌آموز</p>
-          <QuestionPresentation statement={q.statement} visuals={q.visuals} />
         </div>
-        <label className="flex items-start gap-2 text-sm leading-7">
-          <input
-            type="checkbox"
-            className="mt-2"
-            checked={confirmed}
-            onChange={(e) => setConfirmed(e.target.checked)}
-          />
-          متن، پاسخ، تقسیم سؤال و شکل‌های لازم را با PDF تطبیق داده و صحت را
-          تأیید می‌کنم.
-        </label>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={busy || q.statement.trim().length < 3}
-          onClick={() =>
+        <form
+          className="mt-5 grid min-w-0 gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
             void review({
-              action: "save",
+              action: "approve",
+              confirmed: true,
               question: q,
               ...(originalNumber
                 ? { originalNumber: Number(originalNumber) }
                 : {}),
-            })
-          }
+            });
+          }}
         >
-          ذخیره اصلاحات سؤال {fa(index + 1)}
-        </Button>
-        <Button disabled={busy || !valid || !confirmed}>
-          تأیید و ورود سؤال {fa(index + 1)} به بانک
-        </Button>
-      </form>
+          <Field title={`صورت سؤال ${index + 1}`}>
+            <textarea
+              required
+              minLength={3}
+              maxLength={5000}
+              className={`${style} min-h-28`}
+              value={q.statement}
+              onChange={(e) => {
+                setQ({ ...q, statement: e.target.value });
+                setConfirmed(false);
+              }}
+            />
+          </Field>
+          <Field title={`شماره سؤال در دفترچه ${index + 1} (اختیاری)`}>
+            <input
+              type="number"
+              min={1}
+              max={10000}
+              className={style}
+              value={originalNumber}
+              onChange={(e) => {
+                setOriginalNumber(e.target.value);
+                setConfirmed(false);
+              }}
+            />
+          </Field>
+          <Field title={`روش پاسخ سؤال ${index + 1}`}>
+            <select
+              className={style}
+              value={q.type}
+              onChange={(e) => {
+                setQ({ ...q, type: e.target.value });
+                setConfirmed(false);
+              }}
+            >
+              <option value="essay">تشریحی با بررسی معلم</option>
+              <option value="numeric">عددی</option>
+              <option value="choice">چندگزینه‌ای</option>
+              <option value="short">پاسخ کوتاه</option>
+            </select>
+          </Field>
+          {q.type === "choice" && (
+            <Field title={`گزینه‌های سؤال ${index + 1} (هر خط یک گزینه)`}>
+              <textarea
+                className={style}
+                value={q.options.join("\n")}
+                onChange={(e) => {
+                  setQ({
+                    ...q,
+                    options: e.target.value.split("\n").filter(Boolean),
+                  });
+                  setConfirmed(false);
+                }}
+              />
+            </Field>
+          )}
+          <Field title={`پاسخ مرجع سؤال ${index + 1}`}>
+            <textarea
+              required
+              maxLength={2000}
+              className={`${style} min-h-20`}
+              value={q.reference}
+              onChange={(e) => {
+                setQ({ ...q, reference: e.target.value });
+                setConfirmed(false);
+              }}
+            />
+          </Field>
+          <Field title={`درجه سختی سؤال ${index + 1}`}>
+            <select
+              className={style}
+              value={q.difficulty ?? ""}
+              onChange={(e) =>
+                setQ({
+                  ...q,
+                  difficulty: (e.target.value ||
+                    undefined) as typeof q.difficulty,
+                })
+              }
+            >
+              <option value="">تعیین نشده</option>
+              <option value="easy">آسان</option>
+              <option value="medium">متوسط</option>
+              <option value="hard">سخت</option>
+            </select>
+          </Field>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={q.classification === "topic"}
+              onChange={(e) => {
+                setQ({
+                  ...q,
+                  classification: e.target.checked ? "topic" : "free",
+                  topicId: undefined,
+                });
+                setConfirmed(false);
+              }}
+            />
+            اتصال این سؤال به مبحث درسی
+          </label>
+          {q.classification === "topic" && (
+            <TopicSelector
+              context={`سؤال ${index + 1}`}
+              nodes={nodes}
+              value={q.topicId ?? ""}
+              onChange={(topicId) => {
+                setQ({ ...q, topicId: topicId || undefined });
+                setConfirmed(false);
+              }}
+            />
+          )}
+          <details>
+            <summary className="cursor-pointer text-sm text-[#233B8F]">
+              افزودن یا اصلاح نمودار، شکل و فرمول
+            </summary>
+            <div className="mt-3">
+              <VisualEditor
+                value={q.visuals ?? []}
+                disabled={busy}
+                onChange={(visuals) => {
+                  setQ({ ...q, visuals });
+                  setConfirmed(false);
+                }}
+              />
+            </div>
+          </details>
+          <div className="rounded-xl bg-slate-50 p-4">
+            <p className="mb-3 text-xs text-slate-500">پیش‌نمایش دانش‌آموز</p>
+            <QuestionPresentation statement={q.statement} visuals={q.visuals} />
+          </div>
+          <label className="flex items-start gap-2 text-sm leading-7">
+            <input
+              type="checkbox"
+              className="mt-2"
+              checked={confirmed}
+              onChange={(e) => setConfirmed(e.target.checked)}
+            />
+            متن، پاسخ، تقسیم سؤال و شکل‌های لازم را با PDF تطبیق داده و صحت را
+            تأیید می‌کنم.
+          </label>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy || q.statement.trim().length < 3}
+            onClick={() =>
+              void review({
+                action: "save",
+                question: q,
+                ...(originalNumber
+                  ? { originalNumber: Number(originalNumber) }
+                  : {}),
+              })
+            }
+          >
+            ذخیره اصلاحات سؤال {fa(index + 1)}
+          </Button>
+          <Button disabled={busy || !valid || !confirmed}>
+            تأیید و ورود سؤال {fa(index + 1)} به بانک
+          </Button>
+        </form>
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={busy}
+        onClick={() => void review({ action: "defer" })}
+      >
+        انتقال به بازبینی بعدی
+      </Button>
       <div className="mt-4 grid gap-3 border-t border-slate-200 pt-4">
         <Field title={`دلیل رد سؤال ${index + 1}`}>
           <input

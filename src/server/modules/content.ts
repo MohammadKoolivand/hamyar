@@ -23,7 +23,16 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       _id: assetId,
       ...(u.role === "teacher" ? { ownerId: u._id } : {}),
     });
-    if (!asset) ctx.fail(404, "تصویر یافت نشد");
+    const preview =
+      !asset && u.role === "teacher"
+        ? await c("examImportPreviewAssets").findOne({
+            _id: assetId,
+            ownerId: u._id,
+            expiresAt: { $gt: new Date() },
+          })
+        : null;
+    const imageAsset = asset ?? preview;
+    if (!imageAsset) ctx.fail(404, "تصویر یافت نشد");
     if (u.role === "student") {
       const versions = await c("questionVersions")
         .find(
@@ -45,9 +54,9 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       .header("Cache-Control", "private, no-store")
       .header("X-Content-Type-Options", "nosniff");
     return reply.send(
-      asset!.data instanceof Binary
-        ? Buffer.from(asset!.data.value())
-        : Buffer.from(asset!.data),
+      imageAsset!.data instanceof Binary
+        ? Buffer.from(imageAsset!.data.value())
+        : Buffer.from(imageAsset!.data),
     );
   });
   app.get("/api/curriculum/catalog", async (r) => {

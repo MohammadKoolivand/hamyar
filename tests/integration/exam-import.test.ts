@@ -1,3 +1,5 @@
+import { runNextExamJob } from "../../src/server/imports/jobs";
+import { createContext } from "../../src/server/context";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { fixture } from "../helpers/fixture";
@@ -69,6 +71,7 @@ test("exam PDF upload/download/extraction/save/review is durable, private, atomi
     const before = await f.c("questionVersions").countDocuments();
     await f.post(root + "/extract", {}, f.teacher, "extract-intent-1");
     await f.post(root + "/extract", {}, f.teacher, "extract-intent-2");
+    await runNextExamJob(createContext(f.db));
     const extracted = (await f.request(root, undefined, f.teacher)).json();
     assert.equal(extracted.items.length, 2, JSON.stringify(extracted));
     assert.equal(await f.c("questionVersions").countDocuments(), before);
@@ -136,7 +139,13 @@ test("exam PDF upload/download/extraction/save/review is durable, private, atomi
       .c("questionVersions")
       .findOne({ _id: approved.questionVersionId }))!;
     assert.equal(stored.year, 1405);
-    assert.deepEqual(stored.source, { ...metadata.source, questionNumber: 7 });
+    assert.deepEqual(stored.source, {
+      ...metadata.source,
+      questionNumber: 7,
+      sourceTitle: metadata.title,
+      subject: metadata.subject,
+      sourcePage: 1,
+    });
     assert.equal(stored.origin, "exam_import_reviewed");
     assert.equal(
       (await f.request(review, approve, f.teacher, "second-approve-key"))
@@ -200,9 +209,11 @@ test("textless PDF stays review-only, manual fallback works and ordinary JSON re
     });
     assert.equal(upload.statusCode, 200);
     await f.post(root + "/extract", {}, f.teacher);
+    await runNextExamJob(createContext(f.db));
     const detail = (await f.request(root, undefined, f.teacher)).json();
     assert.equal(detail.items.length, 0);
-    assert.ok(detail.extractionNotice.includes("OCR"));
+    assert.equal(detail.state, "review");
+    assert.equal(detail.statistics.pages, 1);
     const item = await f.post(
       root + "/items",
       { statement: "سؤال دستی از فایل اسکن" },

@@ -36,12 +36,17 @@ jobs:
           done
           docker compose logs mongo
           exit 1
+      - name: Install local document tools
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils tesseract-ocr
+      - run: npm run ocr:setup
       - run: cp .env.example .env
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
       - run: npm test
       - run: npx playwright install --with-deps chromium
+      - name: Start durable exam worker
+        run: npm run worker:exams > /tmp/hodhod-worker.log 2>&1 &
       - name: Validate UI and capture light glass screenshots
         run: npm run test:e2e
         env:

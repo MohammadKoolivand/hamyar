@@ -6,13 +6,11 @@ test("teacher selects a live AvalAI chat model in settings, persists it and sees
   await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
   await page.getByLabel("نام و نام خانوادگی").fill("معلم تنظیم مدل");
   await page
-    .getByLabel("ایمیل", { exact: true })
+    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
     .fill(`model-${Date.now()}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page
-    .getByRole("button", { name: "ورود به همیار", exact: true })
-    .click();
+  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
   await page.getByRole("button", { name: "تنظیمات", exact: true }).click();
   await expect(page).toHaveURL(/\/settings$/);
   const owner = page.getByLabel("ارائه‌دهنده مدل AvvalAI");

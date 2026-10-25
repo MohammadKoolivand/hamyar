@@ -3,8 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "admin:bootstrap": "node --env-file-if-exists=.env --import tsx scripts/bootstrap-superadmin.ts",
+    "worker:exams": "node --env-file-if-exists=.env --import tsx scripts/exam-worker.ts",
+    "ocr:setup": "node scripts/setup-ocr.mjs",
     "dev": "node scripts/check-dev-port.mjs && next dev --hostname 127.0.0.1 --port 5174",
-    "build": "next build && node scripts/pwa.mjs",
+    "build": "next build --webpack && node scripts/pwa.mjs",
     "start": "next start --hostname 127.0.0.1 --port 5174",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
@@ -37,10 +40,13 @@
     "mathjs": "^15.2.0",
     "mongodb": "^6.20.0",
     "next": "^16.4.2",
+    "pdfjs-dist": "^6.4.299",
     "postcss": "^8.5.31",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "sharp": "^0.35.5",
     "tailwind-merge": "^3.3.0",
+    "tsx": "^4.23.15",
     "zod": "^4.1.0"
   },
   "devDependencies": {
@@ -52,7 +58,6 @@
     "eslint": "^9.36.0",
     "prettier": "^3.9.10",
     "tailwindcss": "^4.1.0",
-    "tsx": "^4.20.0",
     "typescript": "^5.9.0",
     "typescript-eslint": "^8.44.0"
   }

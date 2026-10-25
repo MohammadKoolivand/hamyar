@@ -1,0 +1,27 @@
+[Unit]
+Description=Hodhod local exam import worker
+After=network.target
+
+[Service]
+Type=simple
+User=hodhod
+Group=hodhod
+WorkingDirectory=/srv/hodhod
+EnvironmentFile=/srv/hodhod/.env
+ExecStart=/usr/bin/node --env-file-if-exists=.env --import tsx scripts/exam-worker.ts
+Restart=on-failure
+RestartSec=5
+KillMode=control-group
+TimeoutStopSec=30
+MemoryMax=1500M
+CPUQuota=100%
+TasksMax=64
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/hodhod/.private
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

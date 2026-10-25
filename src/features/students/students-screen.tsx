@@ -42,7 +42,7 @@ export function StudentsScreen({
             e.preventDefault();
             run(async () => {
               const d = await api<{ token: string }>("/invitations", {
-                email: inviteEmail,
+                phone: inviteEmail,
                 ...(inviteCourseId ? { courseId: inviteCourseId } : {}),
               });
               setInviteToken(d.token);
@@ -50,10 +50,13 @@ export function StudentsScreen({
           }}
           className="grid gap-[18px]"
         >
-          <Field title="ایمیل دانش‌آموز">
+          <Field title="شماره موبایل دانش‌آموز">
             <input
               required
-              type="email"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder="09123456789"
               dir="ltr"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
@@ -84,7 +87,7 @@ export function StudentsScreen({
         {inviteToken && (
           <div className="glass-note p-3.5 leading-[1.9] grid gap-[18px]">
             <small className="text-xs leading-loose text-slate-500">
-              لینک دعوت (ارسال ایمیل انجام نمی‌شود)
+              لینک دعوت (ارسال پیامک انجام نمی‌شود)
             </small>
             <p className="[direction:ltr] [overflow-wrap:anywhere] font-mono select-all">
               {location.origin}/?invite={inviteToken}
@@ -108,7 +111,7 @@ export function StudentsScreen({
             <div key={s._id} className="grid gap-3 glass-option p-[18px]">
               <h3 className="text-base font-bold">{s.name}</h3>
               <small dir="ltr" className="text-xs leading-loose text-slate-500">
-                {s.email}
+                {s.phone ?? s.email}
               </small>
               <ParentInvitation studentId={s._id} />
             </div>

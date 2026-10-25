@@ -10,7 +10,7 @@ export function ParentInvitation({ studentId }: { studentId: string }) {
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [parents, setParents] = useState<
-      { _id: string; name: string; email: string }[]
+      { _id: string; name: string; email?: string; phone?: string }[]
     >([]);
   const refresh = () =>
     api<typeof parents>(`/students/${studentId}/parents`).then(setParents);
@@ -42,7 +42,7 @@ export function ParentInvitation({ studentId }: { studentId: string }) {
           e.preventDefault();
           void run(async () => {
             const d = await api<{ token: string }>("/invitations", {
-              email,
+              phone: email,
               role: "parent",
               studentId,
             });
@@ -50,10 +50,13 @@ export function ParentInvitation({ studentId }: { studentId: string }) {
           });
         }}
       >
-        <Field title="ایمیل ولی دانش‌آموز">
+        <Field title="شماره موبایل ولی دانش‌آموز">
           <input
             required
-            type="email"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="09123456789"
             dir="ltr"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +85,7 @@ export function ParentInvitation({ studentId }: { studentId: string }) {
           <div key={p._id} className="mt-3 grid gap-2 rounded-xl border p-3">
             <p>{p.name}</p>
             <p dir="ltr" className="break-all text-xs">
-              {p.email}
+              {p.phone ?? p.email}
             </p>
             <Button
               variant="outline"

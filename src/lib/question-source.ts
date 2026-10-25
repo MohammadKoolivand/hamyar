@@ -37,6 +37,8 @@ export const questionSourceSchema = z
     stage: z.string().trim().min(1).max(100).optional(),
     bookletCode: z.string().trim().min(1).max(80).optional(),
     questionNumber: z.number().int().min(1).max(10000).optional(),
+    grade: z.string().trim().max(100).optional(),
+    track: z.string().trim().max(100).optional(),
     sourceTitle: z.string().trim().min(1).max(200).optional(),
     examDate: z
       .string()

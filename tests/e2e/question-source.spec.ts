@@ -6,7 +6,7 @@ test("exam taxonomy is visible in bank and saved from authoring with category-sp
   await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
   await page.getByLabel("نام و نام خانوادگی").fill("معلم دسته‌بندی");
   await page
-    .getByLabel("ایمیل", { exact: true })
+    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
     .fill(`taxonomy-${Date.now()}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();

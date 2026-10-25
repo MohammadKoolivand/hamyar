@@ -1,3 +1,5 @@
+import { loginIdentifierSchema } from "../lib/phone";
+import { roleSchema } from "../lib/access";
 import type { FastifyRequest } from "fastify";
 import type { Db } from "mongodb";
 import {
@@ -14,10 +16,7 @@ const id = () => randomUUID(),
   now = () => new Date().toISOString(),
   hash = (s: string) => createHash("sha256").update(s).digest("hex");
 const credentials = z.object({
-  email: z
-    .email()
-    .max(254)
-    .transform((s) => s.toLowerCase()),
+  email: loginIdentifierSchema,
   password: z.string().min(10).max(128),
 });
 const fail = (status: number, message: string) => {
@@ -35,7 +34,9 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
     });
     if (!session) fail(401, "نشست منقضی شده است");
     const u = await c("users").findOne({ _id: session!.userId });
-    if (!u) fail(401, "حساب یافت نشد");
+    if (!u || u.disabledAt) fail(401, "حساب فعال یافت نشد");
+    if (!roleSchema.safeParse(u!.role).success)
+      fail(403, "نقش حساب معتبر نیست");
     if (role && u!.role !== role) fail(403, "دسترسی مجاز نیست");
     return u!;
   }
@@ -43,6 +44,7 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
     _id: u._id,
     name: u.name,
     email: u.email,
+    phone: u.phone,
     role: u.role,
   });
   async function audit(actorId: string, action: string, resourceId: string) {

@@ -1,3 +1,8 @@
+import {
+  accountContact,
+  invitationContactSchema,
+  phoneSchema,
+} from "../../lib/phone";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
 import { z } from "zod";
@@ -18,25 +23,34 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
     scryptSync,
     timingSafeEqual,
   } = ctx;
-  async function addEnrollment(inv: Row, studentId: string, session: ClientSession) {
+  async function addEnrollment(
+    inv: Row,
+    studentId: string,
+    session: ClientSession,
+  ) {
     // Legacy teacher-only invitations intentionally remain valid without a course.
     if (!inv.courseId) return;
-    const course = await c("courses").findOne({
-      _id: inv.courseId,
-      teacherId: inv.teacherId,
-      status: "active",
-    }, { session });
+    const course = await c("courses").findOne(
+      {
+        _id: inv.courseId,
+        teacherId: inv.teacherId,
+        status: "active",
+      },
+      { session },
+    );
     if (!course) fail(404, "این درس دیگر در دسترس نیست");
     await c("enrollments").updateOne(
       { courseId: course!._id, studentId },
-      { $setOnInsert: {
-        _id: id(),
-        courseId: course!._id,
-        teacherId: inv.teacherId,
-        studentId,
-        status: "active",
-        createdAt: now(),
-      } },
+      {
+        $setOnInsert: {
+          _id: id(),
+          courseId: course!._id,
+          teacherId: inv.teacherId,
+          studentId,
+          status: "active",
+          createdAt: now(),
+        },
+      },
       { upsert: true, session },
     );
   }
@@ -57,7 +71,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
       await c("users").insertOne({
         _id: uid,
         name: b.name,
-        email: b.email,
+        ...accountContact(b.email),
         role: b.role,
         passwordHash:
           salt + ":" + scryptSync(b.password, salt, 64).toString("hex"),
@@ -71,7 +85,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
     { config: { rateLimit: { max: 10, timeWindow: "1 minute" } } },
     async (r, reply) => {
       const b = credentials.parse(r.body),
-        u = await c("users").findOne({ email: b.email });
+        u = await c("users").findOne(accountContact(b.email));
       const [salt, digest] = (
         u?.passwordHash ?? "invalid:" + "0".repeat(128)
       ).split(":");
@@ -81,7 +95,8 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
           scryptSync(b.password, salt, 64),
         )
       )
-        fail(401, "ایمیل یا رمز نادرست است");
+        fail(401, "شماره موبایل، ایمیل یا رمز نادرست است");
+      if (u?.disabledAt) fail(401, "شماره موبایل، ایمیل یا رمز نادرست است");
       const token = randomBytes(32).toString("hex");
       await c("sessions").insertOne({
         _id: id(),
@@ -111,9 +126,8 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
   });
   app.post("/api/invitations", async (r) => {
     const u = await user(r, "teacher"),
-      b = z
-        .object({
-          email: z.email().transform((s) => s.toLowerCase()),
+      b = invitationContactSchema
+        .safeExtend({
           role: z.enum(["student", "parent"]).default("student"),
           studentId: z.string().uuid().optional(),
           courseId: z.string().uuid().optional(),
@@ -144,12 +158,12 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
       role: b.role,
       ...(b.role === "parent" ? { studentId: b.studentId } : {}),
       ...(b.role === "student" && b.courseId ? { courseId: b.courseId } : {}),
-      email: b.email,
+      ...(b.phone ? { phone: b.phone } : { email: b.email }),
       tokenHash: hash(token),
       expiresAt: new Date(Date.now() + 72 * 3600000),
       usedAt: null,
     });
-    await audit(u._id, "invite", b.email);
+    await audit(u._id, "invite", "invitation_created");
     return { token, expiresInHours: 72 };
   });
   app.post(
@@ -164,16 +178,19 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
       },
     },
     async (r) => {
-      const b = credentials
-        .extend({
+      const b = invitationContactSchema
+        .safeExtend({
+          password: z.string().min(10).max(128),
           name: z.string().min(2).max(100),
           token: z.string().min(20).max(100),
         })
         .parse(r.body);
-      const existing = await c("users").findOne({ email: b.email });
+      const contact = b.phone ? { phone: b.phone } : { email: b.email! };
+      const existing = await c("users").findOne(contact);
       if (existing) {
         const [salt, digest] = existing.passwordHash.split(":");
         if (
+          existing.disabledAt ||
           !["student", "parent"].includes(existing.role) ||
           !timingSafeEqual(
             Buffer.from(digest, "hex"),
@@ -186,7 +203,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
         const inv = await c("invitations").findOneAndUpdate(
           {
             tokenHash: hash(b.token),
-            email: b.email,
+            ...contact,
             usedAt: null,
             expiresAt: { $gt: new Date() },
           },
@@ -212,7 +229,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
             {
               _id: uid,
               name: b.name,
-              email: b.email,
+              ...contact,
               role,
               passwordHash:
                 salt + ":" + scryptSync(b.password, salt, 64).toString("hex"),
@@ -267,18 +284,31 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
       });
     },
   );
-  // An existing, signed-in student can accept a teacher's email-bound
+  // An existing, signed-in student can accept a teacher's contact-bound
   // invitation without creating another account or re-entering a password.
   app.post("/api/invitations/claim", async (r) => {
     const student = await user(r, "student");
-    const { token } = z
-      .object({ token: z.string().min(20).max(100) })
+    const { token, phone } = z
+      .object({
+        token: z.string().min(20).max(100),
+        phone: phoneSchema.optional(),
+      })
       .parse(r.body);
+    if (phone && student.phone && phone !== student.phone)
+      fail(400, "شماره موبایل با حساب شما مطابقت ندارد");
+    const claimedPhone = student.phone ?? phone;
     return ctx.transaction(async (session) => {
       const inv = await c("invitations").findOneAndUpdate(
         {
           tokenHash: hash(token),
-          email: student.email,
+          ...(claimedPhone
+            ? {
+                $or: [
+                  { phone: claimedPhone },
+                  ...(student.email ? [{ email: student.email }] : []),
+                ],
+              }
+            : { email: student.email }),
           role: "student",
           usedAt: null,
           expiresAt: { $gt: new Date() },
@@ -287,6 +317,15 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
         { returnDocument: "after", session },
       );
       if (!inv) fail(400, "دعوت نامعتبر یا منقضی شده");
+      if (inv!.phone && !student.phone) {
+        const linked = await c("users").updateOne(
+          { _id: student._id, phone: { $exists: false } },
+          { $set: { phone: inv!.phone } },
+          { session },
+        );
+        if (!linked.modifiedCount)
+          fail(409, "شماره حساب تغییر کرده؛ دوباره وارد شوید");
+      }
       await c("relations").updateOne(
         { teacherId: inv!.teacherId, studentId: student._id },
         {
@@ -324,7 +363,12 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
       await c("users")
         .find({ _id: { $in: links.map((l) => l.parentId) } })
         .toArray()
-    ).map((s) => ({ _id: s._id, name: s.name, email: s.email }));
+    ).map((s) => ({
+      _id: s._id,
+      name: s.name,
+      email: s.email,
+      phone: s.phone,
+    }));
   });
   app.post("/api/students/:sid/parents/:pid/revoke", async (r) => {
     const u = await user(r, "teacher"),
@@ -347,7 +391,14 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
             {
               teacherId: u._id,
               studentId: sid,
-              email: p.email,
+              ...(p.phone
+                ? {
+                    $or: [
+                      { phone: p.phone },
+                      ...(p.email ? [{ email: p.email }] : []),
+                    ],
+                  }
+                : { email: p.email }),
               role: "parent",
               usedAt: null,
             },

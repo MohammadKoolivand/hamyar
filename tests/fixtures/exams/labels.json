@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "number": 12,
+      "options": [
+        "چهار",
+        "شش",
+        "پنج",
+        "هفت"
+      ],
+      "correctOption": 3
+    },
+    {
+      "number": 19,
+      "options": [
+        "دو",
+        "سه",
+        "چهار",
+        "پنج"
+      ],
+      "correctOption": 1
+    }
+  ],
+  "keyEntries": [
+    {
+      "number": 12,
+      "option": 3
+    },
+    {
+      "number": 19,
+      "option": 1
+    }
+  ],
+  "limitations": "Small synthetic fixture set; metrics do not represent real exam accuracy. Marked-bubble image keys require manual review."
+}

@@ -14,6 +14,7 @@ export function StudentJoinTeacher({
   onJoined: () => Promise<void>;
 }) {
   const [token, setToken] = useState(invitationToken ?? "");
+  const [phone, setPhone] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -28,8 +29,13 @@ export function StudentJoinTeacher({
     setError("");
     setNotice("");
     try {
-      await api("/invitations/claim", { token: token.trim() });
-      setNotice("اتصال به معلم انجام شد. مأموریت‌های جدید پس از انتشار معلم نمایش داده می‌شوند.");
+      await api("/invitations/claim", {
+        token: token.trim(),
+        ...(phone.trim() ? { phone } : {}),
+      });
+      setNotice(
+        "اتصال به معلم انجام شد. مأموریت‌های جدید پس از انتشار معلم نمایش داده می‌شوند.",
+      );
       setToken("");
       await onJoined();
     } catch (e) {
@@ -40,15 +46,35 @@ export function StudentJoinTeacher({
   }
 
   return (
-    <section id="join-teacher" className="glass-panel grid gap-4 p-6 max-[650px]:p-5">
+    <section
+      id="join-teacher"
+      className="glass-panel grid gap-4 p-6 max-[650px]:p-5"
+    >
       <div className="flex items-center gap-3">
         <Link2 size={21} color="#2ec8c3" aria-hidden />
         <h2 className="text-lg font-bold">اتصال به معلم</h2>
       </div>
       <p className="text-sm leading-loose text-slate-600">
-        حساب شما مستقل است. برای دریافت مأموریت‌های یک معلم، از او لینک یا کد دعوت مخصوص ایمیل همین حساب را بگیرید. اتصال به معلم حساب جدیدی ایجاد نمی‌کند.
+        حساب شما مستقل است. برای دریافت مأموریت‌های یک معلم، از او لینک یا کد
+        دعوت مخصوص شماره موبایل همین حساب را بگیرید. اتصال به معلم حساب جدیدی
+        ایجاد نمی‌کند.
       </p>
-      <form className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end" onSubmit={(e) => void submit(e)}>
+      <form
+        className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
+        onSubmit={(e) => void submit(e)}
+      >
+        <Field title="شماره موبایل دعوت‌شده">
+          <input
+            type="tel"
+            inputMode="tel"
+            dir="ltr"
+            autoComplete="tel"
+            placeholder="09123456789"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="glass-field min-h-[46px] w-full p-3"
+          />
+        </Field>
         <Field title="کد دعوت معلم">
           <input
             autoComplete="off"
@@ -66,8 +92,16 @@ export function StudentJoinTeacher({
           {busy ? "در حال بررسی..." : "اتصال به معلم"}
         </Button>
       </form>
-      {error && <p role="alert" className="text-sm text-rose-800">{error}</p>}
-      {notice && <p role="status" className="text-sm text-emerald-800">{notice}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-rose-800">
+          {error}
+        </p>
+      )}
+      {notice && (
+        <p role="status" className="text-sm text-emerald-800">
+          {notice}
+        </p>
+      )}
     </section>
   );
 }

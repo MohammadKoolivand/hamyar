@@ -1,0 +1,125 @@
+import { test, expect } from "@playwright/test";
+import { fixture } from "../helpers/fixture";
+import { createContext } from "../../src/server/context";
+import { bootstrapSuperadmin } from "../../src/server/access-bootstrap";
+test.use({ serviceWorkers: "block" });
+test("super admin creates scoped secretary and secretary uses a separate operational panel", async ({
+  page,
+}, testInfo) => {
+  const f = await fixture();
+  try {
+    await bootstrapSuperadmin(createContext(f.db), {
+      name: "مدیر آزمایشی",
+      email: "admin@ui.test",
+      password: "AdminStrongPass123!",
+    });
+    // Browser uses the real Fastify backend and MongoDB fixture. Only transport is redirected;
+    // no responses or authorization decisions are mocked and production users are untouched.
+    await page.route("**/api/**", async (route) => {
+      const req = route.request();
+      const url = new URL(req.url());
+      const reply = await f.app.inject({
+        method: req.method() as "GET" | "POST" | "DELETE",
+        url: url.pathname + url.search,
+        headers: req.headers(),
+        ...(req.postDataBuffer() ? { payload: req.postDataBuffer()! } : {}),
+      });
+      await route.fulfill({
+        status: reply.statusCode,
+        headers: Object.fromEntries(
+          Object.entries(reply.headers).map(([k, v]) => [
+            k,
+            Array.isArray(v) ? v.join(",") : String(v),
+          ]),
+        ),
+        body: reply.rawPayload,
+      });
+    });
+    await page.goto("/");
+    await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill("admin@ui.test");
+    await page.getByLabel("رمز عبور").fill("AdminStrongPass123!");
+    await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+    await expect(
+      page.getByRole("heading", {
+        name: "مدیریت سامانه و دسترسی‌ها",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await page.getByLabel("نام کاربر", { exact: true }).fill("منشی آزمایشی");
+    await page
+      .getByLabel("ایمیل کاربر", { exact: true })
+      .fill("secretary@ui.test");
+    await page.getByLabel("رمز اولیه", { exact: true }).fill("StaffStrong123!");
+    await page.getByRole("button", { name: "ایجاد حساب", exact: true }).click();
+    await expect(page.getByRole("status")).toContainText("حساب ساخته شد");
+    await page
+      .getByLabel("منشی", { exact: true })
+      .selectOption({ label: "منشی آزمایشی" });
+    await page
+      .getByLabel("معلم مسئول", { exact: true })
+      .selectOption({ label: "Teacher" });
+    await page
+      .getByLabel("ایجاد دعوت دانش‌آموز و والدین", { exact: true })
+      .check();
+    await page
+      .getByRole("button", { name: "ذخیره دسترسی منشی", exact: true })
+      .click();
+    await expect(page.getByRole("status")).toContainText("واگذار شد");
+    await page.screenshot({
+      path: testInfo.outputPath("superadmin.png"),
+      fullPage: true,
+    });
+    await page.getByRole("button", { name: "خروج", exact: true }).click();
+    await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill("secretary@ui.test");
+    await page.getByLabel("رمز عبور").fill("StaffStrong123!");
+    await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+    await expect(
+      page.getByRole("heading", { name: "امور اجرایی", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: "مدیریت سامانه و دسترسی‌ها",
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    await page
+      .getByLabel("انتخاب حوزه معلم", { exact: true })
+      .selectOption({ label: "Teacher" });
+    await expect(page.getByText("Student", { exact: true })).toBeVisible();
+    await page.getByLabel("شماره موبایل دعوت", { exact: true }).fill("09123456789");
+    await page.getByRole("button", { name: "ساخت دعوت", exact: true }).click();
+    await expect(page.getByText(/\?invite=/)).toBeVisible();
+    expect(
+      await page.evaluate(async () => (await fetch("/api/questions")).status),
+    ).toBe(403);
+    expect(
+      await page.evaluate(async () => (await fetch("/api/admin/users")).status),
+    ).toBe(403);
+    const invitationText = await page.getByText(/\?invite=/).innerText();
+    const inviteToken = invitationText.match(/invite=([a-f0-9]+)/)![1];
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBeTruthy();
+    await page.screenshot({
+      path: testInfo.outputPath("secretary-mobile.png"),
+      fullPage: true,
+    });
+    await page.getByRole("button", { name: "خروج", exact: true }).click();
+    await page.goto("/?invite=" + inviteToken);
+    await page.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز دعوت موبایلی");
+    await page.getByLabel("شماره موبایل دعوت‌شده", { exact: true }).fill("۰۹۱۲۳۴۵۶۷۸۹");
+    await page.getByLabel("رمز عبور").fill("StrongPass123!");
+    await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
+    await expect(page.getByLabel("ایمیل یا شماره موبایل", { exact: true })).toBeVisible();
+    await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill("+989123456789");
+    await page.getByLabel("رمز عبور").fill("StrongPass123!");
+    await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+    await expect(page.getByRole("button", { name: "خروج", exact: true })).toBeVisible();
+    expect(await page.evaluate(async () => (await (await fetch("/api/auth/me")).json()).phone)).toBe("09123456789");
+  } finally {
+    await f.close();
+  }
+});

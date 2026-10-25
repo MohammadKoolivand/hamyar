@@ -96,8 +96,9 @@ export interface StudentDashboardData {
 export interface User {
   _id: string;
   name: string;
-  email: string;
-  role: "teacher" | "student" | "parent";
+  email?: string;
+  phone?: string;
+  role: import("./access").Role;
 }
 export interface Node {
   _id: string;

@@ -1,4 +1,6 @@
 import Fastify from "fastify";
+import { routeRoles } from "../lib/access";
+import { registerAccessManagement } from "./modules/access-management";
 import { AvalaiClient } from "./ai/avalai";
 import { registerAiSettings } from "./modules/ai-settings";
 import cookie from "@fastify/cookie";
@@ -132,6 +134,16 @@ export async function buildApp(
       },
     };
   });
+  app.addHook("preHandler", async (r) => {
+    const route = r.routeOptions.url;
+    if (!route) return;
+    const roles = routeRoles(r.method, route);
+    if (roles === null) return;
+    const actor = await ctx.user(r);
+    if (!roles.includes(actor.role))
+      ctx.fail(403, "دسترسی این نقش به این عملیات مجاز نیست");
+  });
+  registerAccessManagement(app, ctx);
   registerIdentity(app, ctx);
   registerCourses(app, ctx);
   registerClassGroups(app, ctx);

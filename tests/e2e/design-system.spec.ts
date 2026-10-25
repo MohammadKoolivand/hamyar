@@ -1,6 +1,8 @@
 import { test, expect } from "@playwright/test";
 
-test("reference-inspired luminous glass identity is consistent on login and mobile", async ({ page }, testInfo) => {
+test("reference-inspired luminous glass identity is consistent on login and mobile", async ({
+  page,
+}, testInfo) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
   await expect(page.locator(".hy-brand")).toBeVisible();
@@ -17,7 +19,10 @@ test("reference-inspired luminous glass identity is consistent on login and mobi
     return {
       primary: tokens.getPropertyValue("--hy-primary").trim().toLowerCase(),
       teal: tokens.getPropertyValue("--hy-secondary").trim().toLowerCase(),
-      background: tokens.getPropertyValue("--hy-background").trim().toLowerCase(),
+      background: tokens
+        .getPropertyValue("--hy-background")
+        .trim()
+        .toLowerCase(),
       blur: panel?.backdropFilter ?? "",
       radius: panel?.borderRadius ?? "",
       direction: document.documentElement.dir,
@@ -29,16 +34,27 @@ test("reference-inspired luminous glass identity is consistent on login and mobi
   expect(visual.blur).toContain("blur(");
   expect(parseFloat(visual.radius)).toBeGreaterThanOrEqual(20);
   expect(visual.direction).toBe("rtl");
-  await page.screenshot({ path: testInfo.outputPath("luminous-login-desktop.png"), fullPage: true });
+  await page.screenshot({
+    path: testInfo.outputPath("luminous-login-desktop.png"),
+    fullPage: true,
+  });
 
   await page.setViewportSize({ width: 360, height: 780 });
   await page.reload();
   await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await page.screenshot({ path: testInfo.outputPath("luminous-login-mobile.png"), fullPage: true });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: testInfo.outputPath("luminous-login-mobile.png"),
+    fullPage: true,
+  });
 
   await page.emulateMedia({ reducedMotion: "reduce" });
-  const duration = await page.getByRole("button", { name: "ورود به همیار" })
+  const duration = await page
+    .getByRole("button", { name: /^ورود به (همیار|هدهد)$/ })
     .evaluate((el) => getComputedStyle(el).transitionDuration);
   expect(duration).toMatch(/^(0s|0ms)(,\s*(0s|0ms))*$/);
 });

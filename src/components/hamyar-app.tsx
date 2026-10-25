@@ -1,4 +1,5 @@
 "use client";
+import { AccessConsole } from "@/features/access/access-console";
 import { clsx } from "clsx";
 
 import React, { useState, useEffect, type FormEvent } from "react";
@@ -104,7 +105,7 @@ export default function HamyarApp() {
   const [qi, setQi] = useState(0),
     [answer, setAnswer] = useState("");
   async function refresh(u = me) {
-    if (!u || u.role === "parent") return;
+    if (!u || ["parent", "super_admin", "secretary"].includes(u.role)) return;
     const [nextAssignments, nextCourses, nextEnrollments] = await Promise.all([
       api<Assignment[]>("/assignments"),
       api<Course[]>("/courses"),
@@ -240,7 +241,12 @@ export default function HamyarApp() {
     await run(async () => {
       if (mode !== "login") {
         if (mode === "accept") {
-          await api("/invitations/accept", { name, email, password, token });
+          await api("/invitations/accept", {
+            name,
+            ...(email.includes("@") ? { email } : { phone: email }),
+            password,
+            token,
+          });
           setToken("");
           const url = new URL(window.location.href);
           url.searchParams.delete("invite");
@@ -338,6 +344,8 @@ export default function HamyarApp() {
         setToken={setToken}
       />
     );
+  if (me.role === "super_admin" || me.role === "secretary")
+    return <AccessConsole me={me} onLogout={logout} />;
   if (me.role === "parent")
     return <ParentDashboard me={me} onLogout={logout} />;
   const teacher = me.role === "teacher";

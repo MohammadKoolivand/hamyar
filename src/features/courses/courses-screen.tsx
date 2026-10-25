@@ -151,7 +151,7 @@ export function CoursesScreen({
           <h2 className="text-lg font-bold">ایجاد درس آموزشی</h2>
           <p className="text-sm text-slate-600">
             برای درس کد درخواست صادر کنید؛ دانش‌آموز ابتدا درخواست می‌دهد و فقط
-            پس از تأیید شما عضو خواهد شد. دعوت ایمیلی قبلی نیز فعال است.
+            پس از تأیید شما عضو خواهد شد. دعوت با شماره موبایل نیز فعال است.
           </p>
           <form
             onSubmit={(event) => void createCourse(event)}

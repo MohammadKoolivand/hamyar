@@ -7,13 +7,11 @@ test("secondary catalog filter → import → preserved after reload → author 
   await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
   await page.getByLabel("نام و نام خانوادگی").fill("معلم فهرست درسی");
   await page
-    .getByLabel("ایمیل", { exact: true })
+    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
     .fill(`catalog-${Date.now()}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page
-    .getByRole("button", { name: "ورود به همیار", exact: true })
-    .click();
+  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
   await page.getByRole("button", { name: "منابع آموزشی", exact: true }).click();
   await page
     .getByRole("heading", { name: "کتاب‌ها و مباحث درسی", exact: true })

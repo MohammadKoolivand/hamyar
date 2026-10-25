@@ -10,13 +10,11 @@ test("teacher edits chart, diagram and formula; approved visual question persist
   await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
   await page.getByLabel("نام و نام خانوادگی").fill("معلم سؤال تصویری");
   await page
-    .getByLabel("ایمیل", { exact: true })
+    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
     .fill(`visual-${suffix}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page
-    .getByRole("button", { name: "ورود به همیار", exact: true })
-    .click();
+  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();

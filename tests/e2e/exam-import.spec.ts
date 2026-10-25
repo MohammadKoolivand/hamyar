@@ -7,7 +7,7 @@ test("PDF exam upload persists, extracts real text, saves corrections and approv
   await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
   await page.getByLabel("نام و نام خانوادگی").fill("معلم ورود آزمون");
   await page
-    .getByLabel("ایمیل", { exact: true })
+    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
     .fill(`exam-${Date.now()}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
@@ -58,7 +58,6 @@ test("PDF exam upload persists, extracts real text, saves corrections and approv
   expect(download.headers()["cache-control"]).toContain("no-store");
   expect(await download.body()).toEqual(pdf);
   await page.reload();
-  await page.getByRole("button", { name: /آزمون PDF مرورگر/ }).click();
   await page
     .getByRole("button", {
       name: "استخراج متن و ایجاد پیش‌نویس سؤال‌ها",
@@ -80,7 +79,6 @@ test("PDF exam upload persists, extracts real text, saves corrections and approv
     .click();
   await expect(page.getByRole("status")).toContainText("نتیجه بررسی ذخیره شد");
   await page.reload();
-  await page.getByRole("button", { name: /آزمون PDF مرورگر/ }).click();
   await expect(page.getByLabel("صورت سؤال 1", { exact: true })).toHaveValue(
     "حاصل یک به اضافه یک در آزمون مرورگر چیست؟",
   );
