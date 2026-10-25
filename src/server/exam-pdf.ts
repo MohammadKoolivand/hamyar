@@ -18,7 +18,7 @@ export async function pdfPages(file: File) {
   const hash = createHash("sha256").update(bytes).digest("hex");
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const loading = pdfjs.getDocument({
-    data: bytes, isEvalSupported: false, useSystemFonts: false,
+    data: bytes, useSystemFonts: false,
     disableFontFace: true, stopAtErrors: true,
   });
   let deadline: ReturnType<typeof setTimeout> | undefined;
