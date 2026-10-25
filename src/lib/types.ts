@@ -108,6 +108,8 @@ export interface Node {
   tracks?: string[];
 }
 export interface Question {
+  hints?: string[];
+  skillIds?: string[];
   source?: import("./question-source").QuestionSource;
   classification?: "topic" | "free";
   difficulty?: "easy" | "medium" | "hard";
@@ -154,6 +156,7 @@ export interface Assignment {
   questions?: Question[];
   progress: Record<string, { attempts: number; hints: number }>;
   policy: {
+    feedbackMode?: "immediate" | "end";
     maxHints: number;
     maxAttempts: number;
     independent: boolean;
@@ -170,7 +173,33 @@ export interface Assignment {
     model?: string;
   }[];
 }
+export interface ReportQuestion {
+  _id: string;
+  number: number;
+  statement: string;
+  type: string;
+  options: string[];
+  visuals: QuestionVisual[];
+  reference?: string;
+  answer: string | null;
+  result: string;
+  hintsUsed: number;
+  attempts: number;
+  topic: string;
+  difficulty: string | null;
+  analysis: string;
+}
 export interface Report {
+  questions?: ReportQuestion[];
+  topics?: {
+    title: string;
+    total: number;
+    correct: number;
+    incorrect: number;
+    unanswered: number;
+  }[];
+  unanswered?: number;
+  incorrect?: number;
   total: number;
   answered: number;
   independent: number;

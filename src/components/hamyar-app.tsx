@@ -28,6 +28,7 @@ import type {
   Enrollment,
   StudentDashboardData,
 } from "@/lib/types";
+import { practiceAnswer } from "@/lib/practice-answer";
 import { api } from "@/lib/api";
 import {
   assignmentFromSearch,
@@ -177,14 +178,7 @@ export default function HamyarApp() {
       setActive(detail);
       setQi(0);
       setAnswer(
-        localStorage.getItem(
-          "draft:" +
-            detail.studentId +
-            ":" +
-            detail._id +
-            ":" +
-            (detail.questions?.[0]?._id ?? ""),
-        ) ?? "",
+        practiceAnswer(detail, detail.questions?.[0]?._id ?? "", localStorage),
       );
       if (next === "report") {
         setReport(
@@ -285,11 +279,7 @@ export default function HamyarApp() {
       setActive(detail);
       setReport(null);
       setQi(0);
-      setAnswer(
-        localStorage.getItem(
-          "draft:" + me!._id + ":" + a._id + ":" + detail.questions![0]._id,
-        ) ?? "",
-      );
+      setAnswer(practiceAnswer(detail, detail.questions![0]._id, localStorage));
       navigatePage("practice", detail._id);
     });
   }
@@ -440,9 +430,9 @@ export default function HamyarApp() {
                   ? "ورود آزمون"
                   : page === "content-new"
                     ? "افزودن سؤال"
-                  : page === "report"
-                    ? "گزارش عملکرد"
-                    : "محیط تمرین")}
+                    : page === "report"
+                      ? "گزارش عملکرد"
+                      : "محیط تمرین")}
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -528,7 +518,9 @@ export default function HamyarApp() {
           />
         )}
         {page === "settings" && teacher && <AiSettingsScreen />}
-        {page === "exam-import" && teacher && <ExamImportScreen />}
+        {page === "exam-import" && teacher && (
+          <ExamImportScreen nodes={nodes} onApproved={refresh} />
+        )}
         {["content", "content-new", "resources"].includes(page) && teacher && (
           <ContentScreen
             key={page}

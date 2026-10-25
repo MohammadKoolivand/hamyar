@@ -12,10 +12,12 @@ export function SourceEditor({
   value,
   onChange,
   disabled = false,
+  hideQuestionNumber = false,
 }: {
   value?: QuestionSource;
   onChange: (value: QuestionSource | undefined) => void;
   disabled?: boolean;
+  hideQuestionNumber?: boolean;
 }) {
   const category = sourceCategory(value);
   function update(key: keyof QuestionSource, text: string) {
@@ -98,33 +100,37 @@ export function SourceEditor({
                 ["sourceUrl", "لینک صفحه منبع"],
                 ["bookletCode", "کد دفترچه"],
                 ["questionNumber", "شماره سؤال در منبع"],
-              ].map(([key, label]) => (
-                <Field key={key} title={label}>
-                  <input
-                    className={style}
-                    type={
-                      key === "questionNumber"
-                        ? "number"
-                        : key === "sourceUrl"
-                          ? "url"
-                          : "text"
-                    }
-                    min={key === "questionNumber" ? 1 : undefined}
-                    max={key === "questionNumber" ? 10000 : undefined}
-                    maxLength={
-                      key === "sourceUrl"
-                        ? 1500
-                        : key === "bookletCode"
-                          ? 80
-                          : 200
-                    }
-                    value={String(value[key as keyof QuestionSource] ?? "")}
-                    onChange={(e) =>
-                      update(key as keyof QuestionSource, e.target.value)
-                    }
-                  />
-                </Field>
-              ))}
+              ]
+                .filter(
+                  ([key]) => !hideQuestionNumber || key !== "questionNumber",
+                )
+                .map(([key, label]) => (
+                  <Field key={key} title={label}>
+                    <input
+                      className={style}
+                      type={
+                        key === "questionNumber"
+                          ? "number"
+                          : key === "sourceUrl"
+                            ? "url"
+                            : "text"
+                      }
+                      min={key === "questionNumber" ? 1 : undefined}
+                      max={key === "questionNumber" ? 10000 : undefined}
+                      maxLength={
+                        key === "sourceUrl"
+                          ? 1500
+                          : key === "bookletCode"
+                            ? 80
+                            : 200
+                      }
+                      value={String(value[key as keyof QuestionSource] ?? "")}
+                      onChange={(e) =>
+                        update(key as keyof QuestionSource, e.target.value)
+                      }
+                    />
+                  </Field>
+                ))}
             </div>
           </details>
           <p className="text-xs leading-6 text-slate-500">

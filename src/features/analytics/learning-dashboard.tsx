@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import { AppLink as Link } from "@/components/app-link";
+import { MathText } from "@/components/question-presentation";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import type { User } from "@/lib/types";
@@ -21,6 +23,17 @@ interface Skill {
 }
 interface Progress {
   role: string;
+  assignedQuestions: number;
+  recentMissions?: {
+    assignmentId: string;
+    title: string;
+    state: string;
+    total: number;
+    answered: number;
+    incorrect: number;
+    independent: number;
+    assisted: number;
+  }[];
   answered: number;
   independent: number;
   assisted: number;
@@ -87,6 +100,7 @@ export function LearningDashboard({
   students: User[];
   subjectId?: string;
 }) {
+  const [skillFilter, setSkillFilter] = useState("all");
   const [sid, setSid] = useState(
       subjectId ?? (me.role === "student" ? me._id : (students[0]?._id ?? "")),
     ),
@@ -162,24 +176,135 @@ export function LearningDashboard({
         </p>
       ) : (
         <>
-          <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              [data.answered, "سؤال پاسخ‌داده‌شده"],
-              [data.independent, "صحیح بدون کمک"],
-              [data.assisted, "صحیح با کمک"],
-              [data.pending, "نیازمند بررسی معلم"],
-            ].map(([n, title]) => (
+              [
+                data.independent,
+                "صحیح بدون کمک",
+                "border-emerald-200 bg-emerald-50/80 text-emerald-900",
+              ],
+              [
+                data.assisted,
+                "صحیح با راهنما",
+                "border-teal-200 bg-teal-50/80 text-teal-900",
+              ],
+              [
+                data.incorrect,
+                "نیازمند اصلاح",
+                "border-rose-200 bg-rose-50/80 text-rose-900",
+              ],
+              [
+                Math.max(0, data.assignedQuestions - data.answered),
+                "سؤال بدون پاسخ",
+                "border-amber-200 bg-amber-50/80 text-amber-900",
+              ],
+              [
+                data.pending,
+                "در انتظار بررسی",
+                "border-violet-200 bg-violet-50/80 text-violet-900",
+              ],
+              [
+                data.answered,
+                "سؤال پاسخ‌داده‌شده",
+                "border-blue-200 bg-blue-50/80 text-blue-900",
+              ],
+            ].map(([n, title, color]) => (
               <div
-                key={title}
-                className="glass-card p-5"
+                key={String(title)}
+                className={`rounded-2xl border p-5 ${color}`}
               >
-                <p className="text-xs text-slate-500">{title}</p>
-                <strong className="mt-2 block text-2xl text-[#1F3F97]">
+                <p className="text-xs">{title}</p>
+                <strong className="mt-2 block text-3xl">
                   {number(Number(n))}
                 </strong>
               </div>
             ))}
           </section>
+          <section className="glass-panel grid gap-4 p-6 lg:grid-cols-2">
+            <div>
+              <h2 className="text-lg font-bold">در یک نگاه</h2>
+              <p className="mt-3 text-sm leading-7">
+                موفقیت مستقل در اولین تلاش:{" "}
+                <strong>{percent(data.independentSuccessRate)}</strong> · از{" "}
+                {number(data.eligibleFirstAttempts)} تلاش قابل ارزیابی
+              </p>
+              <p className="mt-2 text-sm leading-7">
+                {number(
+                  data.skills.filter((s) =>
+                    ["needs_practice", "needs_review"].includes(s.status),
+                  ).length,
+                )}{" "}
+                مهارت نیازمند تمرین و{" "}
+                {number(
+                  data.skills.filter((s) => s.status === "proficient").length,
+                )}{" "}
+                مهارت با شواهد کافی از حل مستقل.
+              </p>
+              <p className="mt-2 text-xs leading-6 text-slate-500">
+                صحیح با راهنما نشانهٔ موفقیت با کمک است؛ با حل مستقل یکی نیست.
+                دادهٔ کم به معنی ضعف قطعی نیست.
+              </p>
+            </div>
+            <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4">
+              <h3 className="font-bold text-amber-900">از کجا شروع کنم؟</h3>
+              {data.skills.length ? (
+                <ol className="mt-3 grid gap-2">
+                  {[...data.skills]
+                    .sort((a, b) => b.incorrect - a.incorrect)
+                    .slice(0, 3)
+                    .map((skill, i) => (
+                      <li key={skill.skillId} className="text-sm leading-7">
+                        <a
+                          href={`#skill-${skill.skillId}`}
+                          className="font-medium underline-offset-4 hover:underline"
+                        >
+                          {number(i + 1)}. {skill.title}
+                        </a>
+                        <p className="text-xs text-slate-600">
+                          {skill.incorrect
+                            ? `${number(skill.incorrect)} تلاش نادرست؛ مرور روش و سپس یک سؤال تازه بدون کمک`
+                            : skill.status === "proficient"
+                              ? "مرور فاصله‌دار برای بررسی پایداری یادگیری"
+                              : "یک سؤال تازه بدون کمک برای تکمیل شواهد"}
+                        </p>
+                      </li>
+                    ))}
+                </ol>
+              ) : (
+                <p className="mt-3 text-sm">
+                  برای پیشنهاد دقیق‌تر، ابتدا یک تمرین دارای مهارت مشخص انجام
+                  دهید.
+                </p>
+              )}
+            </div>
+          </section>
+          {me.role !== "parent" && !!data.recentMissions?.length && (
+            <section className="glass-panel grid gap-3 p-6">
+              <h2 className="text-lg font-bold">
+                تمرین‌های اخیر و نتیجه واقعی
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {data.recentMissions.map((m) => (
+                  <Link
+                    key={m.assignmentId}
+                    href={`/report?assignment=${m.assignmentId}`}
+                    className={`rounded-xl border p-4 transition-colors hover:border-blue-400 ${m.incorrect ? "border-rose-200 bg-rose-50/50" : m.independent + m.assisted > 0 ? "border-emerald-200 bg-emerald-50/50" : "border-slate-200 bg-white/60"}`}
+                  >
+                    <h3 className="text-sm font-bold">{m.title}</h3>
+                    <p className="mt-2 text-xs leading-6">
+                      {number(m.answered)} از {number(m.total)} پاسخ ·{" "}
+                      {number(m.independent + m.assisted)} صحیح ·{" "}
+                      {number(m.incorrect)} نادرست ·{" "}
+                      {number(Math.max(0, m.total - m.answered))} نزده
+                    </p>
+                    <span className="mt-2 block text-xs font-medium text-[#233B8F]">
+                      بررسی سؤال‌ها و پاسخ‌ها ←
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
           <section className="grid gap-3 glass-panel p-6">
             <h2 className="text-lg font-bold">مهارت‌ها و شواهد یادگیری</h2>
             <p className="text-sm text-slate-600">
@@ -197,63 +322,114 @@ export function LearningDashboard({
                 سؤال‌ها مهارت متصل کند.
               </p>
             )}
-            {data.skills.map((skill) => (
-              <div
-                key={skill.skillId}
-                className="grid gap-3 rounded-2xl border border-slate-200 p-4"
+            <label className="grid gap-2 text-xs text-slate-500">
+              نمایش مهارت‌ها
+              <select
+                className="glass-field min-h-11 p-2 text-sm"
+                value={skillFilter}
+                onChange={(e) => setSkillFilter(e.target.value)}
               >
-                <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="font-bold">{skill.title}</h3>
-                  <span className="rounded-full bg-teal-50 px-3 py-1 text-xs text-teal-800">
-                    {labels[skill.status] ?? skill.status}
-                  </span>
-                </div>
-                <p className="text-sm text-slate-600">
-                  {number(skill.supportingAttempts)} تلاش قابل ارزیابی،{" "}
-                  {number(skill.distinctQuestions)} سؤال متفاوت،{" "}
-                  {number(skill.independentCorrect)} صحیح مستقل در اولین تلاش و{" "}
-                  {number(skill.assistedCorrect)} صحیح با کمک
-                </p>
-                {skill.lastPractice && (
-                  <small className="text-slate-500">
-                    آخرین تمرین:{" "}
-                    {new Date(skill.lastPractice).toLocaleDateString("fa-IR")}
-                  </small>
-                )}
-                {skill.derivedStatus && (
-                  <p className="text-sm text-amber-800">
-                    تصمیم معلم: {skill.overrideReason} · وضعیت محاسبه‌شده:{" "}
-                    {labels[skill.derivedStatus]}
+                <option value="all">همه مهارت‌ها</option>
+                <option value="practice">نیازمند تمرین / مرور</option>
+                <option value="strong">حل مستقل موفق</option>
+                <option value="unknown">شواهد ناکافی</option>
+              </select>
+            </label>
+            {[...data.skills]
+              .filter(
+                (skill) =>
+                  skillFilter === "all" ||
+                  (skillFilter === "practice"
+                    ? ["needs_practice", "needs_review"].includes(skill.status)
+                    : skillFilter === "strong"
+                      ? skill.independentCorrect > 0
+                      : ["not_started", "insufficient_evidence"].includes(
+                          skill.status,
+                        )),
+              )
+              .sort((a, b) => b.incorrect - a.incorrect)
+              .map((skill) => (
+                <div
+                  key={skill.skillId}
+                  id={`skill-${skill.skillId}`}
+                  className={`grid scroll-mt-6 gap-3 rounded-2xl border p-4 ${["needs_practice", "needs_review"].includes(skill.status) ? "border-rose-200 bg-rose-50/50" : skill.status === "proficient" ? "border-emerald-200 bg-emerald-50/50" : skill.status === "developing" ? "border-blue-200 bg-blue-50/50" : "border-amber-200 bg-amber-50/40"}`}
+                >
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h3 className="font-bold">{skill.title}</h3>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs ${["needs_practice", "needs_review"].includes(skill.status) ? "bg-rose-100 text-rose-800" : skill.status === "proficient" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}
+                    >
+                      {labels[skill.status] ?? skill.status}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-600">
+                    {number(skill.supportingAttempts)} تلاش قابل ارزیابی،{" "}
+                    {number(skill.distinctQuestions)} سؤال متفاوت،{" "}
+                    {number(skill.independentCorrect)} صحیح مستقل در اولین تلاش
+                    و {number(skill.assistedCorrect)} صحیح با کمک
                   </p>
-                )}
-                {me.role === "teacher" && (
-                  <>
-                    <details className="text-xs text-slate-500">
-                      <summary className="cursor-pointer">
-                        شناسه شواهد پشتیبان
-                      </summary>
-                      {skill.evidenceIds.map((id) => (
-                        <p key={id} className="break-all font-mono" dir="ltr">
-                          {id}
+                  <div className="grid gap-2">
+                    <div className="flex justify-between text-xs text-slate-600">
+                      <span>صحیح مستقل در اولین تلاش</span>
+                      <strong>
+                        {number(skill.independentCorrect)} از{" "}
+                        {number(skill.independentFirstAttempts)}
+                      </strong>
+                    </div>
+                    <progress
+                      aria-label={`نسبت موفقیت مستقل ${skill.title}`}
+                      max={Math.max(1, skill.independentFirstAttempts)}
+                      value={skill.independentCorrect}
+                      className="h-2 w-full accent-emerald-500"
+                    />
+                    <p className="text-xs leading-6 text-slate-500">
+                      {number(skill.incorrect)} تلاش نادرست ثبت شده ·{" "}
+                      {number(skill.distinctQuestions)} سؤال متفاوت.{" "}
+                      {skill.incorrect
+                        ? "گام بعد: مرور روش حل و یک سؤال مشابه بدون کمک."
+                        : "گام بعد: تمرین مستقل تازه برای تکمیل شواهد."}
+                    </p>
+                  </div>
+                  {skill.lastPractice && (
+                    <small className="text-slate-500">
+                      آخرین تمرین:{" "}
+                      {new Date(skill.lastPractice).toLocaleDateString("fa-IR")}
+                    </small>
+                  )}
+                  {skill.derivedStatus && (
+                    <p className="text-sm text-amber-800">
+                      تصمیم معلم: {skill.overrideReason} · وضعیت محاسبه‌شده:{" "}
+                      {labels[skill.derivedStatus]}
+                    </p>
+                  )}
+                  {me.role === "teacher" && (
+                    <>
+                      <details className="text-xs text-slate-500">
+                        <summary className="cursor-pointer">
+                          شناسه شواهد پشتیبان
+                        </summary>
+                        {skill.evidenceIds.map((id) => (
+                          <p key={id} className="break-all font-mono" dir="ltr">
+                            {id}
+                          </p>
+                        ))}
+                      </details>
+                      <MasteryReview
+                        busy={busy}
+                        submit={(status, reason) =>
+                          override(skill.skillId, status, reason)
+                        }
+                      />
+                      {skill.overrideHistory?.map((h, i) => (
+                        <p key={i} className="text-xs text-slate-500">
+                          {h.reason} ·{" "}
+                          {new Date(h.createdAt).toLocaleString("fa-IR")}
                         </p>
                       ))}
-                    </details>
-                    <MasteryReview
-                      busy={busy}
-                      submit={(status, reason) =>
-                        override(skill.skillId, status, reason)
-                      }
-                    />
-                    {skill.overrideHistory?.map((h, i) => (
-                      <p key={i} className="text-xs text-slate-500">
-                        {h.reason} ·{" "}
-                        {new Date(h.createdAt).toLocaleString("fa-IR")}
-                      </p>
-                    ))}
-                  </>
-                )}
-              </div>
-            ))}
+                    </>
+                  )}
+                </div>
+              ))}
           </section>
           <section className="grid gap-3 glass-panel p-6">
             <h2 className="text-lg font-bold">دفترچه اشتباهات</h2>
@@ -265,9 +441,11 @@ export function LearningDashboard({
             {data.mistakes.map((item) => (
               <article
                 key={item._id}
-                className="grid gap-2 rounded-2xl border border-slate-200 p-4"
+                className={`grid gap-2 rounded-2xl border p-4 ${["resolved", "corrected_by_review"].includes(item.status) ? "border-emerald-200 bg-emerald-50/50" : "border-rose-200 bg-rose-50/40"}`}
               >
-                <h3 className="font-medium">{item.statement}</h3>
+                <h3 className="font-medium">
+                  <MathText text={item.statement} />
+                </h3>
                 {item.sourceAnswer && (
                   <p className="whitespace-pre-wrap text-sm text-slate-600">
                     پاسخ ثبت‌شده: {item.sourceAnswer}

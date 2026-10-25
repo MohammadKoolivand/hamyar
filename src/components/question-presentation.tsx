@@ -1,4 +1,6 @@
 "use client";
+import { Crop } from "lucide-react";
+import Image from "next/image";
 import { useId } from "react";
 import { mathMarkup } from "@/lib/math-render";
 import {
@@ -68,7 +70,33 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
       className="my-3 min-w-0 rounded-2xl border border-slate-200 bg-white p-3"
       aria-label={v.caption}
     >
-      {v.kind === "formula" ? (
+      {v.kind === "image" ? (
+        v.crop ? (
+          <svg
+            role="img"
+            aria-label={v.caption}
+            viewBox={`${(v.width * v.crop.x) / 100} ${(v.height * v.crop.y) / 100} ${(v.width * v.crop.width) / 100} ${(v.height * v.crop.height) / 100}`}
+            className="h-auto w-full rounded-lg"
+            overflow="hidden"
+          >
+            <title>{v.caption}</title>
+            <image
+              href={`/api/question-assets/${v.assetId}`}
+              width={v.width}
+              height={v.height}
+            />
+          </svg>
+        ) : (
+          <Image
+            unoptimized
+            src={`/api/question-assets/${v.assetId}`}
+            width={v.width}
+            height={v.height}
+            alt={v.caption}
+            className="h-auto w-full rounded-lg"
+          />
+        )
+      ) : v.kind === "formula" ? (
         <MathFormula latex={v.latex} />
       ) : v.kind === "chart" ? (
         (() => {
@@ -229,9 +257,11 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
 export function QuestionPresentation({
   statement,
   visuals = [],
+  onCrop,
 }: {
   statement: string;
   visuals?: QuestionVisual[];
+  onCrop?: () => void;
 }) {
   return (
     <div className="min-w-0">
@@ -239,7 +269,20 @@ export function QuestionPresentation({
         <MathText text={statement} />
       </div>
       {visuals.map((v, i) => (
-        <QuestionVisualView key={i} visual={v} />
+        <div key={i} className="relative">
+          <QuestionVisualView visual={v} />
+          {v.kind === "image" && onCrop && (
+            <button
+              type="button"
+              onClick={onCrop}
+              aria-label="کراپ تصویر سؤال"
+              className="absolute start-3 top-3 flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm text-[#233B8F] shadow-md"
+            >
+              <Crop size={20} />
+              کراپ
+            </button>
+          )}
+        </div>
       ))}
     </div>
   );

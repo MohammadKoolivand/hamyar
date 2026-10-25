@@ -1,3 +1,4 @@
+import { Binary } from "mongodb";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
 import { z } from "zod";
@@ -10,6 +11,45 @@ import {
 import { questionSchema } from "../domain";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
+  app.get("/api/question-assets/:assetId", async (r, reply) => {
+    const u = await user(r),
+      assetId = z
+        .string()
+        .uuid()
+        .parse((r.params as { assetId: string }).assetId);
+    if (!["teacher", "student"].includes(u.role))
+      ctx.fail(403, "دسترسی مجاز نیست");
+    const asset = await c("questionAssets").findOne({
+      _id: assetId,
+      ...(u.role === "teacher" ? { ownerId: u._id } : {}),
+    });
+    if (!asset) ctx.fail(404, "تصویر یافت نشد");
+    if (u.role === "student") {
+      const versions = await c("questionVersions")
+        .find(
+          { visuals: { $elemMatch: { kind: "image", assetId } } },
+          { projection: { _id: 1 } },
+        )
+        .toArray();
+      if (
+        !(await c("assignments").findOne({
+          studentId: u._id,
+          questionVersionIds: { $in: versions.map((v) => v._id) },
+          state: { $ne: "cancelled" },
+        }))
+      )
+        ctx.fail(404, "تصویر یافت نشد");
+    }
+    reply
+      .header("Content-Type", "image/png")
+      .header("Cache-Control", "private, no-store")
+      .header("X-Content-Type-Options", "nosniff");
+    return reply.send(
+      asset!.data instanceof Binary
+        ? Buffer.from(asset!.data.value())
+        : Buffer.from(asset!.data),
+    );
+  });
   app.get("/api/curriculum/catalog", async (r) => {
     await user(r, "teacher");
     return {
@@ -86,7 +126,93 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
   });
   app.get("/api/questions", async (r) => {
     const u = await user(r, "teacher");
-    return c("questionVersions").find({ ownerId: u._id }).toArray();
+    return c("questions")
+      .aggregate([
+        { $match: { ownerId: u._id } },
+        {
+          $lookup: {
+            from: "questionVersions",
+            localField: "currentVersionId",
+            foreignField: "_id",
+            as: "version",
+          },
+        },
+        { $unwind: "$version" },
+        { $replaceRoot: { newRoot: "$version" } },
+      ])
+      .toArray();
+  });
+  app.get("/api/questions/:vid", async (r) => {
+    const u = await user(r, "teacher");
+    return owned("questionVersions", (r.params as { vid: string }).vid, u._id);
+  });
+  app.post("/api/questions/:vid/revise", async (r) => {
+    const u = await user(r, "teacher"),
+      vid = (r.params as { vid: string }).vid,
+      b = questionSchema.parse(r.body);
+    if (
+      b.type === "choice" &&
+      new Set(b.options.map((o) => o.trim())).size !== b.options.length
+    )
+      ctx.fail(400, "گزینه‌های تکراری را اصلاح کنید");
+    await validateQuestion(ctx, u._id, b);
+    return ctx.atomic(
+      r,
+      u._id,
+      `revise-question:${vid}`,
+      b,
+      async (session) => {
+        const previous = await c("questionVersions").findOne(
+          { _id: vid, ownerId: u._id },
+          { session },
+        );
+        if (!previous) ctx.fail(404, "سؤال یافت نشد");
+        const nextId = id();
+        const updated = await c("questions").updateOne(
+          { _id: previous!.questionId, ownerId: u._id, currentVersionId: vid },
+          { $set: { currentVersionId: nextId } },
+          { session },
+        );
+        if (!updated.matchedCount)
+          ctx.fail(
+            409,
+            "سؤال قبلاً ویرایش شده؛ صفحه را تازه کنید و دوباره تلاش کنید.",
+          );
+        // Whitelisted provenance: the previous immutable version retains original review evidence.
+        const row = {
+          ...b,
+          _id: nextId,
+          questionId: previous!.questionId,
+          ownerId: u._id,
+          version: previous!.version + 1,
+          verifiedBy: u._id,
+          verifiedAt: ctx.now(),
+          origin: "human_revised",
+          revisedFromVersionId: vid,
+          originalOrigin: previous!.originalOrigin ?? previous!.origin,
+          ...(previous!.sourceExamId
+            ? {
+                sourceExamId: previous!.sourceExamId,
+                sourceExamItemId: previous!.sourceExamItemId,
+              }
+            : {}),
+        };
+        await c("questionVersions").insertOne(row, { session });
+        await ctx.boundary("after_question_version_insert");
+        await c("auditLogs").insertOne(
+          {
+            _id: id(),
+            actorId: u._id,
+            action: "revise_question",
+            resourceId: nextId,
+            previousVersionId: vid,
+            createdAt: ctx.now(),
+          },
+          { session },
+        );
+        return row;
+      },
+    );
   });
   app.post("/api/questions", async (r) => {
     const u = await user(r, "teacher"),

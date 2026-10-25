@@ -1,3 +1,5 @@
+import { feedbackVisible } from "../../lib/practice-answer";
+import type { AvalaiClient } from "../ai/avalai";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
 import { z } from "zod";
@@ -9,6 +11,7 @@ export function registerPractice(
   app: FastifyInstance,
   ctx: Context,
   provider: HintProvider,
+  avalai?: AvalaiClient,
 ) {
   const { c, user, assignment, id, now, fail, atomic, boundary } = ctx;
   app.get("/api/assignments", async (r) => {
@@ -37,6 +40,11 @@ export function registerPractice(
     const questions = await c("questionVersions")
       .find({ _id: { $in: a.questionVersionIds } })
       .toArray();
+    questions.sort(
+      (left, right) =>
+        a.questionVersionIds.indexOf(left._id) -
+        a.questionVersionIds.indexOf(right._id),
+    );
     return {
       ...a,
       questions: questions.map((q) => ({
@@ -49,8 +57,9 @@ export function registerPractice(
         version: q.version,
       })),
       attempts: await c("attempts").find({ assignmentId: a._id }).toArray(),
-      evaluations: (
-        await c("evaluations").find({ assignmentId: a._id }).toArray()
+      evaluations: (u.role !== "teacher" && !feedbackVisible(a.policy, a.state)
+        ? []
+        : await c("evaluations").find({ assignmentId: a._id }).toArray()
       ).map((e) => ({
         _id: e._id,
         attemptId: e.attemptId,
@@ -130,7 +139,12 @@ export function registerPractice(
         { session },
       );
       await boundary("after_evaluation_insert");
-      return { attempt, evaluation };
+      return {
+        attempt,
+        ...(feedbackVisible(current!.policy, current!.state)
+          ? { evaluation }
+          : {}),
+      };
     });
   });
   app.post("/api/assignments/:aid/hints", async (r) => {
@@ -160,10 +174,23 @@ export function registerPractice(
       a.progress[q._id].hints !== b.expectedHintLevel - 1
     )
       fail(409, "وضعیت راهنمایی تغییر کرده است؛ مأموریت را به‌روز کنید");
+    if (b.level === 4 && !feedbackVisible(a.policy, a.state))
+      fail(409, "پاسخ کامل پس از پایان تمرین نمایش داده می‌شود");
     const level = a.progress[q._id].hints,
       requestedLevel = b.level ?? Math.min(level + 1, 3);
     if (level >= a.policy.maxHints) fail(409, "راهنمایی مجاز دیگری وجود ندارد");
-    const guided = await guide(ctx, provider, a, q, requestedLevel);
+    const settings = await c("aiSettings").findOne({ _id: a.teacherId });
+    let hintProvider = provider;
+    if (settings?.provider === "avalai" || avalai?.configured) {
+      const model = settings?.model ?? process.env.AVALAI_AUTHOR_MODEL;
+      if (requestedLevel !== 4 && (!avalai?.configured || !model))
+        fail(
+          503,
+          "مدل راهنمای AvvalAI آماده نیست؛ معلم باید مدل را در تنظیمات انتخاب و اتصال سرور را تنظیم کند.",
+        );
+      if (avalai && model) hintProvider = avalai.tutor(model);
+    }
+    const guided = await guide(ctx, hintProvider, a, q, requestedLevel);
     return atomic(r, u._id, `hint:${a._id}`, b, async (session) => {
       const current = await c("assignments").findOne(
         { _id: a._id, studentId: u._id },
@@ -239,7 +266,10 @@ export function registerPractice(
   });
   app.post("/api/assignments/:aid/complete", async (r) => {
     const { u, a } = await assignment(r, true);
-    return atomic(r, u._id, `complete:${a._id}`, {}, async (session) => {
+    const body = z
+      .object({ allowUnanswered: z.boolean().optional() })
+      .parse(r.body ?? {});
+    return atomic(r, u._id, `complete:${a._id}`, body, async (session) => {
       const current = (await c("assignments").findOne(
         { _id: a._id },
         { session },
@@ -258,6 +288,7 @@ export function registerPractice(
         .find({ assignmentId: a._id }, { session })
         .toArray();
       if (
+        !body.allowUnanswered &&
         current.questionVersionIds.some(
           (q: string) => !attempts.some((t) => t.questionVersionId === q),
         )
@@ -271,7 +302,9 @@ export function registerPractice(
       const next = evaluations.some((e) => e.result === "pending_review")
         ? "submitted"
         : "completed";
-      transition(current.state, next);
+      // A confirmed blank submission may finish directly from published.
+      if (!(body.allowUnanswered && current.state === "published"))
+        transition(current.state, next);
       await c("assignments").updateOne(
         { _id: a._id },
         { $set: { state: next } },

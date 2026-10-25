@@ -157,6 +157,14 @@ export async function progress(ctx: Context, studentId: string, viewer: Row) {
     const filter = {
         studentId,
         ...teacherScope,
+        ...(viewer.role !== "teacher"
+          ? {
+              $or: [
+                { "policy.feedbackMode": { $ne: "end" } },
+                { state: { $in: ["submitted", "completed"] } },
+              ],
+            }
+          : {}),
       },
       snapshot = await canonical(ctx, filter, session),
       { events, assignments, versions } = snapshot;
@@ -200,27 +208,29 @@ export async function progress(ctx: Context, studentId: string, viewer: Row) {
       .c("mistakeRecords")
       .find(filter, { session })
       .toArray();
-    const mistakes = notebook.map((row) => {
-      const source = events.find((e) => e._id === row.sourceAttemptId);
-      return {
-        ...row,
-        ...(source ? mistake(source, events) : {}),
-        statement:
-          versions.find((q) => q._id === row.questionVersionId)?.statement ??
-          "",
-        sourceAnswer:
-          snapshot.attempts.find((t) => t._id === row.sourceAttemptId)
-            ?.answer ?? null,
-        suggestedPracticeVersionIds: versions
-          .filter(
-            (q) =>
-              q._id !== row.questionVersionId &&
-              q.skillIds?.some((s: string) => row.skillIds.includes(s)),
-          )
-          .slice(0, 3)
-          .map((q) => q._id),
-      };
-    });
+    const mistakes = notebook
+      .filter((row) => events.some((e) => e._id === row.sourceAttemptId))
+      .map((row) => {
+        const source = events.find((e) => e._id === row.sourceAttemptId);
+        return {
+          ...row,
+          ...(source ? mistake(source, events) : {}),
+          statement:
+            versions.find((q) => q._id === row.questionVersionId)?.statement ??
+            "",
+          sourceAnswer:
+            snapshot.attempts.find((t) => t._id === row.sourceAttemptId)
+              ?.answer ?? null,
+          suggestedPracticeVersionIds: versions
+            .filter(
+              (q) =>
+                q._id !== row.questionVersionId &&
+                q.skillIds?.some((s: string) => row.skillIds.includes(s)),
+            )
+            .slice(0, 3)
+            .map((q) => q._id),
+        };
+      });
     const hints = await ctx
         .c("hintEvents")
         .find(
@@ -258,6 +268,22 @@ export async function progress(ctx: Context, studentId: string, viewer: Row) {
     }));
     return {
       studentId,
+      recentMissions: assignments
+        .map((a) => ({
+          assignmentId: a._id,
+          title: a.title,
+          state: a.state,
+          total: a.questionVersionIds.length,
+          ...summarize(events.filter((e) => e.assignmentId === a._id)),
+        }))
+        .sort((a, b) => {
+          const left = assignments.find((x) => x._id === a.assignmentId);
+          const right = assignments.find((x) => x._id === b.assignmentId);
+          return String(right?.createdAt ?? "").localeCompare(
+            String(left?.createdAt ?? ""),
+          );
+        })
+        .slice(0, 8),
       ...summarize(events),
       assignedQuestions,
       hintCount: hints.length,

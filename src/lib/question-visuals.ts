@@ -14,6 +14,28 @@ export const questionVisualSchema = z
   .discriminatedUnion("kind", [
     z
       .object({
+        kind: z.literal("image"),
+        caption,
+        assetId: z.string().uuid(),
+        width: z.number().int().min(1).max(4096),
+        height: z.number().int().min(1).max(4096),
+        crop: z
+          .object({
+            x: coord,
+            y: coord,
+            width: z.number().finite().min(1).max(100),
+            height: z.number().finite().min(1).max(100),
+          })
+          .strict()
+          .refine(
+            (c) => c.x + c.width <= 100 && c.y + c.height <= 100,
+            "برش باید داخل تصویر باشد",
+          )
+          .optional(),
+      })
+      .strict(),
+    z
+      .object({
         kind: z.literal("chart"),
         caption,
         xLabel: label,

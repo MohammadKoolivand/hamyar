@@ -1,3 +1,4 @@
+import { feedbackVisible } from "../../lib/practice-answer";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
 import { z } from "zod";
@@ -11,6 +12,8 @@ export function registerAnalytics(
   const { c, user, assignment, now, fail } = ctx;
   app.get("/api/assignments/:aid/report", async (r) => {
     const { u, a } = await assignment(r);
+    if (u.role !== "teacher" && !feedbackVisible(a.policy, a.state))
+      fail(409, "نتیجه پس از پایان تمرین نمایش داده می‌شود");
     return ctx.transaction(async (session) => {
       const attempts = await c("attempts")
           .find({ assignmentId: a._id }, { session })
@@ -21,6 +24,7 @@ export function registerAnalytics(
           .toArray();
       const evidence = attempts.map((t) => ({
         ...t,
+        answer: t.answer as string,
         sequence: t.sequence as number,
         questionVersionId: t.questionVersionId as string,
         hintsUsed: t.hintsUsed as number,
@@ -43,7 +47,83 @@ export function registerAnalytics(
         assisted = latest.filter(
           (t) => t.hintsUsed > 0 && t.evaluation?.result === "correct",
         ).length;
+      const versions = await c("questionVersions")
+        .find({ _id: { $in: a.questionVersionIds } }, { session })
+        .toArray();
+      const nodes = await c("curriculum")
+        .find({ ownerId: a.teacherId }, { session })
+        .project({ _id: 1, title: 1 })
+        .toArray();
+      const revealKey =
+        u.role === "teacher" || ["submitted", "completed"].includes(a.state);
+      const questions = a.questionVersionIds.map(
+        (qid: string, index: number) => {
+          const q = versions.find((q) => q._id === qid);
+          const history = evidence.filter((t) => t.questionVersionId === qid);
+          const last = history.at(-1);
+          const result = !last
+            ? "unanswered"
+            : (last.evaluation?.result ?? "pending_review");
+          const topic =
+            nodes.find((n) => n._id === q?.topicId)?.title ?? "بدون مبحث مشخص";
+          return {
+            _id: qid,
+            number: index + 1,
+            statement: q?.statement ?? "سؤال در دسترس نیست",
+            type: q?.type ?? "short",
+            options: q?.options ?? [],
+            visuals: q?.visuals ?? [],
+            ...(revealKey && q ? { reference: q.reference } : {}),
+            answer: last?.answer ?? null,
+            result,
+            hintsUsed: last?.hintsUsed ?? 0,
+            attempts: history.length,
+            topic,
+            difficulty: q?.difficulty ?? null,
+            analysis:
+              result === "unanswered"
+                ? "پاسخی ثبت نشده؛ ابتدا یک تلاش مستقل برای این مبحث انجام دهید."
+                : result === "correct"
+                  ? last!.hintsUsed > 0
+                    ? "پاسخ با دریافت راهنما صحیح شده؛ یک سؤال مشابه را بدون کمک حل کنید تا استقلال یادگیری بررسی شود."
+                    : history.length > 1
+                      ? "پاسخ در تلاش بعدی اصلاح شده؛ با یک سؤال تازه، یادگیری را بررسی کنید."
+                      : "پاسخ در اولین تلاش و بدون راهنما صحیح بوده؛ برای بررسی پایداری، مرور فاصله‌دار انجام دهید."
+                  : result === "pending_review"
+                    ? "ارزیابی قطعی نیست و بررسی معلم لازم است؛ این پاسخ را غلط قطعی حساب نمی‌کنیم."
+                    : "پاسخ با معیار ارزیابی تطابق کامل ندارد؛ پاسخ ثبت‌شده را با پاسخ مرجع مقایسه و یک تمرین مشابه از همین مبحث حل کنید. علت خطا از انتخاب گزینه به‌تنهایی مشخص نمی‌شود.",
+          };
+        },
+      );
+      const topics = [
+        ...new Set(questions.map((q: { topic: string }) => q.topic)),
+      ].map((topic) => {
+        const rows = questions.filter(
+          (q: { topic: string }) => q.topic === topic,
+        );
+        return {
+          title: topic,
+          total: rows.length,
+          correct: rows.filter(
+            (q: { result: string }) => q.result === "correct",
+          ).length,
+          incorrect: rows.filter((q: { result: string }) =>
+            ["incorrect", "partially_correct"].includes(q.result),
+          ).length,
+          unanswered: rows.filter(
+            (q: { result: string }) => q.result === "unanswered",
+          ).length,
+        };
+      });
       return {
+        questions,
+        topics,
+        unanswered: questions.filter(
+          (q: { result: string }) => q.result === "unanswered",
+        ).length,
+        incorrect: questions.filter((q: { result: string }) =>
+          ["incorrect", "partially_correct"].includes(q.result),
+        ).length,
         total: a.questionVersionIds.length,
         answered: latest.length,
         independent,

@@ -5,6 +5,8 @@ import {
   sourceSummary,
   sourceFields,
 } from "@/lib/question-source";
+import { QuestionEditor } from "./question-editor";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { AppLink as Link } from "@/components/app-link";
 import { Plus, LibraryBig, Search, SlidersHorizontal } from "lucide-react";
@@ -30,10 +32,15 @@ const selectStyle =
 export function QuestionBank({
   nodes,
   questions,
+  onSaved,
 }: {
   nodes: Node[];
   questions: Question[];
+  onSaved: () => Promise<unknown> | void;
 }) {
+  const [cropOpen, setCropOpen] = useState(false);
+  const [editing, setEditing] = useState<string>();
+  const [guidedOnly, setGuidedOnly] = useState(false);
   const [search, setSearch] = useState("");
   const [grade, setGrade] = useState("");
   const [track, setTrack] = useState("");
@@ -88,6 +95,7 @@ export function QuestionBank({
   const visible = questions.filter((q) => {
     const c = q.topicId ? byTopic.get(q.topicId) : undefined;
     return (
+      (!guidedOnly || (!!q.hints?.length && !!q.skillIds?.length)) &&
       (!search.trim() ||
         `${q.statement} ${c?.topic.title ?? ""}`.includes(search.trim())) &&
       (!examCategory || sourceCategory(q.source) === examCategory) &&
@@ -119,6 +127,7 @@ export function QuestionBank({
   });
   const active = [
     search,
+    guidedOnly,
     examCategory,
     ...Object.values(examFilters),
     grade,
@@ -133,6 +142,7 @@ export function QuestionBank({
   ].filter(Boolean).length;
   function clear() {
     setSearch("");
+    setGuidedOnly(false);
     setExamCategory("");
     setExamFilters({});
     setGrade("");
@@ -280,6 +290,14 @@ export function QuestionBank({
             </button>
           )}
         </div>
+        <label className="flex items-center gap-2 text-sm text-slate-600">
+          <input
+            type="checkbox"
+            checked={guidedOnly}
+            onChange={(e) => setGuidedOnly(e.target.checked)}
+          />
+          فقط سؤال‌های دارای راهنما و مهارت
+        </label>
         <Field title="جست‌وجو در بانک سؤال">
           <div className="relative">
             <Search className="pointer-events-none absolute right-3 top-3.5 size-4 text-slate-400" />
@@ -500,12 +518,33 @@ export function QuestionBank({
                   <span className="text-teal-700">هوش مصنوعی · تأیید معلم</span>
                 )}
               </div>
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setCropOpen(false);
+                    setEditing(q._id);
+                  }}
+                >
+                  ویرایش سؤال
+                </Button>
+              </div>
+              {q.origin === "human_revised" && (
+                <p className="text-xs text-amber-700">
+                  نسخهٔ ویرایش‌شده توسط معلم
+                </p>
+              )}
               <p className="text-xs font-medium leading-7 text-teal-700">
                 {sourceSummary(q.source)}
               </p>
               <QuestionPresentation
                 statement={q.statement}
                 visuals={q.visuals}
+                onCrop={() => {
+                  setCropOpen(true);
+                  setEditing(q._id);
+                }}
               />
               <p className="border-t border-slate-100 pt-3 text-xs leading-7 text-slate-500">
                 {q.classification === "free"
@@ -523,6 +562,15 @@ export function QuestionBank({
           );
         })}
       </section>
+      {editing && (
+        <QuestionEditor
+          key={editing}
+          versionId={editing}
+          cropOpen={cropOpen}
+          onClose={() => setEditing(undefined)}
+          onSaved={onSaved}
+        />
+      )}
     </>
   );
 }

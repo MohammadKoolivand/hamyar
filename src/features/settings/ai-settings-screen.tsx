@@ -41,10 +41,11 @@ export function AiSettingsScreen() {
   return (
     <section className="glass-panel mx-auto grid w-full max-w-3xl gap-6 p-5 sm:p-7">
       <header className="space-y-3 border-b border-slate-200 pb-5">
-        <h2 className="text-xl font-bold text-[#233B8F]">تنظیمات تولید سؤال</h2>
+        <h2 className="text-xl font-bold text-[#233B8F]">تنظیمات هوش مصنوعی</h2>
         <p className="text-sm leading-7 text-slate-600">
-          سرویس تولید سؤال AvvalAI است. مدل دلخواه را انتخاب کنید؛ انتخاب شما
-          برای حساب خودتان ذخیره می‌شود و روی پیش‌نویس‌های بعدی اثر دارد.
+          سرویس تولید سؤال و انتخاب راهنمای تمرین AvvalAI است. مدل دلخواه را
+          انتخاب کنید؛ انتخاب شما برای حساب خودتان ذخیره می‌شود و روی
+          پیش‌نویس‌های بعدی اثر دارد.
         </p>
       </header>
       {error && (
@@ -82,7 +83,7 @@ export function AiSettingsScreen() {
           try {
             const saved = await api<Settings>("/settings/authoring", { model });
             setSettings(saved);
-            setNotice("مدل تولید سؤال ذخیره شد.");
+            setNotice("مدل تولید سؤال و راهنمای تمرین ذخیره شد.");
           } catch (e) {
             setError((e as Error).message);
           } finally {
@@ -109,7 +110,7 @@ export function AiSettingsScreen() {
             ))}
           </select>
         </Field>
-        <Field title="مدل تولید سؤال AvvalAI">
+        <Field title="مدل تولید سؤال و راهنمای AvvalAI">
           <select
             value={model}
             onChange={(e) => {
@@ -146,7 +147,7 @@ export function AiSettingsScreen() {
           <Button
             disabled={busy || !settings || !models.some((m) => m.id === model)}
           >
-            {busy ? "در حال انجام…" : "ذخیره مدل تولید سؤال"}
+            {busy ? "در حال انجام…" : "ذخیره مدل هوش مصنوعی"}
           </Button>
           <Button
             type="button"

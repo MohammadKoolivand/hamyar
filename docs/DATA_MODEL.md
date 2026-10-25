@@ -104,3 +104,11 @@ curriculum nodes optionally carry catalogKey/catalogVersion/catalogBookId, order
 منابع مشترک در collection موجود curriculum و با ownerId معلم باقی می‌مانند؛ `/resources` تنها محل UI برای افزودن کتاب رسمی و ساختار شخصی است. صفحه افزودن و فیلتر بانک از همان شناسه‌ها و روابط والد استفاده می‌کنند، کپی مستقلی از فهرست ساخته نمی‌شود.
 
 `questionVersions.source?` مشخصات منبع/آزمون را در همان نسخه ثابت نگهداری می‌کند. مدل source شامل family، administration و مشخصات اختیاری مرتبط با دسته است؛ هشت دسته رابط از این ابعاد استخراج می‌شوند. بنابراین هماهنگ کشوری با نهایی یکی نیست. نسخه‌های بدون source به «دسته‌بندی نشده» می‌روند و همچنان در «همه دسته‌ها» دیده می‌شوند. این مرحله مجموعه آزمون/PDF مستقل یا واردسازی فایل آرشیو ایجاد نمی‌کند.
+
+### آزمون واردشده و فایل‌های خصوصی
+
+- `examImports`: ownerId، metadata و source مشترک، state=collecting/review، revision، مشخصات فایل‌ها (name/size/sha256)، متن سؤال/پاسخ و پیام محدودیت استخراج.
+- `examImportChunks`: examId، ownerId، kind=question/answer، position و Binary حداکثر ۲۵۶ KiB؛ ایندکس یکتای examId/kind/position. فایل ۲۰ MiB در یک سند MongoDB قرار نمی‌گیرد.
+- `examImportItems`: ownerId/examId، question قابل اصلاح، state=pending/approved/rejected، originalNumber، reason، questionVersionId و زمان بررسی.
+
+فایل‌ها، استخراج و بررسی خصوصی‌اند؛ فایل پاسخ هرگز برای دانش‌آموز باز نمی‌شود. تأیید، ثبت question/version، تغییر وضعیت آیتم و auditLog در یک تراکنش‌اند. تعارض همزمان با بازخوانی وضعیت به 409 می‌رسد. نسخه نهایی provenance آزمون را نگه می‌دارد. اصلاح متن قبل از تأیید قابل ذخیره و ادامه است؛ بعد از تأیید نسخه ثابت حفظ می‌شود.

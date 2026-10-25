@@ -113,7 +113,9 @@ export function ContentScreen({
   const visibleNodes = nodes.filter((n) => n.title.includes(nodeSearch.trim()));
   return (
     <>
-      {view === "bank" && <QuestionBank nodes={nodes} questions={questions} />}
+      {view === "bank" && (
+        <QuestionBank nodes={nodes} questions={questions} onSaved={refresh} />
+      )}
       {view !== "bank" && (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-slate-500">

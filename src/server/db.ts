@@ -20,17 +20,38 @@ export async function connect(
     ["hintReports", { hintId: 1, studentId: 1 }],
   ] as const)
     await db.collection(name).createIndex(keys, { unique: true });
-  await db.collection("courseJoinCodes").createIndex({ tokenHash: 1 }, { unique: true });
-  await db.collection("courseJoinCodes").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-  await db.collection("courseRequests").createIndex({ courseId: 1, studentId: 1 }, { unique: true });
-  await db.collection("courseRequests").createIndex({ teacherId: 1, status: 1, updatedAt: -1 });
-  await db.collection("courseRequests").createIndex({ studentId: 1, updatedAt: -1 });
+  await db
+    .collection("courseJoinCodes")
+    .createIndex({ tokenHash: 1 }, { unique: true });
+  await db
+    .collection("courseJoinCodes")
+    .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await db
+    .collection("courseRequests")
+    .createIndex({ courseId: 1, studentId: 1 }, { unique: true });
+  await db
+    .collection("courseRequests")
+    .createIndex({ teacherId: 1, status: 1, updatedAt: -1 });
+  await db
+    .collection("courseRequests")
+    .createIndex({ studentId: 1, updatedAt: -1 });
   await db.collection("classGroups").createIndex({ teacherId: 1, courseId: 1 });
-  await db.collection("groupTasks").createIndex({ teacherId: 1, groupId: 1, createdAt: -1 });
-  await db.collection("assignments").createIndex({ groupTaskId: 1, studentId: 1 });
-  await db.collection("learningEvidence").createIndex({ teacherId: 1, studentId: 1, assignmentId: 1, createdAt: -1 });
+  await db
+    .collection("groupTasks")
+    .createIndex({ teacherId: 1, groupId: 1, createdAt: -1 });
+  await db
+    .collection("assignments")
+    .createIndex({ groupTaskId: 1, studentId: 1 });
+  await db.collection("learningEvidence").createIndex({
+    teacherId: 1,
+    studentId: 1,
+    assignmentId: 1,
+    createdAt: -1,
+  });
   await db.collection("courses").createIndex({ teacherId: 1, status: 1 });
-  await db.collection("enrollments").createIndex({ teacherId: 1, studentId: 1, status: 1 });
+  await db
+    .collection("enrollments")
+    .createIndex({ teacherId: 1, studentId: 1, status: 1 });
   await db.collection("enrollments").createIndex({ studentId: 1, status: 1 });
   await db
     .collection("sessions")
@@ -58,5 +79,12 @@ export async function connect(
   await db
     .collection("questionDrafts")
     .createIndex({ ownerId: 1, state: 1, createdAt: -1 });
+  await db.collection("examImports").createIndex({ ownerId: 1, createdAt: -1 });
+  await db
+    .collection("examImportItems")
+    .createIndex({ examId: 1, ownerId: 1, state: 1 });
+  await db
+    .collection("examImportChunks")
+    .createIndex({ examId: 1, kind: 1, position: 1 }, { unique: true });
   return { client, db };
 }

@@ -5,7 +5,13 @@ import { Field } from "@/components/ui/field";
 import { api } from "@/lib/api";
 import { IndividualRemediation } from "./individual-remediation";
 import { fa, stateLabel } from "@/lib/presentation";
-import type { User, Question, Assignment, Course, Enrollment } from "@/lib/types";
+import type {
+  User,
+  Question,
+  Assignment,
+  Course,
+  Enrollment,
+} from "@/lib/types";
 import { ArrowLeft, Target, BarChart3 } from "lucide-react";
 export function MissionsScreen({
   teacher,
@@ -68,9 +74,21 @@ export function MissionsScreen({
   showReport: (v: Assignment) => Promise<void>;
   open: (v: Assignment) => Promise<void>;
 }) {
+  const [feedbackMode, setFeedbackMode] = useState<"immediate" | "end">("end");
+  const [guidedOnly, setGuidedOnly] = useState(false);
+  const [questionSearch, setQuestionSearch] = useState("");
+  const visibleQuestions = questions.filter(
+    (q) =>
+      (!guidedOnly || (!!q.hints?.length && !!q.skillIds?.length)) &&
+      q.statement.includes(questionSearch.trim()),
+  );
   const [courseId, setCourseId] = useState("");
   const allowedStudents = courseId
-    ? students.filter((person) => enrollments.some((e) => e.courseId === courseId && e.studentId === person._id))
+    ? students.filter((person) =>
+        enrollments.some(
+          (e) => e.courseId === courseId && e.studentId === person._id,
+        ),
+      )
     : students;
   return (
     <>
@@ -95,6 +113,7 @@ export function MissionsScreen({
                   ...(courseId ? { courseId } : {}),
                   questionVersionIds: selected,
                   policy: {
+                    feedbackMode,
                     maxHints,
                     maxAttempts,
                     independent,
@@ -121,10 +140,20 @@ export function MissionsScreen({
               </Field>
               {!!courses.length && (
                 <Field title="درس مأموریت">
-                  <select className="w-full min-h-[46px] glass-field p-3" value={courseId}
-                    onChange={(e) => { setCourseId(e.target.value); setStudent(""); }}>
+                  <select
+                    className="w-full min-h-[46px] glass-field p-3"
+                    value={courseId}
+                    onChange={(e) => {
+                      setCourseId(e.target.value);
+                      setStudent("");
+                    }}
+                  >
                     <option value="">بدون درس (مأموریت قدیمی)</option>
-                    {courses.map((c) => <option key={c._id} value={c._id}>{c.title} · {c.subject}</option>)}
+                    {courses.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.title} · {c.subject}
+                      </option>
+                    ))}
                   </select>
                 </Field>
               )}
@@ -165,6 +194,18 @@ export function MissionsScreen({
                 />
               </Field>
             </div>
+            <Field title="زمان نمایش نتیجه به دانش‌آموز">
+              <select
+                className="glass-field min-h-11 w-full p-3"
+                value={feedbackMode}
+                onChange={(e) =>
+                  setFeedbackMode(e.target.value as "immediate" | "end")
+                }
+              >
+                <option value="immediate">بعد از هر پاسخ</option>
+                <option value="end">پس از پایان همه سؤال‌ها</option>
+              </select>
+            </Field>
             <label className="flex-row items-center flex gap-2 text-[13px] text-slate-600">
               <input
                 type="checkbox"
@@ -207,7 +248,38 @@ export function MissionsScreen({
               </label>
             )}
             <h3 className="text-base font-bold">انتخاب سؤال از بانک معتبر</h3>
-            {questions.map((q) => (
+            <Field title="جست‌وجوی سؤال برای مأموریت">
+              <input
+                className="glass-field min-h-11 w-full p-3"
+                type="search"
+                value={questionSearch}
+                onChange={(e) => setQuestionSearch(e.target.value)}
+              />
+            </Field>
+            <label className="flex items-center gap-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={guidedOnly}
+                onChange={(e) => setGuidedOnly(e.target.checked)}
+              />
+              فقط سؤال‌های دارای راهنما و مهارت
+            </label>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy || !visibleQuestions.length}
+              onClick={() =>
+                setSelected(visibleQuestions.slice(0, 30).map((q) => q._id))
+              }
+            >
+              انتخاب سؤال‌های نمایش‌داده‌شده (حداکثر ۳۰)
+            </Button>
+            {!!questions.length && !visibleQuestions.length && (
+              <p className="text-sm text-slate-500">
+                سؤالی با این فیلتر پیدا نشد.
+              </p>
+            )}
+            {visibleQuestions.map((q) => (
               <label
                 key={q._id}
                 className="flex-row items-center glass-option p-[18px] flex gap-2 text-[13px] text-slate-600"
@@ -276,10 +348,7 @@ export function MissionsScreen({
           </p>
         )}
         {assignments.map((a) => (
-          <div
-            key={a._id}
-            className="grid gap-3 glass-option p-[18px]"
-          >
+          <div key={a._id} className="grid gap-3 glass-option p-[18px]">
             <div className="flex flex-wrap items-center gap-3">
               <h3 className="text-base font-bold">{a.title}</h3>
               <span className="inline-block rounded-full border border-[#2ec8c333] bg-[#2ec8c314] px-3 py-1.5 text-[11px] text-[#08746f]">
@@ -290,7 +359,10 @@ export function MissionsScreen({
               {teacher
                 ? students.find((s) => s._id === a.studentId)?.name
                 : "تمرین زیر نظر معلم"}{" "}
-              {a.courseId ? " · " + (courses.find((c) => c._id === a.courseId)?.title ?? "درس") : ""}{" "}
+              {a.courseId
+                ? " · " +
+                  (courses.find((c) => c._id === a.courseId)?.title ?? "درس")
+                : ""}{" "}
               ·{" "}
               {a.policy.independent
                 ? "سنجش مستقل"

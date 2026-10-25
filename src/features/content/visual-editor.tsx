@@ -1,4 +1,5 @@
 "use client";
+import { ImageCropEditor } from "./image-crop-editor";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { QuestionVisualView } from "@/components/question-presentation";
@@ -8,10 +9,12 @@ export function VisualEditor({
   value,
   onChange,
   disabled = false,
+  cropOpen = false,
 }: {
   value: QuestionVisual[];
   onChange: (v: QuestionVisual[]) => void;
   disabled?: boolean;
+  cropOpen?: boolean;
 }) {
   const change = (i: number, v: QuestionVisual) =>
     onChange(value.map((old, j) => (i === j ? v : old)));
@@ -83,6 +86,13 @@ export function VisualEditor({
                 onChange={(e) => change(i, { ...v, caption: e.target.value })}
               />
             </Field>
+            {v.kind === "image" && (
+              <ImageCropEditor
+                value={v}
+                autoOpen={cropOpen}
+                onChange={(next) => change(i, next)}
+              />
+            )}
             {v.kind === "formula" && (
               <>
                 <Field title={`فرمول LaTeX ${i + 1}`}>
@@ -382,7 +392,7 @@ export function VisualEditor({
                 ))}
               </>
             )}
-            <QuestionVisualView visual={v} />
+            {v.kind !== "image" && <QuestionVisualView visual={v} />}
             <Button
               type="button"
               variant="outline"

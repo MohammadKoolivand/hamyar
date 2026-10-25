@@ -2,7 +2,7 @@ import { backend } from "@/server/backend";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 class PayloadLimit extends Error {}
-async function payload(request: Request) {
+async function payload(request: Request, limit = 65536) {
   const reader = request.body?.getReader();
   if (!reader) return Buffer.alloc(0);
   const chunks: Uint8Array[] = [];
@@ -12,7 +12,7 @@ async function payload(request: Request) {
       const chunk = await reader.read();
       if (chunk.done) break;
       total += chunk.value.byteLength;
-      if (total > 65536) {
+      if (total > limit) {
         await reader.cancel();
         throw new PayloadLimit();
       }
@@ -25,11 +25,32 @@ async function payload(request: Request) {
 }
 async function handle(request: Request) {
   try {
-    const body = !["GET", "HEAD"].includes(request.method)
-      ? await payload(request)
-      : undefined;
-    const app = await backend();
     const url = new URL(request.url);
+    const app = await backend();
+    const large =
+      request.method === "POST" &&
+      /^\/api\/exam-imports\/[a-f0-9-]{36}\/files\/(question|answer)$/.test(
+        url.pathname,
+      );
+    if (large) {
+      const eid = url.pathname.split("/")[3];
+      const authorized = await app.inject({
+        method: "GET",
+        url: `/api/exam-imports/${eid}`,
+        headers: Object.fromEntries(request.headers.entries()),
+      });
+      if (authorized.statusCode !== 200)
+        return new Response(authorized.body, {
+          status: authorized.statusCode,
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store",
+          },
+        });
+    }
+    const body = !["GET", "HEAD"].includes(request.method)
+      ? await payload(request, large ? 20 * 1024 * 1024 : 65536)
+      : undefined;
     const headers = Object.fromEntries(request.headers.entries());
     const response = await app.inject({
       method: request.method as
@@ -54,10 +75,13 @@ async function handle(request: Request) {
         output.append(name, String(item));
     }
     output.set("Cache-Control", "private, no-store");
-    return new Response(request.method === "HEAD" ? null : response.body, {
-      status: response.statusCode,
-      headers: output,
-    });
+    return new Response(
+      request.method === "HEAD" ? null : new Uint8Array(response.rawPayload),
+      {
+        status: response.statusCode,
+        headers: output,
+      },
+    );
   } catch (error) {
     if (error instanceof PayloadLimit)
       return Response.json(

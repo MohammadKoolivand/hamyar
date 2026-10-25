@@ -141,7 +141,7 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await sp.getByRole("button", { name: "ثبت و بررسی پاسخ" }).click();
   await expect(sp.getByText("صحیح · با دریافت کمک")).toBeVisible();
   await sp
-    .getByRole("button", { name: "پایان مأموریت و دریافت گزارش" })
+    .getByRole("button", { name: "پایان تمرین و گزارش" })
     .click();
   await expect(
     sp.getByText(
@@ -384,7 +384,7 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
   await sp.getByRole("button", { name: "ثبت و بررسی پاسخ" }).click();
   await expect(sp.getByText("صحیح · بدون دریافت کمک")).toBeVisible();
   await sp
-    .getByRole("button", { name: "پایان مأموریت و دریافت گزارش" })
+    .getByRole("button", { name: "پایان تمرین و گزارش" })
     .click();
   await expect(
     sp.getByRole("heading", { name: "استقلال در اولین تلاش" }),
