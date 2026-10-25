@@ -108,6 +108,7 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       fullPage: true,
     });
     await page.getByRole("button", { name: "خروج", exact: true }).click();
+    await expect(page.getByLabel("ایمیل یا شماره موبایل", { exact: true })).toBeVisible();
     await page.goto("/?invite=" + inviteToken);
     await page.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز دعوت موبایلی");
     await page.getByLabel("شماره موبایل دعوت‌شده", { exact: true }).fill("۰۹۱۲۳۴۵۶۷۸۹");
