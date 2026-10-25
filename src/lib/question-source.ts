@@ -38,6 +38,23 @@ export const questionSourceSchema = z
     bookletCode: z.string().trim().min(1).max(80).optional(),
     questionNumber: z.number().int().min(1).max(10000).optional(),
     sourceTitle: z.string().trim().min(1).max(200).optional(),
+    examDate: z
+      .string()
+      .regex(
+        /^1[34]\d{2}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/,
+        "تاریخ آزمون را به صورت 1405/08/01 وارد کنید",
+      )
+      .optional(),
+    publishedDate: z.iso.date().optional(),
+    sourcePage: z.number().int().min(1).max(10000).optional(),
+    sourcePageUrl: z
+      .url()
+      .max(1500)
+      .refine(
+        (v) => /^https?:\/\//i.test(v),
+        "نشانی صفحه منبع باید http یا https باشد",
+      )
+      .optional(),
     sourceUrl: z
       .url()
       .max(1500)

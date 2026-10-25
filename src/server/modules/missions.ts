@@ -1,3 +1,4 @@
+import { MAX_MISSION_QUESTIONS } from "../../lib/mission-limits";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
 import { z } from "zod";
@@ -18,7 +19,10 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
           title: z.string().min(3).max(150),
           studentId: z.string().uuid(),
           courseId: z.string().uuid().optional(),
-          questionVersionIds: z.array(z.string().uuid()).min(1).max(30),
+          questionVersionIds: z
+            .array(z.string().uuid())
+            .min(1)
+            .max(MAX_MISSION_QUESTIONS),
           policy: policySchema,
         })
         .parse(r.body);
@@ -43,7 +47,9 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
       : null;
     if (b.courseId) {
       const course = await c("courses").findOne({
-        _id: b.courseId, teacherId: u._id, status: "active",
+        _id: b.courseId,
+        teacherId: u._id,
+        status: "active",
       });
       if (!course || !enrollment) fail(404, "عضویت معتبر در این درس پیدا نشد");
     }
@@ -76,16 +82,24 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
       )
         return { ok: true };
       if (m!.courseId) {
-        const course = await c("courses").findOne({
-          _id: m!.courseId, teacherId: u._id, status: "active",
-        }, { session });
-        const enrollment = await c("enrollments").findOne({
-          _id: m!.enrollmentId,
-          courseId: m!.courseId,
-          studentId: m!.studentId,
-          teacherId: u._id,
-          status: "active",
-        }, { session });
+        const course = await c("courses").findOne(
+          {
+            _id: m!.courseId,
+            teacherId: u._id,
+            status: "active",
+          },
+          { session },
+        );
+        const enrollment = await c("enrollments").findOne(
+          {
+            _id: m!.enrollmentId,
+            courseId: m!.courseId,
+            studentId: m!.studentId,
+            teacherId: u._id,
+            status: "active",
+          },
+          { session },
+        );
         if (!course || !enrollment) fail(409, "عضویت این درس دیگر معتبر نیست");
       }
       transition(m!.state, "published");
@@ -101,7 +115,9 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
           missionId: mid,
           teacherId: u._id,
           studentId: m!.studentId,
-          ...(m!.courseId ? { courseId: m!.courseId, enrollmentId: m!.enrollmentId } : {}),
+          ...(m!.courseId
+            ? { courseId: m!.courseId, enrollmentId: m!.enrollmentId }
+            : {}),
           title: m!.title,
           policy: m!.policy,
           questionVersionIds: m!.questionVersionIds,

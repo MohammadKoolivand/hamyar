@@ -1,4 +1,5 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import { useState } from "react";
 import { CheckCircle2, XCircle, CircleHelp, MinusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ export function MissionReport({
   onReview: (id: string, result: string, note: string) => void;
 }) {
   const [filter, setFilter] = useState("all");
+  const [targetPage, setTargetPage] = useState({ page: 1, token: 0 });
   const questions: ReportQuestion[] =
     report.questions ??
     (active.questions ?? []).map((q, index) => {
@@ -203,7 +205,19 @@ export function MissionReport({
               key={q._id}
               href={`#report-question-${q._id}`}
               title={`سؤال ${fa(q.number)}: ${resultLabel(q.result)}`}
-              onClick={() => setFilter("all")}
+              onClick={(event) => {
+                event.preventDefault();
+                setFilter("all");
+                setTargetPage((old) => ({
+                  page: Math.floor((q.number - 1) / 10) + 1,
+                  token: old.token + 1,
+                }));
+                requestAnimationFrame(() =>
+                  document
+                    .getElementById(`report-question-${q._id}`)
+                    ?.scrollIntoView({ block: "start" }),
+                );
+              }}
               className={`flex min-h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm font-bold ${tone(q.result)}`}
             >
               {fa(q.number)}
@@ -215,107 +229,121 @@ export function MissionReport({
             سؤالی با این وضعیت وجود ندارد.
           </p>
         )}
-        {visible.map((q) => (
-          <article
-            id={`report-question-${q._id}`}
-            key={q._id}
-            className={`scroll-mt-6 rounded-2xl border p-4 sm:p-6 ${tone(q.result)}`}
-          >
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h3 className="font-bold">
-                سؤال {fa(q.number)} · {resultLabel(q.result)}
-              </h3>
-              <span className="text-xs">
-                {q.topic} · {fa(q.attempts)} تلاش · {fa(q.hintsUsed)} راهنما
-              </span>
-            </div>
-            <div className="rounded-xl bg-white/80 p-3 text-slate-800">
-              <QuestionPresentation
-                statement={q.statement}
-                visuals={q.visuals}
-              />
-            </div>
-            {q.type === "choice" ? (
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                {q.options.map((option, index) => {
-                  const selected = option === q.answer,
-                    right = option === q.reference;
-                  return (
-                    <div
-                      key={index}
-                      className={`rounded-xl border p-3 text-sm leading-7 ${right || (selected && q.result === "correct") ? "border-emerald-400 bg-emerald-100/80 text-emerald-950" : selected ? (q.result === "pending_review" ? "border-violet-300 bg-violet-100/80 text-violet-950" : "border-rose-400 bg-rose-100/80 text-rose-950") : "border-slate-200 bg-white/70 text-slate-600"}`}
-                    >
-                      <span className="font-bold">{fa(index + 1)}. </span>
-                      <MathText text={option} />
-                      <div className="mt-1 flex flex-wrap gap-2 text-xs font-bold">
-                        {selected && <span>انتخاب شما</span>}
-                        {right && <span>✓ پاسخ صحیح</span>}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl bg-white/70 p-3">
-                  <p className="mb-2 text-xs">پاسخ شما</p>
-                  <MathText text={q.answer ?? "بدون پاسخ"} />
+        <PagedList
+          key={`${filter}-${targetPage.token}`}
+          initialPage={filter === "all" ? targetPage.page : 1}
+          items={visible}
+          label="گزارش سؤال‌ها"
+        >
+          {(q) => (
+            <article
+              id={`report-question-${q._id}`}
+              key={q._id}
+              className="scroll-mt-6 rounded-3xl border border-blue-200/70 bg-gradient-to-bl from-white/85 via-blue-50/65 to-cyan-50/45 p-4 text-[#233B8F] shadow-[0_8px_30px_rgba(35,59,143,0.05),inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-xl sm:p-6"
+            >
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="font-bold">سؤال {fa(q.number)}</h3>
+                  <span
+                    className={`rounded-full border px-3 py-1 text-xs font-medium ${tone(q.result)}`}
+                  >
+                    {resultLabel(q.result)}
+                  </span>
                 </div>
-                {q.reference !== undefined && (
-                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-900">
-                    <p className="mb-2 text-xs">پاسخ مرجع</p>
-                    <MathText text={q.reference} />
-                  </div>
-                )}
+                <span className="text-xs text-slate-500">
+                  {q.topic} · {fa(q.attempts)} تلاش · {fa(q.hintsUsed)} راهنما
+                </span>
               </div>
-            )}
-            {q.result === "unanswered" && (
-              <p className="mt-3 text-sm font-medium">
-                این سؤال را پاسخ نداده‌اید.
-              </p>
-            )}
-            {q.reference === undefined && (
-              <p className="mt-3 text-xs">
-                پاسخ مرجع پس از پایان تمرین نمایش داده می‌شود.
-              </p>
-            )}
-            <p className="mt-4 text-sm leading-7">{q.analysis}</p>
-            {teacher && (
-              <details className="mt-4 rounded-xl bg-white/60 p-3">
-                <summary className="cursor-pointer text-sm font-medium">
-                  تاریخچه تلاش‌ها و بازبینی معلم
-                </summary>
-                {report.evidence
-                  .filter((t) => t.questionVersionId === q._id)
-                  .map((t) => (
-                    <div
-                      className="mt-4 grid gap-3 border-t border-slate-200 pt-3"
-                      key={t._id}
-                    >
-                      <p className="text-sm">
-                        تلاش {fa(t.sequence)}: <MathText text={t.answer} /> ·{" "}
-                        {stateLabel[t.evaluation?.result ?? ""]}
-                      </p>
-                      {t.evaluation?.reviews?.map((review, i) => (
-                        <p key={i} className="text-xs">
-                          {review.note} · {stateLabel[review.previousResult]} ←{" "}
-                          {stateLabel[review.result]}
-                        </p>
-                      ))}
-                      {t.evaluation && (
-                        <Review
-                          disabled={busy}
-                          submit={(result, note) =>
-                            onReview(t.evaluation!._id, result, note)
-                          }
-                        />
-                      )}
+              <div className="rounded-xl bg-white/80 p-3 text-slate-800">
+                <QuestionPresentation
+                  statement={q.statement}
+                  visuals={q.visuals}
+                />
+              </div>
+              {q.type === "choice" ? (
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  {q.options.map((option, index) => {
+                    const selected = option === q.answer,
+                      right = option === q.reference;
+                    return (
+                      <div
+                        key={index}
+                        className={`rounded-xl border p-3 text-sm leading-7 ${right || (selected && q.result === "correct") ? "border-emerald-400 bg-emerald-100/80 text-emerald-950" : selected ? (q.result === "pending_review" ? "border-violet-300 bg-violet-100/80 text-violet-950" : "border-rose-400 bg-rose-100/80 text-rose-950") : "border-slate-200 bg-white/70 text-slate-600"}`}
+                      >
+                        <span className="font-bold">{fa(index + 1)}. </span>
+                        <MathText text={option} />
+                        <div className="mt-1 flex flex-wrap gap-2 text-xs font-bold">
+                          {selected && <span>انتخاب شما</span>}
+                          {right && <span>✓ پاسخ صحیح</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl bg-white/70 p-3">
+                    <p className="mb-2 text-xs">پاسخ شما</p>
+                    <MathText text={q.answer ?? "بدون پاسخ"} />
+                  </div>
+                  {q.reference !== undefined && (
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-900">
+                      <p className="mb-2 text-xs">پاسخ مرجع</p>
+                      <MathText text={q.reference} />
                     </div>
-                  ))}
-              </details>
-            )}
-          </article>
-        ))}
+                  )}
+                </div>
+              )}
+              {q.result === "unanswered" && (
+                <p className="mt-3 text-sm font-medium">
+                  این سؤال را پاسخ نداده‌اید.
+                </p>
+              )}
+              {q.reference === undefined && (
+                <p className="mt-3 text-xs">
+                  پاسخ مرجع پس از پایان تمرین نمایش داده می‌شود.
+                </p>
+              )}
+              <p className="mt-4 text-sm leading-7 text-slate-600">
+                {q.analysis}
+              </p>
+              {teacher && (
+                <details className="mt-4 rounded-xl bg-white/60 p-3">
+                  <summary className="cursor-pointer text-sm font-medium">
+                    تاریخچه تلاش‌ها و بازبینی معلم
+                  </summary>
+                  {report.evidence
+                    .filter((t) => t.questionVersionId === q._id)
+                    .map((t) => (
+                      <div
+                        className="mt-4 grid gap-3 border-t border-slate-200 pt-3"
+                        key={t._id}
+                      >
+                        <p className="text-sm">
+                          تلاش {fa(t.sequence)}: <MathText text={t.answer} /> ·{" "}
+                          {stateLabel[t.evaluation?.result ?? ""]}
+                        </p>
+                        {t.evaluation?.reviews?.map((review, i) => (
+                          <p key={i} className="text-xs">
+                            {review.note} · {stateLabel[review.previousResult]}{" "}
+                            ← {stateLabel[review.result]}
+                          </p>
+                        ))}
+                        {t.evaluation && (
+                          <Review
+                            disabled={busy}
+                            submit={(result, note) =>
+                              onReview(t.evaluation!._id, result, note)
+                            }
+                          />
+                        )}
+                      </div>
+                    ))}
+                </details>
+              )}
+            </article>
+          )}
+        </PagedList>
       </section>
     </div>
   );

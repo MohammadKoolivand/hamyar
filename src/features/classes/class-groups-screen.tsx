@@ -1,6 +1,8 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { QuestionPicker } from "@/features/content/question-picker";
 import { UsersRound, BookOpen, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -134,26 +136,28 @@ export function ClassGroupsScreen({
   ) {
     return (
       <div className="grid gap-2" aria-label="دانش‌آموزان کلاس">
-        {eligible(course).map((person) => (
-          <label
-            key={person._id}
-            className="glass-option flex items-center gap-3 p-3 text-sm"
-          >
-            <input
-              type="checkbox"
-              className="size-5 accent-[#1f3f97]"
-              checked={chosen.includes(person._id)}
-              onChange={(e) =>
-                onChange(
-                  e.target.checked
-                    ? [...chosen, person._id]
-                    : chosen.filter((x) => x !== person._id),
-                )
-              }
-            />
-            {person.name}
-          </label>
-        ))}
+        <PagedList items={eligible(course)} label="اعضای کلاس">
+          {(person) => (
+            <label
+              key={person._id}
+              className="glass-option flex items-center gap-3 p-3 text-sm"
+            >
+              <input
+                type="checkbox"
+                className="size-5 accent-[#1f3f97]"
+                checked={chosen.includes(person._id)}
+                onChange={(e) =>
+                  onChange(
+                    e.target.checked
+                      ? [...chosen, person._id]
+                      : chosen.filter((x) => x !== person._id),
+                  )
+                }
+              />
+              {person.name}
+            </label>
+          )}
+        </PagedList>
         {!eligible(course).length && (
           <p className="text-sm text-slate-600">
             ابتدا عضویت دانش‌آموزان در درس را تأیید کنید.
@@ -338,7 +342,13 @@ export function ClassGroupsScreen({
             هنوز کلاسی ساخته نشده است.
           </p>
         )}
-        <div className="grid gap-3 sm:grid-cols-2">{groups.map(roster)}</div>
+        <PagedList
+          items={groups}
+          label="کلاس‌ها"
+          className="grid gap-3 sm:grid-cols-2"
+        >
+          {roster}
+        </PagedList>
       </section>
       <section className="glass-panel grid gap-4 p-6">
         <h3 className="flex items-center gap-2 font-bold">
@@ -372,31 +382,12 @@ export function ClassGroupsScreen({
           </Field>
           <div className="grid gap-2">
             <strong className="text-sm">سؤال‌های مأموریت</strong>
-            {questions.map((q) => (
-              <label
-                key={q._id}
-                className="glass-option flex items-center gap-3 p-3 text-sm"
-              >
-                <input
-                  type="checkbox"
-                  className="size-5 accent-[#1f3f97]"
-                  checked={selectedQuestions.includes(q._id)}
-                  onChange={(e) =>
-                    setSelectedQuestions(
-                      e.target.checked
-                        ? [...selectedQuestions, q._id]
-                        : selectedQuestions.filter((v) => v !== q._id),
-                    )
-                  }
-                />
-                {q.statement}
-              </label>
-            ))}
-            {!questions.length && (
-              <p className="text-sm text-slate-600">
-                ابتدا از بانک سؤال، سؤال تعریف کنید.
-              </p>
-            )}
+            <QuestionPicker
+              questions={questions}
+              selected={selectedQuestions}
+              onChange={setSelectedQuestions}
+              disabled={busy}
+            />
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field title="زمان نمایش نتیجه به دانش‌آموز">
@@ -459,74 +450,81 @@ export function ClassGroupsScreen({
             هنوز مأموریت گروهی ندارید.
           </p>
         )}
-        {tasks.map((task) => (
-          <article key={task._id} className="glass-card grid gap-3 p-5">
-            <h4 className="font-bold">{task.title}</h4>
-            <p className="text-xs text-slate-600">
-              {groups.find((g) => g._id === task.groupId)?.title ?? "کلاس"} ·
-              {task.studentIds.length.toLocaleString("fa-IR")} دانش‌آموز ·
-              {task.state === "draft" ? "پیش‌نویس" : "منتشرشده"}
-            </p>
-            {task.state === "draft" ? (
-              <Button
-                disabled={busy}
-                onClick={() =>
-                  void act(async () => {
-                    await api("/group-tasks/" + task._id + "/publish", {});
-                    setNotice("مأموریت برای همه دانش‌آموزان کلاس منتشر شد.");
-                  })
-                }
-              >
-                انتشار برای تمام اعضای کلاس
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                disabled={busy}
-                onClick={() =>
-                  void act(async () => {
-                    const data = await api<GroupReport>(
-                      "/group-tasks/" + task._id + "/report",
-                    );
-                    setReports((prev) => ({ ...prev, [task._id]: data }));
-                  })
-                }
-              >
-                <BarChart3 size={16} /> نمایش / به‌روزرسانی گزارش گروه
-              </Button>
-            )}
-            {reports[task._id] && (
-              <div data-testid="class-group-report" className="grid gap-2">
-                {reports[task._id].students.map((person) => (
-                  <div
-                    key={person.assignmentId}
-                    className="glass-option flex flex-wrap items-center justify-between gap-3 p-3"
+        <PagedList items={tasks} label="مأموریت‌های گروهی">
+          {(task) => (
+            <article key={task._id} className="glass-card grid gap-3 p-5">
+              <h4 className="font-bold">{task.title}</h4>
+              <p className="text-xs text-slate-600">
+                {groups.find((g) => g._id === task.groupId)?.title ?? "کلاس"} ·
+                {task.studentIds.length.toLocaleString("fa-IR")} دانش‌آموز ·
+                {task.state === "draft" ? "پیش‌نویس" : "منتشرشده"}
+              </p>
+              {task.state === "draft" ? (
+                <Button
+                  disabled={busy}
+                  onClick={() =>
+                    void act(async () => {
+                      await api("/group-tasks/" + task._id + "/publish", {});
+                      setNotice("مأموریت برای همه دانش‌آموزان کلاس منتشر شد.");
+                    })
+                  }
+                >
+                  انتشار برای تمام اعضای کلاس
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() =>
+                    void act(async () => {
+                      const data = await api<GroupReport>(
+                        "/group-tasks/" + task._id + "/report",
+                      );
+                      setReports((prev) => ({ ...prev, [task._id]: data }));
+                    })
+                  }
+                >
+                  <BarChart3 size={16} /> نمایش / به‌روزرسانی گزارش گروه
+                </Button>
+              )}
+              {reports[task._id] && (
+                <div data-testid="class-group-report" className="grid gap-2">
+                  <PagedList
+                    items={reports[task._id].students}
+                    label="گزارش دانش‌آموزان"
                   >
-                    <div className="text-sm">
-                      <p className="font-bold">{person.studentName}</p>
-                      <p className="text-slate-600">
-                        {person.answered}/{person.total} پاسخ ·{" "}
-                        {person.independent} درست مستقل ·{person.assisted} با
-                        کمک · {person.pending} در انتظار بررسی
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        const assignment = assignments.find(
-                          (a) => a._id === person.assignmentId,
-                        );
-                        if (assignment) void showReport(assignment);
-                      }}
-                    >
-                      گزارش اختصاصی
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </article>
-        ))}
+                    {(person) => (
+                      <div
+                        key={person.assignmentId}
+                        className="glass-option flex flex-wrap items-center justify-between gap-3 p-3"
+                      >
+                        <div className="text-sm">
+                          <p className="font-bold">{person.studentName}</p>
+                          <p className="text-slate-600">
+                            {person.answered}/{person.total} پاسخ ·{" "}
+                            {person.independent} درست مستقل ·{person.assisted}{" "}
+                            با کمک · {person.pending} در انتظار بررسی
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            const assignment = assignments.find(
+                              (a) => a._id === person.assignmentId,
+                            );
+                            if (assignment) void showReport(assignment);
+                          }}
+                        >
+                          گزارش اختصاصی
+                        </Button>
+                      </div>
+                    )}
+                  </PagedList>
+                </div>
+              )}
+            </article>
+          )}
+        </PagedList>
       </section>
     </div>
   );

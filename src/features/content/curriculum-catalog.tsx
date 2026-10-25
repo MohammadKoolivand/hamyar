@@ -1,4 +1,5 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -183,60 +184,65 @@ export function CurriculumCatalog({
             </p>
           )}
           <div className="grid max-h-[34rem] gap-3 overflow-y-auto">
-            {books.map((book) => (
-              <details
-                className="min-w-0 rounded-xl border border-slate-200 p-3"
-                key={book.id}
-              >
-                <summary className="cursor-pointer text-sm font-medium">
-                  {book.title} · پایه {book.grade.toLocaleString("fa-IR")} ·{" "}
-                  {book.tracks.map((t) => catalog.trackLabels[t]).join("، ")} ·{" "}
-                  {book.chapters.length.toLocaleString("fa-IR")} فصل{" "}
-                  {nodes.some((n) => n.catalogBookId === book.id)
-                    ? "· افزوده‌شده"
-                    : ""}
-                </summary>
-                <div className="mt-3 grid gap-3">
-                  <a
-                    href={book.source.outlineUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs text-[#233B8F] underline"
-                  >
-                    {book.source.officialEditionVerified
-                      ? "فایل رسمی؛ فهرست فصل‌ها بررسی شده"
-                      : "منبع ثانویه؛ چاپ رسمی هنوز تطبیق نشده"}
-                  </a>
-                  {book.chapters.map((ch) => (
-                    <div key={ch.order} className="rounded-xl bg-slate-50 p-3">
-                      <h3 className="text-sm font-bold">
-                        فصل {ch.order.toLocaleString("fa-IR")}: {ch.title}
-                      </h3>
-                      <ul className="mt-2 list-inside list-disc text-sm leading-loose">
-                        {ch.topics.map((t) => (
-                          <li key={t.title}>
-                            {t.title}
-                            {t.basis === "chapter" && (
-                              <span className="text-xs text-slate-500">
-                                {" "}
-                                (در سطح فصل)
-                              </span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                  <Button
-                    disabled={busy}
-                    variant="outline"
-                    onClick={() => void importBooks([book.id])}
-                  >
-                    افزودن این کتاب به مباحث من
-                  </Button>
-                </div>
-              </details>
-            ))}
+            <PagedList items={books} label="کتاب‌ها">
+              {(book) => (
+                <details
+                  className="min-w-0 rounded-xl border border-slate-200 p-3"
+                  key={book.id}
+                >
+                  <summary className="cursor-pointer text-sm font-medium">
+                    {book.title} · پایه {book.grade.toLocaleString("fa-IR")} ·{" "}
+                    {book.tracks.map((t) => catalog.trackLabels[t]).join("، ")}{" "}
+                    · {book.chapters.length.toLocaleString("fa-IR")} فصل{" "}
+                    {nodes.some((n) => n.catalogBookId === book.id)
+                      ? "· افزوده‌شده"
+                      : ""}
+                  </summary>
+                  <div className="mt-3 grid gap-3">
+                    <a
+                      href={book.source.outlineUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-[#233B8F] underline"
+                    >
+                      {book.source.officialEditionVerified
+                        ? "فایل رسمی؛ فهرست فصل‌ها بررسی شده"
+                        : "منبع ثانویه؛ چاپ رسمی هنوز تطبیق نشده"}
+                    </a>
+                    {book.chapters.map((ch) => (
+                      <div
+                        key={ch.order}
+                        className="rounded-xl bg-slate-50 p-3"
+                      >
+                        <h3 className="text-sm font-bold">
+                          فصل {ch.order.toLocaleString("fa-IR")}: {ch.title}
+                        </h3>
+                        <ul className="mt-2 list-inside list-disc text-sm leading-loose">
+                          {ch.topics.map((t) => (
+                            <li key={t.title}>
+                              {t.title}
+                              {t.basis === "chapter" && (
+                                <span className="text-xs text-slate-500">
+                                  {" "}
+                                  (در سطح فصل)
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                    <Button
+                      disabled={busy}
+                      variant="outline"
+                      onClick={() => void importBooks([book.id])}
+                    >
+                      افزودن این کتاب به مباحث من
+                    </Button>
+                  </div>
+                </details>
+              )}
+            </PagedList>
           </div>
         </>
       )}

@@ -108,6 +108,10 @@ export interface Node {
   tracks?: string[];
 }
 export interface Question {
+  importEvidence?: {
+    answerBasis: "published_key" | "independent_review";
+    note: string;
+  };
   hints?: string[];
   skillIds?: string[];
   source?: import("./question-source").QuestionSource;

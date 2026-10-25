@@ -1,8 +1,10 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { api } from "@/lib/api";
+import { QuestionPicker } from "@/features/content/question-picker";
 import { IndividualRemediation } from "./individual-remediation";
 import { fa, stateLabel } from "@/lib/presentation";
 import type {
@@ -75,13 +77,6 @@ export function MissionsScreen({
   open: (v: Assignment) => Promise<void>;
 }) {
   const [feedbackMode, setFeedbackMode] = useState<"immediate" | "end">("end");
-  const [guidedOnly, setGuidedOnly] = useState(false);
-  const [questionSearch, setQuestionSearch] = useState("");
-  const visibleQuestions = questions.filter(
-    (q) =>
-      (!guidedOnly || (!!q.hints?.length && !!q.skillIds?.length)) &&
-      q.statement.includes(questionSearch.trim()),
-  );
   const [courseId, setCourseId] = useState("");
   const allowedStudents = courseId
     ? students.filter((person) =>
@@ -248,62 +243,12 @@ export function MissionsScreen({
               </label>
             )}
             <h3 className="text-base font-bold">انتخاب سؤال از بانک معتبر</h3>
-            <Field title="جست‌وجوی سؤال برای مأموریت">
-              <input
-                className="glass-field min-h-11 w-full p-3"
-                type="search"
-                value={questionSearch}
-                onChange={(e) => setQuestionSearch(e.target.value)}
-              />
-            </Field>
-            <label className="flex items-center gap-2 text-sm text-slate-600">
-              <input
-                type="checkbox"
-                checked={guidedOnly}
-                onChange={(e) => setGuidedOnly(e.target.checked)}
-              />
-              فقط سؤال‌های دارای راهنما و مهارت
-            </label>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={busy || !visibleQuestions.length}
-              onClick={() =>
-                setSelected(visibleQuestions.slice(0, 30).map((q) => q._id))
-              }
-            >
-              انتخاب سؤال‌های نمایش‌داده‌شده (حداکثر ۳۰)
-            </Button>
-            {!!questions.length && !visibleQuestions.length && (
-              <p className="text-sm text-slate-500">
-                سؤالی با این فیلتر پیدا نشد.
-              </p>
-            )}
-            {visibleQuestions.map((q) => (
-              <label
-                key={q._id}
-                className="flex-row items-center glass-option p-[18px] flex gap-2 text-[13px] text-slate-600"
-              >
-                <input
-                  type="checkbox"
-                  checked={selected.includes(q._id)}
-                  onChange={(e) =>
-                    setSelected(
-                      e.target.checked
-                        ? [...selected, q._id]
-                        : selected.filter((x) => x !== q._id),
-                    )
-                  }
-                  className="size-5 min-h-5 shrink-0 cursor-pointer accent-[#1f3f97]"
-                />
-                {q.statement}
-              </label>
-            ))}
-            {!questions.length && (
-              <p className="text-xs leading-loose text-slate-500">
-                ابتدا از بانک سؤال، سؤال اضافه کنید.
-              </p>
-            )}
+            <QuestionPicker
+              questions={questions}
+              selected={selected}
+              onChange={setSelected}
+              disabled={busy}
+            />
             <Button
               disabled={busy || !selected.length}
               className="justify-self-start"
@@ -311,9 +256,11 @@ export function MissionsScreen({
               ساخت پیش‌نویس مأموریت
             </Button>
           </form>
-          {drafts
-            .filter((d) => d.state === "draft")
-            .map((d) => (
+          <PagedList
+            items={drafts.filter((d) => d.state === "draft")}
+            label="پیش‌نویس مأموریت"
+          >
+            {(d) => (
               <div
                 key={d._id}
                 className="glass-option p-[18px] flex flex-wrap items-center gap-3"
@@ -334,7 +281,8 @@ export function MissionsScreen({
                   انتشار برای دانش‌آموز
                 </Button>
               </div>
-            ))}
+            )}
+          </PagedList>
         </section>
       )}
       <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
@@ -347,60 +295,64 @@ export function MissionsScreen({
             هنوز مأموریتی منتشر نشده است.
           </p>
         )}
-        {assignments.map((a) => (
-          <div key={a._id} className="grid gap-3 glass-option p-[18px]">
-            <div className="flex flex-wrap items-center gap-3">
-              <h3 className="text-base font-bold">{a.title}</h3>
-              <span className="inline-block rounded-full border border-[#2ec8c333] bg-[#2ec8c314] px-3 py-1.5 text-[11px] text-[#08746f]">
-                {stateLabel[a.state]}
-              </span>
-            </div>
-            <small className="text-xs leading-loose text-slate-500">
-              {teacher
-                ? students.find((s) => s._id === a.studentId)?.name
-                : "تمرین زیر نظر معلم"}{" "}
-              {a.courseId
-                ? " · " +
-                  (courses.find((c) => c._id === a.courseId)?.title ?? "درس")
-                : ""}{" "}
-              ·{" "}
-              {a.policy.independent
-                ? "سنجش مستقل"
-                : `تا ${fa(a.policy.maxHints)} راهنمایی برای هر سؤال`}
-            </small>
-            <div className="flex flex-wrap items-center gap-3">
-              {!teacher &&
-                !["completed", "submitted", "cancelled"].includes(a.state) && (
-                  <Button disabled={busy} onClick={() => open(a)}>
-                    شروع / ادامه تمرین
-                    <ArrowLeft size={16} />
+        <PagedList items={assignments} label="مأموریت‌ها">
+          {(a) => (
+            <div key={a._id} className="grid gap-3 glass-option p-[18px]">
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="text-base font-bold">{a.title}</h3>
+                <span className="inline-block rounded-full border border-[#2ec8c333] bg-[#2ec8c314] px-3 py-1.5 text-[11px] text-[#08746f]">
+                  {stateLabel[a.state]}
+                </span>
+              </div>
+              <small className="text-xs leading-loose text-slate-500">
+                {teacher
+                  ? students.find((s) => s._id === a.studentId)?.name
+                  : "تمرین زیر نظر معلم"}{" "}
+                {a.courseId
+                  ? " · " +
+                    (courses.find((c) => c._id === a.courseId)?.title ?? "درس")
+                  : ""}{" "}
+                ·{" "}
+                {a.policy.independent
+                  ? "سنجش مستقل"
+                  : `تا ${fa(a.policy.maxHints)} راهنمایی برای هر سؤال`}
+              </small>
+              <div className="flex flex-wrap items-center gap-3">
+                {!teacher &&
+                  !["completed", "submitted", "cancelled"].includes(
+                    a.state,
+                  ) && (
+                    <Button disabled={busy} onClick={() => open(a)}>
+                      شروع / ادامه تمرین
+                      <ArrowLeft size={16} />
+                    </Button>
+                  )}
+                {teacher && !["completed", "cancelled"].includes(a.state) && (
+                  <Button
+                    variant="outline"
+                    disabled={busy}
+                    onClick={() =>
+                      run(async () => {
+                        await api("/missions/" + a.missionId + "/cancel", {});
+                        await refresh();
+                      })
+                    }
+                  >
+                    لغو مأموریت
                   </Button>
                 )}
-              {teacher && !["completed", "cancelled"].includes(a.state) && (
                 <Button
                   variant="outline"
                   disabled={busy}
-                  onClick={() =>
-                    run(async () => {
-                      await api("/missions/" + a.missionId + "/cancel", {});
-                      await refresh();
-                    })
-                  }
+                  onClick={() => showReport(a)}
                 >
-                  لغو مأموریت
+                  <BarChart3 size={16} />
+                  گزارش و شواهد
                 </Button>
-              )}
-              <Button
-                variant="outline"
-                disabled={busy}
-                onClick={() => showReport(a)}
-              >
-                <BarChart3 size={16} />
-                گزارش و شواهد
-              </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          )}
+        </PagedList>
       </section>
     </>
   );

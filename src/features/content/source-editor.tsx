@@ -26,7 +26,10 @@ export function SourceEditor({
     if (!text.trim()) delete next[key];
     else
       Object.assign(next, {
-        [key]: key === "questionNumber" ? Number(text) : text,
+        [key]:
+          key === "questionNumber" || key === "sourcePage"
+            ? Number(text)
+            : text,
       });
     onChange(next);
   }
@@ -100,6 +103,10 @@ export function SourceEditor({
                 ["sourceUrl", "لینک صفحه منبع"],
                 ["bookletCode", "کد دفترچه"],
                 ["questionNumber", "شماره سؤال در منبع"],
+                ["examDate", "تاریخ آزمون (مثال 1405/08/01)"],
+                ["publishedDate", "تاریخ انتشار منبع (میلادی)"],
+                ["sourcePageUrl", "صفحهٔ معرفی منبع"],
+                ["sourcePage", "شماره صفحه در PDF"],
               ]
                 .filter(
                   ([key]) => !hideQuestionNumber || key !== "questionNumber",
@@ -109,16 +116,26 @@ export function SourceEditor({
                     <input
                       className={style}
                       type={
-                        key === "questionNumber"
+                        key === "questionNumber" || key === "sourcePage"
                           ? "number"
-                          : key === "sourceUrl"
+                          : key === "sourceUrl" || key === "sourcePageUrl"
                             ? "url"
-                            : "text"
+                            : key === "publishedDate"
+                              ? "date"
+                              : "text"
                       }
-                      min={key === "questionNumber" ? 1 : undefined}
-                      max={key === "questionNumber" ? 10000 : undefined}
+                      min={
+                        key === "questionNumber" || key === "sourcePage"
+                          ? 1
+                          : undefined
+                      }
+                      max={
+                        key === "questionNumber" || key === "sourcePage"
+                          ? 10000
+                          : undefined
+                      }
                       maxLength={
-                        key === "sourceUrl"
+                        key === "sourceUrl" || key === "sourcePageUrl"
                           ? 1500
                           : key === "bookletCode"
                             ? 80

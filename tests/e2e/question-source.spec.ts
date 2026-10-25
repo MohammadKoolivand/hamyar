@@ -10,9 +10,7 @@ test("exam taxonomy is visible in bank and saved from authoring with category-sp
     .fill(`taxonomy-${Date.now()}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page
-    .getByRole("button", { name: "ورود به همیار", exact: true })
-    .click();
+  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
@@ -56,6 +54,19 @@ test("exam taxonomy is visible in bank and saved from authoring with category-sp
     .getByLabel("محل برگزاری کنکور", { exact: true })
     .selectOption("international");
   await page.getByLabel("نوبت آزمون", { exact: true }).fill("نوبت اول");
+  await page
+    .getByText("مشخصات منبع و دفترچه (اختیاری)", { exact: true })
+    .click();
+  await page
+    .getByLabel("تاریخ آزمون (مثال 1405/08/01)", { exact: true })
+    .fill("1404/02/11");
+  await page
+    .getByLabel("تاریخ انتشار منبع (میلادی)", { exact: true })
+    .fill("2025-05-02");
+  await page
+    .getByLabel("صفحهٔ معرفی منبع", { exact: true })
+    .fill("https://konkur.in/fixture-article");
+  await page.getByLabel("شماره صفحه در PDF", { exact: true }).fill("3");
   await page.getByLabel("سال سؤال (شمسی)", { exact: true }).fill("1404");
   await page
     .getByLabel("صورت سؤال", { exact: true })
@@ -93,6 +104,11 @@ test("exam taxonomy is visible in bank and saved from authoring with category-sp
     .click();
   await page.reload();
   await page.getByRole("button", { name: "کنکور", exact: true }).click();
+  await expect(page.getByText("تاریخ آزمون: 1404/02/11")).toBeVisible();
+  await expect(page.getByText("انتشار منبع:")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "صفحهٔ منبع", exact: true }),
+  ).toHaveAttribute("href", "https://konkur.in/fixture-article");
   await expect(
     page.getByText("سؤال نمونه برای آزمون دسته‌بندی کنکور", { exact: true }),
   ).toBeVisible();

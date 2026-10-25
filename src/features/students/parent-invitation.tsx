@@ -1,4 +1,5 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Field } from "@/components/ui/field";
@@ -76,26 +77,31 @@ export function ParentInvitation({ studentId }: { studentId: string }) {
       >
         به‌روزرسانی اولیا
       </Button>
-      {parents.map((p) => (
-        <div key={p._id} className="mt-3 grid gap-2 rounded-xl border p-3">
-          <p>{p.name}</p>
-          <p dir="ltr" className="break-all text-xs">
-            {p.email}
-          </p>
-          <Button
-            variant="outline"
-            disabled={busy}
-            onClick={() =>
-              void run(async () => {
-                await api(`/students/${studentId}/parents/${p._id}/revoke`, {});
-                await refresh();
-              })
-            }
-          >
-            لغو دسترسی این ولی
-          </Button>
-        </div>
-      ))}
+      <PagedList items={parents} label="اولیای مرتبط">
+        {(p) => (
+          <div key={p._id} className="mt-3 grid gap-2 rounded-xl border p-3">
+            <p>{p.name}</p>
+            <p dir="ltr" className="break-all text-xs">
+              {p.email}
+            </p>
+            <Button
+              variant="outline"
+              disabled={busy}
+              onClick={() =>
+                void run(async () => {
+                  await api(
+                    `/students/${studentId}/parents/${p._id}/revoke`,
+                    {},
+                  );
+                  await refresh();
+                })
+              }
+            >
+              لغو دسترسی این ولی
+            </Button>
+          </div>
+        )}
+      </PagedList>
     </details>
   );
 }

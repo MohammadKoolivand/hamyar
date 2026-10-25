@@ -177,10 +177,15 @@ for (const scenario of [
           "نزده",
         );
         await expect(page.locator(`#report-question-${q2._id}`)).toHaveClass(
-          /border-amber-200/,
+          /border-blue-200/,
         );
+        await expect(
+          page
+            .locator(`#report-question-${q2._id}`)
+            .getByText("نزده", { exact: true }),
+        ).toHaveClass(/border-amber-200/);
         await expect(page.locator(`#report-question-${q1._id}`)).toHaveClass(
-          /border-rose-200/,
+          /border-blue-200/,
         );
         const report = await (
           await page.request.get(`/api/assignments/${assignment._id}/report`)
@@ -206,10 +211,10 @@ for (const scenario of [
       expect(report.answered).toBe(2);
       expect(report.independent).toBe(1);
       await expect(page.locator(`#report-question-${q1._id}`)).toHaveClass(
-        /border-rose-200/,
+        /border-blue-200/,
       );
       await expect(page.locator(`#report-question-${q2._id}`)).toHaveClass(
-        /border-emerald-200/,
+        /border-blue-200/,
       );
       await expect(
         page

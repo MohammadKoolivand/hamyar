@@ -1,4 +1,5 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import { SourceEditor } from "./source-editor";
 import type { QuestionSource } from "@/lib/question-source";
 import { VisualEditor } from "./visual-editor";
@@ -256,17 +257,22 @@ export function ContentScreen({
                     : "هنوز ساختار شخصی نساخته‌اید. می‌توانید کتاب‌های آماده را از بخش بالا اضافه کنید."}
                 </p>
               )}
-              {visibleNodes.map((n) => (
-                <div key={n._id} className="flex flex-wrap items-center gap-3">
-                  <span className="inline-block rounded-full border border-[#2ec8c333] bg-[#2ec8c314] px-3 py-1.5 text-[11px] text-[#08746f]">
-                    {kindLabels[n.kind] ?? n.kind}
-                  </span>
-                  {n.title}
-                  <small className="text-xs leading-loose text-slate-500">
-                    {nodes.find((p) => p._id === n.parentId)?.title}
-                  </small>
-                </div>
-              ))}
+              <PagedList items={visibleNodes} label="منابع آموزشی">
+                {(n) => (
+                  <div
+                    key={n._id}
+                    className="flex flex-wrap items-center gap-3"
+                  >
+                    <span className="inline-block rounded-full border border-[#2ec8c333] bg-[#2ec8c314] px-3 py-1.5 text-[11px] text-[#08746f]">
+                      {kindLabels[n.kind] ?? n.kind}
+                    </span>
+                    {n.title}
+                    <small className="text-xs leading-loose text-slate-500">
+                      {nodes.find((p) => p._id === n.parentId)?.title}
+                    </small>
+                  </div>
+                )}
+              </PagedList>
             </div>
           </ContentSection>
         )}

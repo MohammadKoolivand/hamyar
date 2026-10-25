@@ -1,4 +1,5 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import { SourceEditor } from "./source-editor";
 import type { QuestionSource } from "@/lib/question-source";
 import { useEffect, useState } from "react";
@@ -162,31 +163,33 @@ export function AiAuthoring({
       {!drafts.length && (
         <p className="text-sm text-slate-500">پیش‌نویس بررسی‌نشده‌ای ندارید.</p>
       )}
-      {drafts.map((d) => (
-        <DraftReview
-          key={d._id}
-          draft={d}
-          busy={busy}
-          approve={(question) =>
-            run(async () => {
-              await api(`/question-drafts/${d._id}/approve`, {
-                question,
-                confirmed: true,
-              });
-              await refresh();
-              await onApproved();
-              setNotice("سؤال پس از تأیید شما به بانک اضافه شد.");
-            })
-          }
-          reject={(reason) =>
-            run(async () => {
-              await api(`/question-drafts/${d._id}/reject`, { reason });
-              await refresh();
-              setNotice("پیش‌نویس رد شد.");
-            })
-          }
-        />
-      ))}
+      <PagedList items={drafts} label="پیش‌نویس سؤال">
+        {(d) => (
+          <DraftReview
+            key={d._id}
+            draft={d}
+            busy={busy}
+            approve={(question) =>
+              run(async () => {
+                await api(`/question-drafts/${d._id}/approve`, {
+                  question,
+                  confirmed: true,
+                });
+                await refresh();
+                await onApproved();
+                setNotice("سؤال پس از تأیید شما به بانک اضافه شد.");
+              })
+            }
+            reject={(reason) =>
+              run(async () => {
+                await api(`/question-drafts/${d._id}/reject`, { reason });
+                await refresh();
+                setNotice("پیش‌نویس رد شد.");
+              })
+            }
+          />
+        )}
+      </PagedList>
     </section>
   );
 }

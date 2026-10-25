@@ -1,4 +1,5 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import { useEffect, useState } from "react";
 import { AppLink as Link } from "@/components/app-link";
 import { MathText } from "@/components/question-presentation";
@@ -101,6 +102,7 @@ export function LearningDashboard({
   subjectId?: string;
 }) {
   const [skillFilter, setSkillFilter] = useState("all");
+  const [skillTarget, setSkillTarget] = useState(0);
   const [sid, setSid] = useState(
       subjectId ?? (me.role === "student" ? me._id : (students[0]?._id ?? "")),
     ),
@@ -256,6 +258,16 @@ export function LearningDashboard({
                       <li key={skill.skillId} className="text-sm leading-7">
                         <a
                           href={`#skill-${skill.skillId}`}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            setSkillFilter("all");
+                            setSkillTarget((old) => old + 1);
+                            requestAnimationFrame(() =>
+                              document
+                                .getElementById(`skill-${skill.skillId}`)
+                                ?.scrollIntoView({ block: "start" }),
+                            );
+                          }}
                           className="font-medium underline-offset-4 hover:underline"
                         >
                           {number(i + 1)}. {skill.title}
@@ -284,24 +296,26 @@ export function LearningDashboard({
                 تمرین‌های اخیر و نتیجه واقعی
               </h2>
               <div className="grid gap-3 sm:grid-cols-2">
-                {data.recentMissions.map((m) => (
-                  <Link
-                    key={m.assignmentId}
-                    href={`/report?assignment=${m.assignmentId}`}
-                    className={`rounded-xl border p-4 transition-colors hover:border-blue-400 ${m.incorrect ? "border-rose-200 bg-rose-50/50" : m.independent + m.assisted > 0 ? "border-emerald-200 bg-emerald-50/50" : "border-slate-200 bg-white/60"}`}
-                  >
-                    <h3 className="text-sm font-bold">{m.title}</h3>
-                    <p className="mt-2 text-xs leading-6">
-                      {number(m.answered)} از {number(m.total)} پاسخ ·{" "}
-                      {number(m.independent + m.assisted)} صحیح ·{" "}
-                      {number(m.incorrect)} نادرست ·{" "}
-                      {number(Math.max(0, m.total - m.answered))} نزده
-                    </p>
-                    <span className="mt-2 block text-xs font-medium text-[#233B8F]">
-                      بررسی سؤال‌ها و پاسخ‌ها ←
-                    </span>
-                  </Link>
-                ))}
+                <PagedList items={data.recentMissions} label="تمرین‌های اخیر">
+                  {(m) => (
+                    <Link
+                      key={m.assignmentId}
+                      href={`/report?assignment=${m.assignmentId}`}
+                      className={`rounded-xl border p-4 transition-colors hover:border-blue-400 ${m.incorrect ? "border-rose-200 bg-rose-50/50" : m.independent + m.assisted > 0 ? "border-emerald-200 bg-emerald-50/50" : "border-slate-200 bg-white/60"}`}
+                    >
+                      <h3 className="text-sm font-bold">{m.title}</h3>
+                      <p className="mt-2 text-xs leading-6">
+                        {number(m.answered)} از {number(m.total)} پاسخ ·{" "}
+                        {number(m.independent + m.assisted)} صحیح ·{" "}
+                        {number(m.incorrect)} نادرست ·{" "}
+                        {number(Math.max(0, m.total - m.answered))} نزده
+                      </p>
+                      <span className="mt-2 block text-xs font-medium text-[#233B8F]">
+                        بررسی سؤال‌ها و پاسخ‌ها ←
+                      </span>
+                    </Link>
+                  )}
+                </PagedList>
               </div>
             </section>
           )}
@@ -335,20 +349,26 @@ export function LearningDashboard({
                 <option value="unknown">شواهد ناکافی</option>
               </select>
             </label>
-            {[...data.skills]
-              .filter(
-                (skill) =>
-                  skillFilter === "all" ||
-                  (skillFilter === "practice"
-                    ? ["needs_practice", "needs_review"].includes(skill.status)
-                    : skillFilter === "strong"
-                      ? skill.independentCorrect > 0
-                      : ["not_started", "insufficient_evidence"].includes(
+            <PagedList
+              key={`${skillFilter}-${skillTarget}`}
+              items={[...data.skills]
+                .filter(
+                  (skill) =>
+                    skillFilter === "all" ||
+                    (skillFilter === "practice"
+                      ? ["needs_practice", "needs_review"].includes(
                           skill.status,
-                        )),
-              )
-              .sort((a, b) => b.incorrect - a.incorrect)
-              .map((skill) => (
+                        )
+                      : skillFilter === "strong"
+                        ? skill.independentCorrect > 0
+                        : ["not_started", "insufficient_evidence"].includes(
+                            skill.status,
+                          )),
+                )
+                .sort((a, b) => b.incorrect - a.incorrect)}
+              label="مهارت‌ها"
+            >
+              {(skill) => (
                 <div
                   key={skill.skillId}
                   id={`skill-${skill.skillId}`}
@@ -429,7 +449,8 @@ export function LearningDashboard({
                     </>
                   )}
                 </div>
-              ))}
+              )}
+            </PagedList>
           </section>
           <section className="grid gap-3 glass-panel p-6">
             <h2 className="text-lg font-bold">دفترچه اشتباهات</h2>
@@ -438,36 +459,38 @@ export function LearningDashboard({
                 هنوز خطای قابل ارزیابی ثبت نشده است.
               </p>
             )}
-            {data.mistakes.map((item) => (
-              <article
-                key={item._id}
-                className={`grid gap-2 rounded-2xl border p-4 ${["resolved", "corrected_by_review"].includes(item.status) ? "border-emerald-200 bg-emerald-50/50" : "border-rose-200 bg-rose-50/40"}`}
-              >
-                <h3 className="font-medium">
-                  <MathText text={item.statement} />
-                </h3>
-                {item.sourceAnswer && (
-                  <p className="whitespace-pre-wrap text-sm text-slate-600">
-                    پاسخ ثبت‌شده: {item.sourceAnswer}
+            <PagedList items={data.mistakes} label="اشتباه‌ها">
+              {(item) => (
+                <article
+                  key={item._id}
+                  className={`grid gap-2 rounded-2xl border p-4 ${["resolved", "corrected_by_review"].includes(item.status) ? "border-emerald-200 bg-emerald-50/50" : "border-rose-200 bg-rose-50/40"}`}
+                >
+                  <h3 className="font-medium">
+                    <MathText text={item.statement} />
+                  </h3>
+                  {item.sourceAnswer && (
+                    <p className="whitespace-pre-wrap text-sm text-slate-600">
+                      پاسخ ثبت‌شده: {item.sourceAnswer}
+                    </p>
+                  )}
+                  <p className="text-sm text-[#1F3F97]">
+                    {labels[item.status] ?? item.status}
                   </p>
-                )}
-                <p className="text-sm text-[#1F3F97]">
-                  {labels[item.status] ?? item.status}
-                </p>
-                <p className="text-xs text-slate-500">
-                  {number(item.improvementEvidenceIds.length)} شاهد مستقل برای
-                  پیگیری · نوع خطا بدون بررسی کافی حدس زده نمی‌شود.
-                </p>
-                {me.role === "teacher" && (
-                  <p
-                    className="break-all font-mono text-xs text-slate-500"
-                    dir="ltr"
-                  >
-                    Source: {item.sourceAttemptId}
+                  <p className="text-xs text-slate-500">
+                    {number(item.improvementEvidenceIds.length)} شاهد مستقل برای
+                    پیگیری · نوع خطا بدون بررسی کافی حدس زده نمی‌شود.
                   </p>
-                )}
-              </article>
-            ))}
+                  {me.role === "teacher" && (
+                    <p
+                      className="break-all font-mono text-xs text-slate-500"
+                      dir="ltr"
+                    >
+                      Source: {item.sourceAttemptId}
+                    </p>
+                  )}
+                </article>
+              )}
+            </PagedList>
           </section>
           <section className="grid gap-3 glass-panel p-6">
             <h2 className="text-lg font-bold">
@@ -478,33 +501,35 @@ export function LearningDashboard({
                 برای پیشنهاد آموزشی، شواهد مهارت‌دار بیشتری لازم است.
               </p>
             )}
-            {data.recommendations.map((r) => (
-              <div
-                className="grid gap-2 glass-note p-4 text-sm text-[#1F3F97]"
-                key={r.skillId}
-              >
-                <p>
-                  مشاهده: {number(r.observation.attempts)} تلاش و{" "}
-                  {number(r.observation.errors)} پاسخ نیازمند اصلاح.
-                </p>
-                <p>
-                  برداشت محدود:{" "}
-                  {r.interpretation === "insufficient_evidence"
-                    ? "برای نتیجه‌گیری هنوز شواهد کافی نداریم."
-                    : r.interpretation === "repeated_observed_errors"
-                      ? "در این مهارت چند پاسخ نیازمند اصلاح مشاهده شده است."
-                      : "تمرین ثبت‌شده قابل مرور است."}
-                </p>
-                <p>
-                  اقدام پیشنهادی:{" "}
-                  {r.action === "independent_check"
-                    ? "یک سنجش کوتاه بدون کمک با تأیید معلم."
-                    : r.action === "review_skill"
-                      ? "مرور این مهارت در جلسه بعد و انتخاب سه تمرین معتبر توسط معلم."
-                      : "یک تمرین پیگیری بدون کمک با تأیید معلم."}
-                </p>
-              </div>
-            ))}
+            <PagedList items={data.recommendations} label="پیشنهادهای مرور">
+              {(r) => (
+                <div
+                  className="grid gap-2 glass-note p-4 text-sm text-[#1F3F97]"
+                  key={r.skillId}
+                >
+                  <p>
+                    مشاهده: {number(r.observation.attempts)} تلاش و{" "}
+                    {number(r.observation.errors)} پاسخ نیازمند اصلاح.
+                  </p>
+                  <p>
+                    برداشت محدود:{" "}
+                    {r.interpretation === "insufficient_evidence"
+                      ? "برای نتیجه‌گیری هنوز شواهد کافی نداریم."
+                      : r.interpretation === "repeated_observed_errors"
+                        ? "در این مهارت چند پاسخ نیازمند اصلاح مشاهده شده است."
+                        : "تمرین ثبت‌شده قابل مرور است."}
+                  </p>
+                  <p>
+                    اقدام پیشنهادی:{" "}
+                    {r.action === "independent_check"
+                      ? "یک سنجش کوتاه بدون کمک با تأیید معلم."
+                      : r.action === "review_skill"
+                        ? "مرور این مهارت در جلسه بعد و انتخاب سه تمرین معتبر توسط معلم."
+                        : "یک تمرین پیگیری بدون کمک با تأیید معلم."}
+                  </p>
+                </div>
+              )}
+            </PagedList>
           </section>
           {me.role === "teacher" && (
             <section className="grid gap-3 glass-panel p-6">
@@ -513,18 +538,20 @@ export function LearningDashboard({
                 تفاوت موضوع و سختی سؤال‌ها می‌تواند مقایسه را محدود کند؛ این
                 جدول ادعای پیشرفت قطعی ندارد.
               </p>
-              {data.trends?.map((t) => (
-                <div
-                  className="flex flex-wrap gap-3 rounded-xl border border-slate-200 p-3 text-sm"
-                  key={t.assignmentId}
-                >
-                  <strong>{t.title}</strong>
-                  <span>
-                    {number(t.answered)} پاسخ · مستقل{" "}
-                    {percent(t.independentSuccessRate)}
-                  </span>
-                </div>
-              ))}
+              <PagedList items={data.trends ?? []} label="روند یادگیری">
+                {(t) => (
+                  <div
+                    className="flex flex-wrap gap-3 rounded-xl border border-slate-200 p-3 text-sm"
+                    key={t.assignmentId}
+                  >
+                    <strong>{t.title}</strong>
+                    <span>
+                      {number(t.answered)} پاسخ · مستقل{" "}
+                      {percent(t.independentSuccessRate)}
+                    </span>
+                  </div>
+                )}
+              </PagedList>
             </section>
           )}
         </>

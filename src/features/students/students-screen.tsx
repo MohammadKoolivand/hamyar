@@ -1,4 +1,5 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import { ParentInvitation } from "./parent-invitation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -102,18 +103,17 @@ export function StudentsScreen({
       </section>
       <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
         <h2 className="text-[19px] font-bold">دانش‌آموزان شما</h2>
-        {students.map((s) => (
-          <div
-            key={s._id}
-            className="grid gap-3 glass-option p-[18px]"
-          >
-            <h3 className="text-base font-bold">{s.name}</h3>
-            <small dir="ltr" className="text-xs leading-loose text-slate-500">
-              {s.email}
-            </small>
-            <ParentInvitation studentId={s._id} />
-          </div>
-        ))}
+        <PagedList items={students} label="دانش‌آموزان">
+          {(s) => (
+            <div key={s._id} className="grid gap-3 glass-option p-[18px]">
+              <h3 className="text-base font-bold">{s.name}</h3>
+              <small dir="ltr" className="text-xs leading-loose text-slate-500">
+                {s.email}
+              </small>
+              <ParentInvitation studentId={s._id} />
+            </div>
+          )}
+        </PagedList>
         {!students.length && (
           <p className="p-[30px] text-center leading-loose text-slate-500">
             پس از پذیرش دعوت، دانش‌آموز اینجا ظاهر می‌شود.

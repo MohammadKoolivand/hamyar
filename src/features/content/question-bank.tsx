@@ -1,4 +1,5 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import {
   sourceCategories,
   sourceCategory,
@@ -490,77 +491,132 @@ export function QuestionBank({
             </Link>
           </div>
         )}
-        {visible.map((q, i) => {
-          const c = q.topicId ? byTopic.get(q.topicId) : undefined;
-          return (
-            <article
-              key={q._id}
-              className="grid min-w-0 gap-4 rounded-2xl border border-slate-200/70 bg-white/85 p-5 sm:p-6"
-            >
-              <div className="flex flex-wrap items-center gap-2 text-xs">
-                <span className="rounded-lg bg-blue-50 px-3 py-1.5 font-medium text-[#233B8F]">
-                  سؤال {fa(i + 1)}
-                </span>
-                <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-slate-600">
-                  {types[q.type] ?? q.type}
-                </span>
-                <span className="rounded-lg bg-amber-50 px-3 py-1.5 text-amber-800">
-                  سختی:{" "}
-                  {q.difficulty ? difficultyLabels[q.difficulty] : "تعیین نشده"}
-                </span>
-                <span className="text-slate-500">
-                  سال:{" "}
-                  {q.year
-                    ? q.year.toLocaleString("fa-IR", { useGrouping: false })
-                    : "تعیین نشده"}
-                </span>
-                {q.origin === "ai_reviewed" && (
-                  <span className="text-teal-700">هوش مصنوعی · تأیید معلم</span>
+        <PagedList items={visible} label="بانک سؤال">
+          {(q, i) => {
+            const c = q.topicId ? byTopic.get(q.topicId) : undefined;
+            return (
+              <article
+                key={q._id}
+                className="grid min-w-0 gap-4 rounded-2xl border border-slate-200/70 bg-white/85 p-5 sm:p-6"
+              >
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="rounded-lg bg-blue-50 px-3 py-1.5 font-medium text-[#233B8F]">
+                    سؤال {fa(i + 1)}
+                  </span>
+                  <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-slate-600">
+                    {types[q.type] ?? q.type}
+                  </span>
+                  <span className="rounded-lg bg-amber-50 px-3 py-1.5 text-amber-800">
+                    سختی:{" "}
+                    {q.difficulty
+                      ? difficultyLabels[q.difficulty]
+                      : "تعیین نشده"}
+                  </span>
+                  <span className="text-slate-500">
+                    سال:{" "}
+                    {q.year
+                      ? q.year.toLocaleString("fa-IR", { useGrouping: false })
+                      : "تعیین نشده"}
+                  </span>
+                  {q.origin === "ai_reviewed" && (
+                    <span className="text-teal-700">
+                      هوش مصنوعی · تأیید معلم
+                    </span>
+                  )}
+                </div>
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setCropOpen(false);
+                      setEditing(q._id);
+                    }}
+                  >
+                    ویرایش سؤال
+                  </Button>
+                </div>
+                {q.origin === "human_revised" && (
+                  <p className="text-xs text-amber-700">
+                    نسخهٔ ویرایش‌شده توسط معلم
+                  </p>
                 )}
-              </div>
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setCropOpen(false);
+                <p className="text-xs font-medium leading-7 text-teal-700">
+                  {sourceSummary(q.source)}
+                </p>
+                {q.source && (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs leading-6 text-slate-500">
+                    {q.source.sourceTitle && (
+                      <span>{q.source.sourceTitle}</span>
+                    )}
+                    {q.source.examDate && (
+                      <span>
+                        تاریخ آزمون: <bdi>{q.source.examDate}</bdi>
+                      </span>
+                    )}
+                    {q.source.publishedDate && (
+                      <span>
+                        انتشار منبع:{" "}
+                        {new Date(
+                          q.source.publishedDate + "T12:00:00Z",
+                        ).toLocaleDateString("fa-IR", { timeZone: "UTC" })}
+                      </span>
+                    )}
+                    {q.source.sourcePage && (
+                      <span>صفحهٔ PDF: {fa(q.source.sourcePage)}</span>
+                    )}
+                    {q.source.sourcePageUrl && (
+                      <a
+                        href={q.source.sourcePageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-[#233B8F] underline underline-offset-4"
+                      >
+                        صفحهٔ منبع
+                      </a>
+                    )}
+                    {q.source.sourceUrl && (
+                      <a
+                        href={q.source.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-[#233B8F] underline underline-offset-4"
+                      >
+                        منبع اصلی
+                      </a>
+                    )}
+                  </div>
+                )}
+                {q.importEvidence?.answerBasis === "independent_review" && (
+                  <p className="rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-xs leading-6 text-amber-800">
+                    پاسخ‌نامهٔ منتشرشده در منبع پیدا نشد؛ پاسخ مرجع مستقل بررسی
+                    شده و ارزیابی پاسخ دانش‌آموز نیازمند بررسی معلم است.
+                  </p>
+                )}
+                <QuestionPresentation
+                  statement={q.statement}
+                  visuals={q.visuals}
+                  onCrop={() => {
+                    setCropOpen(true);
                     setEditing(q._id);
                   }}
-                >
-                  ویرایش سؤال
-                </Button>
-              </div>
-              {q.origin === "human_revised" && (
-                <p className="text-xs text-amber-700">
-                  نسخهٔ ویرایش‌شده توسط معلم
+                />
+                <p className="border-t border-slate-100 pt-3 text-xs leading-7 text-slate-500">
+                  {q.classification === "free"
+                    ? "سؤال آزاد"
+                    : c
+                      ? [
+                          c.grade.title,
+                          c.book.title,
+                          c.chapter.title,
+                          c.topic.title,
+                        ].join(" / ")
+                      : "مبحث در دسترس نیست"}
                 </p>
-              )}
-              <p className="text-xs font-medium leading-7 text-teal-700">
-                {sourceSummary(q.source)}
-              </p>
-              <QuestionPresentation
-                statement={q.statement}
-                visuals={q.visuals}
-                onCrop={() => {
-                  setCropOpen(true);
-                  setEditing(q._id);
-                }}
-              />
-              <p className="border-t border-slate-100 pt-3 text-xs leading-7 text-slate-500">
-                {q.classification === "free"
-                  ? "سؤال آزاد"
-                  : c
-                    ? [
-                        c.grade.title,
-                        c.book.title,
-                        c.chapter.title,
-                        c.topic.title,
-                      ].join(" / ")
-                    : "مبحث در دسترس نیست"}
-              </p>
-            </article>
-          );
-        })}
+              </article>
+            );
+          }}
+        </PagedList>
       </section>
       {editing && (
         <QuestionEditor

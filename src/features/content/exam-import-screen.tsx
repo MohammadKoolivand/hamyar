@@ -1,4 +1,5 @@
 "use client";
+import { PagedList } from "@/components/ui/paged-list";
 import { useEffect, useState } from "react";
 import { FileText, UploadCloud, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -238,22 +239,24 @@ export function ExamImportScreen({
                 هنوز آزمونی ثبت نشده است.
               </p>
             )}
-            {list.map((e) => (
-              <button
-                disabled={busy}
-                type="button"
-                key={e._id}
-                onClick={() => void run(() => load(e._id))}
-                className="flex flex-wrap justify-between gap-2 rounded-xl border border-slate-200 bg-white p-4 text-right"
-              >
-                <span>{e.title}</span>
-                <span className="text-xs text-slate-500">
-                  {e.state === "review"
-                    ? "آماده بازبینی"
-                    : "در انتظار فایل / پردازش"}
-                </span>
-              </button>
-            ))}
+            <PagedList items={list} label="آزمون‌های واردشده">
+              {(e) => (
+                <button
+                  disabled={busy}
+                  type="button"
+                  key={e._id}
+                  onClick={() => void run(() => load(e._id))}
+                  className="flex flex-wrap justify-between gap-2 rounded-xl border border-slate-200 bg-white p-4 text-right"
+                >
+                  <span>{e.title}</span>
+                  <span className="text-xs text-slate-500">
+                    {e.state === "review"
+                      ? "آماده بازبینی"
+                      : "در انتظار فایل / پردازش"}
+                  </span>
+                </button>
+              )}
+            </PagedList>
           </section>
         </>
       ) : (
@@ -402,27 +405,31 @@ export function ExamImportScreen({
                     پیش‌نویسی استخراج نشد؛ از فرم بالا سؤال دستی اضافه کنید.
                   </p>
                 )}
-                {exam.items.map((item, index) => (
-                  <ReviewItem
-                    key={item._id}
-                    item={item}
-                    index={index}
-                    nodes={nodes}
-                    busy={busy}
-                    review={(body) =>
-                      run(async () => {
-                        await api(
-                          `/exam-imports/${exam._id}/items/${item._id}/review`,
-                          body,
-                        );
-                        await load(exam._id);
-                        if ((body as { action?: string }).action === "approve")
-                          await onApproved();
-                        setNotice("نتیجه بررسی ذخیره شد.");
-                      })
-                    }
-                  />
-                ))}
+                <PagedList items={exam.items} label="سؤال‌های آزمون">
+                  {(item, index) => (
+                    <ReviewItem
+                      key={item._id}
+                      item={item}
+                      index={index}
+                      nodes={nodes}
+                      busy={busy}
+                      review={(body) =>
+                        run(async () => {
+                          await api(
+                            `/exam-imports/${exam._id}/items/${item._id}/review`,
+                            body,
+                          );
+                          await load(exam._id);
+                          if (
+                            (body as { action?: string }).action === "approve"
+                          )
+                            await onApproved();
+                          setNotice("نتیجه بررسی ذخیره شد.");
+                        })
+                      }
+                    />
+                  )}
+                </PagedList>
               </section>
             </>
           )}
