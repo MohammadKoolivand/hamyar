@@ -58,5 +58,7 @@ export async function connect(
   await db
     .collection("questionDrafts")
     .createIndex({ ownerId: 1, state: 1, createdAt: -1 });
+  await db.collection("exams").createIndex({ ownerId: 1, createdAt: -1 });
+  await db.collection("examQuestionDrafts").createIndex({ ownerId: 1, examId: 1, page: 1 });
   return { client, db };
 }
