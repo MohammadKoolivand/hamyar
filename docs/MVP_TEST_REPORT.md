@@ -69,3 +69,9 @@
 Backup با نویسندگان staging متوقف: 44 collection، 575 سند، 79828 بایت، restore در دیتابیس تصادفی جدا موفق؛ audit:integrity صفر مأموریت نیازمند بازبینی. probe واقعی TTL: سند منقضی صفر، آینده یک، سپس فقط probeهای خود آزمون پاک شدند. preflight روی HTTP محلی عمداً fail با نیاز HTTPS/Secure cookie و هشدار SMS داد.
 
 برای تغییرات CI/CD: YAML هر دو workflow parse شد؛ bash -n و ShellCheck اسکریپت deploy، typecheck و ESLint اجرا شدند. اجرای واقعی SSH deployment و rollback روی Linux هنوز انجام نشده؛ secret، bootstrap مقصد و hook backup وجود ندارند. نتیجه GitHub پس از push باید جدا با لینک run ثبت شود؛ تست‌های قبلی به‌عنوان نتیجه همین اجرای تازه CI معرفی نمی‌شوند.
+
+## حذف منابع — ۲۰۲۶/۱۰/۲۷
+
+دکمه حذف در کتاب‌های افزوده‌شده و ردیف‌های ساختار آموزشی اضافه شد. POST /api/curriculum/:nodeId/remove فقط معلم مالک را می‌پذیرد، در تراکنش منبع و فرزندان را archive و audit ثبت می‌کند؛ GET فهرست فعال آن‌ها را برنمی‌گرداند و انتخاب مجدد منبع بایگانی‌شده رد می‌شود. سؤال‌ها و نسخه‌ها حذف نمی‌شوند؛ افزودن دوباره کتاب رسمی archive همان ساختار را بازمی‌گرداند.
+
+تست integration جدید و رگرسیون catalog: ۲ passed، صفر failed/skipped روی MongoDB موقت. تست اول در sandbox به دلیل EPERM اتصال loopback اجرا نشد؛ بازاجرای دارای دسترسی شبکه موفق شد. Typecheck، Lint و production build موفق؛ وب محلی 5174 با build جدید دوباره اجرا شد. تست مرورگر اختصاصی این تغییر هنوز اجرا نشده است.

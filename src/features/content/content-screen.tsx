@@ -16,7 +16,7 @@ import { NodeSelector } from "./node-selector";
 import { AiAuthoring } from "./ai-authoring";
 import { useState, type ReactNode } from "react";
 import type React from "react";
-import { BookOpen, ChevronDown, Layers3, Sparkles } from "lucide-react";
+import { BookOpen, ChevronDown, Layers3, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { fa } from "@/lib/presentation";
@@ -267,6 +267,32 @@ export function ContentScreen({
                       {kindLabels[n.kind] ?? n.kind}
                     </span>
                     {n.title}
+                    <Button
+                      type="button"
+                      disabled={busy}
+                      className="ms-auto gap-2 border border-rose-200 bg-white/60 text-rose-700 hover:bg-rose-50"
+                      onClick={() => {
+                        if (
+                          !window.confirm(
+                            `«${n.title}» و زیرمجموعه‌های آن از منابع حذف شوند؟ سؤال‌ها و سوابق قبلی حفظ می‌شوند.`,
+                          )
+                        )
+                          return;
+                        run(async () => {
+                          await api(`/curriculum/${n._id}/remove`, {});
+                          setParent("");
+                          setTopic("");
+                          setSkillIds([]);
+                          await refresh();
+                          setNotice(
+                            "منبع و زیرمجموعه‌های آن از فهرست حذف شدند؛ سؤال‌ها و سوابق حفظ شدند.",
+                          );
+                        });
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                      حذف از منابع
+                    </Button>
                     <small className="text-xs leading-loose text-slate-500">
                       {nodes.find((p) => p._id === n.parentId)?.title}
                     </small>

@@ -124,7 +124,61 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
   });
   app.get("/api/curriculum", async (r) => {
     const u = await user(r, "teacher");
-    return c("curriculum").find({ ownerId: u._id }).toArray();
+    return c("curriculum")
+      .find({ ownerId: u._id, archivedAt: { $exists: false } })
+      .toArray();
+  });
+  app.post("/api/curriculum/:nodeId/remove", async (r) => {
+    const u = await user(r, "teacher");
+    const nodeId = z
+      .string()
+      .uuid()
+      .parse((r.params as { nodeId: string }).nodeId);
+    return ctx.atomic(
+      r,
+      u._id,
+      "curriculum-remove",
+      { nodeId },
+      async (session) => {
+        const rows = await c("curriculum")
+          .find({ ownerId: u._id }, { session })
+          .toArray();
+        if (!rows.some((row) => row._id === nodeId))
+          ctx.fail(404, "منبع یافت نشد");
+        const ids = new Set([nodeId]);
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const row of rows) {
+            if (row.parentId && ids.has(row.parentId) && !ids.has(row._id)) {
+              ids.add(row._id);
+              changed = true;
+            }
+          }
+        }
+        const result = await c("curriculum").updateMany(
+          {
+            ownerId: u._id,
+            _id: { $in: [...ids] },
+            archivedAt: { $exists: false },
+          },
+          { $set: { archivedAt: ctx.now() } },
+          { session },
+        );
+        await c("auditLogs").insertOne(
+          {
+            _id: id(),
+            actorId: u._id,
+            action: "remove_curriculum",
+            resourceId: nodeId,
+            count: result.modifiedCount,
+            createdAt: ctx.now(),
+          },
+          { session },
+        );
+        return { removed: result.modifiedCount };
+      },
+    );
   });
   app.post("/api/curriculum", async (r) => {
     const u = await user(r, "teacher"),

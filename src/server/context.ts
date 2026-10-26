@@ -60,7 +60,8 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
   }
   async function owned(name: string, key: string, ownerId: string) {
     const row = await c(name).findOne({ _id: key, ownerId });
-    if (!row) fail(404, "یافت نشد");
+    if (!row || (name === "curriculum" && row.archivedAt))
+      fail(404, "یافت نشد");
     return row!;
   }
   async function assignment(r: FastifyRequest, studentOnly = false) {

@@ -131,6 +131,14 @@ export async function importCatalog(
     })),
     { session, ordered: true },
   );
+  // Re-import restores only the requested official books and their ancestors.
+  await ctx
+    .c("curriculum")
+    .updateMany(
+      { ownerId, _id: { $in: rows.map((row) => row._id) } },
+      { $unset: { archivedAt: "" } },
+      { session },
+    );
   // Refresh catalog-owned provenance. Never replace teacher-authored titles/content.
   const refresh = rows.flatMap<AnyBulkWriteOperation<Row>>((row) => {
     if (row.kind === "course")

@@ -199,6 +199,45 @@ export function CurriculumCatalog({
                       : ""}
                   </summary>
                   <div className="mt-3 grid gap-3">
+                    {nodes.find(
+                      (n) => n.catalogBookId === book.id && n.kind === "course",
+                    ) && (
+                      <Button
+                        variant="outline"
+                        disabled={busy}
+                        onClick={async () => {
+                          const node = nodes.find(
+                            (n) =>
+                              n.catalogBookId === book.id &&
+                              n.kind === "course",
+                          );
+                          if (
+                            !node ||
+                            !window.confirm(
+                              `کتاب «${book.title}» و فصل‌ها و مباحث آن از منابع شما حذف شوند؟ سؤال‌ها و سوابق حفظ می‌شوند.`,
+                            )
+                          )
+                            return;
+                          setBusy(true);
+                          setError("");
+                          setNotice("");
+                          try {
+                            await api(`/curriculum/${node._id}/remove`, {});
+                            await onImported();
+                            setNotice(
+                              "کتاب از منابع شما حذف شد. برای بازگردانی می‌توانید آن را دوباره اضافه کنید.",
+                            );
+                          } catch (e) {
+                            setError((e as Error).message);
+                          } finally {
+                            setBusy(false);
+                          }
+                        }}
+                        className="justify-self-start gap-2 text-rose-700"
+                      >
+                        حذف کتاب از منابع من
+                      </Button>
+                    )}
                     <a
                       href={book.source.outlineUrl}
                       target="_blank"
