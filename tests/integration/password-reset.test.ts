@@ -156,7 +156,7 @@ test("password reset replies before slow SMTP completes, for an existing or miss
 test("failed password reset delivery invalidates its token without exposing the account", async () => {
   const { client, db } = await connect(
     process.env.TEST_MONGO_URL ?? "mongodb://127.0.0.1:27019/?replicaSet=hamyar-rs",
-    "hodhod_reset_delivery_failure_" + randomUUID(),
+    "reset_fail_" + randomUUID(),
   );
   const app = await buildApp(db, undefined, {}, undefined, undefined, async () => {
     throw new Error("Simulated SMTP outage");
