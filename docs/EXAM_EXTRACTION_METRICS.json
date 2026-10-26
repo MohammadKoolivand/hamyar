@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-10-26T11:57:47.314Z",
+  "measuredAt": "2026-10-26T12:39:26.810Z",
   "dataset": "Seven original synthetic PDF fixtures; 2 Persian arithmetic questions, 1 science question, text/scan/hybrid and table/image/conflicting keys. Not representative of national exams.",
   "definitions": {
     "questionDetectionRecall": "correctly detected labeled question numbers / expected questions",
@@ -22,7 +22,7 @@
       "methods": [
         "text"
       ],
-      "millisecondsPerPage": 200,
+      "millisecondsPerPage": 318,
       "questionDetectionRecall": 1,
       "questionDetectionPrecision": 1,
       "falsePositive": 0,
@@ -45,7 +45,7 @@
       "methods": [
         "ocr"
       ],
-      "millisecondsPerPage": 543,
+      "millisecondsPerPage": 715,
       "questionDetectionRecall": 1,
       "questionDetectionPrecision": 1,
       "falsePositive": 0,
@@ -68,7 +68,7 @@
       "methods": [
         "hybrid"
       ],
-      "millisecondsPerPage": 309,
+      "millisecondsPerPage": 469,
       "questionDetectionRecall": 1,
       "questionDetectionPrecision": 1,
       "falsePositive": 0,
@@ -91,7 +91,7 @@
       "methods": [
         "text"
       ],
-      "millisecondsPerPage": 115,
+      "millisecondsPerPage": 187,
       "questionDetectionRecall": 1,
       "questionDetectionPrecision": 1,
       "falsePositive": 0,
@@ -113,7 +113,7 @@
       "methods": [
         "text"
       ],
-      "millisecondsPerPage": 101,
+      "millisecondsPerPage": 153,
       "questionDetectionRecall": null,
       "questionDetectionPrecision": null,
       "falsePositive": null,
@@ -136,7 +136,7 @@
       "methods": [
         "ocr"
       ],
-      "millisecondsPerPage": 395,
+      "millisecondsPerPage": 558,
       "questionDetectionRecall": null,
       "questionDetectionPrecision": null,
       "falsePositive": null,
@@ -158,7 +158,7 @@
       "methods": [
         "ocr"
       ],
-      "millisecondsPerPage": 315,
+      "millisecondsPerPage": 452,
       "questionDetectionRecall": null,
       "questionDetectionPrecision": null,
       "falsePositive": null,

@@ -55,3 +55,9 @@
 اجرای اول مرورگر به‌علت خروج سرور background و نبود listener شکست زیرساختی داشت؛ سرور در نشست پایدار اجرا و مجموعه تکرار شد. در اجرای بعد یک خطای selector واقعی تست جدید ایمیل شناسایی شد: Next route announcer هم role=alert دارد. locator به main محدود شد و متنِ دقیق خطای مصرف دوباره حفظ ماند؛ اجرای کامل نهایی سبز شد. نتیجهٔ اجرای خراب به‌عنوان موفقیت ثبت نشده است.
 
 بازاجرای backup/restore فقط روی `hodhodeh_audit_mail_1026` مصنوعی با وب/worker متوقف: **PASS**، ۴۲ collection، ۱۰۷۶ سند و آرشیو ۱۲۲۴۳۴ بایت؛ منبع تغییر نکرد و مقصد تصادفی drill حذف شد. benchmark هفت fixture خودساخته نیز اجرا شد: FP/FN شمارهٔ چهار fixture سؤال صفر، گزینه‌های mixed همچنان ۶۲٫۵٪ و scan CER برابر ۳٫۳۳٪. این اجرا بهبود دقت OCR یا صحت آزمون ملی را اثبات نمی‌کند.
+
+## Feature Freeze — ممیزی نهایی ۲۰۲۶/۱۰/۲۶
+
+روی commit کد `90eabe9`: نصب پاک، TypeScript، Lint و Build موفق. `npm test` نهایی ۱۲۵ passed / صفر failed/cancelled/skipped؛ تفکیک ۴۴ unit و ۸۱ integration، واحدها جدا نیز ۴۴/۴۴ موفق. Playwright با تقویت چهار عرض برای مدیر/منشی/تمرین/گزارش: ۳۱ passed، صفر failed، یک skip قدیمی اختیاری AI. آزمون اختصاصی امنیت ۱۵/۱۵ موفق؛ هیچ تست حذف یا assertion ضعیف نشد.
+
+اجرای قبلی همین ممیزی به‌علت monitor timeout MongoDB سه شکست و سه لغو داشت؛ جزئیات و بازاجرای بدون تغییر محدودیت در MVP_RELEASE_READINESS ثبت‌اند. audit:integrity روی دیتابیس مصنوعی صفر مغایرت؛ backup/restore با نویسندگان متوقف: ۴۴ collection، ۵۳۸ سند، آرشیو ۷۲۵۷۸ بایت، Pass. benchmark OCR فعلی و دو inference واقعی Ollama هم اجرا شدند. سرویس واقعی ملی‌پیامک/SMTP/AvvalAI پولی و audit وابستگی هنوز Not Verified هستند. گزارش یکپارچه نهایی و checklist A/B در همان MVP_RELEASE_READINESS موجود به‌روز شد؛ مستند تکراری ساخته نشد.

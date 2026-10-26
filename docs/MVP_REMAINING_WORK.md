@@ -34,3 +34,7 @@
 | audit رسمی وابستگی                                                  | BLOCKED — EXTERNAL SERVICE؛ اجرای جدید registry.npmjs.org نیز read ETIMEDOUT داد                |
 
 تغییر دامنه با درخواست صریح مالک: ورود اصلی شماره + OTP و provider ملی‌پیامک. جزئیات فنی و مرز تأیید در PHONE_OTP.md؛ حساب‌های رمزدار قدیمی برای سازگاری حذف نشدند.
+
+## تصمیم Feature Freeze — ممیزی نهایی
+
+در مأموریت پایدارسازی، نقشهٔ توسعهٔ بالا اجرا نمی‌شود. consent/deletion جدید، بانک عمومی، OMR و امکانات آینده OUT OF SCOPE هستند؛ نبود کنترل‌های لازم برای داده کودک همچنان RELEASE BLOCKER واقعی است. فقط نقص‌های موجودِ بازتولیدشدهٔ securityRevision مدیر و TTL OTP در 90eabe9 رفع شدند. وضعیت نهایی فنی و External/Operational و اقدامات مشخص مالک در MVP_RELEASE_READINESS ثبت است؛ ادامهٔ توسعه خودسرانه مجاز نیست.
