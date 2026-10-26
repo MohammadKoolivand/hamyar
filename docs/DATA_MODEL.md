@@ -4,7 +4,7 @@
 
 | collection       | ارتباط و index                                                                                    |
 | ---------------- | ------------------------------------------------------------------------------------------------- |
-| users            | email unique، role teacher/student/parent، passwordHash                                           |
+| users            | email/phone unique sparse، role student/teacher/parent/secretary/super_admin، passwordHash                                           |
 | sessions         | tokenHash unique، userId، expiresAt TTL                                                           |
 | invitations      | tokenHash unique، teacherId، email، expiresAt، usedAt؛ پذیرش یک‌بار اتمیک                         |
 | relations        | teacherId+studentId unique                                                                        |
@@ -112,3 +112,6 @@ curriculum nodes optionally carry catalogKey/catalogVersion/catalogBookId, order
 - `examImportItems`: ownerId/examId، question قابل اصلاح، state=pending/approved/rejected، originalNumber، reason، questionVersionId و زمان بررسی.
 
 فایل‌ها، استخراج و بررسی خصوصی‌اند؛ فایل پاسخ هرگز برای دانش‌آموز باز نمی‌شود. تأیید، ثبت question/version، تغییر وضعیت آیتم و auditLog در یک تراکنش‌اند. تعارض همزمان با بازخوانی وضعیت به 409 می‌رسد. نسخه نهایی provenance آزمون را نگه می‌دارد. اصلاح متن قبل از تأیید قابل ذخیره و ادامه است؛ بعد از تأیید نسخه ثابت حفظ می‌شود.
+
+### ممیزی چرخه عمر حساب
+`users.authRevision` نقطهٔ سریال‌سازی ورود با reset/غیرفعال‌سازی/تغییر نقش است. ایجاد نشست در همان تراکنش با شرط hash و نقش معتبر انجام می‌شود؛ ورود با رمز قدیم پس از reset نشست زنده نمی‌سازد. `passwordResetTokens` و throttle دارای TTL هستند؛ hash توکن نگه‌داری می‌شود. UI نشست یا پاسخ مرجع را cache عمومی نمی‌کند.
