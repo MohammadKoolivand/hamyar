@@ -9,6 +9,12 @@ import { z } from "zod";
 import type { ClientSession } from "mongodb";
 import type { Row } from "../db";
 export function registerIdentity(app: FastifyInstance, ctx: Context) {
+  const authRateLimit = z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(120)
+    .parse(process.env.AUTH_RATE_LIMIT_MAX ?? 10);
   const {
     c,
     user,
@@ -56,7 +62,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
   }
   app.post(
     "/api/auth/register",
-    { config: { rateLimit: { max: 10, timeWindow: "1 minute" } } },
+    { config: { rateLimit: { max: authRateLimit, timeWindow: "1 minute" } } },
     async (r) => {
       const b = credentials
         .extend({
@@ -82,7 +88,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
   );
   app.post(
     "/api/auth/login",
-    { config: { rateLimit: { max: 10, timeWindow: "1 minute" } } },
+    { config: { rateLimit: { max: authRateLimit, timeWindow: "1 minute" } } },
     async (r, reply) => {
       const b = credentials.parse(r.body),
         u = await c("users").findOne(accountContact(b.email));
@@ -90,9 +96,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
       // from timingSafeEqual (which requires buffers of identical length).
       // Still run scrypt for absent or malformed accounts to limit timing leaks.
       const [salt, digest] =
-        typeof u?.passwordHash === "string"
-          ? u.passwordHash.split(":")
-          : [];
+        typeof u?.passwordHash === "string" ? u.passwordHash.split(":") : [];
       const validDigest = /^[a-f0-9]{128}$/i.test(digest ?? "");
       const storedDigest = validDigest
         ? Buffer.from(digest ?? "", "hex")
@@ -108,11 +112,31 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
       if (!passwordMatches || !u || u.disabledAt)
         fail(401, "شماره موبایل، ایمیل یا رمز نادرست است");
       const token = randomBytes(32).toString("hex");
-      await c("sessions").insertOne({
-        _id: id(),
-        tokenHash: hash(token),
-        userId: u!._id,
-        expiresAt: new Date(Date.now() + 7 * 86400000),
+      await ctx.boundary("after_login_credentials_verified");
+      await ctx.transaction(async (session) => {
+        // Serialize with password reset, disabling and role changes on the user row.
+        // A login verified before a reset must never create a fresh session afterward.
+        const valid = await c("users").updateOne(
+          {
+            _id: u!._id,
+            passwordHash: u!.passwordHash,
+            role: u!.role,
+            disabledAt: { $exists: false },
+          },
+          { $inc: { authRevision: 1 } },
+          { session },
+        );
+        if (valid.matchedCount !== 1)
+          fail(401, "حساب تغییر کرده؛ دوباره وارد شوید");
+        await c("sessions").insertOne(
+          {
+            _id: id(),
+            tokenHash: hash(token),
+            userId: u!._id,
+            expiresAt: new Date(Date.now() + 7 * 86400000),
+          },
+          { session },
+        );
       });
       reply.setCookie("session", token, {
         httpOnly: true,

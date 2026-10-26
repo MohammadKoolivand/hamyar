@@ -1,7 +1,10 @@
 import { createInterface } from "node:readline";
 import { connect as tlsConnect } from "node:tls";
 
-export type PasswordResetMailer = (email: string, token: string) => Promise<void>;
+export type PasswordResetMailer = (
+  email: string,
+  token: string,
+) => Promise<void>;
 
 // Use implicit TLS (port 465); do not authenticate or transmit credentials on plaintext SMTP.
 export function smtpConfigured() {
@@ -20,7 +23,10 @@ function checkedEmail(value: string) {
   return value;
 }
 
-export const sendPasswordResetEmail: PasswordResetMailer = async (email, token) => {
+export const sendPasswordResetEmail: PasswordResetMailer = async (
+  email,
+  token,
+) => {
   if (!smtpConfigured()) throw new Error("SMTP is not configured");
   const host = process.env.SMTP_HOST!;
   const port = Number(process.env.SMTP_PORT ?? "465");
@@ -29,31 +35,46 @@ export const sendPasswordResetEmail: PasswordResetMailer = async (email, token) 
   const from = checkedEmail(process.env.SMTP_FROM!);
   const to = checkedEmail(email);
   const origin = new URL(process.env.APP_ORIGIN!);
-  if (origin.protocol !== "https:" && !["localhost", "127.0.0.1"].includes(origin.hostname))
+  if (
+    origin.protocol !== "https:" &&
+    !["localhost", "127.0.0.1"].includes(origin.hostname)
+  )
     throw new Error("Password reset requires HTTPS APP_ORIGIN");
   const url = origin.origin + "/#reset=" + token;
   const message = [
-    "برای تغییر رمز عبور هدهد روی لینک زیر باز کنید:",
+    "برای تغییر رمز عبور هدهده روی لینک زیر باز کنید:",
     url,
     "",
     "این لینک تنها یک بار و تا ۱۰ دقیقه معتبر است.",
     "اگر درخواست نداده‌اید، این پیام را نادیده بگیرید.",
   ].join("\n");
-  const encoded = Buffer.from(message, "utf8").toString("base64").match(/.{1,76}/g)?.join("\r\n") ?? "";
+  const encoded =
+    Buffer.from(message, "utf8")
+      .toString("base64")
+      .match(/.{1,76}/g)
+      ?.join("\r\n") ?? "";
   const body = [
     "From: <" + from + ">",
     "To: <" + to + ">",
-    "Subject: =?UTF-8?B?" + Buffer.from("بازیابی رمز عبور هدهد").toString("base64") + "?=",
+    "Subject: =?UTF-8?B?" +
+      Buffer.from("بازیابی رمز عبور هدهده").toString("base64") +
+      "?=",
     "MIME-Version: 1.0",
     "Content-Type: text/plain; charset=UTF-8",
     "Content-Transfer-Encoding: base64",
     "Auto-Submitted: auto-generated",
     "",
     encoded,
-  ].join("\r\n").replace(/^\./gm, "..");
+  ]
+    .join("\r\n")
+    .replace(/^\./gm, "..");
 
   const socket = tlsConnect({
-    host, port, servername: host, rejectUnauthorized: true, minVersion: "TLSv1.2",
+    host,
+    port,
+    servername: host,
+    rejectUnauthorized: true,
+    minVersion: "TLSv1.2",
   });
   socket.setTimeout(12000, () => socket.destroy(new Error("SMTP timeout")));
   const rl = createInterface({ input: socket, crlfDelay: Infinity });
@@ -76,7 +97,8 @@ export const sendPasswordResetEmail: PasswordResetMailer = async (email, token) 
   }
   try {
     await new Promise<void>((resolve, reject) => {
-      if (socket.encrypted && !socket.connecting && socket.authorized) return resolve();
+      if (socket.encrypted && !socket.connecting && socket.authorized)
+        return resolve();
       socket.once("secureConnect", resolve);
       socket.once("error", reject);
     });
@@ -84,7 +106,10 @@ export const sendPasswordResetEmail: PasswordResetMailer = async (email, token) 
     await reply(220);
     await command("EHLO hodhod", 250);
     await command(
-      "AUTH PLAIN " + Buffer.from("\0" + process.env.SMTP_USER + "\0" + process.env.SMTP_PASSWORD).toString("base64"),
+      "AUTH PLAIN " +
+        Buffer.from(
+          "\0" + process.env.SMTP_USER + "\0" + process.env.SMTP_PASSWORD,
+        ).toString("base64"),
       235,
     );
     await command("MAIL FROM:<" + from + ">", 250);

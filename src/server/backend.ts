@@ -20,6 +20,9 @@ export function backend() {
             ? configuredQuestionGenerator()
             : undefined,
         );
+        app.addHook("onClose", async () => {
+          await client.close();
+        });
         await app.ready();
         return app;
       } catch (error) {

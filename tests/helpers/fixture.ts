@@ -1,3 +1,4 @@
+import type { PasswordResetMailer } from "../../src/server/auth/reset-mail";
 import type { AvalaiClient } from "../../src/server/ai/avalai";
 import { randomUUID } from "node:crypto";
 import assert from "node:assert/strict";
@@ -10,6 +11,7 @@ Object.assign(process.env, { NODE_ENV: "test" });
 export async function fixture(
   options: {
     hooks?: WriteHooks;
+    resetMailer?: PasswordResetMailer;
     avalai?: AvalaiClient;
     questionGenerator?: QuestionGenerator;
     provider?: HintProvider;
@@ -29,6 +31,7 @@ export async function fixture(
     options.hooks,
     options.questionGenerator,
     options.avalai,
+    options.resetMailer,
   );
   await app.ready();
   const request = (url: string, body?: object, cookie = "", key?: string) =>

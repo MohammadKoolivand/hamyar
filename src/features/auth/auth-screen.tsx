@@ -34,8 +34,9 @@ export function AuthScreen({
   setPassword: (value: string) => void;
   setToken: (value: string) => void;
 }) {
-
-  const [resetFlow, setResetFlow] = useState<"none" | "request" | "confirm">("none");
+  const [resetFlow, setResetFlow] = useState<"none" | "request" | "confirm">(
+    "none",
+  );
   const [resetEmail, setResetEmail] = useState("");
   const [resetToken, setResetToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -46,12 +47,21 @@ export function AuthScreen({
 
   // URL fragments are not transmitted in HTTP requests or referrer headers.
   useEffect(() => {
-    const match = /^#reset=([a-f0-9]{64})$/.exec(window.location.hash);
-    if (match) {
-      setResetToken(match[1]);
-      setResetFlow("confirm");
-      window.history.replaceState(window.history.state, "", window.location.pathname + window.location.search);
+    function consumeResetLink() {
+      const match = /^#reset=([a-f0-9]{64})$/.exec(window.location.hash);
+      if (match) {
+        setResetToken(match[1]);
+        setResetFlow("confirm");
+        window.history.replaceState(
+          window.history.state,
+          "",
+          window.location.pathname + window.location.search,
+        );
+      }
     }
+    consumeResetLink();
+    window.addEventListener("hashchange", consumeResetLink);
+    return () => window.removeEventListener("hashchange", consumeResetLink);
   }, []);
 
   async function resetSubmit(event: React.FormEvent) {
@@ -62,18 +72,25 @@ export function AuthScreen({
     setResetInfo("");
     try {
       if (resetFlow === "request") {
-        const result = await api<{ message: string }>("/auth/password-reset/request", {
-          email: resetEmail,
-        });
+        const result = await api<{ message: string }>(
+          "/auth/password-reset/request",
+          {
+            email: resetEmail,
+          },
+        );
         setResetInfo(result.message);
       } else {
         if (newPassword !== confirmPassword) {
           setResetError("تکرار رمز عبور با رمز جدید یکسان نیست.");
           return;
         }
-        const result = await api<{ message: string }>("/auth/password-reset/confirm", {
-          token: resetToken, password: newPassword,
-        });
+        const result = await api<{ message: string }>(
+          "/auth/password-reset/confirm",
+          {
+            token: resetToken,
+            password: newPassword,
+          },
+        );
         setResetToken("");
         setNewPassword("");
         setConfirmPassword("");
@@ -104,7 +121,7 @@ export function AuthScreen({
             به یادگیری مستقل.
           </h1>
           <p className="text-xs leading-loose text-slate-500">
-            معلم آموزش می‌دهد، هدهد تمرین را همراهی می‌کند.
+            معلم آموزش می‌دهد، هدهده تمرین را همراهی می‌کند.
           </p>
           <div className="flex items-center gap-3">
             <span className="hy-icon-container" data-tone="teal">
@@ -132,10 +149,10 @@ export function AuthScreen({
                 : mode === "login"
                   ? "خوش آمدید"
                   : mode === "register"
-                ? "ساخت حساب معلم"
-                : mode === "register-student"
-                  ? "ساخت حساب دانش‌آموز"
-                  : "پذیرش دعوت دانش‌آموز یا اولیا"}
+                    ? "ساخت حساب معلم"
+                    : mode === "register-student"
+                      ? "ساخت حساب دانش‌آموز"
+                      : "پذیرش دعوت دانش‌آموز یا اولیا"}
           </h2>
           <p className="text-xs leading-loose text-slate-500">
             {mode === "register-student"
@@ -145,147 +162,205 @@ export function AuthScreen({
                 : "برای ادامه مسیر یادگیری وارد حساب خود شوید."}
           </p>
           {feedback}
-          {resetInfo && <p role="status" className="glass-note p-3 text-sm leading-7">{resetInfo}</p>}
-          {resetFlow === "none" && <form onSubmit={auth} className="grid gap-[18px]">
-            {mode !== "login" && (
-              <Field title="نام و نام خانوادگی">
-                <input
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  autoComplete="name"
-                  className="w-full min-h-[46px] glass-field p-3"
-                />
-              </Field>
-            )}
-            <Field
-              title={
-                mode === "accept"
-                  ? "شماره موبایل دعوت‌شده"
-                  : mode === "login"
-                    ? "ایمیل یا شماره موبایل"
-                    : "ایمیل یا شماره موبایل"
-              }
-            >
-              <input
-                required
-                type={mode === "accept" ? "tel" : "text"}
-                dir="ltr"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete={mode === "accept" ? "tel" : "username"}
-                className="w-full min-h-[46px] glass-field p-3"
-              />
-            </Field>
-            <Field title="رمز عبور (حداقل ۱۰ کاراکتر)">
-              <input
-                required
-                type="password"
-                minLength={10}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete={
-                  mode === "login" ? "current-password" : "new-password"
+          {resetInfo && (
+            <p role="status" className="glass-note p-3 text-sm leading-7">
+              {resetInfo}
+            </p>
+          )}
+          {resetFlow === "none" && (
+            <form onSubmit={auth} className="grid gap-[18px]">
+              {mode !== "login" && (
+                <Field title="نام و نام خانوادگی">
+                  <input
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    autoComplete="name"
+                    className="w-full min-h-[46px] glass-field p-3"
+                  />
+                </Field>
+              )}
+              <Field
+                title={
+                  mode === "accept"
+                    ? "شماره موبایل دعوت‌شده"
+                    : mode === "login"
+                      ? "ایمیل یا شماره موبایل"
+                      : "ایمیل یا شماره موبایل"
                 }
-                className="w-full min-h-[46px] glass-field p-3"
-              />
-            </Field>
-            {mode === "accept" && (
-              <Field title="کد دعوت معلم">
+              >
                 <input
                   required
+                  type={mode === "accept" ? "tel" : "text"}
                   dir="ltr"
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete={mode === "accept" ? "tel" : "username"}
                   className="w-full min-h-[46px] glass-field p-3"
                 />
               </Field>
-            )}
-            <Button disabled={busy}>
-              {mode === "login" ? "ورود به هدهد" : "ساخت حساب"}
-              <ArrowLeft size={16} />
-            </Button>
-          </form>}
+              <Field title="رمز عبور (حداقل ۱۰ کاراکتر)">
+                <input
+                  required
+                  type="password"
+                  minLength={10}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete={
+                    mode === "login" ? "current-password" : "new-password"
+                  }
+                  className="w-full min-h-[46px] glass-field p-3"
+                />
+              </Field>
+              {mode === "accept" && (
+                <Field title="کد دعوت معلم">
+                  <input
+                    required
+                    dir="ltr"
+                    value={token}
+                    onChange={(e) => setToken(e.target.value)}
+                    className="w-full min-h-[46px] glass-field p-3"
+                  />
+                </Field>
+              )}
+              <Button disabled={busy}>
+                {mode === "login" ? "ورود به هدهده" : "ساخت حساب"}
+                <ArrowLeft size={16} />
+              </Button>
+            </form>
+          )}
           {resetFlow !== "none" && (
-            <form onSubmit={(event) => void resetSubmit(event)} className="grid gap-[18px]">
+            <form
+              onSubmit={(event) => void resetSubmit(event)}
+              className="grid gap-[18px]"
+            >
               {resetFlow === "request" ? (
                 <>
                   <p className="text-sm leading-7 text-slate-600">
-                    ایمیل ثبت‌شده حساب را وارد کنید. برای حساب‌هایی که فقط شماره موبایل دارند،
-                    بازیابی ایمیلی تا زمان ثبت ایمیل امکان‌پذیر نیست.
+                    ایمیل ثبت‌شده حساب را وارد کنید. برای حساب‌هایی که فقط شماره
+                    موبایل دارند، بازیابی ایمیلی تا زمان ثبت ایمیل امکان‌پذیر
+                    نیست.
                   </p>
                   <Field title="ایمیل حساب">
-                    <input required type="email" dir="ltr" autoComplete="email"
-                      value={resetEmail} onChange={(event) => setResetEmail(event.target.value)}
-                      className="w-full min-h-[46px] glass-field p-3" />
+                    <input
+                      required
+                      type="email"
+                      dir="ltr"
+                      autoComplete="email"
+                      value={resetEmail}
+                      onChange={(event) => setResetEmail(event.target.value)}
+                      className="w-full min-h-[46px] glass-field p-3"
+                    />
                   </Field>
                 </>
               ) : (
                 <>
                   <Field title="رمز جدید (حداقل ۱۰ کاراکتر)">
-                    <input required type="password" minLength={10} maxLength={128}
-                      autoComplete="new-password" value={newPassword}
+                    <input
+                      required
+                      type="password"
+                      minLength={10}
+                      maxLength={128}
+                      autoComplete="new-password"
+                      value={newPassword}
                       onChange={(event) => setNewPassword(event.target.value)}
-                      className="w-full min-h-[46px] glass-field p-3" />
+                      className="w-full min-h-[46px] glass-field p-3"
+                    />
                   </Field>
                   <Field title="تکرار رمز جدید">
-                    <input required type="password" minLength={10} maxLength={128}
-                      autoComplete="new-password" value={confirmPassword}
-                      onChange={(event) => setConfirmPassword(event.target.value)}
-                      className="w-full min-h-[46px] glass-field p-3" />
+                    <input
+                      required
+                      type="password"
+                      minLength={10}
+                      maxLength={128}
+                      autoComplete="new-password"
+                      value={confirmPassword}
+                      onChange={(event) =>
+                        setConfirmPassword(event.target.value)
+                      }
+                      className="w-full min-h-[46px] glass-field p-3"
+                    />
                   </Field>
                 </>
               )}
-              {resetError && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-900">{resetError}</p>}
+              {resetError && (
+                <p
+                  role="alert"
+                  className="rounded-xl bg-rose-50 p-3 text-sm text-rose-900"
+                >
+                  {resetError}
+                </p>
+              )}
               <Button disabled={resetBusy}>
-                {resetBusy ? "لطفاً صبر کنید…" : resetFlow === "request" ? "ارسال لینک بازیابی" : "ذخیره رمز جدید"}
+                {resetBusy
+                  ? "لطفاً صبر کنید…"
+                  : resetFlow === "request"
+                    ? "ارسال لینک بازیابی"
+                    : "ذخیره رمز جدید"}
               </Button>
-              <Button type="button" variant="outline" onClick={() => {
-                setResetFlow("none"); setResetToken(""); setResetError(""); setResetInfo("");
-              }}>بازگشت به ورود</Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setResetFlow("none");
+                  setResetToken("");
+                  setResetError("");
+                  setResetInfo("");
+                }}
+              >
+                بازگشت به ورود
+              </Button>
             </form>
           )}
           {resetFlow === "none" && mode === "login" && (
-            <button type="button" onClick={() => {
-              setResetEmail(email.includes("@") ? email : "");
-              setResetInfo(""); setResetError(""); setResetFlow("request");
-            }} className="w-fit text-sm font-medium text-[#17305E] underline-offset-4 hover:underline">
+            <button
+              type="button"
+              onClick={() => {
+                setResetEmail(email.includes("@") ? email : "");
+                setResetInfo("");
+                setResetError("");
+                setResetFlow("request");
+              }}
+              className="w-fit text-sm font-medium text-[#17305E] underline-offset-4 hover:underline"
+            >
               رمز عبور را فراموش کرده‌اید؟
             </button>
           )}
-          {resetFlow === "none" && <div className="flex flex-wrap items-center gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() =>
-                setMode(mode === "register" ? "login" : "register")
-              }
-            >
-              {mode === "register" ? "بازگشت به ورود" : "ثبت‌نام معلم"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() =>
-                setMode(
-                  mode === "register-student" ? "login" : "register-student",
-                )
-              }
-            >
-              {mode === "register-student"
-                ? "بازگشت به ورود"
-                : "ثبت‌نام دانش‌آموز"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setMode(mode === "accept" ? "login" : "accept")}
-            >
-              {mode === "accept" ? "بازگشت به ورود" : "پذیرش دعوت"}
-            </Button>
-          </div>}
+          {resetFlow === "none" && (
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  setMode(mode === "register" ? "login" : "register")
+                }
+              >
+                {mode === "register" ? "بازگشت به ورود" : "ثبت‌نام معلم"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  setMode(
+                    mode === "register-student" ? "login" : "register-student",
+                  )
+                }
+              >
+                {mode === "register-student"
+                  ? "بازگشت به ورود"
+                  : "ثبت‌نام دانش‌آموز"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setMode(mode === "accept" ? "login" : "accept")}
+              >
+                {mode === "accept" ? "بازگشت به ورود" : "پذیرش دعوت"}
+              </Button>
+            </div>
+          )}
           <small className="text-xs leading-loose text-slate-500">
-            نسخه توسعه محلی · هدهد آزمایشی با راهنمایی تأییدشده معلم
+            نسخه توسعه محلی · هدهده آزمایشی با راهنمایی تأییدشده معلم
           </small>
         </section>
       </div>
