@@ -23,6 +23,11 @@ test("password reset: no enumeration, one-time token, expiration and revoke all 
   async function login(email: string, pass = password) {
     return post("/auth/login", { email, password: pass });
   }
+  async function waitForMail(count: number) {
+    for (let attempt = 0; sent.length < count && attempt < 100; attempt++)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    assert.equal(sent.length, count, "Expected asynchronous reset email delivery");
+  }
   try {
     const register = await post("/auth/register", {
       email: "owner@example.test", name: "Owner", password, role: "teacher",
@@ -43,7 +48,7 @@ test("password reset: no enumeration, one-time token, expiration and revoke all 
     assert.equal(unknown.statusCode, 200);
     assert.equal(known.statusCode, 200);
     assert.deepEqual(unknown.json(), known.json());
-    assert.equal(sent.length, 1);
+    await waitForMail(1);
     assert.equal(sent[0].email, "owner@example.test");
     assert.match(sent[0].token, /^[0-9a-f]{64}$/);
     assert.ok(!JSON.stringify(known.json()).includes(sent[0].token));
@@ -74,7 +79,7 @@ test("password reset: no enumeration, one-time token, expiration and revoke all 
     }), 1);
 
     await post("/auth/password-reset/request", { email: "second@example.test" });
-    assert.equal(sent.length, 2);
+    await waitForMail(2);
     const second = await collection(db, "users").findOne({ email: "second@example.test" });
     await collection(db, "passwordResetTokens").updateOne(
       { _id: second!._id }, { $set: { expiresAt: new Date(Date.now()-1000) } },
@@ -86,6 +91,84 @@ test("password reset: no enumeration, one-time token, expiration and revoke all 
     assert.equal((await post("/auth/password-reset/request", { email: "not-email" })).statusCode, 400);
   } finally {
     await app.close();
+    await db.dropDatabase();
+    await client.close();
+  }
+});
+
+
+test("password reset replies before slow SMTP completes, for an existing or missing account", async () => {
+  const { client, db } = await connect(
+    process.env.TEST_MONGO_URL ?? "mongodb://127.0.0.1:27019/?replicaSet=hamyar-rs",
+    "hodhod_reset_async_" + randomUUID(),
+  );
+  let releaseMail: () => void = () => {};
+  let beganMail: () => void = () => {};
+  const mailStarted = new Promise<void>((resolve) => { beganMail = resolve; });
+  const mailBlock = new Promise<void>((resolve) => { releaseMail = resolve; });
+  const delivered: string[] = [];
+  const app = await buildApp(db, undefined, {}, undefined, undefined, async (email) => {
+    beganMail();
+    await mailBlock;
+    delivered.push(email);
+  });
+  await app.ready();
+  try {
+    const register = await app.inject({
+      method: "POST", url: "/api/auth/register",
+      payload: { email: "async@example.test", name: "Async account", password },
+    });
+    assert.equal(register.statusCode, 200, register.body);
+    const unknown = await app.inject({
+      method: "POST", url: "/api/auth/password-reset/request",
+      payload: { email: "nonexistent@example.test" },
+    });
+    // This must resolve before the deliberately blocked mailer finishes.
+    const known = await app.inject({
+      method: "POST", url: "/api/auth/password-reset/request",
+      payload: { email: "async@example.test" },
+    });
+    assert.equal(known.statusCode, 200, known.body);
+    assert.deepEqual(known.json(), unknown.json());
+    await mailStarted;
+    assert.deepEqual(delivered, []);
+    releaseMail();
+  } finally {
+    releaseMail();
+    await app.close();
+    assert.deepEqual(delivered, ["async@example.test"]);
+    await db.dropDatabase();
+    await client.close();
+  }
+});
+
+test("failed password reset delivery invalidates its token without exposing the account", async () => {
+  const { client, db } = await connect(
+    process.env.TEST_MONGO_URL ?? "mongodb://127.0.0.1:27019/?replicaSet=hamyar-rs",
+    "hodhod_reset_delivery_failure_" + randomUUID(),
+  );
+  const app = await buildApp(db, undefined, {}, undefined, undefined, async () => {
+    throw new Error("Simulated SMTP outage");
+  });
+  await app.ready();
+  try {
+    const registration = await app.inject({
+      method: "POST", url: "/api/auth/register",
+      payload: { email: "failing@example.test", name: "SMTP test", password },
+    });
+    assert.equal(registration.statusCode, 200, registration.body);
+    const unknown = await app.inject({
+      method: "POST", url: "/api/auth/password-reset/request",
+      payload: { email: "absent@example.test" },
+    });
+    const known = await app.inject({
+      method: "POST", url: "/api/auth/password-reset/request",
+      payload: { email: "failing@example.test" },
+    });
+    assert.deepEqual(known.json(), unknown.json());
+  } finally {
+    await app.close(); // graceful shutdown waits for the queued send and cleanup
+    assert.equal(await collection(db, "passwordResetTokens").countDocuments(), 0);
     await db.dropDatabase();
     await client.close();
   }
