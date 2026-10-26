@@ -11,7 +11,7 @@ test("question collection filters, pages, modal and bulk add preserve all select
     .fill(`pages-${stamp}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await expect(
     page.getByRole("button", { name: "مأموریت‌ها", exact: true }),
   ).toBeVisible();

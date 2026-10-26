@@ -7,7 +7,7 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
 }, testInfo) => {
   const suffix = Date.now(),
     teacher = `teacher${suffix}@test.dev`,
-    student = `student${suffix}@test.dev`;
+    student = `091${String(suffix).slice(-8)}`;
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
@@ -17,7 +17,7 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await page.getByLabel("رمز عبور").fill(pass);
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
   await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await expect(
     page.getByRole("heading", { name: "نمای کلی", exact: true }),
   ).toBeVisible();
@@ -79,7 +79,7 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await expect(page.getByText("بانک سؤال خصوصی · ۲ سؤال")).toBeVisible();
 
   await page.getByRole("button", { name: "دانش‌آموزان", exact: true }).click();
-  await page.getByLabel("ایمیل دانش‌آموز").fill(student);
+  await page.getByLabel("شماره موبایل دانش‌آموز").fill(student);
   await page.getByRole("button", { name: "ایجاد دعوت" }).click();
   const token = await page.getByTestId("invitation-token").innerText();
   expect(token).toHaveLength(48);
@@ -90,11 +90,11 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   sp.on("pageerror", (e) => errors.push(e.message));
   await sp.goto(`/?invite=${token}`);
   await sp.getByLabel("نام و نام خانوادگی").fill("آراد محمدی");
-  await sp.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(student);
+  await sp.getByLabel("شماره موبایل دعوت‌شده", { exact: true }).fill(student);
   await sp.getByLabel("رمز عبور").fill(pass);
   await sp.getByRole("button", { name: "ساخت حساب", exact: true }).click();
   await expect(sp.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await sp.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await sp.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await expect(
     sp.getByRole("heading", { name: "مسیر یادگیری من", exact: true }),
   ).toBeVisible();
@@ -106,6 +106,9 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await expect(page.getByRole("heading", { name: "آراد محمدی" })).toBeVisible();
   await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
   await page.getByLabel("عنوان مأموریت").fill("اولین گام یادگیری");
+  await page
+    .getByLabel("زمان نمایش نتیجه به دانش‌آموز")
+    .selectOption("immediate");
   await page
     .getByLabel("دانش‌آموز", { exact: true })
     .selectOption({ label: "آراد محمدی" });
@@ -172,9 +175,17 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await sp.getByRole("button", { name: "پایان تمرین و گزارش" }).click();
   await expect(
     sp.getByText(
-      "از ۱ سؤال، ۰ سؤال بدون راهنمایی و ۱ سؤال با راهنمایی درست حل شده است.",
+      "پاسخ با دریافت راهنما صحیح شده؛ یک سؤال مشابه را بدون کمک حل کنید تا استقلال یادگیری بررسی شود.",
+      { exact: true },
     ),
   ).toBeVisible();
+  const reportId = new URL(sp.url()).searchParams.get("assignment");
+  const actualReport = await (
+    await sp.request.get(`/api/assignments/${reportId}/report`)
+  ).json();
+  expect(actualReport.independent).toBe(0);
+  expect(actualReport.assisted).toBe(1);
+  expect(actualReport.questions).toHaveLength(1);
   await expect(sp.locator("html")).toHaveAttribute("dir", "rtl");
   expect(
     await sp.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
@@ -184,10 +195,11 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     fullPage: true,
   });
   await page.getByRole("button", { name: "گزارش و شواهد" }).click();
-  await expect(
-    page.getByRole("heading", { name: "شواهد تلاش‌ها و بازبینی" }),
-  ).toBeVisible();
-  await expect(page.getByText("Evidence:", { exact: false })).toHaveCount(2);
+  await page.getByText("تاریخچه تلاش‌ها و بازبینی معلم", { exact: true }).click();
+  await expect(page.getByText("تلاش ۱:", { exact: false })).toBeVisible();
+  await expect(page.getByText("تلاش ۲:", { exact: false })).toBeVisible();
+  const teacherReport = await (await page.request.get(`/api/assignments/${reportId}/report`)).json();
+  expect(teacherReport.evidence).toHaveLength(2);
   await page.screenshot({
     path: testInfo.outputPath("teacher-report-desktop.png"),
     fullPage: true,
@@ -221,10 +233,12 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     .fill("UNPUBLISHED_PRIVATE_REFERENCE");
   await page.getByRole("button", { name: "خروج", exact: true }).click();
   await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await expect(page.getByLabel("ایمیل یا شماره موبایل", { exact: true })).toHaveValue("");
+  await expect(
+    page.getByLabel("ایمیل یا شماره موبایل", { exact: true }),
+  ).toHaveValue("");
   await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(teacher);
   await page.getByLabel("رمز عبور").fill(pass);
-  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
@@ -317,15 +331,15 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
   );
   const suffix = Date.now(),
     teacher = `author${suffix}@test.dev`,
-    student = `child${suffix}@test.dev`,
-    parent = `parent${suffix}@test.dev`;
+    student = `092${String(suffix).slice(-8)}`,
+    parent = `093${String(suffix).slice(-8)}`;
   await page.goto("/");
   await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
   await page.getByLabel("نام و نام خانوادگی").fill("معلم تولید سؤال");
   await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(teacher);
   await page.getByLabel("رمز عبور").fill(pass);
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
@@ -380,7 +394,9 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
   await expect(page.getByText("پیش‌نویس رد شد.")).toBeVisible();
   await expect(page.getByText("بانک سؤال خصوصی · ۱ سؤال")).toBeVisible();
   await page.getByRole("button", { name: "دانش‌آموزان", exact: true }).click();
-  await page.getByLabel("ایمیل دانش‌آموز", { exact: true }).fill(student);
+  await page
+    .getByLabel("شماره موبایل دانش‌آموز", { exact: true })
+    .fill(student);
   await page.getByRole("button", { name: "ایجاد دعوت", exact: true }).click();
   const token = await page.getByTestId("invitation-token").innerText();
   const sc = await browser.newContext({
@@ -389,16 +405,17 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
     sp = await sc.newPage();
   await sp.goto(`/?invite=${token}`);
   await sp.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز آزمایشی");
-  await sp.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(student);
+  await sp.getByLabel("شماره موبایل دعوت‌شده", { exact: true }).fill(student);
   await sp.getByLabel("رمز عبور").fill(pass);
   await sp.getByRole("button", { name: "ساخت حساب", exact: true }).click();
   await expect(sp.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
   await page
     .getByRole("button", { name: "به‌روزرسانی فهرست", exact: true })
     .click();
-  await sp.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await sp.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
   await page.getByLabel("عنوان مأموریت").fill("تمرین با سؤال تأییدشده");
+  await page.getByLabel("زمان نمایش نتیجه به دانش‌آموز").selectOption("immediate");
   await page
     .getByLabel("دانش‌آموز", { exact: true })
     .selectOption({ label: "دانش‌آموز آزمایشی" });
@@ -415,12 +432,10 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
   await sp.getByRole("button", { name: "ثبت و بررسی پاسخ" }).click();
   await expect(sp.getByText("صحیح · بدون دریافت کمک")).toBeVisible();
   await sp.getByRole("button", { name: "پایان تمرین و گزارش" }).click();
-  await expect(
-    sp.getByRole("heading", { name: "استقلال در اولین تلاش" }),
-  ).toBeVisible();
+  await expect(sp.getByText(/۱ پاسخ صحیح مستقل و ۰ پاسخ صحیح با راهنما/)).toBeVisible();
   await page.getByRole("button", { name: "دانش‌آموزان", exact: true }).click();
   await page.getByText("دسترسی اولیا", { exact: true }).click();
-  await page.getByLabel("ایمیل ولی دانش‌آموز").fill(parent);
+  await page.getByLabel("شماره موبایل ولی دانش‌آموز").fill(parent);
   await page.getByRole("button", { name: "ایجاد دعوت اولیا" }).click();
   const invite = await page.getByTestId("parent-invitation-token").innerText();
   const pc = await browser.newContext({
@@ -429,10 +444,10 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
     pp = await pc.newPage();
   await pp.goto(invite);
   await pp.getByLabel("نام و نام خانوادگی").fill("ولی آزمایشی");
-  await pp.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(parent);
+  await pp.getByLabel("شماره موبایل دعوت‌شده", { exact: true }).fill(parent);
   await pp.getByLabel("رمز عبور").fill(pass);
   await pp.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await pp.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await pp.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await expect(pp.getByRole("heading", { name: "پنل اولیا" })).toBeVisible();
   await expect(pp.getByLabel("انتخاب فرزند")).toHaveValue(/.+/);
   await expect(
@@ -486,7 +501,7 @@ test("student registers without invitation and later joins teacher with existing
   browser,
 }, testInfo) => {
   const suffix = Date.now();
-  const studentEmail = `standalone-${suffix}@test.dev`;
+  const studentEmail = `094${String(suffix).slice(-8)}`;
   const teacherEmail = `mentor-${suffix}@test.dev`;
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
@@ -496,11 +511,13 @@ test("student registers without invitation and later joins teacher with existing
   ).toBeVisible();
   await expect(page.getByLabel("کد دعوت معلم")).toHaveCount(0);
   await page.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز مستقل");
-  await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(studentEmail);
+  await page
+    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
+    .fill(studentEmail);
   await page.getByLabel("رمز عبور").fill(pass);
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
   await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await expect(
     page.getByRole("heading", { name: "مسیر یادگیری من" }),
   ).toBeVisible();
@@ -521,14 +538,14 @@ test("student registers without invitation and later joins teacher with existing
     await teacherPage.goto("/");
     await teacherPage.getByRole("button", { name: "ثبت‌نام معلم" }).click();
     await teacherPage.getByLabel("نام و نام خانوادگی").fill("معلم آزمایشی");
-    await teacherPage.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(teacherEmail);
+    await teacherPage
+      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
+      .fill(teacherEmail);
     await teacherPage.getByLabel("رمز عبور").fill(pass);
     await teacherPage
       .getByRole("button", { name: "ساخت حساب", exact: true })
       .click();
-    await teacherPage
-      .getByRole("button", { name: /^ورود به (همیار|هدهد)$/ })
-      .click();
+    await teacherPage.getByRole("button", { name: /^ورود به هدهده$/ }).click();
     await teacherPage
       .getByRole("button", { name: "درس‌های من", exact: true })
       .click();
@@ -541,7 +558,7 @@ test("student registers without invitation and later joins teacher with existing
     await teacherPage
       .getByRole("button", { name: "دانش‌آموزان", exact: true })
       .click();
-    await teacherPage.getByLabel("ایمیل دانش‌آموز").fill(studentEmail);
+    await teacherPage.getByLabel("شماره موبایل دانش‌آموز").fill(studentEmail);
     await teacherPage
       .getByLabel("درس دعوت")
       .selectOption({ label: "ریاضی آزمایشی · ریاضی" });
@@ -611,10 +628,12 @@ test("student requests a course, teacher approves, and leaving keeps history", a
   await page.goto("/");
   await page.getByRole("button", { name: "ثبت‌نام معلم" }).click();
   await page.getByLabel("نام و نام خانوادگی").fill("معلم دوره");
-  await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(teacherEmail);
+  await page
+    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
+    .fill(teacherEmail);
   await page.getByLabel("رمز عبور").fill(pass);
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await page.getByRole("button", { name: "درس‌های من", exact: true }).click();
   await page.getByLabel("نام درس").fill("ریاضی");
   await page.getByLabel("عنوان دوره").fill("دوره درخواست عضویت");
@@ -633,14 +652,14 @@ test("student requests a course, teacher approves, and leaving keeps history", a
     await student
       .getByLabel("نام و نام خانوادگی")
       .fill("دانش‌آموز درخواست‌کننده");
-    await student.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(studentEmail);
+    await student
+      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
+      .fill(studentEmail);
     await student.getByLabel("رمز عبور").fill(pass);
     await student
       .getByRole("button", { name: "ساخت حساب", exact: true })
       .click();
-    await student
-      .getByRole("button", { name: /^ورود به (همیار|هدهد)$/ })
-      .click();
+    await student.getByRole("button", { name: /^ورود به هدهده$/ }).click();
     await student
       .getByRole("button", { name: "درس‌های من", exact: true })
       .click();
@@ -776,6 +795,9 @@ test("teacher publishes one group assignment to two students and sees separate r
     await expect(page.getByRole("heading", { name: "دهم الف" })).toBeVisible();
     await page.getByLabel("کلاس مقصد").selectOption({ label: "دهم الف" });
     await page.getByLabel("عنوان مأموریت").fill("تکلیف گروهی ریاضی");
+    await page
+      .getByLabel("زمان نمایش نتیجه به دانش‌آموز")
+      .selectOption("immediate");
     await page.getByRole("checkbox", { name: "حاصل یک به علاوه یک؟" }).check();
     await page.getByRole("button", { name: "ساخت پیش‌نویس گروهی" }).click();
     await page

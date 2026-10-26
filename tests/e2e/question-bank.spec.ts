@@ -11,7 +11,7 @@ test("bank-focused page separates resources and authoring; metadata and dependen
     .fill(`bank-${Date.now()}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();

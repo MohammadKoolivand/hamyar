@@ -55,6 +55,9 @@ jobs:
         run: npm run test:e2e
         env:
           CI: "true"
+          # Synthetic accounts share one loopback IP; production default remains 10.
+          # Dedicated auth tests above still verify the default threshold.
+          AUTH_RATE_LIMIT_MAX: "60"
       - name: Upload Playwright screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4

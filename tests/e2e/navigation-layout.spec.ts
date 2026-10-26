@@ -37,7 +37,7 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
     .fill(`nav-teacher-${suffix}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
 
   await expect(
     page.getByRole("heading", { name: "نمای کلی", exact: true }),
@@ -105,4 +105,59 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+test("all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime errors", async ({
+  page,
+}) => {
+  test.setTimeout(180000);
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("console", (m) => {
+    if (/hydration|cannot be a child|cannot contain/i.test(m.text()))
+      errors.push(m.text());
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
+  await page.getByLabel("نام و نام خانوادگی").fill("ممیزی نمایشگر");
+  await page
+    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
+    .fill(`viewport-${crypto.randomUUID()}@test.dev`);
+  await page.getByLabel("رمز عبور").fill("StrongPass123!");
+  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
+  await page
+    .getByRole("button", { name: "ورود به هدهده", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "خروج", exact: true }),
+  ).toBeVisible();
+  for (const route of [
+    "dashboard",
+    "students",
+    "courses",
+    "classes",
+    "content",
+    "content-new",
+    "resources",
+    "homeworks",
+    "learning",
+    "settings",
+    "exam-import",
+  ]) {
+    await page.goto("/" + route);
+    await expect(
+      page.getByRole("button", { name: "خروج", exact: true }),
+    ).toBeVisible();
+    for (const width of [360, 390, 768, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+        `${width}: /${route}`,
+      ).toBe(true);
+      expect(await page.locator("html").getAttribute("dir")).toBe("rtl");
+    }
+  }
+  expect(errors).toEqual([]);
 });

@@ -11,7 +11,7 @@ test("secondary catalog filter → import → preserved after reload → author 
     .fill(`catalog-${Date.now()}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await page.getByRole("button", { name: "منابع آموزشی", exact: true }).click();
   await page
     .getByRole("heading", { name: "کتاب‌ها و مباحث درسی", exact: true })

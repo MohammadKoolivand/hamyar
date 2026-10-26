@@ -45,7 +45,7 @@ test("teacher selects 20 hard questions and edits filtered difficulty", async ({
       .getByLabel("ایمیل یا شماره موبایل", { exact: true })
       .fill("t@test.dev");
     await page.getByLabel("رمز عبور").fill("StrongPass123!");
-    await page.getByRole("button", { name: /^ورود به (همیار|هدهد)$/ }).click();
+    await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
     await expect(
       page.getByRole("button", { name: "خروج", exact: true }),
     ).toBeVisible();

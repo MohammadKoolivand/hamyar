@@ -10,7 +10,8 @@ test("reference-inspired luminous glass identity is consistent on login and mobi
   await expect(mark).toHaveAttribute("src", /icon\.svg/);
   const icon = await page.request.get("/icon.svg");
   expect(icon.ok()).toBe(true);
-  expect(await icon.text()).toContain("#24BFB6");
+  expect(await icon.text()).toContain('aria-label="هدهده"');
+  expect(await icon.text()).toContain('<path fill="#171717"');
 
   const visual = await page.evaluate(() => {
     const tokens = getComputedStyle(document.documentElement);
@@ -54,7 +55,7 @@ test("reference-inspired luminous glass identity is consistent on login and mobi
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   const duration = await page
-    .getByRole("button", { name: /^ورود به (همیار|هدهد)$/ })
+    .getByRole("button", { name: /^ورود به هدهده$/ })
     .evaluate((el) => getComputedStyle(el).transitionDuration);
   expect(duration).toMatch(/^(0s|0ms)(,\s*(0s|0ms))*$/);
 });

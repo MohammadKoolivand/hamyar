@@ -12,7 +12,7 @@ test("teacher edits question, choices, difficulty and persistent image crop", as
   await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(email);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /ورود به (همیار|هدهد)/ }).click();
+  await page.getByRole("button", { name: /ورود به هدهده/ }).click();
   await expect(
     page.getByRole("heading", { name: "معلم ویرایش سؤال", exact: true }),
   ).toBeVisible();

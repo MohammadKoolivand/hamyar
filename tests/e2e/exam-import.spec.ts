@@ -11,7 +11,7 @@ test("PDF exam upload persists, extracts real text, saves corrections and approv
     .fill(`exam-${Date.now()}@test.dev`);
   await page.getByLabel("رمز عبور").fill("StrongPass123!");
   await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /ورود به (همیار|هدهد)/ }).click();
+  await page.getByRole("button", { name: /ورود به هدهده/ }).click();
   await page.getByRole("button", { name: "ورود آزمون", exact: true }).click();
   await page
     .getByLabel("عنوان آزمون", { exact: true })
@@ -99,6 +99,7 @@ test("PDF exam upload persists, extracts real text, saves corrections and approv
   await page
     .getByRole("button", { name: "تأیید و ورود سؤال ۱ به بانک", exact: true })
     .click();
+  await page.getByLabel("فیلتر بازبینی", { exact: true }).selectOption("all");
   await expect(
     page.getByText("سؤال ۱ · تأیید و وارد بانک شد", { exact: true }),
   ).toBeVisible();
