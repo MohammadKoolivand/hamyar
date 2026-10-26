@@ -86,17 +86,27 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
     async (r, reply) => {
       const b = credentials.parse(r.body),
         u = await c("users").findOne(accountContact(b.email));
-      const [salt, digest] = (
-        u?.passwordHash ?? "invalid:" + "0".repeat(128)
-      ).split(":");
-      if (
-        !timingSafeEqual(
-          Buffer.from(digest, "hex"),
-          scryptSync(b.password, salt, 64),
-        )
-      )
+      // Malformed/legacy password records must fail authentication, not throw
+      // from timingSafeEqual (which requires buffers of identical length).
+      // Still run scrypt for absent or malformed accounts to limit timing leaks.
+      const [salt, digest] =
+        typeof u?.passwordHash === "string"
+          ? u.passwordHash.split(":")
+          : [];
+      const validDigest = /^[a-f0-9]{128}$/i.test(digest ?? "");
+      const storedDigest = validDigest
+        ? Buffer.from(digest ?? "", "hex")
+        : Buffer.alloc(64);
+      const safeSalt =
+        typeof salt === "string" && salt.length > 0 && salt.length <= 128
+          ? salt
+          : "invalid";
+      const passwordMatches = timingSafeEqual(
+        storedDigest,
+        scryptSync(b.password, safeSalt, 64),
+      );
+      if (!passwordMatches || !u || u.disabledAt)
         fail(401, "شماره موبایل، ایمیل یا رمز نادرست است");
-      if (u?.disabledAt) fail(401, "شماره موبایل، ایمیل یا رمز نادرست است");
       const token = randomBytes(32).toString("hex");
       await c("sessions").insertOne({
         _id: id(),
