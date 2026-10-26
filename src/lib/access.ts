@@ -69,7 +69,8 @@ export function routeRoles(method: string, route: string): Role[] | null {
     route.startsWith("/api/student/")
   )
     return ["student"];
-  if (route.startsWith("/api/question-assets/")) return ["teacher", "student"];
+  if (route.startsWith("/api/question-assets/"))
+    return ["teacher", "student", "parent"];
   const teacherPrefixes = [
     "/api/students",
     "/api/curriculum",

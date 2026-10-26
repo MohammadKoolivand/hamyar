@@ -1,5 +1,4 @@
 "use client";
-import { PagedList } from "@/components/ui/paged-list";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { User } from "@/lib/types";
@@ -54,13 +53,11 @@ export function ParentDashboard({
           value={child}
           onChange={(e) => setChild(e.target.value)}
         >
-          <PagedList items={children} label="فرزندان">
-            {(c) => (
-              <option key={c._id} value={c._id}>
-                {c.name}
-              </option>
-            )}
-          </PagedList>
+          {children.map((c) => (
+            <option key={c._id} value={c._id}>
+              {c.name}
+            </option>
+          ))}
         </select>
       </Field>
       {!children.length && !error && (

@@ -21,7 +21,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         .string()
         .uuid()
         .parse((r.params as { assetId: string }).assetId);
-    if (!["teacher", "student"].includes(u.role))
+    if (!["teacher", "student", "parent"].includes(u.role))
       ctx.fail(403, "دسترسی مجاز نیست");
     const asset = await c("questionAssets").findOne({
       _id: assetId,
@@ -37,16 +37,29 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         : null;
     const imageAsset = asset ?? preview;
     if (!imageAsset) ctx.fail(404, "تصویر یافت نشد");
-    if (u.role === "student") {
+    if (u.role === "student" || u.role === "parent") {
       const versions = await c("questionVersions")
         .find(
           { visuals: { $elemMatch: { kind: "image", assetId } } },
           { projection: { _id: 1 } },
         )
         .toArray();
+      const links =
+        u.role === "parent"
+          ? await c("parentLinks").find({ parentId: u._id }).toArray()
+          : [];
       if (
         !(await c("assignments").findOne({
-          studentId: u._id,
+          ...(u.role === "student"
+            ? { studentId: u._id }
+            : {
+                $or: links.length
+                  ? links.map((l) => ({
+                      studentId: l.studentId,
+                      teacherId: l.teacherId,
+                    }))
+                  : [{ studentId: "no-authorized-child" }],
+              }),
           questionVersionIds: { $in: versions.map((v) => v._id) },
           state: { $ne: "cancelled" },
         }))

@@ -308,7 +308,7 @@ export default function HamyarApp() {
         role="status"
         className="mx-auto my-[7vh] max-w-[1020px] glass-note p-3.5 leading-[1.9]"
       >
-        در حال اتصال به هدهد…
+        در حال اتصال به هدهده…
       </div>
     );
   const feedback = (
@@ -412,7 +412,7 @@ export default function HamyarApp() {
             <small className="text-xs leading-loose text-slate-500">
               معلم آموزش می‌دهد،
               <br />
-              هدهد راهنمایی می‌کند.
+              هدهده راهنمایی می‌کند.
             </small>
           </div>
         </footer>
@@ -432,7 +432,7 @@ export default function HamyarApp() {
         <header className="glass-header mb-2 flex h-fit self-start items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-2.5 max-[650px]:mb-2 max-[650px]:[&_h1]:text-[22px]">
           <div>
             <small className="text-xs leading-loose text-slate-500">
-              هدهد / {teacher ? "پنل معلم" : "یادگیری"}
+              هدهده / {teacher ? "پنل معلم" : "یادگیری"}
             </small>
             <h1 className="text-[28px] font-bold text-[#17305E]">
               {nav.find((n) => n[0] === page)?.[1] ??
@@ -447,7 +447,13 @@ export default function HamyarApp() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="hy-icon-container !size-[46px]" data-tone="purple">
-              <img src="/app-icon.svg" alt="" width={44} height={44} className="h-11 w-11 object-contain" />
+              <img
+                src="/app-icon.svg"
+                alt=""
+                width={44}
+                height={44}
+                className="h-11 w-11 object-contain"
+              />
             </span>
             <div>
               <h3 className="text-base font-bold">{me.name}</h3>
@@ -647,7 +653,7 @@ export default function HamyarApp() {
           />
         )}
         <footer className="text-xs leading-loose text-slate-500 p-5 text-center">
-          همیار · تمرین و تحلیل یادگیری تحت هدایت معلم · نسخه توسعه
+          هدهده · تمرین و تحلیل یادگیری تحت هدایت معلم · نسخه توسعه
         </footer>
       </main>
     </div>

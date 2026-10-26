@@ -109,6 +109,58 @@ test("original question images stay private, assigned students may see images bu
     assert.equal(allowed.statusCode, 200);
     assert.deepEqual(allowed.rawPayload, png);
     assert.match(String(allowed.headers["cache-control"]), /no-store/);
+    const invite = await f.post(
+      "/api/invitations",
+      { phone: "09120000090", role: "parent", studentId: a.studentId },
+      f.teacher,
+    );
+    await f.post("/api/invitations/accept", {
+      phone: "09120000090",
+      name: "ولی آزمایشی",
+      password: "StrongPass123!",
+      token: invite.token,
+    });
+    const login = await f.request("/api/auth/login", {
+      email: "09120000090",
+      password: "StrongPass123!",
+    });
+    const parentCookie = "session=" + login.cookies[0].value;
+    assert.equal(
+      (
+        await f.request(
+          `/api/question-assets/${assetId}`,
+          undefined,
+          parentCookie,
+        )
+      ).statusCode,
+      200,
+    );
+    assert.equal(
+      (
+        await f.request(
+          `/api/question-assets/${other}`,
+          undefined,
+          parentCookie,
+        )
+      ).statusCode,
+      404,
+    );
+    const parent = login.json();
+    await f.post(
+      `/api/students/${a.studentId}/parents/${parent._id}/revoke`,
+      {},
+      f.teacher,
+    );
+    assert.equal(
+      (
+        await f.request(
+          `/api/question-assets/${assetId}`,
+          undefined,
+          parentCookie,
+        )
+      ).statusCode,
+      404,
+    );
     await f.post(`/api/missions/${m._id}/cancel`, {}, f.teacher);
     assert.equal(
       (await f.request(`/api/question-assets/${assetId}`, undefined, f.student))
