@@ -1,4 +1,5 @@
 "use client";
+import { DifficultyGauge } from "@/components/ui/difficulty-gauge";
 import { PagedList } from "@/components/ui/paged-list";
 import {
   sourceCategories,
@@ -562,12 +563,7 @@ export function QuestionBank({
                   <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-slate-600">
                     {types[q.type] ?? q.type}
                   </span>
-                  <span className="rounded-lg bg-amber-50 px-3 py-1.5 text-amber-800">
-                    سختی:{" "}
-                    {q.difficulty
-                      ? difficultyLabels[q.difficulty]
-                      : "تعیین نشده"}
-                  </span>
+                  <DifficultyGauge value={q.difficulty} />
                   {q.difficultyAssessment?.needsReview && (
                     <span
                       className="text-amber-700"
