@@ -60,6 +60,24 @@ test("login validates credentials, creates a secure session, and logout revokes 
       ).statusCode,
       200,
     );
+    const previousSecure = process.env.COOKIE_SECURE;
+    try {
+      process.env.COOKIE_SECURE = "true";
+      const secureLogin = await f.request(
+        "/api/auth/login",
+        { email: "t@test.dev", password: "StrongPass123!" },
+        f.teacher,
+      );
+      assert.equal(secureLogin.statusCode, 200);
+      assert.match(
+        String(secureLogin.headers["set-cookie"]),
+        /; Secure(?:;|$)/i,
+      );
+      assert.notEqual("session=" + secureLogin.cookies[0].value, f.teacher);
+    } finally {
+      if (previousSecure === undefined) delete process.env.COOKIE_SECURE;
+      else process.env.COOKIE_SECURE = previousSecure;
+    }
   } finally {
     await f.close();
   }

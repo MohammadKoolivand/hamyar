@@ -150,11 +150,24 @@ test("all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime 
     ).toBeVisible();
     for (const width of [360, 390, 768, 1280]) {
       await page.setViewportSize({ width, height: 844 });
+      const layout = await page.evaluate(() => ({
+        fits: document.documentElement.scrollWidth <= innerWidth,
+        overflow: [...document.querySelectorAll("main *")]
+          .filter(
+            (el) =>
+              el.getBoundingClientRect().left < -1 ||
+              el.getBoundingClientRect().right > innerWidth + 1,
+          )
+          .slice(0, 12)
+          .map((el) => ({
+            tag: el.tagName,
+            class: el.className,
+            width: el.getBoundingClientRect().width,
+          })),
+      }));
       expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
-        ),
-        `${width}: /${route}`,
+        layout.fits,
+        `${width}: /${route}: ${JSON.stringify(layout.overflow)}`,
       ).toBe(true);
       expect(await page.locator("html").getAttribute("dir")).toBe("rtl");
     }
