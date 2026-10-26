@@ -41,7 +41,11 @@ test("question collection filters, pages, modal and bulk add preserve all select
       statement: "سؤال تشریحی دسته دیگر",
       type: "essay",
       reference: "مرجع تست",
-      source: { family: "practice", practice: "teacher" },
+      source: {
+        family: "practice",
+        practice: "teacher",
+        sourceTitle: "مجموعه تشریحی",
+      },
     },
   });
   await page.goto("/homeworks");
@@ -49,15 +53,77 @@ test("question collection filters, pages, modal and bulk add preserve all select
     name: "انتخاب سؤال‌های مأموریت",
     exact: true,
   });
+  // Each filter accepts multiple values, unions within a filter and intersects across filters.
+  for (const [label, choices] of [
+    ["دسته‌بندی سؤال برای مأموریت", ["آزمون آزمایشی", "تمرین و تألیف"]],
+    ["نوع سؤال برای مأموریت", ["چندگزینه‌ای", "تشریحی"]],
+    ["منابع / مجموعه‌ها", ["مجموعه تست ۳۵ سؤال", "مجموعه تشریحی"]],
+  ] as [string, string[]][]) {
+    const filter = picker
+      .locator("details")
+      .filter({ has: page.locator("summary", { hasText: label }) });
+    await filter.locator("summary").click();
+    for (const choice of choices)
+      await filter.getByRole("checkbox", { name: choice, exact: true }).check();
+    await expect(filter.locator("summary")).toContainText("۲ انتخاب");
+    await filter.locator("summary").click();
+  }
   await picker
-    .getByLabel("دسته‌بندی سؤال برای مأموریت", { exact: true })
-    .selectOption("mock");
+    .getByLabel("جست‌وجوی سؤال برای مأموریت", { exact: true })
+    .fill("سؤال تشریحی دسته دیگر");
+  await expect(
+    picker.getByText("سؤال تشریحی دسته دیگر", { exact: true }),
+  ).toBeVisible();
   await picker
-    .getByLabel("نوع سؤال برای مأموریت", { exact: true })
-    .selectOption("choice");
+    .getByLabel("جست‌وجوی سؤال برای مأموریت", { exact: true })
+    .fill("");
+  for (const label of [
+    "دسته‌بندی سؤال برای مأموریت",
+    "نوع سؤال برای مأموریت",
+    "منابع / مجموعه‌ها",
+  ]) {
+    const filter = picker
+      .locator("details")
+      .filter({ has: page.locator("summary", { hasText: label }) });
+    await filter.locator("summary").click();
+    await filter
+      .getByRole("button", { name: "همه / پاک‌کردن فیلتر", exact: true })
+      .click();
+    await filter.locator("summary").click();
+  }
   await picker
-    .getByLabel("مجموعه یا آزمون", { exact: true })
-    .selectOption("https://konkur.in/fixture-only.pdf");
+    .locator("summary")
+    .filter({ hasText: "دسته‌بندی سؤال برای مأموریت" })
+    .click();
+  await picker
+    .getByRole("checkbox", { name: "آزمون آزمایشی", exact: true })
+    .check();
+  await picker
+    .locator("summary")
+    .filter({ hasText: "دسته‌بندی سؤال برای مأموریت" })
+    .click();
+  await picker
+    .locator("summary")
+    .filter({ hasText: "نوع سؤال برای مأموریت" })
+    .click();
+  await picker
+    .getByRole("checkbox", { name: "چندگزینه‌ای", exact: true })
+    .check();
+  await picker
+    .locator("summary")
+    .filter({ hasText: "نوع سؤال برای مأموریت" })
+    .click();
+  await picker
+    .locator("summary")
+    .filter({ hasText: "منابع / مجموعه‌ها" })
+    .click();
+  await picker
+    .getByRole("checkbox", { name: "مجموعه تست ۳۵ سؤال", exact: true })
+    .check();
+  await picker
+    .locator("summary")
+    .filter({ hasText: "منابع / مجموعه‌ها" })
+    .click();
   await expect(picker.getByRole("button", { name: /مشاهده سؤال/ })).toHaveCount(
     10,
   );

@@ -383,6 +383,7 @@ export function ClassGroupsScreen({
           <div className="grid gap-2">
             <strong className="text-sm">سؤال‌های مأموریت</strong>
             <QuestionPicker
+              onRefresh={refresh}
               questions={questions}
               selected={selectedQuestions}
               onChange={setSelectedQuestions}

@@ -1,5 +1,9 @@
 "use client";
+import { MultiFilter } from "@/components/ui/multi-filter";
+import { ExamImportScreen } from "./exam-import-screen";
+import { DifficultyGauge } from "@/components/ui/difficulty-gauge";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Eye, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -14,7 +18,7 @@ import { MAX_MISSION_QUESTIONS } from "@/lib/mission-limits";
 import { api } from "@/lib/api";
 import { difficultyLabels } from "@/lib/difficulty";
 import { fa } from "@/lib/presentation";
-import type { Question } from "@/lib/types";
+import type { Question, Node } from "@/lib/types";
 
 const types = {
   choice: "چندگزینه‌ای",
@@ -28,19 +32,25 @@ export function QuestionPicker({
   selected,
   onChange,
   disabled = false,
+  onRefresh,
 }: {
   questions: Question[];
   selected: string[];
   onChange: (ids: string[]) => void;
   disabled?: boolean;
+  onRefresh?: () => Promise<void>;
 }) {
-  const [difficulty, setDifficulty] = useState("medium");
-  const [count, setCount] = useState(20);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const [quotas, setQuotas] = useState({ easy: 0, medium: 20, hard: 0 });
+  const automatic = useRef<HTMLDialogElement>(null);
+  const importer = useRef<HTMLDialogElement>(null);
+  const [importNodes, setImportNodes] = useState<Node[]>([]);
   const [selecting, setSelecting] = useState(false);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
-  const [type, setType] = useState("");
-  const [collection, setCollection] = useState("");
+  const [category, setCategory] = useState<string[]>([]);
+  const [type, setType] = useState<string[]>([]);
+  const [collection, setCollection] = useState<string[]>([]);
   const [guided, setGuided] = useState(false);
   const [preview, setPreview] = useState<Question>();
   const [error, setError] = useState("");
@@ -49,8 +59,8 @@ export function QuestionPicker({
     q.source?.sourceUrl || q.source?.sourceTitle || "";
   const scoped = questions.filter(
     (q) =>
-      (!category || sourceCategory(q.source) === category) &&
-      (!type || q.type === type),
+      (!category.length || category.includes(sourceCategory(q.source))) &&
+      (!type.length || type.includes(q.type)),
   );
   const collections = [
     ...new Map(
@@ -64,7 +74,7 @@ export function QuestionPicker({
   ];
   const visible = scoped.filter(
     (q) =>
-      (!collection || collectionKey(q) === collection) &&
+      (!collection.length || collection.includes(collectionKey(q))) &&
       (!guided || (!!q.hints?.length && !!q.skillIds?.length)) &&
       `${q.statement} ${q.source?.sourceTitle ?? ""}`.includes(search.trim()),
   );
@@ -74,10 +84,11 @@ export function QuestionPicker({
       setError(
         `هر مأموریت حداکثر ${fa(MAX_MISSION_QUESTIONS)} سؤال می‌پذیرد؛ مجموعه را با فیلتر محدود کنید.`,
       );
-      return;
+      return false;
     }
     setError("");
     onChange(unique);
+    return true;
   };
   useEffect(() => {
     if (preview) dialog.current?.showModal();
@@ -90,55 +101,36 @@ export function QuestionPicker({
       aria-label="انتخاب سؤال‌های مأموریت"
     >
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field title="دسته‌بندی سؤال برای مأموریت">
-          <select
-            className="glass-field min-h-11 w-full p-3"
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              setCollection("");
-            }}
-          >
-            <option value="">همه دسته‌ها</option>
-            {sourceCategories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label}
-              </option>
-            ))}
-            <option value="unknown">دسته‌بندی‌نشده</option>
-          </select>
-        </Field>
-        <Field title="نوع سؤال برای مأموریت">
-          <select
-            className="glass-field min-h-11 w-full p-3"
-            value={type}
-            onChange={(e) => {
-              setType(e.target.value);
-              setCollection("");
-            }}
-          >
-            <option value="">همه نوع‌ها</option>
-            {Object.entries(types).map(([id, label]) => (
-              <option key={id} value={id}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field title="مجموعه یا آزمون">
-          <select
-            className="glass-field min-h-11 w-full p-3"
-            value={collection}
-            onChange={(e) => setCollection(e.target.value)}
-          >
-            <option value="">همه مجموعه‌ها</option>
-            {collections.map(([id, label]) => (
-              <option key={id} value={id}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </Field>
+        <MultiFilter
+          label="دسته‌بندی سؤال برای مأموریت"
+          disabled={disabled}
+          value={category}
+          onChange={(v) => {
+            setCategory(v);
+            setCollection([]);
+          }}
+          options={[
+            ...sourceCategories.map((c): [string, string] => [c.id, c.label]),
+            ["unknown", "دسته‌بندی‌نشده"],
+          ]}
+        />
+        <MultiFilter
+          label="نوع سؤال برای مأموریت"
+          disabled={disabled}
+          value={type}
+          onChange={(v) => {
+            setType(v);
+            setCollection([]);
+          }}
+          options={Object.entries(types)}
+        />
+        <MultiFilter
+          label="منابع / مجموعه‌ها"
+          disabled={disabled}
+          value={collection}
+          onChange={setCollection}
+          options={collections}
+        />
         <Field title="جست‌وجوی سؤال برای مأموریت">
           <input
             className="glass-field min-h-11 w-full p-3"
@@ -148,64 +140,130 @@ export function QuestionPicker({
           />
         </Field>
       </div>
-      <div className="glass-note grid gap-3 p-4 sm:grid-cols-3">
-        <Field title="سختی تمرین پیشنهادی">
-          <select
-            className="glass-field min-h-11 w-full p-3"
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
-          >
-            {Object.entries(difficultyLabels).map(([v, label]) => (
-              <option key={v} value={v}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field title="تعداد سؤال تمرین">
-          <input
-            className="glass-field min-h-11 w-full p-3"
-            type="number"
-            min={1}
-            max={MAX_MISSION_QUESTIONS}
-            value={count}
-            onChange={(e) => setCount(Number(e.target.value))}
-          />
-        </Field>
+      <div className="flex flex-wrap gap-3">
         <Button
           type="button"
-          disabled={
-            disabled ||
-            selecting ||
-            !visible.length ||
-            !Number.isInteger(count) ||
-            count < 1 ||
-            count > MAX_MISSION_QUESTIONS
-          }
-          onClick={async () => {
-            setSelecting(true);
-            setError("");
-            try {
-              const result = await api<{ questionVersionIds: string[] }>(
-                "/questions/select",
-                { candidateIds: visible.map((q) => q._id), difficulty, count },
-              );
-              select(result.questionVersionIds);
-            } catch (e) {
-              setError((e as Error).message);
-            } finally {
-              setSelecting(false);
-            }
-          }}
+          disabled={disabled || selecting}
+          onClick={() => automatic.current?.showModal()}
         >
           انتخاب خودکار با تعداد و سختی
         </Button>
-        <p className="text-xs leading-6 text-slate-500 sm:col-span-3">
-          از نتایج همین فیلترها، سؤال‌های بدون تکرار انتخاب و جایگزین انتخاب
-          فعلی می‌شوند. اگر بانک کافی نباشد خطا نمایش داده می‌شود؛ سؤال تازه
-          تولید نمی‌شود.
-        </p>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={disabled}
+          onClick={async () => {
+            try {
+              setImportNodes(await api<Node[]>("/curriculum"));
+              importer.current?.showModal();
+            } catch (e) {
+              setError((e as Error).message);
+            }
+          }}
+        >
+          افزودن سؤال از PDF یا عکس
+        </Button>
       </div>
+      <dialog
+        ref={automatic}
+        className="m-auto max-h-[85dvh] w-[min(560px,94vw)] overflow-y-auto rounded-3xl border border-blue-100 bg-white p-5 text-[#1F2937] shadow-2xl backdrop:bg-slate-900/30"
+        aria-label="تنظیم انتخاب خودکار"
+      >
+        <div dir="rtl" className="grid gap-4">
+          <div className="flex justify-between gap-3">
+            <h3 className="font-bold">ترکیب سؤال‌های مأموریت</h3>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => automatic.current?.close()}
+            >
+              بستن
+            </Button>
+          </div>
+          <p className="text-sm text-slate-600">
+            از منابع و دسته‌های انتخاب‌شده در فیلترهای همین صفحه، بدون تکرار
+            انتخاب می‌شود.
+          </p>
+          {Object.entries(difficultyLabels).map(([key, label]) => (
+            <Field title={`تعداد سؤال ${label}`} key={key}>
+              <input
+                type="number"
+                min={0}
+                max={MAX_MISSION_QUESTIONS}
+                className="glass-field min-h-11 w-full p-3"
+                value={quotas[key as keyof typeof quotas]}
+                onChange={(e) =>
+                  setQuotas({ ...quotas, [key]: Number(e.target.value) })
+                }
+              />
+            </Field>
+          ))}
+          <p className="text-sm">
+            جمع: {fa(Object.values(quotas).reduce((a, b) => a + b, 0))} سؤال ·
+            سقف {fa(MAX_MISSION_QUESTIONS)}
+          </p>
+          {error && (
+            <p role="alert" className="text-sm text-rose-700">
+              {error}
+            </p>
+          )}
+          <Button
+            type="button"
+            disabled={disabled || selecting || !visible.length}
+            onClick={async () => {
+              setSelecting(true);
+              setError("");
+              try {
+                const result = await api<{ questionVersionIds: string[] }>(
+                  "/questions/select",
+                  { candidateIds: visible.map((q) => q._id), quotas },
+                );
+                if (select(result.questionVersionIds))
+                  automatic.current?.close();
+              } catch (e) {
+                setError((e as Error).message);
+              } finally {
+                setSelecting(false);
+              }
+            }}
+          >
+            {selecting
+              ? "در حال انتخاب…"
+              : "اعمال ترکیب و جایگزینی انتخاب فعلی"}
+          </Button>
+        </div>
+      </dialog>
+      {mounted &&
+        createPortal(
+          <dialog
+            ref={importer}
+            className="m-auto max-h-[92dvh] w-[min(1100px,96vw)] overflow-y-auto rounded-3xl border border-blue-100 bg-[#F8FAFC] p-4 text-[#1F2937] shadow-2xl backdrop:bg-slate-900/30"
+            aria-label="ورود فایل برای مأموریت"
+          >
+            <div dir="rtl" className="grid gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="justify-self-start"
+                onClick={() => importer.current?.close()}
+              >
+                بازگشت به مأموریت
+              </Button>
+              <ExamImportScreen
+                embedded
+                nodes={importNodes}
+                onApproved={async () => {
+                  await onRefresh?.();
+                }}
+                onUseQuestions={async (ids) => {
+                  await onRefresh?.();
+                  if (select([...selected, ...ids])) importer.current?.close();
+                }}
+              />
+            </div>
+          </dialog>,
+          document.body,
+        )}
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"
@@ -270,9 +328,7 @@ export function QuestionPicker({
               <span className="min-w-0">
                 <span className="line-clamp-2">{q.statement}</span>
                 <span className="text-xs text-teal-700">
-                  {q.difficulty
-                    ? difficultyLabels[q.difficulty]
-                    : "سختی نامشخص"}
+                  <DifficultyGauge value={q.difficulty} />
                   {q.difficultyAssessment?.needsReview ? " · برآورد اولیه" : ""}
                 </span>
               </span>

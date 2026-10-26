@@ -51,26 +51,44 @@ test("teacher selects 20 hard questions and edits filtered difficulty", async ({
     ).toBeVisible();
     await page.goto("/homeworks");
     await page
-      .getByLabel("سختی تمرین پیشنهادی", { exact: true })
-      .selectOption("hard");
-    await page.getByLabel("تعداد سؤال تمرین", { exact: true }).fill("20");
-    await page
       .getByRole("button", {
         name: "انتخاب خودکار با تعداد و سختی",
+        exact: true,
+      })
+      .click();
+    const automatic = page.getByRole("dialog", {
+      name: "تنظیم انتخاب خودکار",
+      exact: true,
+    });
+    await automatic.getByLabel("تعداد سؤال متوسط", { exact: true }).fill("0");
+    await automatic.getByLabel("تعداد سؤال سخت", { exact: true }).fill("20");
+    await automatic
+      .getByRole("button", {
+        name: "اعمال ترکیب و جایگزینی انتخاب فعلی",
         exact: true,
       })
       .click();
     await expect(
       page.getByText("۲۰ سؤال انتخاب شده", { exact: true }),
     ).toBeVisible();
-    await page.getByLabel("تعداد سؤال تمرین", { exact: true }).fill("21");
     await page
       .getByRole("button", {
         name: "انتخاب خودکار با تعداد و سختی",
         exact: true,
       })
       .click();
-    await expect(page.getByRole("alert").filter({ hasText: "فقط 20 سؤال" })).toContainText("فقط 20 سؤال");
+    await automatic.getByLabel("تعداد سؤال سخت", { exact: true }).fill("21");
+    await automatic
+      .getByRole("button", {
+        name: "اعمال ترکیب و جایگزینی انتخاب فعلی",
+        exact: true,
+      })
+      .click();
+    await expect(automatic.getByRole("alert")).toContainText("فقط 20 سؤال");
+    await expect(
+      page.getByText("۲۰ سؤال انتخاب شده", { exact: true }),
+    ).toBeVisible();
+    await automatic.getByRole("button", { name: "بستن", exact: true }).click();
     await page.goto("/content");
     await page.getByLabel("درجه سختی", { exact: true }).selectOption("hard");
     await page
@@ -79,9 +97,9 @@ test("teacher selects 20 hard questions and edits filtered difficulty", async ({
     await page
       .getByRole("button", { name: "اعمال روی ۲۰ سؤال فیلترشده", exact: true })
       .click();
-    await expect(page.getByRole("status").filter({ hasText: "سختی ۲۰ سؤال ذخیره شد" })).toContainText(
-      "سختی ۲۰ سؤال ذخیره شد",
-    );
+    await expect(
+      page.getByRole("status").filter({ hasText: "سختی ۲۰ سؤال ذخیره شد" }),
+    ).toContainText("سختی ۲۰ سؤال ذخیره شد");
   } finally {
     await page.unrouteAll({ behavior: "wait" });
     await f.close();

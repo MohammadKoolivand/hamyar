@@ -14,10 +14,18 @@ test("PDF exam upload persists, extracts real text, saves corrections and approv
   await page.getByRole("button", { name: /ورود به هدهده/ }).click();
   await page.getByRole("button", { name: "ورود آزمون", exact: true }).click();
   await page
+    .getByText("عنوان دلخواه و زبان اسکن (اختیاری)", { exact: true })
+    .click();
+  await page
     .getByLabel("عنوان آزمون", { exact: true })
     .fill("آزمون PDF مرورگر");
-  await page.getByLabel("درس آزمون", { exact: true }).fill("ریاضی");
-  await page.getByLabel("سال آزمون (شمسی)", { exact: true }).fill("1405");
+  await page.getByLabel("درس آزمون", { exact: true }).selectOption("ریاضی");
+  await page
+    .getByLabel("سال آزمون (اختیاری)", { exact: true })
+    .selectOption("1405");
+  await page
+    .getByText("مشخصات منبع و دفترچه (اختیاری)", { exact: true })
+    .click();
   await page.getByLabel("نوبت آزمون", { exact: true }).fill("خرداد");
   await page
     .getByRole("button", { name: "ثبت آزمون و ادامه به آپلود", exact: true })

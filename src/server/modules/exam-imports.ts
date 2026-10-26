@@ -1,3 +1,4 @@
+import { imageToPdf } from "../imports/image-pdf";
 import type { FastifyInstance } from "fastify";
 import { Binary } from "mongodb";
 import { createHash } from "node:crypto";
@@ -16,7 +17,7 @@ const params = z.object({ eid: z.string().uuid() });
 export function registerExamImports(app: FastifyInstance, ctx: Context) {
   const { c, id, now, owned, user, fail } = ctx;
   app.addContentTypeParser(
-    "application/pdf",
+    ["application/pdf", "image/png", "image/jpeg", "image/webp"],
     { parseAs: "buffer", bodyLimit: MAX_PDF_BYTES },
     (_r, body, done) => done(null, body),
   );
@@ -82,7 +83,26 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         kind = z
           .enum(["question", "answer"])
           .parse((r.params as { kind: string }).kind);
-      const data = r.body;
+      let data = r.body;
+      const imageUpload = /^image\/(png|jpeg|webp)(;|$)/i.test(
+        String(r.headers["content-type"] ?? ""),
+      );
+      if (imageUpload) {
+        if (
+          !Buffer.isBuffer(data) ||
+          !data.length ||
+          data.length > MAX_PDF_BYTES
+        )
+          fail(400, "تصویر معتبر تا ۲۰ مگابایت لازم است");
+        try {
+          data = await imageToPdf(data as Buffer);
+        } catch {
+          return fail(
+            400,
+            "تصویر قابل پردازش نیست؛ PNG، JPEG یا WebP تک‌صفحه‌ای تا ۲۴ مگاپیکسل بارگذاری کنید",
+          );
+        }
+      }
       if (
         !Buffer.isBuffer(data) ||
         data.length === 0 ||
@@ -99,6 +119,11 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         return fail(400, "نام فایل معتبر نیست");
       }
       name = z.string().trim().min(1).max(200).parse(name);
+      if (imageUpload) {
+        if (!/\.(png|jpe?g|webp)$/i.test(name))
+          fail(400, "پسوند تصویر معتبر نیست");
+        name = name.replace(/\.(png|jpe?g|webp)$/i, ".pdf");
+      }
       if (!/\.pdf$/i.test(name)) fail(400, "پسوند فایل باید PDF باشد");
       const buffer = data as Buffer,
         file = {

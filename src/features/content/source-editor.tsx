@@ -13,11 +13,13 @@ export function SourceEditor({
   onChange,
   disabled = false,
   hideQuestionNumber = false,
+  compact = false,
 }: {
   value?: QuestionSource;
   onChange: (value: QuestionSource | undefined) => void;
   disabled?: boolean;
   hideQuestionNumber?: boolean;
+  compact?: boolean;
 }) {
   const category = sourceCategory(value);
   function update(key: keyof QuestionSource, text: string) {
@@ -59,7 +61,10 @@ export function SourceEditor({
         <>
           <div className="grid min-w-0 gap-3 sm:grid-cols-2">
             {sourceFields
-              .filter((f) => f.categories.includes(category))
+              .filter(
+                (f) =>
+                  f.categories.includes(category) && (!compact || f.options),
+              )
               .map((f) => (
                 <Field key={f.key} title={f.label}>
                   {f.options ? (
@@ -98,6 +103,27 @@ export function SourceEditor({
               مشخصات منبع و دفترچه (اختیاری)
             </summary>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {" "}
+              {compact &&
+                sourceFields
+                  .filter((f) => f.categories.includes(category) && !f.options)
+                  .map((f) => (
+                    <Field key={f.key} title={f.label}>
+                      <input
+                        className={style}
+                        maxLength={
+                          f.key === "academicYear"
+                            ? 30
+                            : f.key === "organizer" || f.key === "subject"
+                              ? 150
+                              : 100
+                        }
+                        value={String(value[f.key] ?? "")}
+                        placeholder={f.placeholder}
+                        onChange={(e) => update(f.key, e.target.value)}
+                      />
+                    </Field>
+                  ))}
               {[
                 ["sourceTitle", "عنوان منبع"],
                 ["sourceUrl", "لینک صفحه منبع"],

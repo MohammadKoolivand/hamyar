@@ -24,9 +24,13 @@ type Detail = ExamImport & { items: ExamImportItem[] };
 export function ExamImportScreen({
   nodes,
   onApproved,
+  embedded = false,
+  onUseQuestions,
 }: {
   nodes: Node[];
   onApproved: () => Promise<void>;
+  embedded?: boolean;
+  onUseQuestions?: (ids: string[]) => Promise<void>;
 }) {
   const [list, setList] = useState<ExamImport[]>([]),
     [exam, setExam] = useState<Detail | null>(null);
@@ -59,7 +63,7 @@ export function ExamImportScreen({
   }
   async function load(id: string) {
     setExam(await api<Detail>(`/exam-imports/${id}`));
-    history.replaceState(null, "", `/exam-import?exam=${id}`);
+    if (!embedded) history.replaceState(null, "", `/exam-import?exam=${id}`);
   }
   async function run(work: () => Promise<void>) {
     setBusy(true);
@@ -75,7 +79,8 @@ export function ExamImportScreen({
   }
   useEffect(() => {
     let alive = true;
-    const restored = new URLSearchParams(location.search).get("exam");
+    const restored =
+      !embedded && new URLSearchParams(location.search).get("exam");
     if (restored && /^[a-f0-9-]{36}$/.test(restored))
       void load(restored).catch((e) => setError(e.message));
     api<ExamImport[]>("/exam-imports")
@@ -92,13 +97,24 @@ export function ExamImportScreen({
   async function upload(file: File | null, kind: "question" | "answer") {
     if (!exam || !file) return;
     await run(async () => {
+      const image = /\.(png|jpe?g|webp)$/i.test(file.name);
       if (
-        !/\.pdf$/i.test(file.name) ||
         file.size === 0 ||
         file.size > MAX_PDF_BYTES ||
-        (await file.slice(0, 5).text()) !== "%PDF-"
+        (!image &&
+          (!/\.pdf$/i.test(file.name) ||
+            (await file.slice(0, 5).text()) !== "%PDF-"))
       )
-        throw new Error("PDF غیرخالی معتبر تا ۲۰ مگابایت لازم است.");
+        throw new Error(
+          "فایل PDF یا عکس PNG، JPEG، WebP معتبر تا ۲۰ مگابایت لازم است.",
+        );
+      const contentType = image
+        ? /\.png$/i.test(file.name)
+          ? "image/png"
+          : /\.webp$/i.test(file.name)
+            ? "image/webp"
+            : "image/jpeg"
+        : "application/pdf";
       const digest = await crypto.subtle.digest(
         "SHA-256",
         await file.arrayBuffer(),
@@ -113,7 +129,7 @@ export function ExamImportScreen({
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/pdf",
+            "Content-Type": contentType,
             "X-File-Name": encodeURIComponent(file.name),
             "Idempotency-Key": key,
           },
@@ -135,20 +151,22 @@ export function ExamImportScreen({
         <div className="space-y-2">
           <h2 className="flex items-center gap-2 text-xl font-bold text-[#17305E]">
             <UploadCloud className="size-5" />
-            ورود آزمون به بانک سؤال
+            ورود PDF یا عکس سؤال
           </h2>
           <p className="max-w-2xl text-sm leading-8 text-slate-600">
-            ۱. ثبت مشخصات و PDF · ۲. استخراج متن · ۳. بازبینی و تأیید
+            ۱. انتخاب درس و فایل · ۲. استخراج متن · ۳. بازبینی و تأیید
             تک‌سؤال‌ها. پیش از تأیید شما هیچ سؤالی به بانک اضافه نمی‌شود.
           </p>
         </div>
-        <AppLink
-          href="/content"
-          className="flex items-center gap-1 text-sm text-[#233B8F]"
-        >
-          <ArrowRight className="size-4" />
-          بانک سؤال
-        </AppLink>
+        {!embedded && (
+          <AppLink
+            href="/content"
+            className="flex items-center gap-1 text-sm text-[#233B8F]"
+          >
+            <ArrowRight className="size-4" />
+            بانک سؤال
+          </AppLink>
+        )}
       </div>
       {error && (
         <p
@@ -166,16 +184,45 @@ export function ExamImportScreen({
           {notice}
         </p>
       )}
+      {exam && onUseQuestions && (
+        <Button
+          type="button"
+          disabled={
+            busy ||
+            !exam.items.some(
+              (i) => i.state === "approved" && i.questionVersionId,
+            )
+          }
+          onClick={() =>
+            void run(async () => {
+              await onUseQuestions(
+                exam.items
+                  .filter((i) => i.state === "approved" && i.questionVersionId)
+                  .map((i) => i.questionVersionId!),
+              );
+            })
+          }
+        >
+          افزودن سؤال‌های تأییدشده به مأموریت (
+          {fa(
+            exam.items.filter(
+              (i) => i.state === "approved" && i.questionVersionId,
+            ).length,
+          )}
+          )
+        </Button>
+      )}
       {!exam ? (
         <>
           <form
             className="glass-panel grid min-w-0 gap-5 p-5 sm:p-7"
             onSubmit={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               void run(async () => {
                 if (!source) throw new Error("دسته آزمون را انتخاب کنید.");
                 const row = await api<ExamImport>("/exam-imports", {
-                  title,
+                  title: title.trim() || `${subject} · ${year || "آزمون جدید"}`,
                   subject,
                   ...(grade ? { grade } : {}),
                   ...(track ? { track } : {}),
@@ -190,66 +237,120 @@ export function ExamImportScreen({
           >
             <h3 className="font-bold">آزمون جدید</h3>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field title="زبان OCR">
-                <select
-                  className={style}
-                  value={ocrLanguage}
-                  onChange={(e) => setOcrLanguage(e.target.value)}
-                >
-                  <option value="fas">فارسی</option>
-                  <option value="eng">انگلیسی</option>
-                  <option value="fas+eng">فارسی و انگلیسی</option>
-                </select>
-              </Field>
-              <Field title="عنوان آزمون">
-                <input
-                  required
-                  minLength={3}
-                  maxLength={150}
-                  className={style}
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="مثلاً امتحان فیزیک، خرداد ۱۴۰۵"
-                />
-              </Field>
               <Field title="درس آزمون">
-                <input
+                <select
                   required
-                  maxLength={150}
                   className={style}
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                />
+                >
+                  <option value="">انتخاب درس</option>
+                  {[
+                    ...new Set([
+                      "ریاضی",
+                      "فیزیک",
+                      "علوم تجربی",
+                      "شیمی",
+                      "زیست‌شناسی",
+                      "فارسی",
+                      "عربی",
+                      "زبان انگلیسی",
+                      "دینی",
+                      "مطالعات اجتماعی",
+                      "چنددرس",
+                      ...nodes
+                        .filter((n) => ["subject", "course"].includes(n.kind))
+                        .map((n) => n.title),
+                      "سایر",
+                    ]),
+                  ].map((label) => (
+                    <option key={label} value={label}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
               </Field>
-              <Field title="سال آزمون (شمسی)">
-                <input
-                  type="number"
-                  min={1300}
-                  max={1500}
+              <Field title="سال آزمون (اختیاری)">
+                <select
                   className={style}
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                />
+                >
+                  <option value="">تعیین نشده</option>
+                  {Array.from({ length: 41 }, (_, i) => 1410 - i).map((y) => (
+                    <option key={y} value={y}>
+                      {fa(y)}
+                    </option>
+                  ))}
+                </select>
               </Field>
-              <Field title="پایه یا دامنه آزمون (اختیاری)">
-                <input
-                  maxLength={100}
-                  placeholder="مثلاً دوازدهم یا چندپایه"
+              <Field title="پایه (اختیاری)">
+                <select
                   className={style}
                   value={grade}
                   onChange={(e) => setGrade(e.target.value)}
-                />
+                >
+                  <option value="">چندپایه / تعیین نشده</option>
+                  {Array.from({ length: 12 }, (_, i) => String(i + 1)).map(
+                    (g) => (
+                      <option key={g} value={g}>
+                        پایه {fa(Number(g))}
+                      </option>
+                    ),
+                  )}
+                </select>
               </Field>
               <Field title="رشته یا گروه (اختیاری)">
-                <input
-                  maxLength={100}
+                <select
                   className={style}
                   value={track}
                   onChange={(e) => setTrack(e.target.value)}
-                />
+                >
+                  <option value="">مشترک / تعیین نشده</option>
+                  {[
+                    "ریاضی و فیزیک",
+                    "علوم تجربی",
+                    "علوم انسانی",
+                    "معارف اسلامی",
+                    "هنر",
+                    "زبان",
+                  ].map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
               </Field>
             </div>
+            <details className="rounded-xl border border-slate-200 p-3">
+              <summary className="cursor-pointer text-sm text-[#233B8F]">
+                عنوان دلخواه و زبان اسکن (اختیاری)
+              </summary>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <Field title="عنوان آزمون">
+                  <input
+                    maxLength={150}
+                    className={style}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="در صورت خالی‌بودن خودکار ساخته می‌شود"
+                  />
+                </Field>
+                <Field title="زبان OCR">
+                  <select
+                    className={style}
+                    value={ocrLanguage}
+                    onChange={(e) => setOcrLanguage(e.target.value)}
+                  >
+                    <option value="fas">فارسی</option>
+                    <option value="eng">انگلیسی</option>
+                    <option value="fas+eng">فارسی و انگلیسی</option>
+                  </select>
+                </Field>
+              </div>
+            </details>
             <SourceEditor
+              compact
               hideQuestionNumber
               value={source}
               onChange={setSource}
@@ -297,7 +398,7 @@ export function ExamImportScreen({
                 disabled={busy}
                 onClick={() => {
                   setExam(null);
-                  history.replaceState(null, "", "/exam-import");
+                  if (!embedded) history.replaceState(null, "", "/exam-import");
                   void run(loadList);
                 }}
               >
@@ -352,7 +453,7 @@ export function ExamImportScreen({
                         kind === "question" ? "دفترچه سؤال‌ها" : "پاسخ‌نامه"
                       }
                       type="file"
-                      accept=".pdf,application/pdf"
+                      accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp"
                       disabled={busy}
                       className="min-w-0 w-full text-xs"
                       onChange={(e) => {
@@ -544,6 +645,7 @@ export function ExamImportScreen({
                   className="grid gap-3"
                   onSubmit={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     void run(async () => {
                       await api(`/exam-imports/${exam._id}/items`, {
                         statement: manual,
@@ -801,6 +903,7 @@ function ReviewItem({
           className="mt-5 grid min-w-0 gap-4"
           onSubmit={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             void review({
               action: "approve",
               confirmed: true,

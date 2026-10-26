@@ -224,13 +224,31 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
   });
   app.post("/api/questions/select", async (r) => {
     const u = await user(r, "teacher");
+    const quotaSchema = z.object({
+      easy: z.number().int().min(0).max(MAX_MISSION_QUESTIONS),
+      medium: z.number().int().min(0).max(MAX_MISSION_QUESTIONS),
+      hard: z.number().int().min(0).max(MAX_MISSION_QUESTIONS),
+    });
     const b = z
-      .object({
-        candidateIds: z.array(z.uuid()).min(1).max(5000),
-        difficulty: difficultySchema,
-        count: z.number().int().min(1).max(MAX_MISSION_QUESTIONS),
-      })
+      .union([
+        z.object({
+          candidateIds: z.array(z.uuid()).min(1).max(5000),
+          difficulty: difficultySchema,
+          count: z.number().int().min(1).max(MAX_MISSION_QUESTIONS),
+        }),
+        z.object({
+          candidateIds: z.array(z.uuid()).min(1).max(5000),
+          quotas: quotaSchema,
+        }),
+      ])
       .parse(r.body);
+    const quotas =
+      "quotas" in b
+        ? b.quotas
+        : { easy: 0, medium: 0, hard: 0, [b.difficulty]: b.count };
+    const total = Object.values(quotas).reduce((a, b) => a + b, 0);
+    if (!total || total > MAX_MISSION_QUESTIONS)
+      ctx.fail(400, `مجموع تعداد باید بین ۱ و ${MAX_MISSION_QUESTIONS} باشد`);
     const current = await c("questions")
       .find({ ownerId: u._id, currentVersionId: { $in: b.candidateIds } })
       .project({ currentVersionId: 1 })
@@ -239,23 +257,24 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       .find({
         ownerId: u._id,
         _id: { $in: current.map((q) => q.currentVersionId) },
-        difficulty: b.difficulty,
       })
-      .project({ _id: 1 })
+      .project({ _id: 1, difficulty: 1 })
       .toArray();
-    if (candidates.length < b.count)
-      ctx.fail(
-        400,
-        `فقط ${candidates.length} سؤال با این سختی و فیلترها موجود است؛ تعداد درخواستی را کم کنید.`,
-      );
-    for (let i = candidates.length - 1; i > 0; i--) {
-      const j = randomInt(i + 1);
-      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    const picked: string[] = [];
+    for (const [difficulty, count] of Object.entries(quotas)) {
+      const pool = candidates.filter((q) => q.difficulty === difficulty);
+      if (pool.length < count)
+        ctx.fail(
+          400,
+          `فقط ${pool.length} سؤال ${difficulty === "easy" ? "آسان" : difficulty === "hard" ? "سخت" : "متوسط"} با فیلترهای فعلی موجود است؛ تعداد درخواستی ${count} است.`,
+        );
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = randomInt(i + 1);
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      picked.push(...pool.slice(0, count).map((q) => q._id));
     }
-    return {
-      questionVersionIds: candidates.slice(0, b.count).map((q) => q._id),
-      available: candidates.length,
-    };
+    return { questionVersionIds: picked, available: candidates.length };
   });
   app.post("/api/questions/difficulty-batch", async (r) => {
     const u = await user(r, "teacher");

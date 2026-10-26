@@ -244,6 +244,7 @@ export function MissionsScreen({
             )}
             <h3 className="text-base font-bold">انتخاب سؤال از بانک معتبر</h3>
             <QuestionPicker
+              onRefresh={refresh}
               questions={questions}
               selected={selected}
               onChange={setSelected}
