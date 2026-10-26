@@ -128,6 +128,9 @@ export function registerAccessManagement(app: FastifyInstance, ctx: Context) {
         { _id: uid },
         {
           $set: { role: b.role, ...(b.disabled ? { disabledAt: now() } : {}) },
+          // Invalidate credential checks made before this administrative revocation,
+          // including role changes that later restore the original value.
+          $inc: { securityRevision: 1 },
           ...(!b.disabled ? { $unset: { disabledAt: "" } } : {}),
         },
         { session },

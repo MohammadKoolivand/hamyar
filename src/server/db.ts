@@ -97,6 +97,10 @@ export async function connect(
   await db
     .collection("mailOutbox")
     .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  for (const name of ["otpChallenges", "otpThrottle"])
+    await db
+      .collection(name)
+      .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
   // Additive indexes: existing question versions, assignments and evidence stay unchanged.
   await db
     .collection("attempts")

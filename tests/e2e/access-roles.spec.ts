@@ -67,6 +67,12 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       .getByRole("button", { name: "ذخیره دسترسی منشی", exact: true })
       .click();
     await expect(page.getByRole("status")).toContainText("واگذار شد");
+    for (const width of [360, 390, 768, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(width);
+    }
     await page.screenshot({
       path: testInfo.outputPath("superadmin.png"),
       fullPage: true,
@@ -103,6 +109,12 @@ test("super admin creates scoped secretary and secretary uses a separate operati
     ).toBe(403);
     const invitationText = await page.getByText(/\?invite=/).innerText();
     const inviteToken = invitationText.match(/invite=([a-f0-9]+)/)![1];
+    for (const width of [360, 390, 768, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(width);
+    }
     await page.setViewportSize({ width: 390, height: 844 });
     expect(
       await page.evaluate(

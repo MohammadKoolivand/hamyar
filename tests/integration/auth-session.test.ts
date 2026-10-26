@@ -239,3 +239,71 @@ test("authentication rate limit rejects excess attempts while Origin and expired
     await f.close();
   }
 });
+
+test("administrative access changes invalidate a pending login even when the original role is restored", async () => {
+  const { createContext } = await import("../../src/server/context");
+  const { bootstrapSuperadmin } =
+    await import("../../src/server/access-bootstrap");
+  let paused = false;
+  let resume!: () => void;
+  let reached!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    resume = resolve;
+  });
+  const ready = new Promise<void>((resolve) => {
+    reached = resolve;
+  });
+  const f = await fixture({
+    hooks: {
+      boundary: async (name) => {
+        if (paused && name === "after_login_credentials_verified") {
+          reached();
+          await gate;
+        }
+      },
+    },
+  });
+  try {
+    await bootstrapSuperadmin(createContext(f.db), {
+      name: "Audit administrator",
+      email: "admin@stability.test",
+      password: "AdminStrongPass123!",
+    });
+    const adminLogin = await f.request("/api/auth/login", {
+      email: "admin@stability.test",
+      password: "AdminStrongPass123!",
+    });
+    assert.equal(adminLogin.statusCode, 200);
+    const admin = "session=" + adminLogin.cookies[0].value;
+    const teacher = await f.c("users").findOne({ email: "t@test.dev" });
+    paused = true;
+    const login = f
+      .request("/api/auth/login", {
+        email: "t@test.dev",
+        password: "StrongPass123!",
+      })
+      .then((r) => r);
+    await ready;
+    for (const role of ["student", "teacher"])
+      await f.post(
+        `/api/admin/users/${teacher!._id}/access`,
+        { role, disabled: false },
+        admin,
+      );
+    resume();
+    const response = await login;
+    assert.equal(
+      response.statusCode,
+      401,
+      "A pre-revocation login must not recreate a session after access changes",
+    );
+    assert.equal(response.headers["set-cookie"], undefined);
+    assert.equal(
+      await f.c("sessions").countDocuments({ userId: teacher!._id }),
+      0,
+    );
+  } finally {
+    resume();
+    await f.close();
+  }
+});

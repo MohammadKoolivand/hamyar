@@ -270,3 +270,28 @@ test("OTP invitation binds the verified phone to parent scope; disabled accounts
     await f.close();
   }
 });
+
+test("OTP challenge and throttle collections have TTL cleanup indexes", async () => {
+  const f = await fixture();
+  try {
+    for (const name of ["otpChallenges", "otpThrottle"]) {
+      const indexes = await f.db
+        .collection(name)
+        .listIndexes()
+        .toArray()
+        .catch((error: { code?: number }) => {
+          if (error.code === 26) return [];
+          throw error;
+        });
+      assert.ok(
+        indexes.some(
+          (index) =>
+            index.key.expiresAt === 1 && index.expireAfterSeconds === 0,
+        ),
+        `${name} must expire temporary authentication data`,
+      );
+    }
+  } finally {
+    await f.close();
+  }
+});

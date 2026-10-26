@@ -153,6 +153,12 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
   await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
   await expect(sp.getByLabel("پاسخ شما", { exact: true })).toHaveValue("1");
+  for (const width of [360, 390, 768, 1280]) {
+    await sp.setViewportSize({ width, height: 800 });
+    expect(
+      await sp.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+  }
   await sp.setViewportSize({ width: 360, height: 800 });
   expect(
     await sp.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
@@ -190,15 +196,26 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   expect(
     await sp.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
   ).toBe(true);
+  for (const width of [360, 390, 768, 1280]) {
+    await sp.setViewportSize({ width, height: 800 });
+    expect(
+      await sp.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+  }
+  await sp.setViewportSize({ width: 360, height: 800 });
   await sp.screenshot({
     path: testInfo.outputPath("student-report-mobile.png"),
     fullPage: true,
   });
   await page.getByRole("button", { name: "گزارش و شواهد" }).click();
-  await page.getByText("تاریخچه تلاش‌ها و بازبینی معلم", { exact: true }).click();
+  await page
+    .getByText("تاریخچه تلاش‌ها و بازبینی معلم", { exact: true })
+    .click();
   await expect(page.getByText("تلاش ۱:", { exact: false })).toBeVisible();
   await expect(page.getByText("تلاش ۲:", { exact: false })).toBeVisible();
-  const teacherReport = await (await page.request.get(`/api/assignments/${reportId}/report`)).json();
+  const teacherReport = await (
+    await page.request.get(`/api/assignments/${reportId}/report`)
+  ).json();
   expect(teacherReport.evidence).toHaveLength(2);
   await page.screenshot({
     path: testInfo.outputPath("teacher-report-desktop.png"),
@@ -415,7 +432,9 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
   await sp.getByRole("button", { name: /^ورود به هدهده$/ }).click();
   await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
   await page.getByLabel("عنوان مأموریت").fill("تمرین با سؤال تأییدشده");
-  await page.getByLabel("زمان نمایش نتیجه به دانش‌آموز").selectOption("immediate");
+  await page
+    .getByLabel("زمان نمایش نتیجه به دانش‌آموز")
+    .selectOption("immediate");
   await page
     .getByLabel("دانش‌آموز", { exact: true })
     .selectOption({ label: "دانش‌آموز آزمایشی" });
@@ -432,7 +451,9 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
   await sp.getByRole("button", { name: "ثبت و بررسی پاسخ" }).click();
   await expect(sp.getByText("صحیح · بدون دریافت کمک")).toBeVisible();
   await sp.getByRole("button", { name: "پایان تمرین و گزارش" }).click();
-  await expect(sp.getByText(/۱ پاسخ صحیح مستقل و ۰ پاسخ صحیح با راهنما/)).toBeVisible();
+  await expect(
+    sp.getByText(/۱ پاسخ صحیح مستقل و ۰ پاسخ صحیح با راهنما/),
+  ).toBeVisible();
   await page.getByRole("button", { name: "دانش‌آموزان", exact: true }).click();
   await page.getByText("دسترسی اولیا", { exact: true }).click();
   await page.getByLabel("شماره موبایل ولی دانش‌آموز").fill(parent);
