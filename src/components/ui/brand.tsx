@@ -14,7 +14,7 @@ export function Brand({
         height={large ? 72 : 52}
         alt=""
         aria-hidden
-        className="shrink-0 drop-shadow-[0_7px_14px_rgba(48,90,164,0.13)]"
+        className="shrink-0"
       />
       <div className="min-w-0">
         <span className={`hy-brand-wordmark block font-bold leading-tight ${large ? "text-[32px]" : "text-[25px]"}`}>

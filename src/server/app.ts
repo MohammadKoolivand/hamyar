@@ -11,6 +11,8 @@ import { MockProvider, type HintProvider } from "./domain";
 import { createContext } from "./context";
 import { requireTransactions, type WriteHooks } from "./transactions";
 import { registerIdentity } from "./modules/identity";
+import { registerPasswordReset } from "./modules/password-reset";
+import { sendPasswordResetEmail, type PasswordResetMailer } from "./auth/reset-mail";
 import { registerExamImports } from "./modules/exam-imports";
 import { registerContent } from "./modules/content";
 import { registerMissions } from "./modules/missions";
@@ -30,6 +32,7 @@ export async function buildApp(
   hooks: WriteHooks = {},
   questionGenerator?: QuestionGenerator,
   avalai = new AvalaiClient(),
+  resetMailer: PasswordResetMailer = sendPasswordResetEmail,
 ) {
   await requireTransactions(db);
   const app = Fastify({
@@ -145,6 +148,7 @@ export async function buildApp(
   });
   registerAccessManagement(app, ctx);
   registerIdentity(app, ctx);
+  registerPasswordReset(app, ctx, resetMailer);
   registerCourses(app, ctx);
   registerClassGroups(app, ctx);
   registerCourseMembership(app, ctx);
