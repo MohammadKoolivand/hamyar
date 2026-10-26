@@ -68,11 +68,14 @@ export function registerPasswordReset(
     );
     try {
       await mailer(email, token);
-      await ctx.audit(account._id, "password_reset_requested", account._id);
     } catch {
       await c("passwordResetTokens").deleteOne({ _id: account._id, tokenHash });
       app.log.warn({ event: "password_reset_mail_failed" }, "Password reset delivery failed");
+      return result;
     }
+    // Audit failures must not invalidate an already delivered reset link.
+    await ctx.audit(account._id, "password_reset_requested", account._id)
+      .catch(() => app.log.warn({ event: "password_reset_audit_failed" }, "Reset audit unavailable"));
     return result;
   });
 
