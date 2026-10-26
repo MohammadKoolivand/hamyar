@@ -1,9 +1,14 @@
-name: Verify HamYar runtime and light glass UI
+name: Verify HodHodeh MVP
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -37,7 +42,9 @@ jobs:
           docker compose logs mongo
           exit 1
       - name: Install local document tools
-        run: sudo apt-get update && sudo apt-get install -y poppler-utils tesseract-ocr
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils tesseract-ocr shellcheck
+      - name: Validate deployment shell
+        run: bash -n ops/deploy-staging.sh && shellcheck ops/deploy-staging.sh
       - run: npm run ocr:setup
       - run: cp .env.example .env
       - run: npm run typecheck
@@ -67,3 +74,19 @@ jobs:
             test-results/
             playwright-report/
           if-no-files-found: ignore
+      - name: Package verified source for staging
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          mkdir -p /tmp/hodhod-release
+          git archive --format=tar HEAD | gzip -n > /tmp/hodhod-release/source.tar.gz
+          cd /tmp/hodhod-release
+          sha256sum source.tar.gz > SHA256SUMS
+          printf '%s\n' "$GITHUB_SHA" > COMMIT
+      - name: Publish verified staging source
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: hodhodeh-source-${{ github.sha }}
+          path: /tmp/hodhod-release/
+          retention-days: 14
+          if-no-files-found: error

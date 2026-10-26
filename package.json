@@ -25,7 +25,8 @@
     "smoke:load": "node --env-file-if-exists=.env --import tsx scripts/load-health.ts",
     "predev": "node scripts/prepare-font.mjs",
     "prebuild": "node scripts/prepare-font.mjs",
-    "worker:mail": "node --env-file-if-exists=.env --import tsx scripts/mail-worker.ts"
+    "worker:mail": "node --env-file-if-exists=.env --import tsx scripts/mail-worker.ts",
+    "ops:preflight": "node --env-file-if-exists=.env scripts/check-deployment.mjs"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

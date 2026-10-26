@@ -1,0 +1,76 @@
+name: Deploy verified staging release
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Successful Verify HodHodeh MVP run ID on main
+        required: true
+        type: string
+      activate:
+        description: Activate after server preflight and backup (otherwise prepare only)
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: staging-deployment
+  cancel-in-progress: false
+jobs:
+  staging:
+    if: github.ref == 'refs/heads/main'
+    environment: staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Validate successful CI provenance
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          [[ "$RUN_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" > run.json
+          jq -e '.conclusion == "success" and .head_branch == "main" and (.event == "push" or .event == "workflow_dispatch") and .path == ".github/workflows/verify.yml"' run.json > /dev/null
+          SHA=$(jq -r .head_sha run.json)
+          [[ "$SHA" =~ ^[a-f0-9]{40}$ ]]
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          name: hodhodeh-source-${{ steps.source.outputs.sha }}
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: release
+      - name: Verify bundle and configure pinned SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+          EXPECTED_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_KEY" && test -n "$KNOWN_HOSTS"
+          test "$(cat release/COMMIT)" = "$EXPECTED_SHA"
+          (cd release && sha256sum -c SHA256SUMS)
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/staging_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/staging_key ~/.ssh/known_hosts
+      - name: Upload and prepare or activate
+        env:
+          SHA: ${{ steps.source.outputs.sha }}
+          ACTIVATE: ${{ inputs.activate }}
+          HOST: ${{ vars.STAGING_HOST }}
+          USER: ${{ vars.STAGING_USER }}
+          PORT: ${{ vars.STAGING_PORT }}
+        run: |
+          set -euo pipefail
+          [[ "$HOST" =~ ^[a-zA-Z0-9.-]+$ && "$USER" =~ ^[a-z_][a-z0-9_-]*$ && "$PORT" =~ ^[0-9]+$ ]]
+          SSH_ARGS=(-i "$HOME/.ssh/staging_key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15)
+          ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "mkdir -p /var/lib/hodhod/incoming/$SHA"
+          scp "${SSH_ARGS[@]}" -P "$PORT" release/* "$USER@$HOST:/var/lib/hodhod/incoming/$SHA/"
+          ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sudo -n /usr/local/sbin/hodhod-deploy $SHA $ACTIVATE"
+      - name: Remove SSH material
+        if: always()
+        run: rm -f ~/.ssh/staging_key ~/.ssh/known_hosts

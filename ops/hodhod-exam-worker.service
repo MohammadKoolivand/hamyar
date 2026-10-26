@@ -7,8 +7,11 @@ Type=simple
 User=hodhod
 Group=hodhod
 WorkingDirectory=/srv/hodhod
+Environment=NODE_ENV=production
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
 EnvironmentFile=/srv/hodhod/.env
-ExecStart=/usr/bin/node --env-file-if-exists=.env --import tsx scripts/exam-worker.ts
+ExecStartPre=/usr/bin/env node --env-file-if-exists=.env scripts/check-deployment.mjs exams
+ExecStart=/usr/bin/env node --env-file-if-exists=.env --import tsx scripts/exam-worker.ts
 Restart=on-failure
 RestartSec=5
 KillMode=control-group

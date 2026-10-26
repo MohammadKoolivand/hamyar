@@ -6,6 +6,7 @@ import { deliverNextMail } from "../../src/server/auth/mail-outbox";
 test.use({ serviceWorkers: "block" });
 test("email verification UI confirms ownership once, strips token and supports mobile RTL (SMTP transport controlled)", async ({
   page,
+  baseURL,
 }) => {
   const saved = {
     SMTP_HOST: process.env.SMTP_HOST,
@@ -19,7 +20,7 @@ test("email verification UI confirms ownership once, strips token and supports m
     SMTP_USER: "fixture",
     SMTP_PASSWORD: "fixture",
     SMTP_FROM: "fixture@example.test",
-    APP_ORIGIN: "http://127.0.0.1:5174",
+    APP_ORIGIN: baseURL!,
   });
   const f = await fixture();
   try {

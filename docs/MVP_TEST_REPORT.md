@@ -61,3 +61,11 @@
 روی commit کد `90eabe9`: نصب پاک، TypeScript، Lint و Build موفق. `npm test` نهایی ۱۲۵ passed / صفر failed/cancelled/skipped؛ تفکیک ۴۴ unit و ۸۱ integration، واحدها جدا نیز ۴۴/۴۴ موفق. Playwright با تقویت چهار عرض برای مدیر/منشی/تمرین/گزارش: ۳۱ passed، صفر failed، یک skip قدیمی اختیاری AI. آزمون اختصاصی امنیت ۱۵/۱۵ موفق؛ هیچ تست حذف یا assertion ضعیف نشد.
 
 اجرای قبلی همین ممیزی به‌علت monitor timeout MongoDB سه شکست و سه لغو داشت؛ جزئیات و بازاجرای بدون تغییر محدودیت در MVP_RELEASE_READINESS ثبت‌اند. audit:integrity روی دیتابیس مصنوعی صفر مغایرت؛ backup/restore با نویسندگان متوقف: ۴۴ collection، ۵۳۸ سند، آرشیو ۷۲۵۷۸ بایت، Pass. benchmark OCR فعلی و دو inference واقعی Ollama هم اجرا شدند. سرویس واقعی ملی‌پیامک/SMTP/AvvalAI پولی و audit وابستگی هنوز Not Verified هستند. گزارش یکپارچه نهایی و checklist A/B در همان MVP_RELEASE_READINESS موجود به‌روز شد؛ مستند تکراری ساخته نشد.
+
+## Staging isolated و CI/CD — ۲۰۲۶/۱۰/۲۷
+
+نسخه مجزا در `/private/tmp/hodhodeh-staging-bm9dpz0c` با دیتابیس مصنوعی `hodhodeh_audit_staging_1026` و وب production روی 5175 بررسی شد؛ سرویس و داده اصلی 5174 تغییر نکرد. npm ci، typecheck، lint و production build موفق؛ backend **127 passed / 0 failed / 0 skipped**؛ Playwright **32 passed / 0 failed / 0 skipped** شامل Ollama واقعی محلی. دو تست E2E که origin ثابت 5174 داشتند از baseURL پیکربندی‌شده استفاده می‌کنند. دو تست جدید guard استقرار، دیتابیس نادرست، HTTPS/cookie و عدم چاپ secret را بررسی می‌کنند. این اجرا SMS/SMTP/AvvalAI واقعی را ثابت نمی‌کند.
+
+Backup با نویسندگان staging متوقف: 44 collection، 575 سند، 79828 بایت، restore در دیتابیس تصادفی جدا موفق؛ audit:integrity صفر مأموریت نیازمند بازبینی. probe واقعی TTL: سند منقضی صفر، آینده یک، سپس فقط probeهای خود آزمون پاک شدند. preflight روی HTTP محلی عمداً fail با نیاز HTTPS/Secure cookie و هشدار SMS داد.
+
+برای تغییرات CI/CD: YAML هر دو workflow parse شد؛ bash -n و ShellCheck اسکریپت deploy، typecheck و ESLint اجرا شدند. اجرای واقعی SSH deployment و rollback روی Linux هنوز انجام نشده؛ secret، bootstrap مقصد و hook backup وجود ندارند. نتیجه GitHub پس از push باید جدا با لینک run ثبت شود؛ تست‌های قبلی به‌عنوان نتیجه همین اجرای تازه CI معرفی نمی‌شوند.

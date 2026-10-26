@@ -1,0 +1,30 @@
+[Unit]
+Description=Hodhod Next.js web runtime
+After=network.target
+
+[Service]
+Type=simple
+User=hodhod
+Group=hodhod
+WorkingDirectory=/srv/hodhod
+Environment=NODE_ENV=production
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/srv/hodhod/.env
+ExecStartPre=/usr/bin/env node --env-file-if-exists=.env scripts/check-deployment.mjs web
+ExecStart=/usr/bin/env node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 5174
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+KillMode=control-group
+TimeoutStopSec=45
+MemoryMax=1G
+TasksMax=64
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/hodhod/.private /srv/hodhod/.next/cache
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

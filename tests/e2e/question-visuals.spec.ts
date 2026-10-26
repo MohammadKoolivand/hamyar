@@ -3,9 +3,10 @@ import { test, expect } from "@playwright/test";
 test("teacher edits chart, diagram and formula; approved visual question persists and student sees the same media", async ({
   page,
   browser,
+  baseURL,
 }, testInfo) => {
-  const suffix = Date.now(),
-    base = "http://127.0.0.1:5174";
+  const suffix = Date.now();
+  const base = baseURL!;
   await page.goto("/content");
   await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
   await page.getByLabel("نام و نام خانوادگی").fill("معلم سؤال تصویری");
