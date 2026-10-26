@@ -33,6 +33,8 @@ export function routeRoles(method: string, route: string): Role[] | null {
       "/api/auth/login",
       "/api/auth/logout",
       "/api/auth/register",
+      "/api/auth/password-reset/request",
+      "/api/auth/password-reset/confirm",
       "/api/invitations/accept",
     ].includes(route)
   )

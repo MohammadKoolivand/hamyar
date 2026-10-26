@@ -10,7 +10,6 @@ import {
   Library,
   Target,
   LogOut,
-  GraduationCap,
   BarChart3,
   BookOpenCheck,
   FileUp,
@@ -204,7 +203,10 @@ export default function HamyarApp() {
       void restoreLocation();
     };
     window.addEventListener("popstate", handleHistory);
-    api<User>("/auth/me")
+    const sessionCheck = window.location.hash.startsWith("#reset=")
+      ? Promise.reject(new Error("Reset flow"))
+      : api<User>("/auth/me");
+    sessionCheck
       .then(async (u) => {
         setMe(u);
         await refresh(u);
@@ -306,7 +308,7 @@ export default function HamyarApp() {
         role="status"
         className="mx-auto my-[7vh] max-w-[1020px] glass-note p-3.5 leading-[1.9]"
       >
-        در حال اتصال به همیار…
+        در حال اتصال به هدهد…
       </div>
     );
   const feedback = (
@@ -445,7 +447,7 @@ export default function HamyarApp() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="hy-icon-container !size-[46px]" data-tone="purple">
-              <GraduationCap />
+              <img src="/app-icon.svg" alt="" width={44} height={44} className="h-11 w-11 object-contain" />
             </span>
             <div>
               <h3 className="text-base font-bold">{me.name}</h3>

@@ -73,6 +73,9 @@ export async function connect(
   await db
     .collection("sessions")
     .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await db.collection("passwordResetTokens").createIndex({ tokenHash: 1 }, { unique: true });
+  await db.collection("passwordResetTokens").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await db.collection("passwordResetThrottle").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
   // Additive indexes: existing question versions, assignments and evidence stay unchanged.
   await db
     .collection("attempts")
