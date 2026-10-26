@@ -131,7 +131,7 @@ export function AuthScreen({
                 ? "انتخاب رمز جدید"
                 : mode === "login"
                   ? "خوش آمدید"
-              : mode === "register"
+                  : mode === "register"
                 ? "ساخت حساب معلم"
                 : mode === "register-student"
                   ? "ساخت حساب دانش‌آموز"
@@ -145,6 +145,7 @@ export function AuthScreen({
                 : "برای ادامه مسیر یادگیری وارد حساب خود شوید."}
           </p>
           {feedback}
+          {resetInfo && <p role="status" className="glass-note p-3 text-sm leading-7">{resetInfo}</p>}
           {resetFlow === "none" && <form onSubmit={auth} className="grid gap-[18px]">
             {mode !== "login" && (
               <Field title="نام و نام خانوادگی">
@@ -235,7 +236,6 @@ export function AuthScreen({
                   </Field>
                 </>
               )}
-              {resetInfo && <p role="status" className="glass-note p-3 text-sm leading-7">{resetInfo}</p>}
               {resetError && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-900">{resetError}</p>}
               <Button disabled={resetBusy}>
                 {resetBusy ? "لطفاً صبر کنید…" : resetFlow === "request" ? "ارسال لینک بازیابی" : "ذخیره رمز جدید"}

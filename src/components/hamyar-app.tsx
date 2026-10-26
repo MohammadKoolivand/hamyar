@@ -10,7 +10,6 @@ import {
   Library,
   Target,
   LogOut,
-  GraduationCap,
   BarChart3,
   BookOpenCheck,
   FileUp,
