@@ -19,6 +19,41 @@ export function registerPasswordReset(
   mailer: PasswordResetMailer = sendPasswordResetEmail,
 ) {
   const { c, hash, randomBytes, scryptSync, id, now, fail } = ctx;
+  const pendingDeliveries = new Set<Promise<void>>();
+  // Finish already accepted sends during graceful shutdown. A hard process crash
+  // can still lose a queued email; production should use a durable outbox worker.
+  app.addHook("onClose", async () => {
+    await Promise.allSettled([...pendingDeliveries]);
+  });
+
+  function scheduleDelivery(email: string, token: string, userId: string, tokenHash: string) {
+    // Never wait for SMTP (or its timeouts) in the public request: doing so
+    // leaks whether an account exists by observable response latency.
+    const delivery = new Promise<void>((resolve) => {
+      setImmediate(() => {
+        void (async () => {
+          try {
+            const active = await c("passwordResetTokens").findOne({
+              _id: userId, tokenHash, usedAt: null, expiresAt: { $gt: new Date() },
+            });
+            if (!active) return; // token was already revoked or replaced
+            await mailer(email, token);
+            await ctx.audit(userId, "password_reset_requested", userId)
+              .catch(() => app.log.warn({ event: "password_reset_audit_failed" }, "Reset audit unavailable"));
+          } catch {
+            // Do not delete a newer request's token or expose delivery details.
+            await c("passwordResetTokens").deleteOne({ _id: userId, tokenHash })
+              .catch(() => app.log.warn({ event: "password_reset_cleanup_failed" }, "Reset token cleanup failed"));
+            app.log.warn({ event: "password_reset_mail_failed" }, "Password reset delivery failed");
+          } finally {
+            resolve();
+          }
+        })();
+      });
+    });
+    pendingDeliveries.add(delivery);
+    void delivery.then(() => pendingDeliveries.delete(delivery));
+  }
 
   app.post("/api/auth/password-reset/request", {
     config: { rateLimit: { max: 5, timeWindow: "10 minutes", keyGenerator: (r) => "reset:" + r.ip } },
@@ -46,12 +81,13 @@ export function registerPasswordReset(
       );
       if (resumed.modifiedCount === 0) return result;
     }
-    const account = await c("users").findOne({ email });
-    if (!account || account.disabledAt) return result;
+    // Configuration handling is independent of account existence.
     if (mailer === sendPasswordResetEmail && !smtpConfigured()) {
       app.log.warn({ event: "password_reset_mail_not_configured" }, "Password reset delivery unavailable");
       return result;
     }
+    const account = await c("users").findOne({ email });
+    if (!account || account.disabledAt) return result;
     const token = randomBytes(32).toString("hex");
     const tokenHash = hash(token);
     await c("passwordResetTokens").replaceOne(
@@ -66,16 +102,7 @@ export function registerPasswordReset(
       },
       { upsert: true },
     );
-    try {
-      await mailer(email, token);
-    } catch {
-      await c("passwordResetTokens").deleteOne({ _id: account._id, tokenHash });
-      app.log.warn({ event: "password_reset_mail_failed" }, "Password reset delivery failed");
-      return result;
-    }
-    // Audit failures must not invalidate an already delivered reset link.
-    await ctx.audit(account._id, "password_reset_requested", account._id)
-      .catch(() => app.log.warn({ event: "password_reset_audit_failed" }, "Reset audit unavailable"));
+    scheduleDelivery(email, token, account._id, tokenHash);
     return result;
   });
 
