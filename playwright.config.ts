@@ -10,6 +10,17 @@ export default defineConfig({
   use: {
     baseURL,
     headless: true,
+    // Existing credential journeys explicitly exercise the retained password method.
+    // OTP has separate tests starting from the public default with empty storage.
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: new URL(baseURL).origin,
+          localStorage: [{ name: "auth-method", value: "password" }],
+        },
+      ],
+    },
     // Use Playwright's installed Chromium unless an explicit Chrome path is provided.
     ...(process.env.CHROME_PATH
       ? { launchOptions: { executablePath: process.env.CHROME_PATH } }

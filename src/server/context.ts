@@ -44,6 +44,8 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
     _id: u._id,
     name: u.name,
     email: u.email,
+    emailVerified: u.emailVerified === true,
+    phoneVerified: u.phoneVerified === true,
     phone: u.phone,
     role: u.role,
   });

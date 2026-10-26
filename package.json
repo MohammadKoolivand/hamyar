@@ -24,7 +24,8 @@
     "ops:status": "node --env-file-if-exists=.env --import tsx scripts/check-runtime.ts",
     "smoke:load": "node --env-file-if-exists=.env --import tsx scripts/load-health.ts",
     "predev": "node scripts/prepare-font.mjs",
-    "prebuild": "node scripts/prepare-font.mjs"
+    "prebuild": "node scripts/prepare-font.mjs",
+    "worker:mail": "node --env-file-if-exists=.env --import tsx scripts/mail-worker.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

@@ -1,3 +1,6 @@
+import { registerPhoneAuth } from "./modules/phone-auth";
+import { MelipayamakProvider, type SmsProvider } from "./auth/sms";
+import { registerEmailVerification } from "./modules/email-verification";
 import Fastify from "fastify";
 import { routeRoles } from "../lib/access";
 import { registerAccessManagement } from "./modules/access-management";
@@ -12,7 +15,10 @@ import { createContext } from "./context";
 import { requireTransactions, type WriteHooks } from "./transactions";
 import { registerIdentity } from "./modules/identity";
 import { registerPasswordReset } from "./modules/password-reset";
-import { sendPasswordResetEmail, type PasswordResetMailer } from "./auth/reset-mail";
+import {
+  sendPasswordResetEmail,
+  type PasswordResetMailer,
+} from "./auth/reset-mail";
 import { registerExamImports } from "./modules/exam-imports";
 import { registerContent } from "./modules/content";
 import { registerMissions } from "./modules/missions";
@@ -33,6 +39,7 @@ export async function buildApp(
   questionGenerator?: QuestionGenerator,
   avalai = new AvalaiClient(),
   resetMailer: PasswordResetMailer = sendPasswordResetEmail,
+  sms: SmsProvider = new MelipayamakProvider(),
 ) {
   await requireTransactions(db);
   const app = Fastify({
@@ -147,8 +154,10 @@ export async function buildApp(
       ctx.fail(403, "دسترسی این نقش به این عملیات مجاز نیست");
   });
   registerAccessManagement(app, ctx);
-  registerIdentity(app, ctx);
+  const { linkInvitation } = registerIdentity(app, ctx);
+  registerPhoneAuth(app, ctx, sms, linkInvitation);
   registerPasswordReset(app, ctx, resetMailer);
+  registerEmailVerification(app, ctx);
   registerCourses(app, ctx);
   registerClassGroups(app, ctx);
   registerCourseMembership(app, ctx);

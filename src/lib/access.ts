@@ -30,7 +30,11 @@ export function routeRoles(method: string, route: string): Role[] | null {
   if (
     [
       "/api/health",
+      "/api/auth/email-verification/request",
+      "/api/auth/email-verification/confirm",
       "/api/auth/login",
+      "/api/auth/otp/request",
+      "/api/auth/otp/verify",
       "/api/auth/logout",
       "/api/auth/register",
       "/api/auth/password-reset/request",
@@ -39,7 +43,14 @@ export function routeRoles(method: string, route: string): Role[] | null {
     ].includes(route)
   )
     return null;
-  if (["/api/auth/me", "/api/auth/logout", "/api/access/me"].includes(route))
+  if (
+    [
+      "/api/auth/me",
+      "/api/auth/logout",
+      "/api/access/me",
+      "/api/auth/email/change",
+    ].includes(route)
+  )
     return [...roleSchema.options];
   if (route.startsWith("/api/admin/")) return ["super_admin"];
   if (route.startsWith("/api/staff/")) return ["secretary"];

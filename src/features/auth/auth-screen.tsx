@@ -1,4 +1,6 @@
 "use client";
+import { PhoneAuthScreen } from "./phone-auth-screen";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { GraduationCap, Sparkles, ShieldCheck, ArrowLeft } from "lucide-react";
@@ -34,6 +36,11 @@ export function AuthScreen({
   setPassword: (value: string) => void;
   setToken: (value: string) => void;
 }) {
+  const [method, setMethod] = useState("otp");
+  useEffect(() => {
+    if (localStorage.getItem("auth-method") === "password")
+      setMethod("password");
+  }, []);
   const [resetFlow, setResetFlow] = useState<"none" | "request" | "confirm">(
     "none",
   );
@@ -104,6 +111,16 @@ export function AuthScreen({
       setResetBusy(false);
     }
   }
+
+  if (method === "otp" && resetFlow === "none")
+    return (
+      <PhoneAuthScreen
+        onPassword={() => {
+          localStorage.setItem("auth-method", "password");
+          setMethod("password");
+        }}
+      />
+    );
 
   return (
     <main className="mx-auto my-[5vh] max-w-[1120px] p-5 sm:p-8">
@@ -326,6 +343,23 @@ export function AuthScreen({
               رمز عبور را فراموش کرده‌اید؟
             </button>
           )}
+          <button
+            type="button"
+            className="text-sm text-blue-800 underline"
+            onClick={() => {
+              localStorage.setItem("auth-method", "otp");
+              setMethod("otp");
+              setResetFlow("none");
+            }}
+          >
+            ورود با شماره موبایل و کد پیامکی
+          </button>
+          <Link
+            href="/verify-email"
+            className="text-sm text-blue-800 underline"
+          >
+            تأیید ایمیل حساب
+          </Link>
           {resetFlow === "none" && (
             <div className="flex flex-wrap items-center gap-3">
               <Button

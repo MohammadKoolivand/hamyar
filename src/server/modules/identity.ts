@@ -60,6 +60,49 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
       { upsert: true, session },
     );
   }
+  async function linkInvitation(inv: Row, uid: string, session: ClientSession) {
+    if (
+      inv.role === "parent" &&
+      !(await c("relations").findOne(
+        { teacherId: inv.teacherId, studentId: inv.studentId },
+        { session },
+      ))
+    )
+      fail(404, "ارتباط آموزشی معتبر نیست");
+    if (inv.role === "parent") {
+      await c("parentLinks").updateOne(
+        {
+          parentId: uid,
+          studentId: inv.studentId,
+          teacherId: inv.teacherId,
+        },
+        {
+          $setOnInsert: {
+            _id: id(),
+            parentId: uid,
+            studentId: inv.studentId,
+            teacherId: inv.teacherId,
+            createdAt: now(),
+            verification: "teacher_invited",
+          },
+        },
+        { upsert: true, session },
+      );
+    } else {
+      await c("relations").updateOne(
+        { teacherId: inv.teacherId, studentId: uid },
+        {
+          $setOnInsert: {
+            _id: id(),
+            teacherId: inv.teacherId,
+            studentId: uid,
+          },
+        },
+        { upsert: true, session },
+      );
+      await addEnrollment(inv, uid, session);
+    }
+  }
   app.post(
     "/api/auth/register",
     { config: { rateLimit: { max: authRateLimit, timeWindow: "1 minute" } } },
@@ -120,6 +163,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
           {
             _id: u!._id,
             passwordHash: u!.passwordHash,
+            securityRevision: u!.securityRevision ?? { $exists: false },
             role: u!.role,
             disabledAt: { $exists: false },
           },
@@ -271,39 +315,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
             { session },
           );
         await ctx.boundary("after_invited_user_insert");
-        if (role === "parent") {
-          await c("parentLinks").updateOne(
-            {
-              parentId: uid,
-              studentId: inv!.studentId,
-              teacherId: inv!.teacherId,
-            },
-            {
-              $setOnInsert: {
-                _id: id(),
-                parentId: uid,
-                studentId: inv!.studentId,
-                teacherId: inv!.teacherId,
-                createdAt: now(),
-                verification: "teacher_invited",
-              },
-            },
-            { upsert: true, session },
-          );
-        } else {
-          await c("relations").updateOne(
-            { teacherId: inv!.teacherId, studentId: uid },
-            {
-              $setOnInsert: {
-                _id: id(),
-                teacherId: inv!.teacherId,
-                studentId: uid,
-              },
-            },
-            { upsert: true, session },
-          );
-          await addEnrollment(inv!, uid, session);
-        }
+        await linkInvitation(inv!, uid, session);
         await c("auditLogs").insertOne(
           {
             _id: id(),
@@ -471,4 +483,5 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
         .toArray()
     ).map(safe);
   });
+  return { linkInvitation };
 }

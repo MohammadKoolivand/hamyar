@@ -4,6 +4,7 @@ import { connect as tlsConnect } from "node:tls";
 export type PasswordResetMailer = (
   email: string,
   token: string,
+  purpose?: "password_reset" | "email_verification",
 ) => Promise<void>;
 
 // Use implicit TLS (port 465); do not authenticate or transmit credentials on plaintext SMTP.
@@ -26,6 +27,7 @@ function checkedEmail(value: string) {
 export const sendPasswordResetEmail: PasswordResetMailer = async (
   email,
   token,
+  purpose = "password_reset",
 ) => {
   if (!smtpConfigured()) throw new Error("SMTP is not configured");
   const host = process.env.SMTP_HOST!;
@@ -40,12 +42,20 @@ export const sendPasswordResetEmail: PasswordResetMailer = async (
     !["localhost", "127.0.0.1"].includes(origin.hostname)
   )
     throw new Error("Password reset requires HTTPS APP_ORIGIN");
-  const url = origin.origin + "/#reset=" + token;
+  const verification = purpose === "email_verification";
+  const url =
+    origin.origin +
+    (verification ? "/verify-email#token=" : "/#reset=") +
+    token;
   const message = [
-    "برای تغییر رمز عبور هدهده روی لینک زیر باز کنید:",
+    verification
+      ? "برای تأیید مالکیت ایمیل هدهده لینک زیر را باز کنید:"
+      : "برای تغییر رمز عبور هدهده روی لینک زیر باز کنید:",
     url,
     "",
-    "این لینک تنها یک بار و تا ۱۰ دقیقه معتبر است.",
+    verification
+      ? "این لینک تنها یک بار و تا ۳۰ دقیقه معتبر است."
+      : "این لینک تنها یک بار و تا ۱۰ دقیقه معتبر است.",
     "اگر درخواست نداده‌اید، این پیام را نادیده بگیرید.",
   ].join("\n");
   const encoded =
@@ -57,7 +67,9 @@ export const sendPasswordResetEmail: PasswordResetMailer = async (
     "From: <" + from + ">",
     "To: <" + to + ">",
     "Subject: =?UTF-8?B?" +
-      Buffer.from("بازیابی رمز عبور هدهده").toString("base64") +
+      Buffer.from(
+        verification ? "تأیید ایمیل هدهده" : "بازیابی رمز عبور هدهده",
+      ).toString("base64") +
       "?=",
     "MIME-Version: 1.0",
     "Content-Type: text/plain; charset=UTF-8",
@@ -77,6 +89,10 @@ export const sendPasswordResetEmail: PasswordResetMailer = async (
     minVersion: "TLSv1.2",
   });
   socket.setTimeout(12000, () => socket.destroy(new Error("SMTP timeout")));
+  const deadline = setTimeout(
+    () => socket.destroy(new Error("SMTP deadline")),
+    30000,
+  );
   const rl = createInterface({ input: socket, crlfDelay: Infinity });
   const lines = rl[Symbol.asyncIterator]();
   async function reply(expected: number) {
@@ -119,6 +135,7 @@ export const sendPasswordResetEmail: PasswordResetMailer = async (
     await reply(250);
     socket.write("QUIT\r\n");
   } finally {
+    clearTimeout(deadline);
     rl.close();
     socket.destroy();
   }

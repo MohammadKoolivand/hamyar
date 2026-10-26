@@ -1,3 +1,4 @@
+process.env.MAIL_OUTBOX_KEY ??= Buffer.alloc(32, 7).toString("base64");
 import type { PasswordResetMailer } from "../../src/server/auth/reset-mail";
 import type { AvalaiClient } from "../../src/server/ai/avalai";
 import { randomUUID } from "node:crypto";
@@ -12,6 +13,7 @@ export async function fixture(
   options: {
     hooks?: WriteHooks;
     resetMailer?: PasswordResetMailer;
+    sms?: import("../../src/server/auth/sms").SmsProvider;
     avalai?: AvalaiClient;
     questionGenerator?: QuestionGenerator;
     provider?: HintProvider;
@@ -32,6 +34,7 @@ export async function fixture(
     options.questionGenerator,
     options.avalai,
     options.resetMailer,
+    options.sms,
   );
   await app.ready();
   const request = (url: string, body?: object, cookie = "", key?: string) =>
@@ -62,6 +65,12 @@ export async function fixture(
     email: "t@test.dev",
     password: "StrongPass123!",
   });
+  // Reset tests start from an already verified email; verification has its own suite.
+  if (options.resetMailer)
+    await collection(db, "users").updateOne(
+      { email: "t@test.dev" },
+      { $set: { emailVerified: true } },
+    );
   const teacher = await login("t@test.dev");
   const invite = await post(
     "/api/invitations",
