@@ -10,7 +10,7 @@
 2. MongoDB replica set، MONGO_URL/MONGO_DB اختصاصی و شبکه محدود. indexهای یکتا/TTL و شرط تراکنش در startup اعمال می‌شوند؛ دیتای قبلی بدون backup reset نشود.
 3. HTTPS، APP_ORIGIN دقیق و COOKIE_SECURE=true. Headerهای پایه در Next فعال‌اند. در reverse proxy، اعتماد به IP باید عمداً طراحی شود؛ X-Forwarded-For ناشناس مورد اعتماد نیست. محدودیت ورود پیش‌فرض ۱۰/دقیقه است.
 4. Poppler و Tesseract، `npm run ocr:setup`، checksum مدل‌های OCR و worker دائمی. الگوی systemd در ops با Restart=on-failure، MemoryMax/CPUQuota و کاربر غیر-root موجود است. در deploy پیش از npm ci و تعویض build، فرایندهای قدیمی متوقف و سپس وب و worker بازراه‌اندازی شوند.
-5. SMTP با TLS معتبر و secretهای سمت سرور برای reset ایمیلی؛ ارسال و دریافت واقعی Inbox هنوز باید بررسی شود. حساب phone-only بازیابی ایمیلی ندارد؛ OTP/SMS پیاده نشده است.
+5. SMTP با TLS معتبر، MAIL_OUTBOX_KEY ثابت و worker:mail مستقل برای تأیید/بازیابی ایمیلی؛ ارسال و دریافت واقعی Inbox هنوز باید بررسی شود. حساب phone-only بازیابی ایمیلی ندارد؛ ورود OTP ملی‌پیامک پیاده و با dependency کنترل‌شده آزموده شده؛ ارسال واقعی نیازمند تنظیمات پنل است.
 6. AvvalAI key فقط سمت سرور؛ catalog واقعی بررسی شد، inference آن هنوز Not Verified است. انتخاب مدل و اعتبار حساب تضمین دقت سؤال نیست و تأیید معلم لازم است.
 7. bootstrap اولین مدیر با فرمان اپراتور و env امن طبق ACCESS_CONTROL؛ حساب واقعی در ممیزی ارتقا داده نشد.
 8. برنامه backup زمان‌بندی‌شده، مقصد خارج از میزبان و مانور restore؛ این اجرا فقط drill روی داده مصنوعی را اثبات کرده است.
@@ -21,3 +21,9 @@
 ## وضعیت Git در پایان آماده‌سازی
 
 فقط main محلی و origin/main باقی است. دو branch محلی قدیمی پس از اثبات ancestor بودن در main با `git branch -d` حذف شدند؛ branch ریموت اضافی و Pull Request باز صفر بود. همه تغییرات در commitهای منطقی ثبت و با push معمولی حفظ شدند؛ force push یا reset مخرب انجام نشد. SHA نهایی از `git rev-parse HEAD` و تطبیق `origin/main` در گزارش نهایی همین اجرا اعلام می‌شود.
+
+## بستهٔ امنیت حساب و ورود OTP (۲۰۲۶/۱۰/۲۶)
+
+ثبت‌نام/ورود اصلی طبق درخواست مالک به شماره موبایل و OTP ملی‌پیامک تغییر کرد. تأیید موبایل فقط پس از کد معتبر اتفاق می‌افتد؛ کد در خروجی API یا log نیست و raw در DB ذخیره نمی‌شود. تنظیم MELIPAYAMAK_USERNAME/PASSWORD/OTP_BODY_ID و AUTH_OTP_SECRET در محیط موجود نیست؛ ارسال واقعی **BLOCKED — EXTERNAL SERVICE**. ورود با رمز حساب‌های قدیمی حفظ شده است.
+
+تأیید/تغییر ایمیل، بازیابی محدود به ایمیل تأییدشده، outbox رمزگذاری‌شده و worker مستقل تکمیل شدند. نتیجهٔ نهایی تست‌ها در MVP_TEST_REPORT است. این بسته هنوز تمام مأموریت تولیدی را تکمیل نمی‌کند: زیرساخت رضایت نسخه‌دار/اجرای لغو، حذف بررسی‌شده/retention و زمان‌بندی/rotation/DR کامل **NOT IMPLEMENTED** هستند؛ تصمیم حقوقی و میزبانی جداگانه نیز از مالک لازم است. **CONDITIONALLY READY** فقط برای نمایش/آزمایش کنترل‌شده با داده مصنوعی؛ انتشار عمومی کودک READY نیست.

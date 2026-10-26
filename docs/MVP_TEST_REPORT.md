@@ -40,3 +40,18 @@
 ## بازیابی worker
 
 دو خروج واقعی worker بر اثر monitor timeout اتصال MongoDB در همین محیط مشاهده شد. loop اکنون خطاهای شبکه/انتخاب سرور را با backoff از ۱٫۵ تا ۳۰ ثانیه تحمل می‌کند، بعد از کار موفق delay را reset می‌کند و خطای برنامه‌نویسی را نمی‌پوشاند. سه تست واحد جدید این تصمیم‌ها را بررسی می‌کنند؛ lease/retry و بازیابی job همچنان در integration قبلی آزموده‌اند. این تست واحدِ خطای تزریق‌شده، ادعای خاموش/روشن‌کردن MongoDB واقعی نیست؛ چنین آزمایش مخربی روی سرویس محلیِ داده واقعی انجام نشد.
+
+## گیت بستهٔ تأیید ایمیل و OTP ملی‌پیامک — ۲۰۲۶/۱۰/۲۶
+
+- نصب پاک: `npm ci` موفق، ۲۵۷ بسته؛ lockfile وابستگی تغییر نکرد.
+- `npm run typecheck`، `npm run lint` و `npm run build`: موفق پس از تغییرات OTP؛ ۱۷ صفحه static شامل verify-email.
+- `npm test`: **۱۲۳ passed / ۰ failed / ۰ skipped**، حدود ۱۳۵ ثانیه؛ شامل OCR واقعی، نقش‌ها، reset/session، صف رمزگذاری‌شده، تأیید/تغییر ایمیل و OTP جدید.
+- `npm run test:e2e`: **۳۱ passed / ۰ failed / ۱ skipped**، حدود ۱٫۷ دقیقه. skip همان inference اختیاریِ حالت mock است؛ هیچ skip تازه اضافه نشد. OTP جدید با SMS transport کنترل‌شده تا حساب/نشست/refresh/logout و چهار عرض پاس شد؛ ایمیل نیز یک‌بارمصرف/حذف fragment را پاس کرد.
+- `npm run smoke:ollama`: **PASS** با qwen2.5:3b؛ دو inference واقعی مصنوعی، usage واقعی ۱۴۵/۱۲ و ۲۰۲/۱۵ توکن؛ هیچ درخواست AvvalAI پولی ارسال نشد.
+- adapter ملی‌پیامک: POST الگویی HTTPS، rejection/timeout با transport کنترل‌شده آزموده؛ ارسال/دریافت واقعی **Not Verified** (تنظیمات پنل و AUTH_OTP_SECRET وجود ندارند).
+- SMTP Inbox واقعی **Not Verified**؛ تست‌های صف/SMTP کند/شکست، retry/lease و concurrency جایگزین Inbox نیستند.
+- audit رسمی مجدداً با `npm audit --registry=https://registry.npmjs.org --json` اجرا شد و `read ETIMEDOUT` داد؛ نتیجه **Not Verified**.
+
+اجرای اول مرورگر به‌علت خروج سرور background و نبود listener شکست زیرساختی داشت؛ سرور در نشست پایدار اجرا و مجموعه تکرار شد. در اجرای بعد یک خطای selector واقعی تست جدید ایمیل شناسایی شد: Next route announcer هم role=alert دارد. locator به main محدود شد و متنِ دقیق خطای مصرف دوباره حفظ ماند؛ اجرای کامل نهایی سبز شد. نتیجهٔ اجرای خراب به‌عنوان موفقیت ثبت نشده است.
+
+بازاجرای backup/restore فقط روی `hodhodeh_audit_mail_1026` مصنوعی با وب/worker متوقف: **PASS**، ۴۲ collection، ۱۰۷۶ سند و آرشیو ۱۲۲۴۳۴ بایت؛ منبع تغییر نکرد و مقصد تصادفی drill حذف شد. benchmark هفت fixture خودساخته نیز اجرا شد: FP/FN شمارهٔ چهار fixture سؤال صفر، گزینه‌های mixed همچنان ۶۲٫۵٪ و scan CER برابر ۳٫۳۳٪. این اجرا بهبود دقت OCR یا صحت آزمون ملی را اثبات نمی‌کند.
