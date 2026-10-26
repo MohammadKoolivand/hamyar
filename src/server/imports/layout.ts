@@ -164,6 +164,26 @@ export function parseQuestions(
           continue;
         }
       }
+      // OCR may lose one option marker or turn ')' into '.'. During a partial
+      // option block a bare low-number anchor is ambiguous, not a new question.
+      // Keep its raw text for review; never invent the missing option(s). Explicit
+      // question labels and anchors after a complete block remain valid.
+      if (
+        current &&
+        current.options.length > 0 &&
+        current.options.length < 4 &&
+        a &&
+        !a[1] &&
+        Number(a[2]) >= 1 &&
+        Number(a[2]) <= 4
+      ) {
+        current.warnings.push(
+          "شماره‌گذاری گزینه‌ها ناقص یا نامطمئن است؛ مرز و گزینه‌ها را بررسی کنید",
+        );
+        current.options[current.options.length - 1] += "\n" + line.text;
+        collected.push(line);
+        continue;
+      }
       if (a && (a[1] || a[3] || Number(a[2]) > 4)) {
         finish();
         current = {

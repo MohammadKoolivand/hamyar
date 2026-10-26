@@ -63,9 +63,14 @@ for (const file of [
           ]
         : expected;
     const isQuestion = !file.startsWith("key");
-    const detected = qs.filter((q) =>
-      labels.some((e) => q.number === e.number),
-    ).length;
+    const predicted = qs.filter((q) => q.number !== null);
+    const detected = new Set(
+      predicted
+        .filter((q) => labels.some((e) => q.number === e.number))
+        .map((q) => q.number),
+    ).size;
+    const falsePositive = predicted.length - detected;
+    const falseNegative = labels.length - detected;
     const optionsCorrect = labels.reduce(
       (total, e) =>
         total +
@@ -83,6 +88,12 @@ for (const file of [
       millisecondsPerPage:
         pages.reduce((n, p) => n + p.milliseconds, 0) / pages.length,
       questionDetectionRecall: isQuestion ? detected / labels.length : null,
+      questionDetectionPrecision: isQuestion
+        ? detected / Math.max(1, predicted.length)
+        : null,
+      falsePositive: isQuestion ? falsePositive : null,
+      falseNegative: isQuestion ? falseNegative : null,
+      unnumberedReviewRegions: qs.filter((q) => q.number === null).length,
       optionExtractionAccuracy: isQuestion
         ? optionsCorrect / (labels.length * 4)
         : null,
@@ -143,6 +154,10 @@ const output = {
   definitions: {
     questionDetectionRecall:
       "correctly detected labeled question numbers / expected questions",
+    questionDetectionPrecision:
+      "unique correct labeled numbers / all numbered predictions; duplicate anchors count as false positives",
+    falsePositive: "numbered predictions not matched one-to-one to a label",
+    falseNegative: "labeled question numbers not detected",
     optionExtractionAccuracy:
       "exact normalized option text at correct question and option index / labeled options",
     keyAccuracy:

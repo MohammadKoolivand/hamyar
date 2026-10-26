@@ -1,8 +1,11 @@
 {
-  "measuredAt": "2026-10-25T14:28:45.680Z",
+  "measuredAt": "2026-10-26T08:13:27.699Z",
   "dataset": "Seven original synthetic PDF fixtures; 2 Persian arithmetic questions, 1 science question, text/scan/hybrid and table/image/conflicting keys. Not representative of national exams.",
   "definitions": {
     "questionDetectionRecall": "correctly detected labeled question numbers / expected questions",
+    "questionDetectionPrecision": "unique correct labeled numbers / all numbered predictions; duplicate anchors count as false positives",
+    "falsePositive": "numbered predictions not matched one-to-one to a label",
+    "falseNegative": "labeled question numbers not detected",
     "optionExtractionAccuracy": "exact normalized option text at correct question and option index / labeled options",
     "keyAccuracy": "correct extracted number-option pairs / extracted pairs (precision)",
     "keyRecall": "correct extracted number-option pairs / expected pairs",
@@ -19,8 +22,12 @@
       "methods": [
         "text"
       ],
-      "millisecondsPerPage": 200,
+      "millisecondsPerPage": 324,
       "questionDetectionRecall": 1,
+      "questionDetectionPrecision": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "unnumberedReviewRegions": 0,
       "optionExtractionAccuracy": 1,
       "keyAccuracy": null,
       "keyRecall": null,
@@ -38,8 +45,12 @@
       "methods": [
         "ocr"
       ],
-      "millisecondsPerPage": 551,
+      "millisecondsPerPage": 863,
       "questionDetectionRecall": 1,
+      "questionDetectionPrecision": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "unnumberedReviewRegions": 0,
       "optionExtractionAccuracy": 1,
       "keyAccuracy": null,
       "keyRecall": null,
@@ -57,20 +68,22 @@
       "methods": [
         "hybrid"
       ],
-      "millisecondsPerPage": 313,
+      "millisecondsPerPage": 586,
       "questionDetectionRecall": 1,
-      "optionExtractionAccuracy": 0.75,
+      "questionDetectionPrecision": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "unnumberedReviewRegions": 0,
+      "optionExtractionAccuracy": 0.625,
       "keyAccuracy": null,
       "keyRecall": null,
       "ocrCharacterErrorRate": null,
       "questions": [
         12,
-        2,
-        4,
         19
       ],
       "keyEntries": 0,
-      "reviewWarnings": 14
+      "reviewWarnings": 9
     },
     {
       "fixture": "science",
@@ -78,8 +91,12 @@
       "methods": [
         "text"
       ],
-      "millisecondsPerPage": 115,
+      "millisecondsPerPage": 212,
       "questionDetectionRecall": 1,
+      "questionDetectionPrecision": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "unnumberedReviewRegions": 0,
       "optionExtractionAccuracy": 1,
       "keyAccuracy": null,
       "keyRecall": null,
@@ -96,8 +113,12 @@
       "methods": [
         "text"
       ],
-      "millisecondsPerPage": 103,
+      "millisecondsPerPage": 184,
       "questionDetectionRecall": null,
+      "questionDetectionPrecision": null,
+      "falsePositive": null,
+      "falseNegative": null,
+      "unnumberedReviewRegions": 0,
       "optionExtractionAccuracy": null,
       "keyAccuracy": 1,
       "keyRecall": 1,
@@ -115,8 +136,12 @@
       "methods": [
         "ocr"
       ],
-      "millisecondsPerPage": 399,
+      "millisecondsPerPage": 677,
       "questionDetectionRecall": null,
+      "questionDetectionPrecision": null,
+      "falsePositive": null,
+      "falseNegative": null,
+      "unnumberedReviewRegions": 1,
       "optionExtractionAccuracy": null,
       "keyAccuracy": 0,
       "keyRecall": 0,
@@ -133,8 +158,12 @@
       "methods": [
         "ocr"
       ],
-      "millisecondsPerPage": 313,
+      "millisecondsPerPage": 530,
       "questionDetectionRecall": null,
+      "questionDetectionPrecision": null,
+      "falsePositive": null,
+      "falseNegative": null,
+      "unnumberedReviewRegions": 0,
       "optionExtractionAccuracy": null,
       "keyAccuracy": null,
       "keyRecall": null,

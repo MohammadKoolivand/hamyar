@@ -86,3 +86,52 @@ test("duplicate numbers and unnumbered pages are explicit review cases", () => {
   assert.equal(unnumbered[0].number, null);
   assert.ok(unnumbered[0].warnings.length);
 });
+
+test("damaged option numbering cannot promote an orphan option into a question anchor", () => {
+  for (const orphan of ["۴) هفت", "4. seven", "٣: six", "۲- five"]) {
+    const parsed = parseQuestions(
+      lines([
+        "سؤال ۱۲. حاصل جمع چند است؟",
+        "۱) چهار",
+        "؟) گزینه با شماره خراب",
+        orphan,
+        "سؤال ۱۹. سؤال بعدی",
+        "1) one 2) two 3) three 4) four",
+      ]),
+      sizes,
+    );
+    assert.deepEqual(
+      parsed.map((q) => q.number),
+      [12, 19],
+    );
+    assert.ok(parsed[0].warnings.some((w) => w.includes("شماره‌گذاری")));
+    assert.ok(parsed[0].options.length < 4);
+  }
+  // Low-number questions remain valid after a complete option block or an explicit label.
+  const actual = parseQuestions(
+    lines([
+      "3. Question three",
+      "1) a 2) b 3) c 4) d",
+      "4. Question four",
+      "1) a 2) b 3) c 4) d",
+      "سؤال ۲. Explicit restart",
+    ]),
+    sizes,
+  );
+  assert.deepEqual(
+    actual.map((q) => q.number),
+    [3, 4, 2],
+  );
+});
+
+test("two-column RTL layout, continuation pages and low OCR confidence remain reviewable", () => {
+  const right = lines(["سؤال ۱۲. پرسش راست", "1) a 2) b 3) c 4) d", "سؤال ۱۹. پرسش دوم راست", "1) a 2) b 3) c 4) d"]).map((l) => ({ ...l, x: 335, width: 220 }));
+  const left = lines(["سؤال ۲۰. پرسش چپ", "1) a 2) b 3) c 4) d", "سؤال ۳۱. پرسش دوم چپ", "1) a 2) b 3) c 4) d"]).map((l) => ({ ...l, x: 25, width: 220, method: "ocr" as const, confidence: 45 }));
+  const parsed = parseQuestions([...right, ...left], sizes);
+  assert.deepEqual(parsed.map((q) => q.number), [12,19,20,31]);
+  assert.ok(parsed.every((q) => q.options.length === 4));
+  assert.ok(parsed[2].warnings.some((w) => w.includes("۸۰")));
+  const continued = parseQuestions([...lines(["سؤال ۷. آغاز پرسش"]), ...lines(["ادامه در صفحه دیگر", "1) a 2) b 3) c 4) d"]).map((l) => ({ ...l, page: 2 }))], { ...sizes, 2: sizes[1] });
+  assert.equal(continued[0].regions.length, 2);
+  assert.ok(continued[0].warnings.some((w) => w.includes("چندصفحه")));
+});
