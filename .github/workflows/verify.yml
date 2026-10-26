@@ -43,6 +43,8 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
+      - name: Verify authentication and password recovery (independent of OCR)
+        run: timeout 180s node --import tsx --test tests/integration/auth-session.test.ts tests/integration/password-reset.test.ts
       - run: npm test
       - run: npx playwright install --with-deps chromium
       - name: Start durable exam worker
