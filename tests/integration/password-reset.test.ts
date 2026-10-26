@@ -124,13 +124,24 @@ test("password reset replies before slow SMTP completes, for an existing or miss
       payload: { email: "nonexistent@example.test" },
     });
     // This must resolve before the deliberately blocked mailer finishes.
-    const known = await app.inject({
+    const knownRequest = app.inject({
       method: "POST", url: "/api/auth/password-reset/request",
       payload: { email: "async@example.test" },
     });
+    const known = await Promise.race([
+      knownRequest,
+      new Promise<never>((_, reject) => setTimeout(
+        () => reject(new Error("Reset HTTP response blocked by SMTP delivery")), 12000,
+      )),
+    ]);
     assert.equal(known.statusCode, 200, known.body);
     assert.deepEqual(known.json(), unknown.json());
-    await mailStarted;
+    await Promise.race([
+      mailStarted,
+      new Promise<never>((_, reject) => setTimeout(
+        () => reject(new Error("Queued reset mail was not started")), 12000,
+      )),
+    ]);
     assert.deepEqual(delivered, []);
     releaseMail();
   } finally {
