@@ -95,7 +95,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
           : [];
       const validDigest = /^[a-f0-9]{128}$/i.test(digest ?? "");
       const storedDigest = validDigest
-        ? Buffer.from(digest, "hex")
+        ? Buffer.from(digest ?? "", "hex")
         : Buffer.alloc(64);
       const safeSalt =
         typeof salt === "string" && salt.length > 0 && salt.length <= 128
