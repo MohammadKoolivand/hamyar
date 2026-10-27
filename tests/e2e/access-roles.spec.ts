@@ -137,7 +137,7 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       phone: "09123456789", challengeId: studentOtp.challengeId, code: smsCode,
       name: "دانش‌آموز دعوت موبایلی", invitationToken: inviteToken,
     });
-    expect(studentLogin.statusCode).toBe(200, studentLogin.body);
+    expect(studentLogin.statusCode).toBe(200);
     await useFixtureSession(page, "session=" + studentLogin.cookies[0].value );
     await expect(
       page.getByRole("button", { name: "خروج", exact: true }),
@@ -183,7 +183,7 @@ test("parent portal has a valid child selector without hydration errors and revo
     const parentLogin = await f.request("/api/auth/login", {
       email: "09120000092", password: "StrongPass123!",
     });
-    expect(parentLogin.statusCode).toBe(200, parentLogin.body);
+    expect(parentLogin.statusCode).toBe(200);
     await page.goto("/");
     await useFixtureSession(page, "session=" + parentLogin.cookies[0].value );
     await expect(
