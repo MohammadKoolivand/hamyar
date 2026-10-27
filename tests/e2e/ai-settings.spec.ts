@@ -1,3 +1,4 @@
+import { useFixtureSession } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 import { fixture } from "../helpers/fixture";
 import { routeBackend } from "../helpers/browser-backend";
@@ -18,17 +19,7 @@ test("teacher selects an AvalAI model with controlled external catalog transport
   });
   await routeBackend(page, f.app);
   try {
-    await page.goto("/settings");
-    await page
-      .getByRole("button", { name: "ثبت‌نام معلم", exact: true })
-      .click();
-    await page.getByLabel("نام و نام خانوادگی").fill("معلم تنظیم مدل");
-    await page
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill(`model-${Date.now()}@test.dev`);
-    await page.getByLabel("رمز عبور").fill("StrongPass123!");
-    await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-    await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+    await useFixtureSession(page, f.teacher);
     await page.getByRole("button", { name: "تنظیمات", exact: true }).click();
     await expect(page).toHaveURL(/\/settings$/);
     const owner = page.getByLabel("ارائه‌دهنده مدل AvvalAI");
