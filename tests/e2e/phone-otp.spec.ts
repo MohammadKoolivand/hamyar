@@ -23,7 +23,7 @@ test("public phone OTP signup verifies mobile and enters real student dashboard 
     await routeBackend(page, f.app);
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهده" }),
+      page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" }),
     ).toBeVisible();
     await page.getByRole("button", { name: "حساب جدید می‌سازم" }).click();
     await page.getByLabel("شماره موبایل", { exact: true }).fill("۰۹۱۲۳۴۵۶۷۸۹");
