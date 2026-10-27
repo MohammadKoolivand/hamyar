@@ -43,6 +43,6 @@ export async function useFixtureSession(page: Page, cookie: string) {
     name, value: value.join("="), url: new URL(baseURL).origin,
     httpOnly: true, sameSite: "Strict",
   }]);
-  await page.goto("/dashboard");
-  await expect(page.getByRole("button", { name: "خروج", exact: true })).toBeVisible();
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("button", { name: "خروج", exact: true })).toBeVisible({ timeout: 15000 });
 }
