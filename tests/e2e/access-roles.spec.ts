@@ -4,6 +4,8 @@ import { fixture } from "../helpers/fixture";
 import { createContext } from "../../src/server/context";
 import { bootstrapSuperadmin } from "../../src/server/access-bootstrap";
 test.use({ serviceWorkers: "block" });
+// Controlled test SMS still uses an HMAC-protected OTP challenge.
+process.env.AUTH_OTP_SECRET ??= Buffer.alloc(32, 19).toString("base64");
 test("super admin creates scoped secretary and secretary uses a separate operational panel", async ({
   page,
 }, testInfo) => {
