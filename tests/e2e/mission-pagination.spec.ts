@@ -3,7 +3,6 @@ import { test, expect } from "@playwright/test";
 test("question collection filters, pages, modal and bulk add preserve all selected questions", async ({
   page,
 }) => {
-  const stamp = Date.now();
   await registerSyntheticUser(page, "معلم صفحه‌بندی");
   await expect(
     page.getByRole("button", { name: "مأموریت‌ها", exact: true }),
