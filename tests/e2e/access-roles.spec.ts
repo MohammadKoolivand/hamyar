@@ -46,7 +46,7 @@ test("super admin creates scoped secretary and secretary uses a separate operati
     expect(firstAdmin.statusCode).toBe(200);
     const adminCookie = "session=" + firstAdmin.cookies[0].value;
     await page.goto("/");
-    await useFixtureSession(page, adminCookie);;
+    await useFixtureSession(page, adminCookie );
     await expect(
       page.getByRole("heading", {
         name: "مدیریت سامانه و دسترسی‌ها",
@@ -88,7 +88,7 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       phone: "09120000177", challengeId: secretaryOtp.challengeId, code: smsCode,
     });
     expect(secretaryLogin.statusCode).toBe(200);
-    await useFixtureSession(page, "session=" + secretaryLogin.cookies[0].value);;
+    await useFixtureSession(page, "session=" + secretaryLogin.cookies[0].value );
     await expect(
       page.getByRole("heading", { name: "امور اجرایی", exact: true }),
     ).toBeVisible();
@@ -138,7 +138,7 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       name: "دانش‌آموز دعوت موبایلی", invitationToken: inviteToken,
     });
     expect(studentLogin.statusCode).toBe(200, studentLogin.body);
-    await useFixtureSession(page, "session=" + studentLogin.cookies[0].value);;
+    await useFixtureSession(page, "session=" + studentLogin.cookies[0].value );
     await expect(
       page.getByRole("button", { name: "خروج", exact: true }),
     ).toBeVisible();
@@ -185,7 +185,7 @@ test("parent portal has a valid child selector without hydration errors and revo
     });
     expect(parentLogin.statusCode).toBe(200, parentLogin.body);
     await page.goto("/");
-    await useFixtureSession(page, "session=" + parentLogin.cookies[0].value);;
+    await useFixtureSession(page, "session=" + parentLogin.cookies[0].value );
     await expect(
       page.getByRole("heading", { name: "پنل اولیا", exact: true }),
     ).toBeVisible();
