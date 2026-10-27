@@ -19,12 +19,12 @@ test("phone-only public UI redirects legacy email verification while existing to
     await expect(page.getByLabel("شماره موبایل", { exact: true })).toBeVisible();
     await expect(page.getByLabel("ایمیل حساب", { exact: true })).toHaveCount(0);
     const issued = await f.request("/api/auth/email-verification/request", { email: "t@test.dev" });
-    expect(issued.statusCode).toBe(200, issued.body);
+    expect(issued.statusCode).toBe(200);
     let token = "";
     await deliverNextMail(createContext(f.db), async (_to, value) => {token = value;});
     expect(token).toHaveLength(64);
     const confirmed = await f.request("/api/auth/email-verification/confirm", { token });
-    expect(confirmed.statusCode).toBe(200, confirmed.body);
+    expect(confirmed.statusCode).toBe(200);
     expect((await f.c("users").findOne({ email: "t@test.dev" }))?.emailVerified).toBe(true);
     const replay = await f.request("/api/auth/email-verification/confirm", { token });
     expect(replay.statusCode).toBe(400);
