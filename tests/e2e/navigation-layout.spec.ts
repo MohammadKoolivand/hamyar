@@ -29,7 +29,6 @@ test("each navigation section resolves to a standalone URL on direct load", asyn
 test("logged-in teacher navigation supports deep links, refresh, Back and Forward; header fits content", async ({
   page,
 }) => {
-  const suffix = Date.now();
   await registerSyntheticUser(page, "معلم مسیرها");
 
   await expect(
