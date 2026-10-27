@@ -1,3 +1,4 @@
+import { registerSyntheticUser } from "./auth-helpers";
 import { expect, test } from "@playwright/test";
 
 test("each navigation section resolves to a standalone URL on direct load", async ({
@@ -19,7 +20,7 @@ test("each navigation section resolves to a standalone URL on direct load", asyn
   for (const route of routes) {
     await page.goto(route);
     await expect(
-      page.getByRole("heading", { name: "خوش آمدید" }),
+      page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" }),
     ).toBeVisible();
     expect(new URL(page.url()).pathname).toBe(route);
   }
@@ -29,15 +30,7 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
   page,
 }) => {
   const suffix = Date.now();
-  await page.goto("/dashboard");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم مسیرها");
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(`nav-teacher-${suffix}@test.dev`);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await registerSyntheticUser(page, "معلم مسیرها");
 
   await expect(
     page.getByRole("heading", { name: "نمای کلی", exact: true }),
@@ -117,17 +110,7 @@ test("all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime 
     if (/hydration|cannot be a child|cannot contain/i.test(m.text()))
       errors.push(m.text());
   });
-  await page.goto("/");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("ممیزی نمایشگر");
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(`viewport-${crypto.randomUUID()}@test.dev`);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page
-    .getByRole("button", { name: "ورود به هدهده", exact: true })
-    .click();
+  await registerSyntheticUser(page, "ممیزی نمایشگر");
   await expect(
     page.getByRole("button", { name: "خروج", exact: true }),
   ).toBeVisible();
