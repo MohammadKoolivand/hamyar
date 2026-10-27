@@ -1,0 +1,95 @@
+{
+  "source": "Existing owner-provided Konkur1405 source.pdf page 2; key.pdf page 1, extracted locally without database writes",
+  "reference": "Six numbered questions per existing markers, not independently re-annotated truth",
+  "expectedNumbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "detectedNumbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "keyEntries": 15,
+  "keyWarnings": [
+    "گزینه یا شماره نامعتبر در صفحه 1",
+    "گزینه یا شماره نامعتبر در صفحه 1",
+    "گزینه یا شماره نامعتبر در صفحه 1",
+    "گزینه یا شماره نامعتبر در صفحه 1",
+    "گزینه یا شماره نامعتبر در صفحه 1"
+  ],
+  "sourceMethods": [
+    "text"
+  ],
+  "sourceRendered": [
+    true
+  ],
+  "sourceSha256": "f4a01ce26ebc2ff2f57aabbd28a5fdf4fa4623b5aab55fca189485628f0ba07f",
+  "questions": [
+    {
+      "number": 1,
+      "optionCount": 4,
+      "warnings": [
+        "مرز سؤال، فرمول‌ها و شکل‌ها باید توسط معلم بررسی شوند",
+        "گزینه‌های کنار هم با تصویر و ترتیب شماره‌ها تطبیق داده شوند"
+      ],
+      "keyMatch": "needs_review"
+    },
+    {
+      "number": 2,
+      "optionCount": 1,
+      "warnings": [
+        "مرز سؤال، فرمول‌ها و شکل‌ها باید توسط معلم بررسی شوند",
+        "گزینه‌های کامل چهارگانه استخراج نشد؛ با تصویر تطبیق دهید"
+      ],
+      "keyMatch": "needs_review"
+    },
+    {
+      "number": 3,
+      "optionCount": 1,
+      "warnings": [
+        "مرز سؤال، فرمول‌ها و شکل‌ها باید توسط معلم بررسی شوند",
+        "گزینه‌های کامل چهارگانه استخراج نشد؛ با تصویر تطبیق دهید"
+      ],
+      "keyMatch": "needs_review"
+    },
+    {
+      "number": 4,
+      "optionCount": 1,
+      "warnings": [
+        "مرز سؤال، فرمول‌ها و شکل‌ها باید توسط معلم بررسی شوند",
+        "گزینه‌های کامل چهارگانه استخراج نشد؛ با تصویر تطبیق دهید"
+      ],
+      "keyMatch": "needs_review"
+    },
+    {
+      "number": 5,
+      "optionCount": 4,
+      "warnings": [
+        "مرز سؤال، فرمول‌ها و شکل‌ها باید توسط معلم بررسی شوند",
+        "گزینه‌های کنار هم با تصویر و ترتیب شماره‌ها تطبیق داده شوند",
+        "گزینه‌های کنار هم با تصویر و ترتیب شماره‌ها تطبیق داده شوند"
+      ],
+      "keyMatch": "needs_review"
+    },
+    {
+      "number": 6,
+      "optionCount": 1,
+      "warnings": [
+        "مرز سؤال، فرمول‌ها و شکل‌ها باید توسط معلم بررسی شوند",
+        "گزینه‌های کامل چهارگانه استخراج نشد؛ با تصویر تطبیق دهید"
+      ],
+      "keyMatch": "needs_review"
+    }
+  ],
+  "textScientificAccuracy": "MANUAL_REQUIRED",
+  "formulasAndOptions": "Source raster retained; no claim of exact mathematical OCR",
+  "published": 0
+}

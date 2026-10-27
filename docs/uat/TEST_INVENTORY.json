@@ -1,0 +1,777 @@
+[
+  {
+    "file": "tests/unit/exam-import-route.test.ts",
+    "line": 5,
+    "name": "exam import has an independent, refreshable route"
+  },
+  {
+    "file": "tests/unit/deployment-config.test.mjs",
+    "line": 14,
+    "name": "deployment guard rejects wrong database, insecure origin and unsafe mail configuration"
+  },
+  {
+    "file": "tests/unit/deployment-config.test.mjs",
+    "line": 55,
+    "name": "deployment preflight reports only codes and never secrets; optional SMS is truthful"
+  },
+  {
+    "file": "tests/unit/domain.test.ts",
+    "line": 14,
+    "name": "Persian numeric answers normalize and tolerance is respected"
+  },
+  {
+    "file": "tests/unit/domain.test.ts",
+    "line": 20,
+    "name": "essay is never automatically marked correct"
+  },
+  {
+    "file": "tests/unit/domain.test.ts",
+    "line": 25,
+    "name": "invalid numeric and multiple choice references are rejected"
+  },
+  {
+    "file": "tests/unit/question-visuals.test.ts",
+    "line": 18,
+    "name": "visual data validates ranges, bounds, complexity and required content"
+  },
+  {
+    "file": "tests/unit/question-visuals.test.ts",
+    "line": 84,
+    "name": "safe mathematical rendering produces actual SVG and MathML, escapes text and rejects external resources"
+  },
+  {
+    "file": "tests/unit/question-source.test.ts",
+    "line": 11,
+    "name": "eight UI source views keep final separate from coordinated national exams; reject unrelated dimensions"
+  },
+  {
+    "file": "tests/unit/worker-loop.test.ts",
+    "line": 6,
+    "name": "worker recovers from network errors with bounded backoff and resets delay after work"
+  },
+  {
+    "file": "tests/unit/worker-loop.test.ts",
+    "line": 28,
+    "name": "worker retries cap at thirty seconds and respects shutdown between cycles"
+  },
+  {
+    "file": "tests/unit/worker-loop.test.ts",
+    "line": 47,
+    "name": "worker does not hide programming or validation errors behind infinite retries"
+  },
+  {
+    "file": "tests/unit/learning.test.ts",
+    "line": 26,
+    "name": "assisted correction does not inflate first-attempt independent success or resolve a mistake"
+  },
+  {
+    "file": "tests/unit/learning.test.ts",
+    "line": 41,
+    "name": "mastery requires varied independent evidence; repeated same-question practice is insufficient"
+  },
+  {
+    "file": "tests/unit/learning.test.ts",
+    "line": 57,
+    "name": "mistake resolution needs two independent, distinct followups in the same relationship"
+  },
+  {
+    "file": "tests/unit/avalai.test.ts",
+    "line": 16,
+    "name": "AvalAI forwards the selected model, server-only credential, bounded curriculum and usage"
+  },
+  {
+    "file": "tests/unit/avalai.test.ts",
+    "line": 51,
+    "name": "model discovery only exposes chat models and caches the live list"
+  },
+  {
+    "file": "tests/unit/avalai.test.ts",
+    "line": 74,
+    "name": "missing keys, upstream failures, truncation and invalid JSON fail closed"
+  },
+  {
+    "file": "tests/unit/avalai.test.ts",
+    "line": 100,
+    "name": "numeric JSON references normalize to the internal string contract without relaxing other answer types"
+  },
+  {
+    "file": "tests/unit/curriculum-catalog.test.ts",
+    "line": 10,
+    "name": "Iran secondary catalog covers grades/tracks, retains distinct physics editions and has no empty chapters"
+  },
+  {
+    "file": "tests/unit/curriculum-catalog.test.ts",
+    "line": 84,
+    "name": "catalog identities are stable, UUIDs valid, nodes connected and tenant scoped; path handles cycles"
+  },
+  {
+    "file": "tests/unit/curriculum-catalog.test.ts",
+    "line": 108,
+    "name": "official supplements remain distinct and do not invent missing geology chapters"
+  },
+  {
+    "file": "tests/unit/curriculum-catalog.test.ts",
+    "line": 130,
+    "name": "upper secondary official book codes map to distinct grade/track books; corrected titles retain old topic identities"
+  },
+  {
+    "file": "tests/unit/state.test.ts",
+    "line": 6,
+    "name": "topology guard rejects standalone instead of assuming transactions"
+  },
+  {
+    "file": "tests/unit/state.test.ts",
+    "line": 16,
+    "name": "state transitions cannot reopen, complete a draft, or write cancelled/submitted assignments"
+  },
+  {
+    "file": "tests/unit/topic-selector.test.ts",
+    "line": 9,
+    "name": "topic paths select nearest grade/book/chapter and carry each book track without mixing repeated names"
+  },
+  {
+    "file": "tests/unit/topic-selector.test.ts",
+    "line": 27,
+    "name": "custom topics without hierarchy remain selectable; malformed ancestor cycles terminate"
+  },
+  {
+    "file": "tests/unit/topic-selector.test.ts",
+    "line": 40,
+    "name": "ancestor selection handles orphan roots and cycles; related skills do not leak from another topic"
+  },
+  {
+    "file": "tests/unit/dev-port.test.mjs",
+    "line": 7,
+    "name": "dev port probe reports a free port"
+  },
+  {
+    "file": "tests/unit/dev-port.test.mjs",
+    "line": 16,
+    "name": "dev port probe does not kill or take over an occupied port"
+  },
+  {
+    "file": "tests/unit/document-layout.test.ts",
+    "line": 23,
+    "name": "Persian/Arabic normalization, questions, multiline and inline options keep actual numbers"
+  },
+  {
+    "file": "tests/unit/document-layout.test.ts",
+    "line": 47,
+    "name": "keys match numbers, reject duplicates, invalid and uncertain keys, and do not use array position"
+  },
+  {
+    "file": "tests/unit/document-layout.test.ts",
+    "line": 79,
+    "name": "duplicate numbers and unnumbered pages are explicit review cases"
+  },
+  {
+    "file": "tests/unit/document-layout.test.ts",
+    "line": 90,
+    "name": "damaged option numbering cannot promote an orphan option into a question anchor"
+  },
+  {
+    "file": "tests/unit/document-layout.test.ts",
+    "line": 127,
+    "name": "two-column RTL layout, continuation pages and low OCR confidence remain reviewable"
+  },
+  {
+    "file": "tests/unit/authoring.test.ts",
+    "line": 10,
+    "name": "authoring sends only bounded teacher curriculum; validates JSON and never executes model content"
+  },
+  {
+    "file": "tests/unit/ai.test.ts",
+    "line": 35,
+    "name": "Ollama maps only a validated index to teacher-approved text; no model prose is displayed"
+  },
+  {
+    "file": "tests/unit/ai.test.ts",
+    "line": 46,
+    "name": "prompt/answer leakage and invalid model responses are rejected"
+  },
+  {
+    "file": "tests/unit/ai.test.ts",
+    "line": 63,
+    "name": "provider timeout aborts transport and marks unavailable"
+  },
+  {
+    "file": "tests/unit/ai.test.ts",
+    "line": 77,
+    "name": "fallback is explicit and real/mock/unavailable states remain distinguishable"
+  },
+  {
+    "file": "tests/unit/exam-import.test.ts",
+    "line": 10,
+    "name": "PDF text is really extracted, numbered question candidates stay drafts and empty files have an honest fallback"
+  },
+  {
+    "file": "tests/unit/evaluation.test.ts",
+    "line": 27,
+    "name": "numeric: signed Persian/Arabic, decimals, scientific notation and relative/absolute tolerance"
+  },
+  {
+    "file": "tests/unit/evaluation.test.ts",
+    "line": 65,
+    "name": "symbolic: exact fractions, polynomial equivalence, explicit real assumptions"
+  },
+  {
+    "file": "tests/unit/evaluation.test.ts",
+    "line": 89,
+    "name": "unsupported domains/syntax/precision route to review, never an unjustified incorrect grade"
+  },
+  {
+    "file": "tests/unit/evaluation.test.ts",
+    "line": 117,
+    "name": "rubric-based short/essay responses remain human reviewed and preserve reference/rubric"
+  },
+  {
+    "file": "tests/unit/evaluation.test.ts",
+    "line": 135,
+    "name": "deterministic algebra property corpus: expansion and scaled linear equations"
+  },
+  {
+    "file": "tests/integration/parents.test.ts",
+    "line": 5,
+    "name": "parent invitation creates scoped read-only access; private teacher notes and other children isolated; revocation works"
+  },
+  {
+    "file": "tests/integration/courses.test.ts",
+    "line": 5,
+    "name": "course enrollments isolate teachers and students; missions preserve course provenance"
+  },
+  {
+    "file": "tests/integration/pilot.test.ts",
+    "line": 4,
+    "name": "pilot single-process authenticated rate cap is enforced without writes or private errors"
+  },
+  {
+    "file": "tests/integration/class-groups.test.ts",
+    "line": 8,
+    "name": "group task fans out only to actively enrolled class members, with isolated evidence and reports"
+  },
+  {
+    "file": "tests/integration/class-groups.test.ts",
+    "line": 122,
+    "name": "group publishing rejects inactive recipients atomically without partial assignment"
+  },
+  {
+    "file": "tests/integration/phone-invitations.test.ts",
+    "line": 17,
+    "name": "mobile invitations normalize Iran formats, bind accounts and protect tokens"
+  },
+  {
+    "file": "tests/integration/phone-invitations.test.ts",
+    "line": 121,
+    "name": "existing email student can claim a phone-bound invite without a duplicate account"
+  },
+  {
+    "file": "tests/integration/full-individual-journey.test.ts",
+    "line": 12,
+    "name": "12-step individual learning journey: five questions, recovery and parent isolation"
+  },
+  {
+    "file": "tests/integration/auth-session.test.ts",
+    "line": 6,
+    "name": "login validates credentials, creates a secure session, and logout revokes only that session"
+  },
+  {
+    "file": "tests/integration/auth-session.test.ts",
+    "line": 86,
+    "name": "missing or malformed password hashes reject login without internal errors or sessions"
+  },
+  {
+    "file": "tests/integration/auth-session.test.ts",
+    "line": 122,
+    "name": "a login verified before password reset cannot resurrect an old-password session"
+  },
+  {
+    "file": "tests/integration/auth-session.test.ts",
+    "line": 186,
+    "name": "authentication rate limit rejects excess attempts while Origin and expired sessions fail closed"
+  },
+  {
+    "file": "tests/integration/auth-session.test.ts",
+    "line": 243,
+    "name": "administrative access changes invalidate a pending login even when the original role is restored"
+  },
+  {
+    "file": "tests/integration/feedback-mode.test.ts",
+    "line": 4,
+    "name": "teacher can defer student feedback until completion, including reports/dashboard/mastery and idempotent attempts"
+  },
+  {
+    "file": "tests/integration/course-membership.test.ts",
+    "line": 5,
+    "name": "course join requests require owner approval and do not leak other students"
+  },
+  {
+    "file": "tests/integration/course-membership.test.ts",
+    "line": 92,
+    "name": "revocation freezes unfinished assignments but retains history and permits reapproval"
+  },
+  {
+    "file": "tests/integration/resource-removal.test.ts",
+    "line": 10,
+    "name": "resource removal archives owned subtree, preserves question history and supports official reimport"
+  },
+  {
+    "file": "tests/integration/question-visuals.test.ts",
+    "line": 6,
+    "name": "visual authoring survives review, immutable version, mission snapshot and student projection without private answer"
+  },
+  {
+    "file": "tests/integration/student-dashboard.test.ts",
+    "line": 5,
+    "name": "student dashboard groups lessons, counts real evaluations, and keeps legacy work separate"
+  },
+  {
+    "file": "tests/integration/email-verification.test.ts",
+    "line": 7,
+    "name": "email ownership: generic requests, encrypted delivery, one-use confirmation, session revocation, verified reset and secure change"
+  },
+  {
+    "file": "tests/integration/email-verification.test.ts",
+    "line": 131,
+    "name": "a login checked before email verification cannot recreate a revoked session"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 14,
+    "name": "attempt rollback and retry after ${boundary}"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 68,
+    "name": "hint rollback and retry after ${boundary}"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 112,
+    "name": "lost response after commit survives app restart and replays the same evidence"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 152,
+    "name": "concurrent identical requests consume one quota; changed payload conflicts"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 215,
+    "name": "distinct concurrent submissions respect the attempt limit without orphan evaluations"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 244,
+    "name": "completion serializes with an uncommitted attempt; terminal states reject writes"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 328,
+    "name": "review rollback preserves pending state; retries have a single audit/history entry"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 378,
+    "name": "cancellation is terminal, repeated cancellation is safe, cancelled missions cannot publish"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 421,
+    "name": "publication/invitation rollback after ${boundary}"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 493,
+    "name": "completion failure is rolled back; a repeated review racing completion stays consistent"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 551,
+    "name": "client expected counters prevent stale intents while replay returns the acknowledged result"
+  },
+  {
+    "file": "tests/integration/integrity.test.ts",
+    "line": 597,
+    "name": "symbolic and rubric answers use versioned policy and uncertain work reaches teacher review"
+  },
+  {
+    "file": "tests/integration/question-source.test.ts",
+    "line": 5,
+    "name": "source categories persist in immutable question versions and are private; invalid combinations rejected"
+  },
+  {
+    "file": "tests/integration/learning.test.ts",
+    "line": 4,
+    "name": "persistent evidence/notebook/mastery and teacher override use only authorized canonical work"
+  },
+  {
+    "file": "tests/integration/learning.test.ts",
+    "line": 171,
+    "name": "concurrent missions sharing a skill retain all evidence and a consistent mastery projection"
+  },
+  {
+    "file": "tests/integration/ai-settings.test.ts",
+    "line": 5,
+    "name": "teacher model persists privately and selects the actual AvalAI request; drafts still require approval"
+  },
+  {
+    "file": "tests/integration/ai-settings.test.ts",
+    "line": 146,
+    "name": "a model can be selected without a server key but generation stays unavailable"
+  },
+  {
+    "file": "tests/integration/question-revisions.test.ts",
+    "line": 6,
+    "name": "question revisions preserve assigned versions, latest bank, ownership and idempotency"
+  },
+  {
+    "file": "tests/integration/question-revisions.test.ts",
+    "line": 82,
+    "name": "image crop metadata is bounded and cannot escape original image"
+  },
+  {
+    "file": "tests/integration/tutor.test.ts",
+    "line": 5,
+    "name": "tutor sends only active relationship context, selects according to submitted work and records provenance"
+  },
+  {
+    "file": "tests/integration/tutor.test.ts",
+    "line": 84,
+    "name": "levels zero/independent/full-solution permissions are enforced outside the model"
+  },
+  {
+    "file": "tests/integration/tutor.test.ts",
+    "line": 131,
+    "name": "unapproved provider text never consumes quota or loses submitted work"
+  },
+  {
+    "file": "tests/integration/tutor.test.ts",
+    "line": 176,
+    "name": "orchestrator timeout keeps quota and previous attempts intact"
+  },
+  {
+    "file": "tests/integration/curriculum-catalog.test.ts",
+    "line": 8,
+    "name": "catalog import is transactional, repeat/concurrent safe, preserves custom content and private per teacher"
+  },
+  {
+    "file": "tests/integration/remediation.test.ts",
+    "line": 7,
+    "name": "teacher can publish one individual remediation from verified incorrect latest answer, idempotently"
+  },
+  {
+    "file": "tests/integration/remediation.test.ts",
+    "line": 80,
+    "name": "remediation is course-scoped and requires active enrollment, including on publication"
+  },
+  {
+    "file": "tests/integration/report-details.test.ts",
+    "line": 4,
+    "name": "report includes ordered questions, actual answers and keys after submission, including deliberately unanswered questions"
+  },
+  {
+    "file": "tests/integration/report-details.test.ts",
+    "line": 112,
+    "name": "explicitly submitting entirely unanswered work produces yellow-ready question rows without fake attempts"
+  },
+  {
+    "file": "tests/integration/document-pipeline.test.ts",
+    "line": 8,
+    "name": "durable local PDF jobs match actual key numbers, preserve images on publish and delete source safely"
+  },
+  {
+    "file": "tests/integration/document-pipeline.test.ts",
+    "line": 152,
+    "name": "scanned and mixed Persian PDFs really run OCR; formulas and image keys remain human-reviewed"
+  },
+  {
+    "file": "tests/integration/mail-outbox.test.ts",
+    "line": 10,
+    "name": "encrypted durable mail survives retry and lease recovery; stale tokens and concurrent consumers are safe"
+  },
+  {
+    "file": "tests/integration/phone-otp.test.ts",
+    "line": 7,
+    "name": "phone OTP: verified signup/login, single use, cooldown, five wrong guesses, expiration and role boundaries"
+  },
+  {
+    "file": "tests/integration/phone-otp.test.ts",
+    "line": 120,
+    "name": "OTP has no fake production success when SMS is absent or fails"
+  },
+  {
+    "file": "tests/integration/phone-otp.test.ts",
+    "line": 161,
+    "name": "Melipayamak adapter sends approved pattern over HTTPS and validates acceptance (controlled HTTP)"
+  },
+  {
+    "file": "tests/integration/phone-otp.test.ts",
+    "line": 204,
+    "name": "OTP invitation binds the verified phone to parent scope; disabled accounts stay denied"
+  },
+  {
+    "file": "tests/integration/phone-otp.test.ts",
+    "line": 274,
+    "name": "OTP challenge and throttle collections have TTL cleanup indexes"
+  },
+  {
+    "file": "tests/integration/student-signup.test.ts",
+    "line": 6,
+    "name": "independent student signs up without teacher, then claims email-bound invitations using the same account"
+  },
+  {
+    "file": "tests/integration/reviewed-samples.test.ts",
+    "line": 11,
+    "name": "reviewed source import is additive, atomic, private, dry by default and repeat safe"
+  },
+  {
+    "file": "tests/integration/reviewed-samples.test.ts",
+    "line": 128,
+    "name": "source publication and exam dates remain distinct and validated"
+  },
+  {
+    "file": "tests/integration/question-bank.test.ts",
+    "line": 4,
+    "name": "question bank stores optional year/difficulty and free questions, validates metadata and isolates teacher data"
+  },
+  {
+    "file": "tests/integration/password-reset.test.ts",
+    "line": 13,
+    "name": "password reset: no enumeration, one-time token, expiration and revoke all sessions"
+  },
+  {
+    "file": "tests/integration/password-reset.test.ts",
+    "line": 166,
+    "name": "password reset replies before slow SMTP completes, for an existing or missing account"
+  },
+  {
+    "file": "tests/integration/password-reset.test.ts",
+    "line": 248,
+    "name": "failed password reset delivery is durably retried without exposing the account"
+  },
+  {
+    "file": "tests/integration/question-assets.test.ts",
+    "line": 6,
+    "name": "original question images stay private, assigned students may see images but not answer documents"
+  },
+  {
+    "file": "tests/integration/authoring.test.ts",
+    "line": 22,
+    "name": "generated questions stay private drafts until edited teacher approval; replay/reject/isolation"
+  },
+  {
+    "file": "tests/integration/authoring.test.ts",
+    "line": 146,
+    "name": "unavailable generator cannot add questions; invalid numeric reference requires teacher correction"
+  },
+  {
+    "file": "tests/integration/authoring.test.ts",
+    "line": 206,
+    "name": "question version/draft approval rollback together at the final write boundary"
+  },
+  {
+    "file": "tests/integration/difficulty.test.ts",
+    "line": 5,
+    "name": "difficulty metadata, bulk edits and exact 20-question selection are persisted and scoped"
+  },
+  {
+    "file": "tests/integration/mission-collection.test.ts",
+    "line": 6,
+    "name": "a complete collection above the old 30-question cap is saved and assigned intact"
+  },
+  {
+    "file": "tests/integration/exam-import.test.ts",
+    "line": 8,
+    "name": "exam PDF upload/download/extraction/save/review is durable, private, atomic and idempotent"
+  },
+  {
+    "file": "tests/integration/exam-import.test.ts",
+    "line": 191,
+    "name": "textless PDF stays review-only, manual fallback works and ordinary JSON request limits stay unchanged"
+  },
+  {
+    "file": "tests/integration/api.test.ts",
+    "line": 7,
+    "name": "real MongoDB: teacher → invitation → mission → practice → reports and isolation"
+  },
+  {
+    "file": "tests/integration/mission-selection.test.ts",
+    "line": 6,
+    "name": "mixed difficulty quotas select exact unique owned current versions and reject invalid or insufficient plans"
+  },
+  {
+    "file": "tests/integration/avalai-hints.test.ts",
+    "line": 5,
+    "name": "AvvalAI hints use the teacher model, record usage and never charge quota on provider failure"
+  },
+  {
+    "file": "tests/integration/access-control.test.ts",
+    "line": 6,
+    "name": "five roles have distinct server permissions, delegated staff scope, revocation and no public escalation"
+  },
+  {
+    "file": "tests/integration/access-control.test.ts",
+    "line": 239,
+    "name": "parent access is tied to verified child links and stays read-only"
+  },
+  {
+    "file": "tests/integration/image-import.test.ts",
+    "line": 6,
+    "name": "raster exam upload normalizes to private PDF and rejects corrupt images and unauthorized users"
+  },
+  {
+    "file": "tests/e2e/navigation-layout.spec.ts",
+    "line": 3,
+    "name": "each navigation section resolves to a standalone URL on direct load"
+  },
+  {
+    "file": "tests/e2e/navigation-layout.spec.ts",
+    "line": 28,
+    "name": "logged-in teacher navigation supports deep links, refresh, Back and Forward; header fits content"
+  },
+  {
+    "file": "tests/e2e/navigation-layout.spec.ts",
+    "line": 110,
+    "name": "all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime errors"
+  },
+  {
+    "file": "tests/e2e/uat-golden.spec.ts",
+    "line": 35,
+    "name": "UAT GOLD cohort ${cohort}: actual UI five questions, independent/helped results, remediation, parent and isolation"
+  },
+  {
+    "file": "tests/e2e/design-system.spec.ts",
+    "line": 3,
+    "name": "reference-inspired luminous glass identity is consistent on login and mobile"
+  },
+  {
+    "file": "tests/e2e/access-roles.spec.ts",
+    "line": 6,
+    "name": "super admin creates scoped secretary and secretary uses a separate operational panel"
+  },
+  {
+    "file": "tests/e2e/access-roles.spec.ts",
+    "line": 160,
+    "name": "parent portal has a valid child selector without hydration errors and revocation removes data"
+  },
+  {
+    "file": "tests/e2e/email-verification.spec.ts",
+    "line": 7,
+    "name": "email verification UI confirms ownership once, strips token and supports mobile RTL (SMTP transport controlled)"
+  },
+  {
+    "file": "tests/e2e/question-source.spec.ts",
+    "line": 2,
+    "name": "exam taxonomy is visible in bank and saved from authoring with category-specific filters"
+  },
+  {
+    "file": "tests/e2e/question-visuals.spec.ts",
+    "line": 3,
+    "name": "teacher edits chart, diagram and formula; approved visual question persists and student sees the same media"
+  },
+  {
+    "file": "tests/e2e/mission-pagination.spec.ts",
+    "line": 2,
+    "name": "question collection filters, pages, modal and bulk add preserve all selected questions"
+  },
+  {
+    "file": "tests/e2e/curriculum-catalog.spec.ts",
+    "line": 3,
+    "name": "secondary catalog filter → import → preserved after reload → author a real question"
+  },
+  {
+    "file": "tests/e2e/question-edit.spec.ts",
+    "line": 5,
+    "name": "teacher edits question, choices, difficulty and persistent image crop"
+  },
+  {
+    "file": "tests/e2e/ai-settings.spec.ts",
+    "line": 6,
+    "name": "teacher selects an AvalAI model with controlled external catalog transport, persists it and sees it in authoring"
+  },
+  {
+    "file": "tests/e2e/mission-file-import.spec.ts",
+    "line": 4,
+    "name": "mission keeps its draft while image OCR is reviewed and approved questions are added"
+  },
+  {
+    "file": "tests/e2e/phone-otp.spec.ts",
+    "line": 8,
+    "name": "public phone OTP signup verifies mobile and enters real student dashboard (SMS controlled)"
+  },
+  {
+    "file": "tests/e2e/practice-selection.spec.ts",
+    "line": 9,
+    "name": "answers save on navigation and finish with ${scenario} feedback"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 4,
+    "name": "UI: teacher creates content and invite; student solves; both see evidence"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 267,
+    "name": "PWA shell works offline without caching private API data"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 294,
+    "name": "Next Node.js API preserves private response and payload limits"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 313,
+    "name": "licensed local fonts load and layout uses Tailwind utilities"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 338,
+    "name": "real AI question draft → teacher edit/approve or reject; parent read-only portal"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 498,
+    "name": "public login uses bright frosted-glass surfaces"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 520,
+    "name": "student registers without invitation and later joins teacher with existing account"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 642,
+    "name": "student requests a course, teacher approves, and leaving keeps history"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 730,
+    "name": "teacher publishes one group assignment to two students and sees separate reports"
+  },
+  {
+    "file": "tests/e2e/flow.spec.ts",
+    "line": 862,
+    "name": "teacher assigns one corrective practice from a student"
+  },
+  {
+    "file": "tests/e2e/question-bank.spec.ts",
+    "line": 3,
+    "name": "bank-focused page separates resources and authoring; metadata and dependent filters persist"
+  },
+  {
+    "file": "tests/e2e/password-reset.spec.ts",
+    "line": 5,
+    "name": "password recovery UI uses one-time token and invalidates every old session (SMTP dependency controlled)"
+  },
+  {
+    "file": "tests/e2e/exam-import.spec.ts",
+    "line": 3,
+    "name": "PDF exam upload persists, extracts real text, saves corrections and approves/rejects into the actual bank"
+  },
+  {
+    "file": "tests/e2e/difficulty.spec.ts",
+    "line": 4,
+    "name": "teacher selects 20 hard questions and edits filtered difficulty"
+  }
+]

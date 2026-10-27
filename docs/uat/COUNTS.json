@@ -1,0 +1,16 @@
+{
+  "businessCases": 430,
+  "setupCases": 14,
+  "product": {
+    "PASS": 392,
+    "BLOCKED": 7,
+    "NOT_RUN": 20,
+    "NOT_IMPLEMENTED": 3,
+    "MANUAL_REQUIRED": 7,
+    "FAIL": 1
+  },
+  "setup": {
+    "PASS": 12,
+    "BLOCKED": 2
+  }
+}

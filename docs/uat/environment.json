@@ -1,0 +1,8 @@
+{
+  "workspace": "/private/tmp/hodhodeh-uat-y2ny62dl",
+  "database": "hodhodeh_audit_uat_1027_f962b582",
+  "port": 5176,
+  "provider": "mock-approved-hints",
+  "realSms": false,
+  "realSmtp": false
+}

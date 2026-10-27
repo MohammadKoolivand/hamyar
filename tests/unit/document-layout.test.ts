@@ -125,13 +125,80 @@ test("damaged option numbering cannot promote an orphan option into a question a
 });
 
 test("two-column RTL layout, continuation pages and low OCR confidence remain reviewable", () => {
-  const right = lines(["سؤال ۱۲. پرسش راست", "1) a 2) b 3) c 4) d", "سؤال ۱۹. پرسش دوم راست", "1) a 2) b 3) c 4) d"]).map((l) => ({ ...l, x: 335, width: 220 }));
-  const left = lines(["سؤال ۲۰. پرسش چپ", "1) a 2) b 3) c 4) d", "سؤال ۳۱. پرسش دوم چپ", "1) a 2) b 3) c 4) d"]).map((l) => ({ ...l, x: 25, width: 220, method: "ocr" as const, confidence: 45 }));
+  const right = lines([
+    "سؤال ۱۲. پرسش راست",
+    "1) a 2) b 3) c 4) d",
+    "سؤال ۱۹. پرسش دوم راست",
+    "1) a 2) b 3) c 4) d",
+  ]).map((l) => ({ ...l, x: 335, width: 220 }));
+  const left = lines([
+    "سؤال ۲۰. پرسش چپ",
+    "1) a 2) b 3) c 4) d",
+    "سؤال ۳۱. پرسش دوم چپ",
+    "1) a 2) b 3) c 4) d",
+  ]).map((l) => ({
+    ...l,
+    x: 25,
+    width: 220,
+    method: "ocr" as const,
+    confidence: 45,
+  }));
   const parsed = parseQuestions([...right, ...left], sizes);
-  assert.deepEqual(parsed.map((q) => q.number), [12,19,20,31]);
+  assert.deepEqual(
+    parsed.map((q) => q.number),
+    [12, 19, 20, 31],
+  );
   assert.ok(parsed.every((q) => q.options.length === 4));
   assert.ok(parsed[2].warnings.some((w) => w.includes("۸۰")));
-  const continued = parseQuestions([...lines(["سؤال ۷. آغاز پرسش"]), ...lines(["ادامه در صفحه دیگر", "1) a 2) b 3) c 4) d"]).map((l) => ({ ...l, page: 2 }))], { ...sizes, 2: sizes[1] });
+  const continued = parseQuestions(
+    [
+      ...lines(["سؤال ۷. آغاز پرسش"]),
+      ...lines(["ادامه در صفحه دیگر", "1) a 2) b 3) c 4) d"]).map((l) => ({
+        ...l,
+        page: 2,
+      })),
+    ],
+    { ...sizes, 2: sizes[1] },
+  );
   assert.equal(continued[0].regions.length, 2);
   assert.ok(continued[0].warnings.some((w) => w.includes("چندصفحه")));
+});
+
+test("aligned sequential text headings remain separate after incomplete options; option-like dash lines stay conservative", () => {
+  const row = (text: string, y: number, x = 150, width = 800): TextLine => ({
+    text,
+    page: 1,
+    x,
+    y,
+    width,
+    height: 16,
+    method: "text",
+    confidence: null,
+  });
+  const source = [
+    row("۲- متن پرسش دوم", 20),
+    row("1) گزینه نخست", 50, 400, 500),
+    row("۳- متن پرسش بعدی", 100, 200, 750),
+    row("1) گزینه نخست", 130, 400, 500),
+    row("۴- متن پرسش پایانی", 180),
+    row("1) گزینه نخست", 210, 400, 500),
+  ];
+  assert.deepEqual(
+    parseQuestions(source, { 1: { width: 1000, height: 1400 } }).map(
+      (q) => q.number,
+    ),
+    [2, 3, 4],
+  );
+  const ambiguous = [
+    row("۲- متن پرسش دوم", 20),
+    row("1) گزینه نخست", 50, 400, 500),
+    row("3- ادامه مبهم گزینه", 90, 400, 500),
+    row("Question 9. Next genuine question", 140),
+  ];
+  assert.deepEqual(
+    parseQuestions(ambiguous, { 1: { width: 1000, height: 1400 } }).map(
+      (q) => q.number,
+    ),
+    [2, 9],
+  );
 });

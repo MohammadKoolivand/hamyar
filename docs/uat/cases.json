@@ -1,0 +1,3554 @@
+[
+  {
+    "id": "T-001",
+    "description": "محیط تست محلی یا staging را مشخص کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-002",
+    "description": "نسخه و SHA دقیق کد اجراشده را ثبت کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-003",
+    "description": "سازگاری تنظیمات محیط با نسخه کد را بررسی کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-004",
+    "description": "اتصال MongoDB Replica Set را تأیید کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-005",
+    "description": "دیتابیس تست را کاملاً از داده واقعی جدا کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-006",
+    "description": "Startup برنامه را آزمایش کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-007",
+    "description": "HTTPS را در محیط مناسب بررسی کن.",
+    "priority": "P1",
+    "status": "BLOCKED",
+    "evidence": "environment.json",
+    "reason": "محیط HTTP loopback؛ credential واقعی SMS/SMTP وجود ندارد"
+  },
+  {
+    "id": "T-008",
+    "description": "Worker پردازش PDF/OCR را بررسی کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-009",
+    "description": "AI Provider فعال را بررسی کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-010",
+    "description": "SMS و SMTP را از نظر پیکربندی و آمادگی بررسی کن.",
+    "priority": "P1",
+    "status": "BLOCKED",
+    "evidence": "environment.json",
+    "reason": "محیط HTTP loopback؛ credential واقعی SMS/SMTP وجود ندارد"
+  },
+  {
+    "id": "T-011",
+    "description": "Health Check و اتصال دیتابیس را تست کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-012",
+    "description": "نسخه مرورگر، سیستم‌عامل و محیط تست را ثبت کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-013",
+    "description": "لاگ‌های شروع و اجرای برنامه را بررسی کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "SOURCE_MANIFEST.json; evidence/environment.json; evidence/build.log; evidence/health.json",
+    "reason": "محیط مستقل 5176 و DB تصادفی روی replica set"
+  },
+  {
+    "id": "T-014",
+    "description": "قبل از تست مخرب، امکان Backup داده آزمایشی را تأیید کن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "evidence/backup.log",
+    "reason": "بکاپ واقعی با بازیابی در DB تازه؛ هیچ داده واقعی هدف نبود"
+  },
+  {
+    "id": "AUTH-001",
+    "description": "ثبت‌نام معلم با شماره جدید و نقش صحیح.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-002",
+    "description": "ورود موفق با OTP معتبر.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-003",
+    "description": "رد OTP اشتباه.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-004",
+    "description": "رد OTP منقضی‌شده.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-005",
+    "description": "رد استفاده مجدد OTP مصرف‌شده.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-006",
+    "description": "محدودیت ارسال مجدد زودهنگام.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-007",
+    "description": "محدودیت پس از پنج حدس نادرست.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-008",
+    "description": "نرمال‌سازی شماره با ارقام فارسی، انگلیسی و +98.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-009",
+    "description": "ورود مجدد بدون ساخت حساب تکراری.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-010",
+    "description": "حفظ نشست مجاز پس از Refresh.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/phone-otp.spec.ts; flow.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-011",
+    "description": "بررسی رفتار نشست پس از بستن و بازکردن مرورگر.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-probes.spec.ts; evidence/probes.log",
+    "reason": "Chrome واقعی با پروفایل موقت بسته و دوباره اجرا شد؛ نشست بدون ساخت دوباره حساب حفظ شد"
+  },
+  {
+    "id": "AUTH-012",
+    "description": "Logout و جلوگیری از دسترسی خصوصی پس از آن.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-013",
+    "description": "ثبت‌نام مستقل دانش‌آموز بدون دعوت.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-014",
+    "description": "نمایش صحیح وضعیت خالی داشبورد دانش‌آموز تازه‌وارد.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/phone-otp.spec.ts; flow.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-015",
+    "description": "جلوگیری از انتخاب نقش مدیر یا منشی در ثبت‌نام عمومی.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-016",
+    "description": "جلوگیری از ورود حساب غیرفعال.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-017",
+    "description": "جلوگیری از دسترسی مستقیم به Route خصوصی بدون نشست.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/phone-otp.spec.ts; flow.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-018",
+    "description": "جلوگیری از ایجاد نشست تکراری با تأیید هم‌زمان OTP.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-019",
+    "description": "ورود حساب قدیمی با روش رمز عبور سازگار.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-020",
+    "description": "ابطال نشست‌های لازم پس از بازیابی یا تغییر رمز.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-021",
+    "description": "تأیید ایمیل با لینک معتبر.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-022",
+    "description": "رد لینک تأیید منقضی یا مصرف‌شده.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-023",
+    "description": "جلوگیری از افشای وجود حساب در بازیابی رمز.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-024",
+    "description": "یک‌بارمصرف‌بودن توکن بازیابی.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-025",
+    "description": "ابطال نشست‌های قبلی پس از بازیابی رمز.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-026",
+    "description": "جلوگیری از تغییر ایمیل بدون اثبات مالکیت.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/phone-otp.test.ts; auth-session.test.ts; email-verification.test.ts; password-reset.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AUTH-027",
+    "description": "بررسی تحویل واقعی ایمیل در صورت وجود محیط و مجوز معتبر؛ در غیر این صورت BLOCKED.",
+    "priority": "P0",
+    "status": "BLOCKED",
+    "evidence": "docs/PHONE_OTP.md; .env.example",
+    "reason": "SMTP واقعی/گیرنده مجاز تنظیم نشده؛ ارسال انجام نشد"
+  },
+  {
+    "id": "LINK-001",
+    "description": "ایجاد درس توسط Teacher A.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-002",
+    "description": "ساخت دعوت برای Student A.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-003",
+    "description": "انتساب دعوت به درس صحیح.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-004",
+    "description": "بازشدن لینک دعوت در حساب دانش‌آموز.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "LINK-005",
+    "description": "پذیرش دعوت با حساب معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-006",
+    "description": "نمایش درس پس از پذیرش.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-007",
+    "description": "نمایش دانش‌آموز در پنل معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-008",
+    "description": "جلوگیری از عضویت تکراری.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-009",
+    "description": "رد دعوت منقضی یا نامعتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-010",
+    "description": "رد دعوت محدود به شماره دیگر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-011",
+    "description": "صدور کد درخواست عضویت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-012",
+    "description": "ثبت درخواست توسط دانش‌آموز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-013",
+    "description": "عدم فعال‌شدن عضویت قبل از تأیید معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-014",
+    "description": "نمایش درخواست در صف معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-015",
+    "description": "تأیید درخواست و فعال‌شدن عضویت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-016",
+    "description": "رد درخواست و عدم ایجاد عضویت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-017",
+    "description": "باطل‌شدن کد قبلی پس از صدور مجدد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-018",
+    "description": "اتصال دانش‌آموز به معلم دوم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-019",
+    "description": "نمایش درس‌ها و معلم‌های مجاز در یک حساب.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-020",
+    "description": "جداسازی اطلاعات دو معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-021",
+    "description": "خروج از یک درس بدون تأثیر روی درس دیگر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-022",
+    "description": "لغو تکالیف ناتمام پس از پایان عضویت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-023",
+    "description": "حفظ سوابق تاریخی مجاز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LINK-024",
+    "description": "الزام درخواست معتبر تازه برای عضویت مجدد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/course-membership.test.ts; courses.test.ts; phone-invitations.test.ts; student-signup.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-001",
+    "description": "نمایش داشبورد متناسب با نقش معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-002",
+    "description": "وضعیت خالی بدون خطا و داده ساختگی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-003",
+    "description": "شمارش صحیح دانش‌آموزان.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "TEACH-004",
+    "description": "به‌روزرسانی آمار پس از انتشار تکلیف.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "TEACH-005",
+    "description": "به‌روزرسانی آمار پس از پاسخ و بررسی.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "TEACH-006",
+    "description": "عملکرد صحیح میانبرهای داشبورد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-007",
+    "description": "ایجاد درس ریاضی دهم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-008",
+    "description": "ایجاد مستقل فیزیک دوازدهم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-009",
+    "description": "اعتبارسنجی اطلاعات ناقص درس.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/curriculum-catalog.test.ts; resource-removal.test.ts; question-bank.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-010",
+    "description": "نمایش ساختار پایه، درس، فصل، مبحث و مهارت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-011",
+    "description": "ایجاد مبحث با والد صحیح.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/curriculum-catalog.test.ts; resource-removal.test.ts; question-bank.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-012",
+    "description": "ایجاد مهارت مرتبط.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/curriculum-catalog.test.ts; resource-removal.test.ts; question-bank.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-013",
+    "description": "رد Parent ID نامعتبر یا متعلق به معلم دیگر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/curriculum-catalog.test.ts; resource-removal.test.ts; question-bank.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-014",
+    "description": "فیلتر مرحله‌ای پایه، رشته، درس و فصل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-015",
+    "description": "پاک‌شدن انتخاب نامعتبر پس از تغییر پایه.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-016",
+    "description": "عدم نمایش ساختار نامرتبط.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-017",
+    "description": "افزودن مباحث آماده ریاضی و فیزیک.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/curriculum-catalog.test.ts; resource-removal.test.ts; question-bank.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-018",
+    "description": "جلوگیری از تکرار مباحث هنگام افزودن مجدد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/curriculum-catalog.test.ts; resource-removal.test.ts; question-bank.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-019",
+    "description": "حذف/بایگانی منبع آموزشی از فهرست فعال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/curriculum-catalog.test.ts; resource-removal.test.ts; question-bank.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-020",
+    "description": "حفظ سؤال و تکلیف قبلی پس از حذف منبع.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/curriculum-catalog.test.ts; resource-removal.test.ts; question-bank.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-021",
+    "description": "بازیابی ساختار بایگانی‌شده پس از افزودن مجدد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/curriculum-catalog.test.ts; resource-removal.test.ts; question-bank.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "TEACH-022",
+    "description": "ماندگاری ساختارها پس از Refresh.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; curriculum-catalog.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-001",
+    "description": "ساخت سؤال چهارگزینه‌ای و تعیین جواب صحیح.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-002",
+    "description": "ساخت سؤال عددی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-003",
+    "description": "ساخت سؤال با عبارت ریاضی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-004",
+    "description": "ساخت سؤال تشریحی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-005",
+    "description": "اتصال سؤال به درس، مبحث و مهارت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-006",
+    "description": "تعیین سختی سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-007",
+    "description": "ثبت منبع سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-008",
+    "description": "ذخیره پاسخ مرجع خصوصی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-009",
+    "description": "تعریف راهنمایی‌های مجاز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-010",
+    "description": "پیش‌نمایش صحیح سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-bank.spec.ts; mission-pagination.spec.ts; question-source.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-011",
+    "description": "ماندگاری پس از Refresh.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-bank.spec.ts; mission-pagination.spec.ts; question-source.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-012",
+    "description": "جلوگیری از تأیید سؤال فاقد پاسخ مرجع ضروری.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-013",
+    "description": "اعتبارسنجی سؤال ناقص بدون ازدست‌رفتن بی‌دلیل داده فرم.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "QB-014",
+    "description": "نمایش فرمول LaTeX.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-015",
+    "description": "نمایش فرمول در گزینه‌ها.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-probes.spec.ts; evidence/probes.log",
+    "reason": "MathML واقعی گزینه‌ها، انتخاب با کیبورد و تصحیح روی backend واقعی"
+  },
+  {
+    "id": "QB-016",
+    "description": "تولید و نمایش نمودار خطی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-017",
+    "description": "تولید و نمایش شکل هندسی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-018",
+    "description": "برابری نمایش سؤال در پنل معلم و دانش‌آموز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-visuals.spec.ts; evidence/e2e-existing.log",
+    "reason": "همان chart/diagram/image معلم و دانش‌آموز از نسخه محفوظ سؤال خوانده شد"
+  },
+  {
+    "id": "QB-019",
+    "description": "حفظ تصاویر واردشده از PDF.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-020",
+    "description": "مدیریت فرمول نامعتبر بدون Crash.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-021",
+    "description": "صحت RTL/LTR در متن و فرمول.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-022",
+    "description": "ایجاد نسخه جدید هنگام ویرایش سؤال تأییدشده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-023",
+    "description": "ثبت و نمایش شناسه نسخه.",
+    "priority": "P1",
+    "status": "NOT_IMPLEMENTED",
+    "evidence": "src/features/content/question-editor.tsx",
+    "reason": "شناسه نسخه در API و DB هست؛ نمایش اختصاصی شناسه در UI موجود نیست"
+  },
+  {
+    "id": "QB-024",
+    "description": "حفظ نسخه سؤال مورد استفاده در تکلیف قدیمی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-025",
+    "description": "جداسازی پیش‌نویس و سؤال تأییدشده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-026",
+    "description": "جلوگیری از انتخاب سؤال تأییدنشده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-027",
+    "description": "جلوگیری از دسترسی معلم دیگر به بانک خصوصی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/question-visuals.test.ts; question-assets.test.ts; question-revisions.test.ts; authoring.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-028",
+    "description": "جست‌وجوی متنی سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-bank.spec.ts; mission-pagination.spec.ts; question-source.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-029",
+    "description": "فیلتر پایه و درس.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-bank.spec.ts; mission-pagination.spec.ts; question-source.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-030",
+    "description": "فیلتر مبحث و مهارت.",
+    "priority": "P1",
+    "status": "NOT_IMPLEMENTED",
+    "evidence": "src/features/content/question-bank.tsx",
+    "reason": "فیلتر مبحث هست؛ فیلتر مستقل مهارت در بانک موجود نیست؛ فقط دارای راهنما/مهارت"
+  },
+  {
+    "id": "QB-031",
+    "description": "فیلتر منبع آزمون.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-bank.spec.ts; mission-pagination.spec.ts; question-source.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-032",
+    "description": "فیلتر هم‌زمان چند دسته، نوع و منبع.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-bank.spec.ts; mission-pagination.spec.ts; question-source.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-033",
+    "description": "صحت Pagination و ترتیب نتایج.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-bank.spec.ts; mission-pagination.spec.ts; question-source.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-034",
+    "description": "حفظ انتخاب سؤال بین صفحات.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-bank.spec.ts; mission-pagination.spec.ts; question-source.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "QB-035",
+    "description": "جلوگیری از تغییر ناخواسته انتخاب‌ها هنگام تغییر فیلتر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/question-bank.spec.ts; mission-pagination.spec.ts; question-source.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "AI-001",
+    "description": "بررسی تنظیم Provider و مدل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/ai-settings.test.ts; authoring.test.ts; tutor.test.ts; avalai-hints.test.ts; evidence/backend.log",
+    "reason": "قرارداد و transport کنترل‌شده؛ PASS به معنی inference واقعی AvvalAI نیست"
+  },
+  {
+    "id": "AI-002",
+    "description": "ماندگاری مدل انتخابی معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/ai-settings.test.ts; authoring.test.ts; tutor.test.ts; avalai-hints.test.ts; evidence/backend.log",
+    "reason": "قرارداد و transport کنترل‌شده؛ PASS به معنی inference واقعی AvvalAI نیست"
+  },
+  {
+    "id": "AI-003",
+    "description": "انتخاب مرحله‌ای پایه، درس، فصل و مبحث.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/ai-settings.spec.ts; tests/integration/authoring.test.ts; evidence/e2e-existing.log",
+    "reason": "تنظیم/انتخاب کنترل‌شده، نه تضمین خروجی علمی مدل واقعی"
+  },
+  {
+    "id": "AI-004",
+    "description": "تنظیم نوع و دشواری سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/ai-settings.spec.ts; tests/integration/authoring.test.ts; evidence/e2e-existing.log",
+    "reason": "تنظیم/انتخاب کنترل‌شده، نه تضمین خروجی علمی مدل واقعی"
+  },
+  {
+    "id": "AI-005",
+    "description": "تولید پیش‌نویس سؤال با Provider واقعی در صورت امکان.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "local-ai-probe.ts; evidence/authoring.json",
+    "reason": "سه تولید واقعی محلی Ollama: ۳/۳ قرارداد معتبر، صفر انتشار؛ این نتیجه AvvalAI پولی یا صحت علمی عمومی را اثبات نمی‌کند"
+  },
+  {
+    "id": "AI-006",
+    "description": "اعتبار علمی صورت سؤال.",
+    "priority": "P1",
+    "status": "MANUAL_REQUIRED",
+    "evidence": "evidence/ollama.log",
+    "reason": "صحت علمی، تناسب سنی و عدم افشای معنایی نیازمند مرجع مستقل و داوری انسانی است"
+  },
+  {
+    "id": "AI-007",
+    "description": "صحت پاسخ مرجع پیشنهادی.",
+    "priority": "P1",
+    "status": "MANUAL_REQUIRED",
+    "evidence": "evidence/ollama.log",
+    "reason": "صحت علمی، تناسب سنی و عدم افشای معنایی نیازمند مرجع مستقل و داوری انسانی است"
+  },
+  {
+    "id": "AI-008",
+    "description": "کیفیت و عدم افشای زودهنگام پاسخ در راهنمایی.",
+    "priority": "P2",
+    "status": "FAIL",
+    "evidence": "evidence/authoring.json; UAT_BUG_REPORT.md",
+    "reason": "UAT-AI-001: در سه پیش‌نویس واقعی Ollama متن راهنما پاسخ ۷ را آشکار کرد؛ هیچ‌کدام منتشر نشد؛ بررسی اجباری معلم مانع انتشار خودکار است"
+  },
+  {
+    "id": "AI-009",
+    "description": "ذخیره خروجی به‌صورت پیش‌نویس.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/ai-settings.test.ts; authoring.test.ts; tutor.test.ts; avalai-hints.test.ts; evidence/backend.log",
+    "reason": "قرارداد و transport کنترل‌شده؛ PASS به معنی inference واقعی AvvalAI نیست"
+  },
+  {
+    "id": "AI-010",
+    "description": "ویرایش پیش‌نویس توسط معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/ai-settings.test.ts; authoring.test.ts; tutor.test.ts; avalai-hints.test.ts; evidence/backend.log",
+    "reason": "قرارداد و transport کنترل‌شده؛ PASS به معنی inference واقعی AvvalAI نیست"
+  },
+  {
+    "id": "AI-011",
+    "description": "رد پیش‌نویس بدون ورود به بانک معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/ai-settings.test.ts; authoring.test.ts; tutor.test.ts; avalai-hints.test.ts; evidence/backend.log",
+    "reason": "قرارداد و transport کنترل‌شده؛ PASS به معنی inference واقعی AvvalAI نیست"
+  },
+  {
+    "id": "AI-012",
+    "description": "تأیید انسانی و ورود به بانک.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/ai-settings.test.ts; authoring.test.ts; tutor.test.ts; avalai-hints.test.ts; evidence/backend.log",
+    "reason": "قرارداد و transport کنترل‌شده؛ PASS به معنی inference واقعی AvvalAI نیست"
+  },
+  {
+    "id": "AI-013",
+    "description": "مدیریت قطعی سرویس AI.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/ai-settings.test.ts; authoring.test.ts; tutor.test.ts; avalai-hints.test.ts; evidence/backend.log",
+    "reason": "قرارداد و transport کنترل‌شده؛ PASS به معنی inference واقعی AvvalAI نیست"
+  },
+  {
+    "id": "AI-014",
+    "description": "رد خروجی ناقص یا ساختار نامعتبر مدل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/ai-settings.test.ts; authoring.test.ts; tutor.test.ts; avalai-hints.test.ts; evidence/backend.log",
+    "reason": "قرارداد و transport کنترل‌شده؛ PASS به معنی inference واقعی AvvalAI نیست"
+  },
+  {
+    "id": "AI-015",
+    "description": "تشخیص خروجی واقعی از Mock.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/ai-settings.test.ts; authoring.test.ts; tutor.test.ts; avalai-hints.test.ts; evidence/backend.log",
+    "reason": "قرارداد و transport کنترل‌شده؛ PASS به معنی inference واقعی AvvalAI نیست"
+  },
+  {
+    "id": "AI-016",
+    "description": "بررسی تکرارپذیری چند درخواست تولید متوالی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "local-ai-probe.ts; evidence/authoring.json",
+    "reason": "سه تولید واقعی محلی Ollama: ۳/۳ قرارداد معتبر، صفر انتشار؛ این نتیجه AvvalAI پولی یا صحت علمی عمومی را اثبات نمی‌کند"
+  },
+  {
+    "id": "OCR-001",
+    "description": "آپلود PDF متن‌دار.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-002",
+    "description": "پردازش PDF اسکن‌شده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-003",
+    "description": "ورود تصویر JPG.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; tests/e2e/exam-import.spec.ts; mission-file-import.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "OCR-004",
+    "description": "ورود تصویر PNG و WebP.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; tests/e2e/exam-import.spec.ts; mission-file-import.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "OCR-005",
+    "description": "ذخیره متادیتای آزمون.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-006",
+    "description": "اتصال پاسخ‌نامه در صورت وجود.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-007",
+    "description": "نمایش وضعیت صف و پردازش.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; tests/e2e/exam-import.spec.ts; mission-file-import.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "OCR-008",
+    "description": "حفظ وضعیت پردازش پس از Refresh.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; tests/e2e/exam-import.spec.ts; mission-file-import.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "OCR-009",
+    "description": "صحت استخراج شماره سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-010",
+    "description": "حفظ شماره و صفحه اصلی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-011",
+    "description": "جداسازی گزینه‌ها از سؤال بعدی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-012",
+    "description": "مدیریت سؤال چندخطی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-013",
+    "description": "حفظ تصاویر و فرمول‌ها یا علامت‌گذاری نیاز به بازبینی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-014",
+    "description": "بررسی ترتیب صفحات و ستون‌ها در PDF دو‌ستونی.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "tests/unit/document-layout.test.ts; tests/integration/document-limits.test.ts",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OCR-015",
+    "description": "پیش‌نمایش سؤال استخراج‌شده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; tests/e2e/exam-import.spec.ts; mission-file-import.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "OCR-016",
+    "description": "مقایسه با تصویر و محدوده منبع.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; tests/e2e/exam-import.spec.ts; mission-file-import.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "OCR-017",
+    "description": "اصلاح دستی OCR.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-018",
+    "description": "اصلاح گزینه‌های ناقص.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-019",
+    "description": "اصلاح یا تأیید کلید پاسخ.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-020",
+    "description": "انتخاب مبحث و مهارت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; tests/e2e/exam-import.spec.ts; mission-file-import.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "OCR-021",
+    "description": "رد سؤال استخراج‌شده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-022",
+    "description": "تأیید و انتقال به بانک سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-023",
+    "description": "عدم انتشار سؤال تأییدنشده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-024",
+    "description": "حفظ نسخه سؤال پس از حذف فایل موقت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-025",
+    "description": "تشخیص ورود تکراری و جلوگیری از نسخه تکراری ناخواسته.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-026",
+    "description": "رد فایل نامعتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-027",
+    "description": "اعمال محدودیت حجم PDF.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; document-limits.test.ts; evidence/backend.log",
+    "reason": "بارگذاری ۲۰MB+۱، تصویر ۲۵MP و PDF واقعی ۱۰۱صفحه‌ای رد شدند"
+  },
+  {
+    "id": "OCR-028",
+    "description": "اعمال محدودیت تعداد صفحات.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; document-limits.test.ts; evidence/backend.log",
+    "reason": "بارگذاری ۲۰MB+۱، تصویر ۲۵MP و PDF واقعی ۱۰۱صفحه‌ای رد شدند"
+  },
+  {
+    "id": "OCR-029",
+    "description": "اعمال محدودیت ابعاد تصویر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; document-limits.test.ts; evidence/backend.log",
+    "reason": "بارگذاری ۲۰MB+۱، تصویر ۲۵MP و PDF واقعی ۱۰۱صفحه‌ای رد شدند"
+  },
+  {
+    "id": "OCR-030",
+    "description": "مدیریت PDF خراب یا رمزدار.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "tests/unit/document-layout.test.ts; tests/integration/document-limits.test.ts",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OCR-031",
+    "description": "بازیابی کار پس از Restart worker در محیط ایزوله.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-032",
+    "description": "جلوگیری از ایجاد سؤال تکراری در Retry.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-033",
+    "description": "محافظت فایل خصوصی در برابر معلم دیگر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-034",
+    "description": "ارائه مسیر اصلاح/ورود دستی هنگام شکست OCR.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; exam-import.test.ts; image-import.test.ts; tests/unit/document-layout.test.ts; evidence/backend.log",
+    "reason": "fixtureهای خودساخته؛ دقت عمومی کنکور تأیید نمی‌شود"
+  },
+  {
+    "id": "OCR-035",
+    "description": "نمایش خوانای تصاویر سؤال در پنل دانش‌آموز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/image-import.test.ts; tests/e2e/exam-import.spec.ts; mission-file-import.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-001",
+    "description": "نمایش فهرست تکالیف و وضعیت‌ها.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; mission-pagination.spec.ts; mission-file-import.spec.ts; difficulty.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-002",
+    "description": "ساخت مأموریت فردی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-003",
+    "description": "انتخاب درس صحیح.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-004",
+    "description": "انتخاب دانش‌آموز دارای عضویت معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-005",
+    "description": "انتخاب پنج سؤال معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-006",
+    "description": "عدم وجود سؤال تکراری ناخواسته.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-007",
+    "description": "صحت ترتیب و تعداد سؤال‌ها.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-008",
+    "description": "تنظیم تعداد تلاش و سیاست راهنما.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-009",
+    "description": "تنظیم حالت حل مستقل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-010",
+    "description": "بررسی مهلت مأموریت در صورت پشتیبانی.",
+    "priority": "P1",
+    "status": "NOT_IMPLEMENTED",
+    "evidence": "src/server/domain.ts",
+    "reason": "deadline در قرارداد مأموریت فعلی وجود ندارد؛ خارج از اصلاح محدود"
+  },
+  {
+    "id": "HW-011",
+    "description": "ذخیره پیش‌نویس.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-012",
+    "description": "ماندگاری پیش‌نویس پس از Refresh.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; mission-pagination.spec.ts; mission-file-import.spec.ts; difficulty.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-013",
+    "description": "انتشار مأموریت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-014",
+    "description": "نمایش مأموریت در پنل دانش‌آموز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; mission-pagination.spec.ts; mission-file-import.spec.ts; difficulty.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-015",
+    "description": "فیلتر سؤال هنگام ساخت مأموریت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; mission-pagination.spec.ts; mission-file-import.spec.ts; difficulty.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-016",
+    "description": "فیلتر چندانتخابی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; mission-pagination.spec.ts; mission-file-import.spec.ts; difficulty.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-017",
+    "description": "انتخاب تعداد سؤال بر اساس سه سطح سختی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-018",
+    "description": "انتخاب ترکیبی ۲ آسان، ۲ متوسط، ۱ سخت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-019",
+    "description": "خطای شفاف در صورت کمبود سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-020",
+    "description": "حفظ انتخاب قبلی بعد از خطای کمبود.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; mission-pagination.spec.ts; mission-file-import.spec.ts; difficulty.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-021",
+    "description": "حفظ انتخاب بین صفحات بانک.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; mission-pagination.spec.ts; mission-file-import.spec.ts; difficulty.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-022",
+    "description": "ورود فایل بدون ازدست‌رفتن اطلاعات فرم مأموریت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; mission-pagination.spec.ts; mission-file-import.spec.ts; difficulty.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-023",
+    "description": "عدم انتخاب سؤال نامعتبر یا متعلق به معلم دیگر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-024",
+    "description": "تفکیک پیش‌نویس و منتشرشده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-025",
+    "description": "جلوگیری از انتشار دوباره همان مأموریت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-026",
+    "description": "جلوگیری از ایجاد تخصیص تکراری با درخواست مجدد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-027",
+    "description": "جلوگیری از تخصیص خارج از عضویت معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-028",
+    "description": "لغو مأموریت ناتمام.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-029",
+    "description": "جلوگیری از پاسخ تازه پس از لغو.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "HW-030",
+    "description": "حفظ تاریخچه مأموریت تکمیل‌شده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/mission-selection.test.ts; mission-collection.test.ts; integrity.test.ts; courses.test.ts; feedback-mode.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-001",
+    "description": "نمایش مأموریت منتشرشده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-002",
+    "description": "نمایش عنوان، درس، معلم و تعداد سؤال صحیح.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-003",
+    "description": "شروع تمرین و نمایش سؤال اول.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-004",
+    "description": "نمایش صحیح متن، گزینه، فرمول و تصویر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-005",
+    "description": "نمایش شماره سؤال و پیشرفت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-006",
+    "description": "پیمایش بین سؤال‌ها.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-007",
+    "description": "حفظ پاسخ هنگام پیمایش.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-008",
+    "description": "نمایش وضعیت پاسخ‌داده و بی‌پاسخ.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-009",
+    "description": "ثبت گزینه انتخاب‌شده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-010",
+    "description": "ثبت پاسخ عددی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-011",
+    "description": "ثبت عدد منفی و اعشاری.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-012",
+    "description": "ثبت پاسخ ریاضی در نوع پشتیبانی‌شده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-013",
+    "description": "ثبت پاسخ تشریحی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-014",
+    "description": "مدیریت سؤال بی‌پاسخ.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-015",
+    "description": "ثبت پاسخ اشتباه.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-016",
+    "description": "ثبت پاسخ صحیح.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-017",
+    "description": "جلوگیری از تلاش تکراری با Double Click.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-018",
+    "description": "مدیریت قطعی شبکه هنگام ثبت پاسخ.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-019",
+    "description": "جلوگیری از دوباره‌شماری هنگام Retry.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-020",
+    "description": "اعمال سقف تلاش مجاز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-021",
+    "description": "درخواست راهنمایی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-022",
+    "description": "دریافت راهنمای سطح اول معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-023",
+    "description": "عدم افشای زودهنگام جواب.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-024",
+    "description": "رعایت ترتیب سطوح راهنمایی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-025",
+    "description": "ثبت تعداد راهنماها.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-026",
+    "description": "تشخیص پاسخ صحیح با کمک.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-027",
+    "description": "تشخیص پاسخ صحیح مستقل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-028",
+    "description": "عدم دسترسی به راهنما در مأموریت مستقل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-029",
+    "description": "اعمال محدودیت تعداد راهنما.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-030",
+    "description": "حفظ پاسخ‌ها در زمان قطعی مدل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-031",
+    "description": "نمایش صحیح Provider و وضعیت راهنمایی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-032",
+    "description": "جلوگیری از دورزدن سیاست راهنما و افشای پاسخ خصوصی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-033",
+    "description": "بازیابی وضعیت بعد از Refresh.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-034",
+    "description": "ادامه تمرین پس از ورود مجدد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-035",
+    "description": "سازگاری وضعیت سروری در دستگاه دوم.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "PR-036",
+    "description": "پیمایش صحیح Browser Back/Forward.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; question-visuals.spec.ts; navigation-layout.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-037",
+    "description": "پایان موفق مأموریت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-038",
+    "description": "نمایش گزارش مربوط به همان مأموریت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-039",
+    "description": "تفکیک پاسخ‌های بی‌پاسخ و منتظر بررسی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PR-040",
+    "description": "جلوگیری از تغییر غیرمجاز نتیجه مأموریت تکمیل‌شده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; tutor.test.ts; integrity.test.ts; feedback-mode.test.ts; tests/unit/evaluation.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GOLD-001",
+    "description": "مجموع پاسخ‌ها ۵ باشد.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "GOLD-002",
+    "description": "۳ پاسخ مستقل و ۱ پاسخ با کمک جدا ثبت شوند.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "GOLD-003",
+    "description": "یک پاسخ نادرست وجود داشته باشد.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "GOLD-004",
+    "description": "تعداد راهنماها دقیقاً ۱ باشد.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "GOLD-005",
+    "description": "معلم همان آمار را مشاهده کند.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "GOLD-006",
+    "description": "دانش‌آموز فقط گزارش خودش را ببیند.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "GOLD-007",
+    "description": "اعداد پس از Refresh ثابت بمانند.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "GOLD-008",
+    "description": "تاریخچه تلاش‌ها محفوظ باشد.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "GOLD-009",
+    "description": "سؤال دوم برای تمرین تقویتی پیشنهاد شود.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "GOLD-010",
+    "description": "پاسخ درست با کمک، تسلط مستقل محسوب نشود.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-golden.spec.ts; evidence/golden-final.log",
+    "reason": "دو cohort واقعی UI؛ ۵ پاسخ، ۳ مستقل، ۱ با کمک، ۱ نادرست، ۱ راهنما؛ گزارش معلم و تاریخچه ثابت"
+  },
+  {
+    "id": "EVAL-001",
+    "description": "صحیح‌بودن گزینه درست.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-002",
+    "description": "نادرست‌بودن گزینه غلط.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-003",
+    "description": "تشخیص پاسخ عددی دقیق.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-004",
+    "description": "اعمال تلورانس عددی.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-005",
+    "description": "رد عدد خارج از تلورانس.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-006",
+    "description": "تشخیص صحیح علامت مثبت و منفی.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-007",
+    "description": "هم‌ارزی عبارت‌های ریاضی فقط در محدوده پشتیبانی.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-008",
+    "description": "ارسال پاسخ تشریحی نامطمئن به pending_review.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-009",
+    "description": "عدم اعلام نتیجه قطعی قبل از بازبینی لازم.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-010",
+    "description": "بررسی و تعیین نتیجه توسط معلم مجاز.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-011",
+    "description": "انعکاس نتیجه جدید در گزارش.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-012",
+    "description": "رد بررسی پاسخ توسط معلم نامرتبط.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-013",
+    "description": "حفظ محرمانگی پاسخ مرجع.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EVAL-014",
+    "description": "استقلال ارزیابی سؤال‌ها از یکدیگر.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/unit/evaluation.test.ts; tests/integration/integrity.test.ts; report-details.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-001",
+    "description": "بازشدن گزارش مأموریت معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-002",
+    "description": "نمایش درست عنوان، درس و تعداد سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-003",
+    "description": "صحت تعداد صحیح، غلط، بی‌پاسخ و منتظر بررسی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; learning.test.ts; feedback-mode.test.ts; parents.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-004",
+    "description": "تفکیک پاسخ مستقل و کمکی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; learning.test.ts; feedback-mode.test.ts; parents.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-005",
+    "description": "شناسایی سؤال‌های اشتباه.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; learning.test.ts; feedback-mode.test.ts; parents.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-006",
+    "description": "نمایش مهارت‌های مرتبط.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; learning.test.ts; feedback-mode.test.ts; parents.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-007",
+    "description": "استفاده از داده واقعی در شاخص‌ها.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; learning.test.ts; feedback-mode.test.ts; parents.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-008",
+    "description": "عدم ادعای تسلط کامل با شواهد ناکافی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; learning.test.ts; feedback-mode.test.ts; parents.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-009",
+    "description": "نمایش وضعیت کمبود شواهد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; learning.test.ts; feedback-mode.test.ts; parents.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-010",
+    "description": "به‌روزرسانی پس از بررسی معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; learning.test.ts; feedback-mode.test.ts; parents.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-011",
+    "description": "حفظ گزارش پس از ورود مجدد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts; practice-selection.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REP-012",
+    "description": "رد دسترسی با شناسه نامعتبر یا غیرمجاز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/report-details.test.ts; learning.test.ts; feedback-mode.test.ts; parents.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "LEARN-001",
+    "description": "نمایش دانش‌آموزان مرتبط.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-002",
+    "description": "نمایش پرونده دانش‌آموز صحیح.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-003",
+    "description": "تفکیک مأموریت فعال و تکمیل‌شده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-004",
+    "description": "جداسازی گزارش درس‌ها.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-005",
+    "description": "صحت نرخ پاسخ مستقل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-006",
+    "description": "صحت نرخ پاسخ با کمک.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-007",
+    "description": "تفکیک pending_review از نتیجه قطعی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-008",
+    "description": "نمایش خطاهای جاری.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-009",
+    "description": "اصلاح وضعیت خطا پس از نتیجه جدید.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-010",
+    "description": "عدم نمایش پیشرفت ساختگی بدون شواهد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-011",
+    "description": "قابلیت ردیابی گزارش به پاسخ و تلاش واقعی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-012",
+    "description": "دسترسی به مسیر تمرین تقویتی از گزارش.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-013",
+    "description": "به‌روزرسانی عملکرد پس از مأموریت جدید.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "LEARN-014",
+    "description": "عدم نشت اطلاعات معلم‌های دیگر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/learning.test.ts; remediation.test.ts; student-dashboard.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "API و projection واقعی؛ پوشش UI در اجرای مرورگر جدا مشخص است"
+  },
+  {
+    "id": "REM-001",
+    "description": "ورود معلم به بخش تمرین تقویتی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/flow.spec.ts: teacher assigns one corrective practice; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-002",
+    "description": "انتخاب دانش‌آموز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-003",
+    "description": "انتخاب صحیح درس.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-004",
+    "description": "پیشنهاد سؤال دارای آخرین نتیجه نادرست.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-005",
+    "description": "عدم پیشنهاد سؤال صحیح مستقل به‌عنوان خطای جاری.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-006",
+    "description": "عدم تلقی pending_review به‌عنوان خطای قطعی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-007",
+    "description": "ایجاد مأموریت تقویتی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-008",
+    "description": "تخصیص فقط به دانش‌آموز انتخابی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-009",
+    "description": "جلوگیری از ایجاد پیشنهاد تقویتی تکراری باز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-010",
+    "description": "حل مستقل و صحیح تمرین تقویتی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-011",
+    "description": "ثبت پاسخ صحیح جدید.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-012",
+    "description": "خروج سؤال از پیشنهادهای خطای جاری.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-013",
+    "description": "حفظ سابقه پاسخ نادرست اولیه.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-014",
+    "description": "به‌روزرسانی شواهد بدون ادعای تسلط کاذب.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "REM-015",
+    "description": "جلوگیری از ایجاد تمرین توسط معلم نامرتبط.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/remediation.test.ts; full-individual-journey.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-001",
+    "description": "ساخت کلاس گروهی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-002",
+    "description": "اتصال کلاس به درس صحیح.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-003",
+    "description": "افزودن Student A و B با عضویت معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-004",
+    "description": "رد عضویت دانش‌آموز نامرتبط.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-005",
+    "description": "ویرایش اعضای کلاس.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts: members update and snapshot; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-006",
+    "description": "ساخت مأموریت گروهی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-007",
+    "description": "ایجاد Assignment مستقل برای هر عضو.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-008",
+    "description": "جداسازی پاسخ‌های دو دانش‌آموز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-009",
+    "description": "گزارش گروهی صحیح.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-010",
+    "description": "دسترسی معلم به گزارش اختصاصی هر عضو.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-011",
+    "description": "جلوگیری از تخصیص تکراری.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-012",
+    "description": "حفظ Snapshot مأموریت بعد از تغییر اعضا.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-013",
+    "description": "مدیریت پایان عضویت یک دانش‌آموز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "GROUP-014",
+    "description": "اعمال محدودیت تعداد اعضای فعال.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "src/server/modules/class-groups.ts",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "GROUP-015",
+    "description": "جلوگیری از دسترسی معلم دیگر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/class-groups.test.ts; course-membership.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "PARENT-001",
+    "description": "صدور دعوت والد توسط معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-002",
+    "description": "پذیرش دعوت معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-003",
+    "description": "مشاهده اطلاعات فرزند مرتبط.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-004",
+    "description": "مشاهده گزارش مأموریت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-005",
+    "description": "صحت شاخص‌های پیشرفت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-006",
+    "description": "جلوگیری از ثبت پاسخ توسط والد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-007",
+    "description": "جلوگیری از مصرف راهنمایی توسط والد.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-008",
+    "description": "جلوگیری از ویرایش ارزیابی یا محتوا.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-009",
+    "description": "عدم نمایش اطلاعات محرمانه معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-010",
+    "description": "جلوگیری از مشاهده دانش‌آموز نامرتبط با تغییر URL.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-011",
+    "description": "لغو دسترسی والد توسط معلم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-012",
+    "description": "اعمال فوری لغو دسترسی در درخواست‌های بعدی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-013",
+    "description": "رد دعوت منقضی یا نامرتبط.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "PARENT-014",
+    "description": "جلوگیری از جست‌وجوی آزاد اطلاعات سایر دانش‌آموزان.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/parents.test.ts; access-control.test.ts; phone-otp.test.ts; evidence/backend.log",
+    "reason": "رابطه فنی و read-only؛ جایگزین رضایت/احراز حقوقی سرپرستی نیست"
+  },
+  {
+    "id": "ADMIN-001",
+    "description": "ایجاد یا مجازکردن حساب منشی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-002",
+    "description": "نمایش پنل مخصوص منشی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/access-roles.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-003",
+    "description": "دسترسی صرفاً در محدوده واگذارشده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-004",
+    "description": "ایجاد دعوت دانش‌آموز با مجوز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-005",
+    "description": "ایجاد دعوت والد با مجوز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-006",
+    "description": "رد عملیات فاقد مجوز.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-007",
+    "description": "عدم دسترسی به کلید و پاسخ خصوصی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-008",
+    "description": "جلوگیری از ارتقای نقش توسط منشی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-009",
+    "description": "اعمال لغو مجوز منشی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-010",
+    "description": "ورود سوپرادمین به پنل مدیریت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/access-roles.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-011",
+    "description": "نمایش فهرست واقعی کاربران.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/access-roles.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-012",
+    "description": "جست‌وجو و صفحه‌بندی کاربران.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/access-roles.spec.ts; evidence/e2e-existing.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-013",
+    "description": "تغییر نقش مجاز و ثبت Audit.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-014",
+    "description": "غیرفعال‌سازی حساب آزمایشی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-015",
+    "description": "ابطال نشست پس از تغییر دسترسی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-016",
+    "description": "جلوگیری از حذف آخرین سوپرادمین فعال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-017",
+    "description": "جلوگیری از تغییر نقش غیرمجاز مدیر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-018",
+    "description": "ثبت رخدادهای مدیریتی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-019",
+    "description": "جلوگیری از دسترسی آموزشی نامحدود و خودکار مدیر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "ADMIN-020",
+    "description": "جلوگیری از دورزدن نقش با API مستقیم.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/access-control.test.ts; auth-session.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-001",
+    "description": "رد دسترسی Student B به Assignment خصوصی Student A.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-002",
+    "description": "رد دسترسی Teacher B به سؤال خصوصی Teacher A.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-003",
+    "description": "رد دسترسی والد نامرتبط به گزارش دانش‌آموز.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-004",
+    "description": "جلوگیری از ساخت سؤال توسط دانش‌آموز.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-005",
+    "description": "جلوگیری از تغییر ارزیابی توسط والد.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-006",
+    "description": "جلوگیری از مدیریت نقش توسط منشی.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-007",
+    "description": "رد درخواست خصوصی با نشست باطل‌شده.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-008",
+    "description": "جلوگیری از بازگشت مجوز قدیمی بعد از تغییر نقش.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-009",
+    "description": "عدم افشای رمز، OTP و پاسخ مرجع در API عمومی یا لاگ.",
+    "priority": "P0",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "SEC-010",
+    "description": "جلوگیری از اجرای محتوای مخرب در سؤال.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-011",
+    "description": "حفاظت فایل‌های خصوصی.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-012",
+    "description": "جلوگیری از IDOR با تغییر شناسه Assignment.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-013",
+    "description": "بررسی تنظیمات امنیتی کوکی و HTTPS.",
+    "priority": "P0",
+    "status": "BLOCKED",
+    "evidence": "tests/integration/auth-session.test.ts; evidence/backend.log",
+    "reason": "ویژگی کوکی در تست backend تأیید شده؛ HTTPS واقعی محیط آنلاین هنوز تأیید نیست"
+  },
+  {
+    "id": "SEC-014",
+    "description": "بررسی Idempotency عملیات حساس.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-015",
+    "description": "بررسی Rate Limiting.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-016",
+    "description": "جلوگیری از نشت پاسخ هنگام خرابی AI.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-017",
+    "description": "عدم افشای اطلاعات داخلی در خطاها.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "SEC-018",
+    "description": "عدم Cache اطلاعات خصوصی در منابع عمومی/PWA.",
+    "priority": "P0",
+    "status": "PASS",
+    "evidence": "tests/integration/api.test.ts; access-control.test.ts; tutor.test.ts; integrity.test.ts; pilot.test.ts; tests/unit/question-visuals.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "UI-001",
+    "description": "یکسان‌سازی برند «هدهد» در UI و metadata.",
+    "priority": "P1",
+    "status": "BLOCKED",
+    "evidence": "src/app/layout.tsx; src/components/hamyar-app.tsx",
+    "reason": "برند قبلاً تأییدشده هدهده است، سند UAT هدهد می‌خواهد؛ تصمیم مالک لازم است، بازطراحی/تغییر نام انجام نشد"
+  },
+  {
+    "id": "UI-002",
+    "description": "نمایش صحیح لوگو و آیکن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-003",
+    "description": "بازشدن مستقیم مسیرهای Dashboard، Students، Courses، Classes و Content.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-004",
+    "description": "بازشدن مسیرهای Homeworks، Learning، Exam Import و Settings.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-005",
+    "description": "بازیابی Practice و Report با لینک مستقیم معتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-006",
+    "description": "مدیریت مسیر نامعتبر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-probes.spec.ts; evidence/probes.log",
+    "reason": "404 واقعی Next و transitionDuration=0s در prefers-reduced-motion"
+  },
+  {
+    "id": "UI-007",
+    "description": "عملکرد Back/Forward.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-008",
+    "description": "حفظ صفحه بعد از Refresh.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-009",
+    "description": "وضعیت خالی، Loading و Error.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-010",
+    "description": "عملکرد Modal، Dropdown و Select.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-011",
+    "description": "Responsive در عرض ۳۶۰ پیکسل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-012",
+    "description": "Responsive در عرض ۳۹۰ پیکسل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-013",
+    "description": "Responsive در عرض ۷۶۸ پیکسل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-014",
+    "description": "Responsive در عرض ۱۲۸۰ پیکسل.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-015",
+    "description": "ارتفاع و Padding صحیح Header.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-016",
+    "description": "عرض صحیح Sidebar.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-017",
+    "description": "صحت RTL/LTR.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-018",
+    "description": "استفاده از فرم هنگام نمایش کیبورد موبایل.",
+    "priority": "P1",
+    "status": "MANUAL_REQUIRED",
+    "evidence": "UAT_EXECUTION_REPORT.md",
+    "reason": "کیبورد و نصب واقعی موبایل/داوری کنتراست و Safari iOS/Chrome Android واقعی در دسترس نیست؛ viewport جایگزین دستگاه نیست"
+  },
+  {
+    "id": "UI-019",
+    "description": "کنتراست متن روی سطوح شیشه‌ای.",
+    "priority": "P1",
+    "status": "MANUAL_REQUIRED",
+    "evidence": "UAT_EXECUTION_REPORT.md",
+    "reason": "کیبورد و نصب واقعی موبایل/داوری کنتراست و Safari iOS/Chrome Android واقعی در دسترس نیست؛ viewport جایگزین دستگاه نیست"
+  },
+  {
+    "id": "UI-020",
+    "description": "خوانایی و سادگی صفحه تمرین.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-021",
+    "description": "انتقال پیام خطا فراتر از رنگ.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-022",
+    "description": "Keyboard Navigation و Focus.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-023",
+    "description": "پشتیبانی Reduced Motion.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/uat-probes.spec.ts; evidence/probes.log",
+    "reason": "404 واقعی Next و transitionDuration=0s در prefers-reduced-motion"
+  },
+  {
+    "id": "UI-024",
+    "description": "Chrome Desktop.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-025",
+    "description": "Safari iOS.",
+    "priority": "P1",
+    "status": "MANUAL_REQUIRED",
+    "evidence": "UAT_EXECUTION_REPORT.md",
+    "reason": "کیبورد و نصب واقعی موبایل/داوری کنتراست و Safari iOS/Chrome Android واقعی در دسترس نیست؛ viewport جایگزین دستگاه نیست"
+  },
+  {
+    "id": "UI-026",
+    "description": "Chrome Android.",
+    "priority": "P1",
+    "status": "MANUAL_REQUIRED",
+    "evidence": "UAT_EXECUTION_REPORT.md",
+    "reason": "کیبورد و نصب واقعی موبایل/داوری کنتراست و Safari iOS/Chrome Android واقعی در دسترس نیست؛ viewport جایگزین دستگاه نیست"
+  },
+  {
+    "id": "UI-027",
+    "description": "Firefox Desktop.",
+    "priority": "P1",
+    "status": "BLOCKED",
+    "evidence": "evidence/environment.json",
+    "reason": "Firefox نصب/اجرا نشده؛ نتیجه Chrome به آن تعمیم داده نمی‌شود"
+  },
+  {
+    "id": "UI-028",
+    "description": "نصب PWA در محیط پشتیبانی‌شده.",
+    "priority": "P1",
+    "status": "MANUAL_REQUIRED",
+    "evidence": "UAT_EXECUTION_REPORT.md",
+    "reason": "کیبورد و نصب واقعی موبایل/داوری کنتراست و Safari iOS/Chrome Android واقعی در دسترس نیست؛ viewport جایگزین دستگاه نیست"
+  },
+  {
+    "id": "UI-029",
+    "description": "رفتار واضح هنگام Offline، بدون ادعای ثبت پاسخ آفلاین.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "UI-030",
+    "description": "عملکرد برنامه پس از Update و پاکسازی Cache قدیمی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/e2e/navigation-layout.spec.ts; flow.spec.ts; practice-selection.spec.ts; design-system.spec.ts; evidence/e2e-existing.log",
+    "reason": "Chrome واقعی؛ چهار viewport؛ بدون تعمیم به Safari/Android واقعی"
+  },
+  {
+    "id": "OPS-001",
+    "description": "Startup با دیتابیس سالم و مدیریت قطعی دیتابیس.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OPS-002",
+    "description": "بازیابی عملیات پس از اتصال مجدد دیتابیس.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OPS-003",
+    "description": "حفظ صف OCR بعد از توقف Worker.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; integrity.test.ts; tutor.test.ts; learning.test.ts; evidence/backend.log",
+    "reason": "تست app/worker در سطح ماژول روی replica set؛ نه اثبات systemd مقصد"
+  },
+  {
+    "id": "OPS-004",
+    "description": "ادامه کار Worker پس از Restart.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; integrity.test.ts; tutor.test.ts; learning.test.ts; evidence/backend.log",
+    "reason": "تست app/worker در سطح ماژول روی replica set؛ نه اثبات systemd مقصد"
+  },
+  {
+    "id": "OPS-005",
+    "description": "عدم اختلال در ثبت پاسخ هنگام قطعی AI.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; integrity.test.ts; tutor.test.ts; learning.test.ts; evidence/backend.log",
+    "reason": "تست app/worker در سطح ماژول روی replica set؛ نه اثبات systemd مقصد"
+  },
+  {
+    "id": "OPS-006",
+    "description": "ثبت متادیتای واقعی مصرف AI.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; integrity.test.ts; tutor.test.ts; learning.test.ts; evidence/backend.log",
+    "reason": "تست app/worker در سطح ماژول روی replica set؛ نه اثبات systemd مقصد"
+  },
+  {
+    "id": "OPS-007",
+    "description": "جلوگیری از داده تکراری در Retry.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; integrity.test.ts; tutor.test.ts; learning.test.ts; evidence/backend.log",
+    "reason": "تست app/worker در سطح ماژول روی replica set؛ نه اثبات systemd مقصد"
+  },
+  {
+    "id": "OPS-008",
+    "description": "وجود شناسه قابل پیگیری خطا.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OPS-009",
+    "description": "عدم ثبت داده حساس در Log.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OPS-010",
+    "description": "Backup دیتابیس آزمایشی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "evidence/backup.log; scripts/verify-backup.ts",
+    "reason": "توقف فقط نویسندگان UAT؛ بکاپ ۴۴ collection و ۲۳۴۹ سند، restore به DB تصادفی، برابری hash سند و index و ثبات مبدأ تأیید شد"
+  },
+  {
+    "id": "OPS-011",
+    "description": "Restore در دیتابیس جدا.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "evidence/backup.log; scripts/verify-backup.ts",
+    "reason": "توقف فقط نویسندگان UAT؛ بکاپ ۴۴ collection و ۲۳۴۹ سند، restore به DB تصادفی، برابری hash سند و index و ثبات مبدأ تأیید شد"
+  },
+  {
+    "id": "OPS-012",
+    "description": "اعتبارسنجی برابری داده و Index بعد از Restore.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "evidence/backup.log; scripts/verify-backup.ts",
+    "reason": "توقف فقط نویسندگان UAT؛ بکاپ ۴۴ collection و ۲۳۴۹ سند، restore به DB تصادفی، برابری hash سند و index و ثبات مبدأ تأیید شد"
+  },
+  {
+    "id": "OPS-013",
+    "description": "عدم تغییر دیتابیس مبدأ در Backup.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "evidence/backup.log; scripts/verify-backup.ts",
+    "reason": "توقف فقط نویسندگان UAT؛ بکاپ ۴۴ collection و ۲۳۴۹ سند، restore به DB تصادفی، برابری hash سند و index و ثبات مبدأ تأیید شد"
+  },
+  {
+    "id": "OPS-014",
+    "description": "ماندگاری داده بعد از Restart برنامه.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; integrity.test.ts; tutor.test.ts; learning.test.ts; evidence/backend.log",
+    "reason": "تست app/worker در سطح ماژول روی replica set؛ نه اثبات systemd مقصد"
+  },
+  {
+    "id": "OPS-015",
+    "description": "عدم ایجاد داده تکراری بعد از Restart هم‌زمان Workerها.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; integrity.test.ts; tutor.test.ts; learning.test.ts; evidence/backend.log",
+    "reason": "تست app/worker در سطح ماژول روی replica set؛ نه اثبات systemd مقصد"
+  },
+  {
+    "id": "OPS-016",
+    "description": "قابلیت شناسایی نسخه و SHA استقرار.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OPS-017",
+    "description": "HTTPS و Secure Cookie و Origin.",
+    "priority": "P1",
+    "status": "BLOCKED",
+    "evidence": "UAT_RELEASE_READINESS.md",
+    "reason": "HTTPS/deploy/rollback/systemd و SMTP مقصد آماده نیستند؛ روی سرور یا داده واقعی عملیاتی انجام نشد"
+  },
+  {
+    "id": "OPS-018",
+    "description": "بررسی Deploy/Rollback در محیط آزمایشی مجاز.",
+    "priority": "P1",
+    "status": "BLOCKED",
+    "evidence": "UAT_RELEASE_READINESS.md",
+    "reason": "HTTPS/deploy/rollback/systemd و SMTP مقصد آماده نیستند؛ روی سرور یا داده واقعی عملیاتی انجام نشد"
+  },
+  {
+    "id": "OPS-019",
+    "description": "عدم Restore خودکار و مخرب دیتابیس هنگام Rollback.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OPS-020",
+    "description": "سلامت Worker ایمیل.",
+    "priority": "P1",
+    "status": "BLOCKED",
+    "evidence": "UAT_RELEASE_READINESS.md",
+    "reason": "HTTPS/deploy/rollback/systemd و SMTP مقصد آماده نیستند؛ روی سرور یا داده واقعی عملیاتی انجام نشد"
+  },
+  {
+    "id": "OPS-021",
+    "description": "جداسازی داده در استفاده هم‌زمان چند کاربر.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/document-pipeline.test.ts; integrity.test.ts; tutor.test.ts; learning.test.ts; evidence/backend.log",
+    "reason": "تست app/worker در سطح ماژول روی replica set؛ نه اثبات systemd مقصد"
+  },
+  {
+    "id": "OPS-022",
+    "description": "اندازه‌گیری تأخیر و نرخ خطا در بار واقعی تمرین.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OPS-023",
+    "description": "کنترل مصرف حافظه و فضای دیسک در پردازش فایل.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "OPS-024",
+    "description": "مستندسازی روش بازیابی و مسئول عملیات.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "EDGE-001",
+    "description": "قطع اتصال هنگام ساخت سؤال.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-002",
+    "description": "Double Click هنگام انتشار مأموریت.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-003",
+    "description": "بازکردن تمرین در دو تب.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-004",
+    "description": "پایان عضویت دانش‌آموز وسط تمرین.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-005",
+    "description": "سؤال بدون پاسخ.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-006",
+    "description": "ارزیابی تشریحی نامطمئن.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-007",
+    "description": "توقف Worker هنگام OCR.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-008",
+    "description": "Timeout سرویس AI هنگام راهنمایی.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-009",
+    "description": "OCR ناقص یا ناخوانا.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-010",
+    "description": "حذف منبع دارای سؤال تأییدشده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-011",
+    "description": "درخواست API غیرمجاز با نقش نامرتبط.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-012",
+    "description": "Refresh هنگام تأخیر سرور.",
+    "priority": "P1",
+    "status": "NOT_RUN",
+    "evidence": "",
+    "reason": "در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد"
+  },
+  {
+    "id": "EDGE-013",
+    "description": "ثبت پاسخ هم‌زمان از دو نشست.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-014",
+    "description": "سؤال فاقد راهنمای تأییدشده.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  },
+  {
+    "id": "EDGE-015",
+    "description": "مدیریت خطای داخلی بدون Crash کل برنامه.",
+    "priority": "P1",
+    "status": "PASS",
+    "evidence": "tests/integration/integrity.test.ts; tutor.test.ts; document-pipeline.test.ts; resource-removal.test.ts; access-control.test.ts; evidence/backend.log",
+    "reason": "MongoDB واقعیِ موقت؛ وابستگی خارجی کنترل‌شده مگر خلاف آن ذکر شده"
+  }
+]

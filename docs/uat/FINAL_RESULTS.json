@@ -1,0 +1,54 @@
+{
+  "baseCommit": "4356a58b3f6a50119e38b1e6710f4668bf8c61f0",
+  "uncommittedChanges": true,
+  "pushed": false,
+  "counts": {
+    "businessCases": 430,
+    "setupCases": 14,
+    "product": {
+      "PASS": 392,
+      "BLOCKED": 7,
+      "NOT_RUN": 20,
+      "NOT_IMPLEMENTED": 3,
+      "MANUAL_REQUIRED": 7,
+      "FAIL": 1
+    },
+    "setup": {
+      "PASS": 12,
+      "BLOCKED": 2
+    }
+  },
+  "automated": {
+    "unit": {
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "passed": 85,
+      "failed": 0,
+      "skipped": 0
+    },
+    "e2e": {
+      "passed": 37,
+      "failed": 0,
+      "skipped": 1,
+      "skipReason": "Existing optional real Ollama browser test; primary UAT provider mock. Separate real local inference probes performed."
+    }
+  },
+  "golden": "PASS: two cohorts, repeated in final full suite",
+  "readiness": {
+    "educationalCore": "CONDITIONALLY READY",
+    "controlledPilot": "NOT READY",
+    "publicRelease": "NOT READY"
+  },
+  "openBugs": {
+    "P0Known": 0,
+    "P1Known": 0,
+    "P2": 1
+  },
+  "notes": [
+    "Known-open bug counts do not clear untested or blocked acceptance cases.",
+    "AI-008 acceptance failure is a real generated-content quality failure, despite passing transport/schema automated tests."
+  ]
+}

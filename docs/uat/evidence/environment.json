@@ -1,0 +1,840 @@
+{
+  "node": "v22.23.2",
+  "platform": "darwin",
+  "arch": "arm64",
+  "replica": "hamyar-rs",
+  "database": "hodhodeh_audit_uat_1027_f962b582",
+  "dependencies": {
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "typescript": "5.9.3",
+    "mongodb": "6.21.0",
+    "sharp": "0.35.5",
+    "pdfjs-dist": "6.4.299",
+    "fastify": "5.12.7",
+    "@playwright/test": "1.64.1"
+  },
+  "collections": [
+    {
+      "name": "masteryRecords",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "studentId_1_teacherId_1",
+          "key": {
+            "studentId": 1,
+            "teacherId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "workerLeases",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "otpChallenges",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "relations",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "teacherId_1_studentId_1",
+          "key": {
+            "teacherId": 1,
+            "studentId": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "questionAssets",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "evaluations",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "attemptId_1",
+          "key": {
+            "attemptId": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "examImports",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "ownerId_1_createdAt_-1",
+          "key": {
+            "ownerId": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "hintEvents",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "assignmentId_1_questionVersionId_1_level_1",
+          "key": {
+            "assignmentId": 1,
+            "questionVersionId": 1,
+            "level": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "email_1",
+          "key": {
+            "email": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "phone_1",
+          "key": {
+            "phone": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "parentLinks",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "parentId_1_studentId_1_teacherId_1",
+          "key": {
+            "parentId": 1,
+            "studentId": 1,
+            "teacherId": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "mistakeRecords",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "studentId_1_teacherId_1",
+          "key": {
+            "studentId": 1,
+            "teacherId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "emailVerificationTokens",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "tokenHash_1",
+          "key": {
+            "tokenHash": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "examImportJobs",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "state_1_leaseUntil_1_createdAt_1",
+          "key": {
+            "state": 1,
+            "leaseUntil": 1,
+            "createdAt": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "courseRequests",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "courseId_1_studentId_1",
+          "key": {
+            "courseId": 1,
+            "studentId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "teacherId_1_status_1_updatedAt_-1",
+          "key": {
+            "teacherId": 1,
+            "status": 1,
+            "updatedAt": -1
+          }
+        },
+        {
+          "name": "studentId_1_updatedAt_-1",
+          "key": {
+            "studentId": 1,
+            "updatedAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "courseJoinCodes",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "tokenHash_1",
+          "key": {
+            "tokenHash": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "classGroups",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "teacherId_1_courseId_1",
+          "key": {
+            "teacherId": 1,
+            "courseId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "hintReports",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "hintId_1_studentId_1",
+          "key": {
+            "hintId": 1,
+            "studentId": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "examImportPreviewAssets",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "emailVerificationThrottle",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "questionVersions",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "courses",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "teacherId_1_status_1",
+          "key": {
+            "teacherId": 1,
+            "status": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "sessions",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "tokenHash_1",
+          "key": {
+            "tokenHash": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "auditLogs",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "invitations",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "tokenHash_1",
+          "key": {
+            "tokenHash": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "learningEvidence",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "teacherId_1_studentId_1_assignmentId_1_createdAt_-1",
+          "key": {
+            "teacherId": 1,
+            "studentId": 1,
+            "assignmentId": 1,
+            "createdAt": -1
+          }
+        },
+        {
+          "name": "studentId_1_teacherId_1",
+          "key": {
+            "studentId": 1,
+            "teacherId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "passwordResetTokens",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "tokenHash_1",
+          "key": {
+            "tokenHash": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "enrollments",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "courseId_1_studentId_1",
+          "key": {
+            "courseId": 1,
+            "studentId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "teacherId_1_studentId_1_status_1",
+          "key": {
+            "teacherId": 1,
+            "studentId": 1,
+            "status": 1
+          }
+        },
+        {
+          "name": "studentId_1_status_1",
+          "key": {
+            "studentId": 1,
+            "status": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "questions",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "questionDrafts",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "ownerId_1_state_1_createdAt_-1",
+          "key": {
+            "ownerId": 1,
+            "state": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "attempts",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "assignmentId_1_questionVersionId_1_sequence_1",
+          "key": {
+            "assignmentId": 1,
+            "questionVersionId": 1,
+            "sequence": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "examImportPages",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "masteryOverrides",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "studentId_1_teacherId_1",
+          "key": {
+            "studentId": 1,
+            "teacherId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "staffAssignments",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "secretaryId_1_teacherId_1",
+          "key": {
+            "secretaryId": 1,
+            "teacherId": 1
+          },
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "examImportItems",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "examId_1_ownerId_1_state_1",
+          "key": {
+            "examId": 1,
+            "ownerId": 1,
+            "state": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "groupTasks",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "teacherId_1_groupId_1_createdAt_-1",
+          "key": {
+            "teacherId": 1,
+            "groupId": 1,
+            "createdAt": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "curriculum",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "examImportChunks",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "examId_1_kind_1_position_1",
+          "key": {
+            "examId": 1,
+            "kind": 1,
+            "position": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "operations",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "passwordResetThrottle",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "mailOutbox",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "state_1_availableAt_1_leaseUntil_1",
+          "key": {
+            "state": 1,
+            "availableAt": 1,
+            "leaseUntil": 1
+          }
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    },
+    {
+      "name": "assignments",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "missionId_1_studentId_1",
+          "key": {
+            "missionId": 1,
+            "studentId": 1
+          },
+          "unique": true
+        },
+        {
+          "name": "groupTaskId_1_studentId_1",
+          "key": {
+            "groupTaskId": 1,
+            "studentId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "otpThrottle",
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          }
+        },
+        {
+          "name": "expiresAt_1",
+          "key": {
+            "expiresAt": 1
+          },
+          "ttl": 0
+        }
+      ]
+    }
+  ]
+}

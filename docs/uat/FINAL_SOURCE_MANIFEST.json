@@ -1,0 +1,1173 @@
+{
+  "baseCommit": "4356a58b3f6a50119e38b1e6710f4668bf8c61f0",
+  "timestampUtc": "2026-10-27T05:10:56.694554+00:00",
+  "snapshot": "/private/tmp/hodhodeh-uat-y2ny62dl",
+  "notes": "Working tree includes initial owner changes and UAT OCR fix. Hashes exclude env/private/artifacts. Root-only formatting differences in tests do not change product behavior. This is not a committed deployment.",
+  "files": [
+    {
+      "path": "next.config.mjs",
+      "workingTreeSha256": "62b067d1ef18fc223fc873354c29388e8829e66a446ca9aea3a6fa7cf6f5e19f",
+      "testedSnapshotSha256": "62b067d1ef18fc223fc873354c29388e8829e66a446ca9aea3a6fa7cf6f5e19f"
+    },
+    {
+      "path": "package-lock.json",
+      "workingTreeSha256": "5574d0d7b529f1f7b3b57a2d9d583e62bc53d3bfa68ac7de06ad7185ee6ffcf9",
+      "testedSnapshotSha256": "5574d0d7b529f1f7b3b57a2d9d583e62bc53d3bfa68ac7de06ad7185ee6ffcf9"
+    },
+    {
+      "path": "package.json",
+      "workingTreeSha256": "65391311db599ba93090d3938b3e961b26ecd8a8ce08008babb5772c2d10e372",
+      "testedSnapshotSha256": "65391311db599ba93090d3938b3e961b26ecd8a8ce08008babb5772c2d10e372"
+    },
+    {
+      "path": "playwright.config.ts",
+      "workingTreeSha256": "f5ff50520a6cd153e88c5c994ef4d7036dcc312bbd1adf3155610d7107fce817",
+      "testedSnapshotSha256": "f5ff50520a6cd153e88c5c994ef4d7036dcc312bbd1adf3155610d7107fce817"
+    },
+    {
+      "path": "public/app-icon.svg",
+      "workingTreeSha256": "dc4dd6f67f4f18067c802ab54f927d3b933536359bc8b6edb8d6237f43cc6698",
+      "testedSnapshotSha256": "dc4dd6f67f4f18067c802ab54f927d3b933536359bc8b6edb8d6237f43cc6698"
+    },
+    {
+      "path": "public/icon.svg",
+      "workingTreeSha256": "f60651daf276fafedb2725c13d61cf9b3fa812792d74c9f02b4843aef6e4a143",
+      "testedSnapshotSha256": "f60651daf276fafedb2725c13d61cf9b3fa812792d74c9f02b4843aef6e4a143"
+    },
+    {
+      "path": "public/licenses/Poppins-OFL.txt",
+      "workingTreeSha256": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b",
+      "testedSnapshotSha256": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b"
+    },
+    {
+      "path": "public/manifest.webmanifest",
+      "workingTreeSha256": "49764e5f72c83dd5583b56b6223d3a60b4bef7608b5126e61b11eab12988e543",
+      "testedSnapshotSha256": "49764e5f72c83dd5583b56b6223d3a60b4bef7608b5126e61b11eab12988e543"
+    },
+    {
+      "path": "public/sw.js",
+      "workingTreeSha256": "6b0102991a454398563ea61ac542bb7d7de220d376fd4d2d8e358dfdc69ecd63",
+      "testedSnapshotSha256": "d140346d05e9c91270677b80d5b7821bf869b2c87a68082a4f953dbe5429169c"
+    },
+    {
+      "path": "scripts/audit-integrity.ts",
+      "workingTreeSha256": "89ff717d8343dd68fc9369694e36f312a6c29781969ac6e50d51cbc64c989b72",
+      "testedSnapshotSha256": "89ff717d8343dd68fc9369694e36f312a6c29781969ac6e50d51cbc64c989b72"
+    },
+    {
+      "path": "scripts/backfill-difficulty.ts",
+      "workingTreeSha256": "1fbdbc9fe589b426018b20e7b16286c7d14c43cde3fe595f03a99339d829d5d0",
+      "testedSnapshotSha256": "1fbdbc9fe589b426018b20e7b16286c7d14c43cde3fe595f03a99339d829d5d0"
+    },
+    {
+      "path": "scripts/benchmark-exams.ts",
+      "workingTreeSha256": "21facc2ddcc3c935daa5755d894d3a19c52fc321f5b601f58ba64db623293049",
+      "testedSnapshotSha256": "21facc2ddcc3c935daa5755d894d3a19c52fc321f5b601f58ba64db623293049"
+    },
+    {
+      "path": "scripts/bootstrap-superadmin.ts",
+      "workingTreeSha256": "91a43cc0545796b12a56b4f783ace52d4d562c48cca6f504cfe871878872b63b",
+      "testedSnapshotSha256": "91a43cc0545796b12a56b4f783ace52d4d562c48cca6f504cfe871878872b63b"
+    },
+    {
+      "path": "scripts/check-deployment.mjs",
+      "workingTreeSha256": "2bb63eb4f29abeba9334fb981fad019ac882e2fe4e7996287c3b57b50d088911",
+      "testedSnapshotSha256": "2bb63eb4f29abeba9334fb981fad019ac882e2fe4e7996287c3b57b50d088911"
+    },
+    {
+      "path": "scripts/check-dev-port.mjs",
+      "workingTreeSha256": "92122323e5effa9924160ea8ca5d7866d02a3f4bd906bc8f46d78514f0ac119d",
+      "testedSnapshotSha256": "92122323e5effa9924160ea8ca5d7866d02a3f4bd906bc8f46d78514f0ac119d"
+    },
+    {
+      "path": "scripts/check-runtime.ts",
+      "workingTreeSha256": "79f756a0eb4e194507f09a364a7d63012dc48a3ca003bb525d0fa55dbe50ac18",
+      "testedSnapshotSha256": "79f756a0eb4e194507f09a364a7d63012dc48a3ca003bb525d0fa55dbe50ac18"
+    },
+    {
+      "path": "scripts/copy-to-replica.ts",
+      "workingTreeSha256": "24ab1ea08b6ce5ffc513929fb6a9e507e7afeda2dcb9812b5c02e373fbee0f70",
+      "testedSnapshotSha256": "24ab1ea08b6ce5ffc513929fb6a9e507e7afeda2dcb9812b5c02e373fbee0f70"
+    },
+    {
+      "path": "scripts/exam-worker.ts",
+      "workingTreeSha256": "8474759e42015314fb8783f0f621f7910a004a0d9b76f799f0a38c641a764f9a",
+      "testedSnapshotSha256": "8474759e42015314fb8783f0f621f7910a004a0d9b76f799f0a38c641a764f9a"
+    },
+    {
+      "path": "scripts/extract-document.ts",
+      "workingTreeSha256": "793a38244664e1f30611709e518912fd4288587a9677570faa50a87fc4fec87d",
+      "testedSnapshotSha256": "793a38244664e1f30611709e518912fd4288587a9677570faa50a87fc4fec87d"
+    },
+    {
+      "path": "scripts/generate-exam-fixtures.ts",
+      "workingTreeSha256": "b8147d705fe470f1a62c7e0ac5d36712535e5c8fb99cc6a9fac65ed306d205a9",
+      "testedSnapshotSha256": "b8147d705fe470f1a62c7e0ac5d36712535e5c8fb99cc6a9fac65ed306d205a9"
+    },
+    {
+      "path": "scripts/import-category-samples.ts",
+      "workingTreeSha256": "acb22b3c0fe5fd067ef66a919dde30ba8629ad68b06f46a0c30bf4cd7ed2153b",
+      "testedSnapshotSha256": "acb22b3c0fe5fd067ef66a919dde30ba8629ad68b06f46a0c30bf4cd7ed2153b"
+    },
+    {
+      "path": "scripts/import-reviewed-konkur.ts",
+      "workingTreeSha256": "587f01bbf565156b4eafcf407aac2ac5ecafe4ec0a731ce1b961abd4a9dfb843",
+      "testedSnapshotSha256": "587f01bbf565156b4eafcf407aac2ac5ecafe4ec0a731ce1b961abd4a9dfb843"
+    },
+    {
+      "path": "scripts/init-replica.mjs",
+      "workingTreeSha256": "114c37105aee4eca0066c31c3ba44448bb2e15a7873aba32e88b7652ee906b6f",
+      "testedSnapshotSha256": "114c37105aee4eca0066c31c3ba44448bb2e15a7873aba32e88b7652ee906b6f"
+    },
+    {
+      "path": "scripts/load-health.ts",
+      "workingTreeSha256": "8f4baaddea846a8eb1a6e0faa2812929b892f7012b3ef50c85b4fd6df1196021",
+      "testedSnapshotSha256": "8f4baaddea846a8eb1a6e0faa2812929b892f7012b3ef50c85b4fd6df1196021"
+    },
+    {
+      "path": "scripts/mail-worker.ts",
+      "workingTreeSha256": "79b95edc62c6c62f461087e6706ee9e6bf711da89f31469e61b19da98ed1fbb0",
+      "testedSnapshotSha256": "79b95edc62c6c62f461087e6706ee9e6bf711da89f31469e61b19da98ed1fbb0"
+    },
+    {
+      "path": "scripts/prepare-font.mjs",
+      "workingTreeSha256": "a3f4cd805d3bbd4300b07cb7091f63fbce60dae817b268909382dcf788639688",
+      "testedSnapshotSha256": "a3f4cd805d3bbd4300b07cb7091f63fbce60dae817b268909382dcf788639688"
+    },
+    {
+      "path": "scripts/pwa.mjs",
+      "workingTreeSha256": "c4af2d06217faf6792ba85bfd45d8d18f0dc4f462fc8ff9e801cdb2732431cc5",
+      "testedSnapshotSha256": "c4af2d06217faf6792ba85bfd45d8d18f0dc4f462fc8ff9e801cdb2732431cc5"
+    },
+    {
+      "path": "scripts/rebuild-learning.ts",
+      "workingTreeSha256": "292c6d938ebc222ef9bf5ccccc4684d49d583e578b67bff93f0c558a0eaee96f",
+      "testedSnapshotSha256": "292c6d938ebc222ef9bf5ccccc4684d49d583e578b67bff93f0c558a0eaee96f"
+    },
+    {
+      "path": "scripts/run-e2e.mjs",
+      "workingTreeSha256": "824c504f409d295828d3fca1c63662ba39d5ba08acdb5fab6ee4e792547a457d",
+      "testedSnapshotSha256": "824c504f409d295828d3fca1c63662ba39d5ba08acdb5fab6ee4e792547a457d"
+    },
+    {
+      "path": "scripts/setup-ocr.mjs",
+      "workingTreeSha256": "739f587d013225bafd3e95e9d4028644e531a3c1223a6ed16cd1f389f66760d5",
+      "testedSnapshotSha256": "739f587d013225bafd3e95e9d4028644e531a3c1223a6ed16cd1f389f66760d5"
+    },
+    {
+      "path": "scripts/smoke-ollama.ts",
+      "workingTreeSha256": "f22e646ba27397d570b67a0dc4ce30c9d283a2f9ee60da526269d71fe90abd77",
+      "testedSnapshotSha256": "f22e646ba27397d570b67a0dc4ce30c9d283a2f9ee60da526269d71fe90abd77"
+    },
+    {
+      "path": "scripts/sw.template.js",
+      "workingTreeSha256": "3d3221a6537bf17ff489d18cfa79f90f1c1a1fe47735bdc51e874f48d9919ed0",
+      "testedSnapshotSha256": "3d3221a6537bf17ff489d18cfa79f90f1c1a1fe47735bdc51e874f48d9919ed0"
+    },
+    {
+      "path": "scripts/verify-backup.ts",
+      "workingTreeSha256": "1b6729c0f0461bf9c01d37bd81d3d1dcb41994cf6d566964a8126bf5baa16cd9",
+      "testedSnapshotSha256": "1b6729c0f0461bf9c01d37bd81d3d1dcb41994cf6d566964a8126bf5baa16cd9"
+    },
+    {
+      "path": "src/app/[section]/page.tsx",
+      "workingTreeSha256": "d72458eea7ae621a574041f0c3494337e81fff568368cca1aa39133813b08795",
+      "testedSnapshotSha256": "d72458eea7ae621a574041f0c3494337e81fff568368cca1aa39133813b08795"
+    },
+    {
+      "path": "src/app/api/[...path]/route.ts",
+      "workingTreeSha256": "c23a517f03fd45d6aae21f8286735edd4f410d9760dca6d74278d58e02dcb26b",
+      "testedSnapshotSha256": "c23a517f03fd45d6aae21f8286735edd4f410d9760dca6d74278d58e02dcb26b"
+    },
+    {
+      "path": "src/app/globals.css",
+      "workingTreeSha256": "26fef9cd919d86a3277af5f15a4f0f3082bd88e1a18ac46fb6d3819699b7a0e7",
+      "testedSnapshotSha256": "26fef9cd919d86a3277af5f15a4f0f3082bd88e1a18ac46fb6d3819699b7a0e7"
+    },
+    {
+      "path": "src/app/layout.tsx",
+      "workingTreeSha256": "5e91713828c60df3f6c65373e2460c5266e933ae12f6a447594b9a34110fdae3",
+      "testedSnapshotSha256": "5e91713828c60df3f6c65373e2460c5266e933ae12f6a447594b9a34110fdae3"
+    },
+    {
+      "path": "src/app/page.tsx",
+      "workingTreeSha256": "84a7e29e0760759ccea8add9f7f836593ec8ce5e7b35dcf8a248dd6af265036d",
+      "testedSnapshotSha256": "84a7e29e0760759ccea8add9f7f836593ec8ce5e7b35dcf8a248dd6af265036d"
+    },
+    {
+      "path": "src/app/verify-email/page.tsx",
+      "workingTreeSha256": "445ec86befb0a896790426d2ce54e131921cf144cffb842c62b0fd9e9d4f2e98",
+      "testedSnapshotSha256": "445ec86befb0a896790426d2ce54e131921cf144cffb842c62b0fd9e9d4f2e98"
+    },
+    {
+      "path": "src/assets/fonts/Poppins-Regular.ttf",
+      "workingTreeSha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a",
+      "testedSnapshotSha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "path": "src/components/app-link.tsx",
+      "workingTreeSha256": "f7d5ee69cc3c38ba42f567598845d3bfd2966783341a1bdf658d79cf3f38a8ff",
+      "testedSnapshotSha256": "f7d5ee69cc3c38ba42f567598845d3bfd2966783341a1bdf658d79cf3f38a8ff"
+    },
+    {
+      "path": "src/components/hamyar-app.tsx",
+      "workingTreeSha256": "23e6c9ee23c8a9efbb3ffaffe41f31740abd0ea56e6b661e04b578e8b49ab7ce",
+      "testedSnapshotSha256": "23e6c9ee23c8a9efbb3ffaffe41f31740abd0ea56e6b661e04b578e8b49ab7ce"
+    },
+    {
+      "path": "src/components/question-presentation.tsx",
+      "workingTreeSha256": "dce0d912f230850865d40747fa807d44e548731b9f5e88d7c1fc36483140ca78",
+      "testedSnapshotSha256": "dce0d912f230850865d40747fa807d44e548731b9f5e88d7c1fc36483140ca78"
+    },
+    {
+      "path": "src/components/ui/brand.tsx",
+      "workingTreeSha256": "1c91cc33e5e595c7f5268f50a0bb4265b8e5a37c30bc9a8f91498384b112be2b",
+      "testedSnapshotSha256": "1c91cc33e5e595c7f5268f50a0bb4265b8e5a37c30bc9a8f91498384b112be2b"
+    },
+    {
+      "path": "src/components/ui/button.tsx",
+      "workingTreeSha256": "b6c44852f2b476313e97afd35c45e6dcc1d802ab5543b2474622decc802065b7",
+      "testedSnapshotSha256": "b6c44852f2b476313e97afd35c45e6dcc1d802ab5543b2474622decc802065b7"
+    },
+    {
+      "path": "src/components/ui/difficulty-gauge.tsx",
+      "workingTreeSha256": "186d1de6dfae7fdfe423838eb996e5798bfd39149aca8614699b6d29991ac4fa",
+      "testedSnapshotSha256": "186d1de6dfae7fdfe423838eb996e5798bfd39149aca8614699b6d29991ac4fa"
+    },
+    {
+      "path": "src/components/ui/field.tsx",
+      "workingTreeSha256": "b01d6b241d7362eca4e511ad498592fa9b3f598708a595b4aa7c19c6970e275d",
+      "testedSnapshotSha256": "b01d6b241d7362eca4e511ad498592fa9b3f598708a595b4aa7c19c6970e275d"
+    },
+    {
+      "path": "src/components/ui/multi-filter.tsx",
+      "workingTreeSha256": "176b31c7805aa042267fb9f022c9187ad179dfc0bd4be7fbe6d552f5bb50f5bb",
+      "testedSnapshotSha256": "176b31c7805aa042267fb9f022c9187ad179dfc0bd4be7fbe6d552f5bb50f5bb"
+    },
+    {
+      "path": "src/components/ui/paged-list.tsx",
+      "workingTreeSha256": "7878f05926a97add7194a0822ee04860767426636bec55a0b33b9f01bf2ca7ff",
+      "testedSnapshotSha256": "7878f05926a97add7194a0822ee04860767426636bec55a0b33b9f01bf2ca7ff"
+    },
+    {
+      "path": "src/data/iran-secondary-curriculum.json",
+      "workingTreeSha256": "f397887e446bc1d945044dd67af30dee0e183d1061ab099fb4bf253b99300cf4",
+      "testedSnapshotSha256": "f397887e446bc1d945044dd67af30dee0e183d1061ab099fb4bf253b99300cf4"
+    },
+    {
+      "path": "src/features/access/access-console.tsx",
+      "workingTreeSha256": "6fcdf6a0ace419f01253e3e2acbc7fce2414df809b8f71e869f20a35a4caa5ea",
+      "testedSnapshotSha256": "6fcdf6a0ace419f01253e3e2acbc7fce2414df809b8f71e869f20a35a4caa5ea"
+    },
+    {
+      "path": "src/features/analytics/learning-dashboard.tsx",
+      "workingTreeSha256": "2e8c3dc92d876c9d1740715bc4af2a833c591b461d61eb0ad3b7aef43fa9d229",
+      "testedSnapshotSha256": "2e8c3dc92d876c9d1740715bc4af2a833c591b461d61eb0ad3b7aef43fa9d229"
+    },
+    {
+      "path": "src/features/analytics/mission-report.tsx",
+      "workingTreeSha256": "32c2c2049544e3ef299280026f483aa93373ad4b208eae7fcf492236776a455e",
+      "testedSnapshotSha256": "32c2c2049544e3ef299280026f483aa93373ad4b208eae7fcf492236776a455e"
+    },
+    {
+      "path": "src/features/analytics/parent-dashboard.tsx",
+      "workingTreeSha256": "af15c220783c8b9a550e28c7bd0cfbfb3d5dc48f3896171e31823d4a64041182",
+      "testedSnapshotSha256": "af15c220783c8b9a550e28c7bd0cfbfb3d5dc48f3896171e31823d4a64041182"
+    },
+    {
+      "path": "src/features/auth/auth-screen.tsx",
+      "workingTreeSha256": "2a7ee12ebba661d734ca678d33af15bd6bb71102f8e9ad2b0b93e958dda47fa8",
+      "testedSnapshotSha256": "2a7ee12ebba661d734ca678d33af15bd6bb71102f8e9ad2b0b93e958dda47fa8"
+    },
+    {
+      "path": "src/features/auth/phone-auth-screen.tsx",
+      "workingTreeSha256": "5e0402581f209ec866f32e419d6b2dae076f69ef47f8a998864ba418f4078289",
+      "testedSnapshotSha256": "5e0402581f209ec866f32e419d6b2dae076f69ef47f8a998864ba418f4078289"
+    },
+    {
+      "path": "src/features/classes/class-groups-screen.tsx",
+      "workingTreeSha256": "c841d4d9473fb32493e8f27c9106e7cb9a1e9e84e47b53d98d49b79da74207e0",
+      "testedSnapshotSha256": "c841d4d9473fb32493e8f27c9106e7cb9a1e9e84e47b53d98d49b79da74207e0"
+    },
+    {
+      "path": "src/features/content/ai-authoring.tsx",
+      "workingTreeSha256": "a95d7e0560bdbb520fd061caa0ed411d521c31b512fb2f599d361b77b0cf99bc",
+      "testedSnapshotSha256": "a95d7e0560bdbb520fd061caa0ed411d521c31b512fb2f599d361b77b0cf99bc"
+    },
+    {
+      "path": "src/features/content/content-screen.tsx",
+      "workingTreeSha256": "251a4fb286ebc844f4910411b77e54bb7a806b025bbaadb4fe44d2d6b0fe62f6",
+      "testedSnapshotSha256": "251a4fb286ebc844f4910411b77e54bb7a806b025bbaadb4fe44d2d6b0fe62f6"
+    },
+    {
+      "path": "src/features/content/curriculum-catalog.tsx",
+      "workingTreeSha256": "8a5170bf2edef3ce4a986a96d527f990c640f6241f9fec90712d0d14b12b5518",
+      "testedSnapshotSha256": "8a5170bf2edef3ce4a986a96d527f990c640f6241f9fec90712d0d14b12b5518"
+    },
+    {
+      "path": "src/features/content/exam-import-screen.tsx",
+      "workingTreeSha256": "760d59156204009a85e12921e7d5d6a545405fdd50d5615c49f54f9ac6e1ef1e",
+      "testedSnapshotSha256": "760d59156204009a85e12921e7d5d6a545405fdd50d5615c49f54f9ac6e1ef1e"
+    },
+    {
+      "path": "src/features/content/image-crop-editor.tsx",
+      "workingTreeSha256": "5971382f27edb031f22f16c4519b84e269a9bf3612ba974aa7f4fe83c257bd2c",
+      "testedSnapshotSha256": "5971382f27edb031f22f16c4519b84e269a9bf3612ba974aa7f4fe83c257bd2c"
+    },
+    {
+      "path": "src/features/content/node-selector.tsx",
+      "workingTreeSha256": "cad457aa66e83654c8875ef1982a30fb7aa53426da2c52928449d81de07426da",
+      "testedSnapshotSha256": "cad457aa66e83654c8875ef1982a30fb7aa53426da2c52928449d81de07426da"
+    },
+    {
+      "path": "src/features/content/question-bank.tsx",
+      "workingTreeSha256": "9a384dce6030cd2a454c7f1c8a1be802dabc1cfb52d6b6057f5fee71ea4ac906",
+      "testedSnapshotSha256": "9a384dce6030cd2a454c7f1c8a1be802dabc1cfb52d6b6057f5fee71ea4ac906"
+    },
+    {
+      "path": "src/features/content/question-editor.tsx",
+      "workingTreeSha256": "e4fecc82137cc70fe248920dfe07eb6648d176870c4a3ce5f3a49d04debdd76f",
+      "testedSnapshotSha256": "e4fecc82137cc70fe248920dfe07eb6648d176870c4a3ce5f3a49d04debdd76f"
+    },
+    {
+      "path": "src/features/content/question-picker.tsx",
+      "workingTreeSha256": "d03b9dbf0899c0ac16255f0bd5c44242c23522b5955f7cd89b68d0ef62330ac4",
+      "testedSnapshotSha256": "d03b9dbf0899c0ac16255f0bd5c44242c23522b5955f7cd89b68d0ef62330ac4"
+    },
+    {
+      "path": "src/features/content/source-editor.tsx",
+      "workingTreeSha256": "21a6c609830cce4960e03852b6e049855bc21400fc638362951199a7bb270613",
+      "testedSnapshotSha256": "21a6c609830cce4960e03852b6e049855bc21400fc638362951199a7bb270613"
+    },
+    {
+      "path": "src/features/content/topic-selector.tsx",
+      "workingTreeSha256": "726ef554c26a963af2f16081b0713df0f9a1997bf0662d49933df378e7fec9e0",
+      "testedSnapshotSha256": "726ef554c26a963af2f16081b0713df0f9a1997bf0662d49933df378e7fec9e0"
+    },
+    {
+      "path": "src/features/content/visual-editor.tsx",
+      "workingTreeSha256": "a1a90dac8b5b68143a8325ac885ba1036e13d582eb316b67f96b472340d9600b",
+      "testedSnapshotSha256": "a1a90dac8b5b68143a8325ac885ba1036e13d582eb316b67f96b472340d9600b"
+    },
+    {
+      "path": "src/features/courses/courses-screen.tsx",
+      "workingTreeSha256": "afd8a6c8a3378c60f525ddc2bd91ab3234032ab27807735cbf8cf48ebb51e01d",
+      "testedSnapshotSha256": "afd8a6c8a3378c60f525ddc2bd91ab3234032ab27807735cbf8cf48ebb51e01d"
+    },
+    {
+      "path": "src/features/dashboard/dashboard-screen.tsx",
+      "workingTreeSha256": "c9b427bdbec6bd03ed1e88ff32b0c0a8be26f1caeb99c1ddc4add8ce3c915fea",
+      "testedSnapshotSha256": "c9b427bdbec6bd03ed1e88ff32b0c0a8be26f1caeb99c1ddc4add8ce3c915fea"
+    },
+    {
+      "path": "src/features/dashboard/student-overview.tsx",
+      "workingTreeSha256": "acd24ffc583ca589eeb5e4333892927ef4abcbb6621244cd5774a96ef257fdeb",
+      "testedSnapshotSha256": "acd24ffc583ca589eeb5e4333892927ef4abcbb6621244cd5774a96ef257fdeb"
+    },
+    {
+      "path": "src/features/missions/individual-remediation.tsx",
+      "workingTreeSha256": "f94325e50a6b65261c47fb03e8c7b9b91b9700a29b977714fe33a53f37f91f6d",
+      "testedSnapshotSha256": "f94325e50a6b65261c47fb03e8c7b9b91b9700a29b977714fe33a53f37f91f6d"
+    },
+    {
+      "path": "src/features/missions/missions-screen.tsx",
+      "workingTreeSha256": "84fca5da203d370b46ce5008825fedfcfa0ae076717cf27b07cacdaa72fcb324",
+      "testedSnapshotSha256": "84fca5da203d370b46ce5008825fedfcfa0ae076717cf27b07cacdaa72fcb324"
+    },
+    {
+      "path": "src/features/practice/practice-screen.tsx",
+      "workingTreeSha256": "566a4c51b3f9f53b9f398cd0f7874071eb24c3ccff3ad4165fbc33669ba7dbbd",
+      "testedSnapshotSha256": "566a4c51b3f9f53b9f398cd0f7874071eb24c3ccff3ad4165fbc33669ba7dbbd"
+    },
+    {
+      "path": "src/features/settings/ai-settings-screen.tsx",
+      "workingTreeSha256": "bada34e5f9dd4f1d1a64121cae9a7f0362baa24eb2e557aabb0115a826dab56c",
+      "testedSnapshotSha256": "bada34e5f9dd4f1d1a64121cae9a7f0362baa24eb2e557aabb0115a826dab56c"
+    },
+    {
+      "path": "src/features/students/join-teacher.tsx",
+      "workingTreeSha256": "71a62b8a8dfacbc630ea15a0fdd6984296df2f941bb18aa93624af1a1e0b3959",
+      "testedSnapshotSha256": "71a62b8a8dfacbc630ea15a0fdd6984296df2f941bb18aa93624af1a1e0b3959"
+    },
+    {
+      "path": "src/features/students/parent-invitation.tsx",
+      "workingTreeSha256": "8421ae45ed9436530ca27de91bb1ce84fe53d41ead74a8bbe8306320e749c7d7",
+      "testedSnapshotSha256": "8421ae45ed9436530ca27de91bb1ce84fe53d41ead74a8bbe8306320e749c7d7"
+    },
+    {
+      "path": "src/features/students/students-screen.tsx",
+      "workingTreeSha256": "15b7d54d78486b22ea4d60def81af8859e59b3e17f325cfd77800f50ef949109",
+      "testedSnapshotSha256": "15b7d54d78486b22ea4d60def81af8859e59b3e17f325cfd77800f50ef949109"
+    },
+    {
+      "path": "src/lib/access.ts",
+      "workingTreeSha256": "8682d3d6ccd0f03347552f218e07f0ddadff9b82c736804ed6f1542d8a075abb",
+      "testedSnapshotSha256": "8682d3d6ccd0f03347552f218e07f0ddadff9b82c736804ed6f1542d8a075abb"
+    },
+    {
+      "path": "src/lib/api.ts",
+      "workingTreeSha256": "6b281ca81fe1b51130414bf9a32dc1aa525b34d119a9d77b0eac1c2d71f9f90e",
+      "testedSnapshotSha256": "6b281ca81fe1b51130414bf9a32dc1aa525b34d119a9d77b0eac1c2d71f9f90e"
+    },
+    {
+      "path": "src/lib/app-routes.ts",
+      "workingTreeSha256": "51189f91015bb22364e71ba267c3423de47ab7ee218e51eb43e1b057300d20d2",
+      "testedSnapshotSha256": "51189f91015bb22364e71ba267c3423de47ab7ee218e51eb43e1b057300d20d2"
+    },
+    {
+      "path": "src/lib/curriculum.ts",
+      "workingTreeSha256": "cd3ab990ea4774846a60acacb790c9732a7357ff8f200cc2638f840d281a64d9",
+      "testedSnapshotSha256": "cd3ab990ea4774846a60acacb790c9732a7357ff8f200cc2638f840d281a64d9"
+    },
+    {
+      "path": "src/lib/difficulty.ts",
+      "workingTreeSha256": "d15f8ace127140e413143c442656d78794d7fd083f644b13227cf5843b5780b8",
+      "testedSnapshotSha256": "d15f8ace127140e413143c442656d78794d7fd083f644b13227cf5843b5780b8"
+    },
+    {
+      "path": "src/lib/exam-import.ts",
+      "workingTreeSha256": "27ea3002f3e1ca5a6834ef1f58e717c0a374a3e77a5be3642a47904b91b71d4e",
+      "testedSnapshotSha256": "27ea3002f3e1ca5a6834ef1f58e717c0a374a3e77a5be3642a47904b91b71d4e"
+    },
+    {
+      "path": "src/lib/math-render.ts",
+      "workingTreeSha256": "9074cebe507e4f046bf54c83e2c4ebda78f320793172ecda17aaef5662e4fbad",
+      "testedSnapshotSha256": "9074cebe507e4f046bf54c83e2c4ebda78f320793172ecda17aaef5662e4fbad"
+    },
+    {
+      "path": "src/lib/mission-limits.ts",
+      "workingTreeSha256": "a991a5e8f7e758b089eeed2bf79af0df3990bf2659e103411bcae00c106e5a18",
+      "testedSnapshotSha256": "a991a5e8f7e758b089eeed2bf79af0df3990bf2659e103411bcae00c106e5a18"
+    },
+    {
+      "path": "src/lib/phone.ts",
+      "workingTreeSha256": "28cc3184299e82347ab26214fca243cecefb89d2a65a645e25d6ad5ae211ae4b",
+      "testedSnapshotSha256": "28cc3184299e82347ab26214fca243cecefb89d2a65a645e25d6ad5ae211ae4b"
+    },
+    {
+      "path": "src/lib/practice-answer.ts",
+      "workingTreeSha256": "ef8714edb281f9747dbfa5b0c21fa772877ce030f44db5634e65412f792d3dbd",
+      "testedSnapshotSha256": "ef8714edb281f9747dbfa5b0c21fa772877ce030f44db5634e65412f792d3dbd"
+    },
+    {
+      "path": "src/lib/presentation.ts",
+      "workingTreeSha256": "2dddaf055e2843d4bdf15a253f583e0c3c5135825b1d990501d6449ad0680a33",
+      "testedSnapshotSha256": "2dddaf055e2843d4bdf15a253f583e0c3c5135825b1d990501d6449ad0680a33"
+    },
+    {
+      "path": "src/lib/question-source.ts",
+      "workingTreeSha256": "15d6d7d8a5a5425236c65083748ffd6f66a740b74bb19a84df8d2c5ed29db9a1",
+      "testedSnapshotSha256": "15d6d7d8a5a5425236c65083748ffd6f66a740b74bb19a84df8d2c5ed29db9a1"
+    },
+    {
+      "path": "src/lib/question-visuals.ts",
+      "workingTreeSha256": "cba5060e5846fe66bb4b1b741d561dd77d03af8cfaab46a78c557bad40d7b6e1",
+      "testedSnapshotSha256": "cba5060e5846fe66bb4b1b741d561dd77d03af8cfaab46a78c557bad40d7b6e1"
+    },
+    {
+      "path": "src/lib/types.ts",
+      "workingTreeSha256": "439bb8e4e67e7e93b757960659fe794e0c1acf615fa7ec6ea65819512e51c8be",
+      "testedSnapshotSha256": "439bb8e4e67e7e93b757960659fe794e0c1acf615fa7ec6ea65819512e51c8be"
+    },
+    {
+      "path": "src/server/access-bootstrap.ts",
+      "workingTreeSha256": "090023e05a17d5f4690f2ab0cec4e3232f9b0e9197fcaec77152a6ca2b91a73f",
+      "testedSnapshotSha256": "090023e05a17d5f4690f2ab0cec4e3232f9b0e9197fcaec77152a6ca2b91a73f"
+    },
+    {
+      "path": "src/server/ai/avalai.ts",
+      "workingTreeSha256": "d66844ad5697e98ac466b571bacd5452ff050c62bc26a5a13515fe5f1ae2cef7",
+      "testedSnapshotSha256": "d66844ad5697e98ac466b571bacd5452ff050c62bc26a5a13515fe5f1ae2cef7"
+    },
+    {
+      "path": "src/server/ai/ollama.ts",
+      "workingTreeSha256": "0fa13fd64c0ecbe5660813241e1e56e793dafdaa570a724380ce5935edf0c5f7",
+      "testedSnapshotSha256": "0fa13fd64c0ecbe5660813241e1e56e793dafdaa570a724380ce5935edf0c5f7"
+    },
+    {
+      "path": "src/server/ai/provider.ts",
+      "workingTreeSha256": "04c5775c6649e9d5f833b3773a7aaea4d81a4a9af04b352c72165bb5d5bb2be8",
+      "testedSnapshotSha256": "04c5775c6649e9d5f833b3773a7aaea4d81a4a9af04b352c72165bb5d5bb2be8"
+    },
+    {
+      "path": "src/server/ai/question-generator.ts",
+      "workingTreeSha256": "a4c453513f3f6c264ab898e31ce7932fb347ba52463ce505239196895e79a5cf",
+      "testedSnapshotSha256": "a4c453513f3f6c264ab898e31ce7932fb347ba52463ce505239196895e79a5cf"
+    },
+    {
+      "path": "src/server/ai/tutor.ts",
+      "workingTreeSha256": "359045a6d55bcc55ecf0901ca523b12035e6bacc08472a4896e7d37eec26f1e5",
+      "testedSnapshotSha256": "359045a6d55bcc55ecf0901ca523b12035e6bacc08472a4896e7d37eec26f1e5"
+    },
+    {
+      "path": "src/server/ai/types.ts",
+      "workingTreeSha256": "7964cb6395374e0c466319838e9eea60ba3c863af18eaa1d780d9a2be69551cb",
+      "testedSnapshotSha256": "7964cb6395374e0c466319838e9eea60ba3c863af18eaa1d780d9a2be69551cb"
+    },
+    {
+      "path": "src/server/app.ts",
+      "workingTreeSha256": "68a1cd623931b1812aa6121cf5296e979a14af48040e78bd0c98ecc848095271",
+      "testedSnapshotSha256": "68a1cd623931b1812aa6121cf5296e979a14af48040e78bd0c98ecc848095271"
+    },
+    {
+      "path": "src/server/auth/mail-outbox.ts",
+      "workingTreeSha256": "0f4e3253fd103e06651ebdea482476030e50057ba231ce5fe57de51c0008ad31",
+      "testedSnapshotSha256": "0f4e3253fd103e06651ebdea482476030e50057ba231ce5fe57de51c0008ad31"
+    },
+    {
+      "path": "src/server/auth/reset-mail.ts",
+      "workingTreeSha256": "7a7d6d4dca427e0c484600c4b3ea3a4ab718eac734714195208a26425552ea93",
+      "testedSnapshotSha256": "7a7d6d4dca427e0c484600c4b3ea3a4ab718eac734714195208a26425552ea93"
+    },
+    {
+      "path": "src/server/auth/sms.ts",
+      "workingTreeSha256": "18594ff40f4274612a0453cc452110b7e63b5dba8ed75b880ab572882da9a00f",
+      "testedSnapshotSha256": "18594ff40f4274612a0453cc452110b7e63b5dba8ed75b880ab572882da9a00f"
+    },
+    {
+      "path": "src/server/backend.ts",
+      "workingTreeSha256": "2dc89d182a26a8db01c769176168422e02bf018467b9879a5a9c72dc93dd6dbe",
+      "testedSnapshotSha256": "2dc89d182a26a8db01c769176168422e02bf018467b9879a5a9c72dc93dd6dbe"
+    },
+    {
+      "path": "src/server/context.ts",
+      "workingTreeSha256": "dba238c0aa9ca996c90c14ba5c1578c307abcbb5056174b03194087773ace424",
+      "testedSnapshotSha256": "dba238c0aa9ca996c90c14ba5c1578c307abcbb5056174b03194087773ace424"
+    },
+    {
+      "path": "src/server/curriculum-catalog.ts",
+      "workingTreeSha256": "a9deb607f56ee3ff6ff5028148236302cb06cec9975e46197d66047d6fff699a",
+      "testedSnapshotSha256": "a9deb607f56ee3ff6ff5028148236302cb06cec9975e46197d66047d6fff699a"
+    },
+    {
+      "path": "src/server/db.ts",
+      "workingTreeSha256": "9e6ce97017c2055126fff88c709921017587608ccb44c18c73ea5d3cec7eef9f",
+      "testedSnapshotSha256": "9e6ce97017c2055126fff88c709921017587608ccb44c18c73ea5d3cec7eef9f"
+    },
+    {
+      "path": "src/server/domain.ts",
+      "workingTreeSha256": "65a5e260a0aef39a8ceefa9ded2534894cc32c61aa46196a5c0049c11de25327",
+      "testedSnapshotSha256": "65a5e260a0aef39a8ceefa9ded2534894cc32c61aa46196a5c0049c11de25327"
+    },
+    {
+      "path": "src/server/evaluation/index.ts",
+      "workingTreeSha256": "6955330d52e5dc11a70cc9f4e5cd663de65d767554641d366885260d25bfffe8",
+      "testedSnapshotSha256": "6955330d52e5dc11a70cc9f4e5cd663de65d767554641d366885260d25bfffe8"
+    },
+    {
+      "path": "src/server/evaluation/numeric.ts",
+      "workingTreeSha256": "cd218aa23396b4948b7be926cc4f2199f6e0a8f0dc67a1c30655c71d9f97093f",
+      "testedSnapshotSha256": "cd218aa23396b4948b7be926cc4f2199f6e0a8f0dc67a1c30655c71d9f97093f"
+    },
+    {
+      "path": "src/server/evaluation/symbolic.ts",
+      "workingTreeSha256": "dfe4b55457ac9e156c49e50477f1b406a5022e018a0ed38c7f8e042398338e40",
+      "testedSnapshotSha256": "dfe4b55457ac9e156c49e50477f1b406a5022e018a0ed38c7f8e042398338e40"
+    },
+    {
+      "path": "src/server/evaluation/types.ts",
+      "workingTreeSha256": "ae3db212be7c3c589ce4a960dfab3c6b8d4d422fb2c0d05b1eec1c6224ce2e51",
+      "testedSnapshotSha256": "ae3db212be7c3c589ce4a960dfab3c6b8d4d422fb2c0d05b1eec1c6224ce2e51"
+    },
+    {
+      "path": "src/server/imports/document-engine.ts",
+      "workingTreeSha256": "4f9470d65e0da285b1237b2e893413fba8208a88b4cf7f43506c0b0107eac94a",
+      "testedSnapshotSha256": "4f9470d65e0da285b1237b2e893413fba8208a88b4cf7f43506c0b0107eac94a"
+    },
+    {
+      "path": "src/server/imports/image-pdf.ts",
+      "workingTreeSha256": "19cf5fdc920f4727a911574ab9f7cfca432cacd9edfb24f5cd8e2a75ef2b32e8",
+      "testedSnapshotSha256": "19cf5fdc920f4727a911574ab9f7cfca432cacd9edfb24f5cd8e2a75ef2b32e8"
+    },
+    {
+      "path": "src/server/imports/jobs.ts",
+      "workingTreeSha256": "394865f99269763eccc5c7a4dae583bcb02b1f82a17f4d6146c542f443e719ec",
+      "testedSnapshotSha256": "394865f99269763eccc5c7a4dae583bcb02b1f82a17f4d6146c542f443e719ec"
+    },
+    {
+      "path": "src/server/imports/layout.ts",
+      "workingTreeSha256": "bb3ffe32fd2f55683189078bd7069f4aea65fed12a52a478f226901e7417b953",
+      "testedSnapshotSha256": "bb3ffe32fd2f55683189078bd7069f4aea65fed12a52a478f226901e7417b953"
+    },
+    {
+      "path": "src/server/imports/pdf.ts",
+      "workingTreeSha256": "5ea5bc7c5a56b08ecc36b6f4de259a8e04f047321e3db505ac1e77757ec94481",
+      "testedSnapshotSha256": "5ea5bc7c5a56b08ecc36b6f4de259a8e04f047321e3db505ac1e77757ec94481"
+    },
+    {
+      "path": "src/server/imports/reviewed-samples.ts",
+      "workingTreeSha256": "cb5ef6f5e44f9e94a4d3a7972a86a68920c5a0c55370d202c9a3b3c50ca0689e",
+      "testedSnapshotSha256": "cb5ef6f5e44f9e94a4d3a7972a86a68920c5a0c55370d202c9a3b3c50ca0689e"
+    },
+    {
+      "path": "src/server/imports/worker-loop.ts",
+      "workingTreeSha256": "ec8da3429bbf672b8a02954ccccc5b6dd9c32c1654e45b69ddd025f169c49315",
+      "testedSnapshotSha256": "ec8da3429bbf672b8a02954ccccc5b6dd9c32c1654e45b69ddd025f169c49315"
+    },
+    {
+      "path": "src/server/learning/model.ts",
+      "workingTreeSha256": "ef3eeec93f6e83a1ffd2fa3576c79a7dd7b9b313f03e5e3c0cdc1ff2faa4571a",
+      "testedSnapshotSha256": "ef3eeec93f6e83a1ffd2fa3576c79a7dd7b9b313f03e5e3c0cdc1ff2faa4571a"
+    },
+    {
+      "path": "src/server/learning/service.ts",
+      "workingTreeSha256": "e6d0e7ba837e3360373b1d9dfa917f36f1f1dd982bbd6dc30279f97631547669",
+      "testedSnapshotSha256": "e6d0e7ba837e3360373b1d9dfa917f36f1f1dd982bbd6dc30279f97631547669"
+    },
+    {
+      "path": "src/server/modules/access-management.ts",
+      "workingTreeSha256": "4e7395913a32819ff58b1e5b4d8d39dc7d58312f3b1206ab2fa62276fd221412",
+      "testedSnapshotSha256": "4e7395913a32819ff58b1e5b4d8d39dc7d58312f3b1206ab2fa62276fd221412"
+    },
+    {
+      "path": "src/server/modules/ai-settings.ts",
+      "workingTreeSha256": "126e8bbfb0410f6a5b3e18b7646208436db60d711ce777f4e70d1605c5cb0927",
+      "testedSnapshotSha256": "126e8bbfb0410f6a5b3e18b7646208436db60d711ce777f4e70d1605c5cb0927"
+    },
+    {
+      "path": "src/server/modules/analytics.ts",
+      "workingTreeSha256": "844154256d8ee89af30b2d6c440a49aebf01ebf861e3e9d16fc3dc943589d32f",
+      "testedSnapshotSha256": "844154256d8ee89af30b2d6c440a49aebf01ebf861e3e9d16fc3dc943589d32f"
+    },
+    {
+      "path": "src/server/modules/authoring.ts",
+      "workingTreeSha256": "e501eda0ecfdb420a747e77ae5afdac551d45ac2800ebbf4bc6acff595e4679e",
+      "testedSnapshotSha256": "e501eda0ecfdb420a747e77ae5afdac551d45ac2800ebbf4bc6acff595e4679e"
+    },
+    {
+      "path": "src/server/modules/class-groups.ts",
+      "workingTreeSha256": "5ad8fab817003ac00a55f3c67b25fced6af38a088494e02a9c9c3efc8ca33991",
+      "testedSnapshotSha256": "5ad8fab817003ac00a55f3c67b25fced6af38a088494e02a9c9c3efc8ca33991"
+    },
+    {
+      "path": "src/server/modules/content.ts",
+      "workingTreeSha256": "b30ab1a7248c2cc52b0872ed8770547e9e3133c52b0de3d05cf33f52437b9066",
+      "testedSnapshotSha256": "b30ab1a7248c2cc52b0872ed8770547e9e3133c52b0de3d05cf33f52437b9066"
+    },
+    {
+      "path": "src/server/modules/course-membership.ts",
+      "workingTreeSha256": "2ebad5ca59b90a236587d813441b2fffeaa5edefd40f65cc96424bf2d1bb81f9",
+      "testedSnapshotSha256": "2ebad5ca59b90a236587d813441b2fffeaa5edefd40f65cc96424bf2d1bb81f9"
+    },
+    {
+      "path": "src/server/modules/courses.ts",
+      "workingTreeSha256": "9c4043aa8c2032e558ab70abb3583152ef62c7ebb042349f53ba75cceb662ffb",
+      "testedSnapshotSha256": "9c4043aa8c2032e558ab70abb3583152ef62c7ebb042349f53ba75cceb662ffb"
+    },
+    {
+      "path": "src/server/modules/email-verification.ts",
+      "workingTreeSha256": "f77fab78e0b81f07da3b905c9c50bc4a80e9be93564aa4c9ea9eea47eeee36f2",
+      "testedSnapshotSha256": "f77fab78e0b81f07da3b905c9c50bc4a80e9be93564aa4c9ea9eea47eeee36f2"
+    },
+    {
+      "path": "src/server/modules/exam-imports.ts",
+      "workingTreeSha256": "c174a8c245757ce4054dbc4285611a86a6369e7f40b8f00620bbec3a48806177",
+      "testedSnapshotSha256": "c174a8c245757ce4054dbc4285611a86a6369e7f40b8f00620bbec3a48806177"
+    },
+    {
+      "path": "src/server/modules/identity.ts",
+      "workingTreeSha256": "459c7c5ce6e992308d4301502116396e454b7876f3aed1c5f394c6db7fe93b59",
+      "testedSnapshotSha256": "459c7c5ce6e992308d4301502116396e454b7876f3aed1c5f394c6db7fe93b59"
+    },
+    {
+      "path": "src/server/modules/learning.ts",
+      "workingTreeSha256": "611c7394b13b4b18013ff3da8119c6e6ae54810bb1658728ab87dbce0bdc7532",
+      "testedSnapshotSha256": "611c7394b13b4b18013ff3da8119c6e6ae54810bb1658728ab87dbce0bdc7532"
+    },
+    {
+      "path": "src/server/modules/missions.ts",
+      "workingTreeSha256": "c48809d4af8b3dccdcd40ea3fc1cf6ca30341ac798870e4f78a0d029fe805da2",
+      "testedSnapshotSha256": "c48809d4af8b3dccdcd40ea3fc1cf6ca30341ac798870e4f78a0d029fe805da2"
+    },
+    {
+      "path": "src/server/modules/password-reset.ts",
+      "workingTreeSha256": "d42846cf8815f88e85f4ec5e3576c9d9c0f91aa0958934b444749ddbdbc74b75",
+      "testedSnapshotSha256": "d42846cf8815f88e85f4ec5e3576c9d9c0f91aa0958934b444749ddbdbc74b75"
+    },
+    {
+      "path": "src/server/modules/phone-auth.ts",
+      "workingTreeSha256": "f755f0187ae62dd767ea9e1fc8c2b541b1e2b83687ed5533c55d3cff39d6f4b9",
+      "testedSnapshotSha256": "f755f0187ae62dd767ea9e1fc8c2b541b1e2b83687ed5533c55d3cff39d6f4b9"
+    },
+    {
+      "path": "src/server/modules/practice.ts",
+      "workingTreeSha256": "87f51b43ad15e04ecec610826d1bcc148d02b16a8153eaf2d4cba36b3246162b",
+      "testedSnapshotSha256": "87f51b43ad15e04ecec610826d1bcc148d02b16a8153eaf2d4cba36b3246162b"
+    },
+    {
+      "path": "src/server/modules/remediation.ts",
+      "workingTreeSha256": "dabc50c3af314fe286c8cdb97951187aafc17757983f9cdf9e480fd40ae82097",
+      "testedSnapshotSha256": "dabc50c3af314fe286c8cdb97951187aafc17757983f9cdf9e480fd40ae82097"
+    },
+    {
+      "path": "src/server/modules/student-dashboard.ts",
+      "workingTreeSha256": "c9b058a694cf81c1d48c7516f93c02daca026e7528b6cebcb3d085ab1cb3b9e8",
+      "testedSnapshotSha256": "c9b058a694cf81c1d48c7516f93c02daca026e7528b6cebcb3d085ab1cb3b9e8"
+    },
+    {
+      "path": "src/server/state.ts",
+      "workingTreeSha256": "2f8ebd81ee330fe249214f23b60bcc2337b60ff0f7d9315137c95b535282d953",
+      "testedSnapshotSha256": "2f8ebd81ee330fe249214f23b60bcc2337b60ff0f7d9315137c95b535282d953"
+    },
+    {
+      "path": "src/server/transactions.ts",
+      "workingTreeSha256": "8657e5a06d2ec2084802e55af0f2206ab4da6cf71fb23fc3fbead4baf5f10c0b",
+      "testedSnapshotSha256": "8657e5a06d2ec2084802e55af0f2206ab4da6cf71fb23fc3fbead4baf5f10c0b"
+    },
+    {
+      "path": "tests/e2e/access-roles.spec.ts",
+      "workingTreeSha256": "f94c7022b75b1ed3c1c6d3a6894c9ec863e3e773fe4d9bb36a623c8f461f098f",
+      "testedSnapshotSha256": "f94c7022b75b1ed3c1c6d3a6894c9ec863e3e773fe4d9bb36a623c8f461f098f"
+    },
+    {
+      "path": "tests/e2e/ai-settings.spec.ts",
+      "workingTreeSha256": "5b37ea6ef47234255e5cfbf306ee5f7ab9a2db30401329cd4e4252047c8f82ae",
+      "testedSnapshotSha256": "5b37ea6ef47234255e5cfbf306ee5f7ab9a2db30401329cd4e4252047c8f82ae"
+    },
+    {
+      "path": "tests/e2e/curriculum-catalog.spec.ts",
+      "workingTreeSha256": "ee1da80920496ef5ee3cd5b9284433ebdfd4cc6bdf64c95cae93d9cee16f9529",
+      "testedSnapshotSha256": "ee1da80920496ef5ee3cd5b9284433ebdfd4cc6bdf64c95cae93d9cee16f9529"
+    },
+    {
+      "path": "tests/e2e/curriculum-helpers.ts",
+      "workingTreeSha256": "a80be0d4e87a83335914580b2f42b9383552d687189384015dafa7a06074bef9",
+      "testedSnapshotSha256": "a80be0d4e87a83335914580b2f42b9383552d687189384015dafa7a06074bef9"
+    },
+    {
+      "path": "tests/e2e/design-system.spec.ts",
+      "workingTreeSha256": "a1f003ef676e21368369179b74f3c6ff35352482d1eb675b61eaffb5f7a2a826",
+      "testedSnapshotSha256": "a1f003ef676e21368369179b74f3c6ff35352482d1eb675b61eaffb5f7a2a826"
+    },
+    {
+      "path": "tests/e2e/difficulty.spec.ts",
+      "workingTreeSha256": "30b8fa912f7e3ac6feb71c589d151774bc0d41be2be20ea4818f1596c0114a05",
+      "testedSnapshotSha256": "30b8fa912f7e3ac6feb71c589d151774bc0d41be2be20ea4818f1596c0114a05"
+    },
+    {
+      "path": "tests/e2e/email-verification.spec.ts",
+      "workingTreeSha256": "8384c9dc50faeefec529c54187f670f83c030fcfae53f2d3971fa83604b202bb",
+      "testedSnapshotSha256": "8384c9dc50faeefec529c54187f670f83c030fcfae53f2d3971fa83604b202bb"
+    },
+    {
+      "path": "tests/e2e/exam-import.spec.ts",
+      "workingTreeSha256": "6374c09ee42d5f319fd9c0bebd9e9b1e48aaa339ecd718cbc0da9688ecc54498",
+      "testedSnapshotSha256": "6374c09ee42d5f319fd9c0bebd9e9b1e48aaa339ecd718cbc0da9688ecc54498"
+    },
+    {
+      "path": "tests/e2e/flow.spec.ts",
+      "workingTreeSha256": "e9c6c7979e0971e85dac4a5f3b2e4a9dfdcd04720ae0f8507d141dd56b0c6b4c",
+      "testedSnapshotSha256": "e9c6c7979e0971e85dac4a5f3b2e4a9dfdcd04720ae0f8507d141dd56b0c6b4c"
+    },
+    {
+      "path": "tests/e2e/mission-file-import.spec.ts",
+      "workingTreeSha256": "ea58b65acf5b6b7d5131c26ce68f4741bd7d6a171d9ed54645692d0bb5e4031a",
+      "testedSnapshotSha256": "ea58b65acf5b6b7d5131c26ce68f4741bd7d6a171d9ed54645692d0bb5e4031a"
+    },
+    {
+      "path": "tests/e2e/mission-pagination.spec.ts",
+      "workingTreeSha256": "55b0874f383290abaf7e13791542f7b38a7f894257fac6ddfcb2e0006bb3cd64",
+      "testedSnapshotSha256": "55b0874f383290abaf7e13791542f7b38a7f894257fac6ddfcb2e0006bb3cd64"
+    },
+    {
+      "path": "tests/e2e/navigation-layout.spec.ts",
+      "workingTreeSha256": "b16aed04f88a13b0682e53ed921fa1a8acd864c24ebe79900d8ab2d7af0a3569",
+      "testedSnapshotSha256": "b16aed04f88a13b0682e53ed921fa1a8acd864c24ebe79900d8ab2d7af0a3569"
+    },
+    {
+      "path": "tests/e2e/password-reset.spec.ts",
+      "workingTreeSha256": "870623c84b0d3740a29cc42b4ec01f30c0912bf95db534a10431a3b77268e1fd",
+      "testedSnapshotSha256": "870623c84b0d3740a29cc42b4ec01f30c0912bf95db534a10431a3b77268e1fd"
+    },
+    {
+      "path": "tests/e2e/phone-otp.spec.ts",
+      "workingTreeSha256": "c5fb077151ac4039cf0ca568af13057cdae29bb7d32c091110f5842f47b1df1b",
+      "testedSnapshotSha256": "c5fb077151ac4039cf0ca568af13057cdae29bb7d32c091110f5842f47b1df1b"
+    },
+    {
+      "path": "tests/e2e/practice-selection.spec.ts",
+      "workingTreeSha256": "e67b6be701a16cb2339c0c2b5f5bd3f17aa107421c905feb0e79d42b486e046f",
+      "testedSnapshotSha256": "e67b6be701a16cb2339c0c2b5f5bd3f17aa107421c905feb0e79d42b486e046f"
+    },
+    {
+      "path": "tests/e2e/question-bank.spec.ts",
+      "workingTreeSha256": "a860531d41e41d02a60fe38e550827978002d1cf9efadca7fd213f6741bdf6e5",
+      "testedSnapshotSha256": "a860531d41e41d02a60fe38e550827978002d1cf9efadca7fd213f6741bdf6e5"
+    },
+    {
+      "path": "tests/e2e/question-edit.spec.ts",
+      "workingTreeSha256": "b3f505e14ebb564a2fd726d12d50cf1e1dc3952b264a93cc5e963e83c92e367d",
+      "testedSnapshotSha256": "b3f505e14ebb564a2fd726d12d50cf1e1dc3952b264a93cc5e963e83c92e367d"
+    },
+    {
+      "path": "tests/e2e/question-source.spec.ts",
+      "workingTreeSha256": "0bd72df63632def07944491a5d27e1a487398cc8da0bb6085a5096a9ddcfcdbb",
+      "testedSnapshotSha256": "0bd72df63632def07944491a5d27e1a487398cc8da0bb6085a5096a9ddcfcdbb"
+    },
+    {
+      "path": "tests/e2e/question-visuals.spec.ts",
+      "workingTreeSha256": "7bb695df7740c33d93b5b5ea0b00cbd652c057b0c5b9ba5fb368ab6aa7d42836",
+      "testedSnapshotSha256": "7bb695df7740c33d93b5b5ea0b00cbd652c057b0c5b9ba5fb368ab6aa7d42836"
+    },
+    {
+      "path": "tests/e2e/uat-golden.spec.ts",
+      "workingTreeSha256": "400083c19c8c98764700d1d4522efbdab33d2479fe4a525267fe88e3428ef329",
+      "testedSnapshotSha256": "400083c19c8c98764700d1d4522efbdab33d2479fe4a525267fe88e3428ef329"
+    },
+    {
+      "path": "tests/e2e/uat-probes.spec.ts",
+      "workingTreeSha256": "101c5e8e4640d17abf7e61a7fb9accbdcc613eb315ce6122dcd3bb92ba625c03",
+      "testedSnapshotSha256": "101c5e8e4640d17abf7e61a7fb9accbdcc613eb315ce6122dcd3bb92ba625c03"
+    },
+    {
+      "path": "tests/fixtures/exams/LICENSE.md",
+      "workingTreeSha256": "4aeab0842c094acd4a31677a1fc3da6ff90577bbb4dea81c8ccb2768db9ff885",
+      "testedSnapshotSha256": "4aeab0842c094acd4a31677a1fc3da6ff90577bbb4dea81c8ccb2768db9ff885"
+    },
+    {
+      "path": "tests/fixtures/exams/key-image.pdf",
+      "workingTreeSha256": "b97ddc3cf25ce16c6c7e73df6c87d625c5082947f0b178a505ad13e461761edb",
+      "testedSnapshotSha256": "b97ddc3cf25ce16c6c7e73df6c87d625c5082947f0b178a505ad13e461761edb"
+    },
+    {
+      "path": "tests/fixtures/exams/key-partial.pdf",
+      "workingTreeSha256": "f0a0424b34ab348372751045707313758fd2b85794f6001fc5f00c6d0defd448",
+      "testedSnapshotSha256": "f0a0424b34ab348372751045707313758fd2b85794f6001fc5f00c6d0defd448"
+    },
+    {
+      "path": "tests/fixtures/exams/key-table.pdf",
+      "workingTreeSha256": "74db7fc0ea3b9ad781f248f09018078fda58154f66c1e94c70afe8dcb2aa20c6",
+      "testedSnapshotSha256": "74db7fc0ea3b9ad781f248f09018078fda58154f66c1e94c70afe8dcb2aa20c6"
+    },
+    {
+      "path": "tests/fixtures/exams/labels.json",
+      "workingTreeSha256": "ff0293b4b06de31346a59556be0210031272d3cbfa053e7272cc8940ed977c31",
+      "testedSnapshotSha256": "ff0293b4b06de31346a59556be0210031272d3cbfa053e7272cc8940ed977c31"
+    },
+    {
+      "path": "tests/fixtures/exams/mixed-fa.pdf",
+      "workingTreeSha256": "f2b8dea4792576500c8e524a10fa94173f22c972a4c8e67e569f12fd9e31a0ee",
+      "testedSnapshotSha256": "f2b8dea4792576500c8e524a10fa94173f22c972a4c8e67e569f12fd9e31a0ee"
+    },
+    {
+      "path": "tests/fixtures/exams/scan-fa.pdf",
+      "workingTreeSha256": "d5a48a90ec0484fdb435ca8e74b16444754860d9c708d7ac189ad6cd082b071e",
+      "testedSnapshotSha256": "d5a48a90ec0484fdb435ca8e74b16444754860d9c708d7ac189ad6cd082b071e"
+    },
+    {
+      "path": "tests/fixtures/exams/science.pdf",
+      "workingTreeSha256": "f9ccf82cafa495421292e806fa442e72660160587d669ca928835fc2b915793b",
+      "testedSnapshotSha256": "f9ccf82cafa495421292e806fa442e72660160587d669ca928835fc2b915793b"
+    },
+    {
+      "path": "tests/fixtures/exams/text-fa.pdf",
+      "workingTreeSha256": "6e1e746676d938e197d3380519614d293a2dbc3ace7f02604e6a931bf7c45092",
+      "testedSnapshotSha256": "6e1e746676d938e197d3380519614d293a2dbc3ace7f02604e6a931bf7c45092"
+    },
+    {
+      "path": "tests/helpers/browser-backend.ts",
+      "workingTreeSha256": "a59b9056184631723647544c863dd06ac7a1d60bdd2d77548799ed8a7a6d902e",
+      "testedSnapshotSha256": "a59b9056184631723647544c863dd06ac7a1d60bdd2d77548799ed8a7a6d902e"
+    },
+    {
+      "path": "tests/helpers/fixture.ts",
+      "workingTreeSha256": "dd4184399bb5c6a099f43d1d24e7f5acba5ba1f4beebc57a98b1782057a1e23f",
+      "testedSnapshotSha256": "dd4184399bb5c6a099f43d1d24e7f5acba5ba1f4beebc57a98b1782057a1e23f"
+    },
+    {
+      "path": "tests/helpers/pdf.ts",
+      "workingTreeSha256": "e87cac0bb1a73c4dfd744ba5c2bbe194cde0231d95ec42e5073ebb10ba661284",
+      "testedSnapshotSha256": "e87cac0bb1a73c4dfd744ba5c2bbe194cde0231d95ec42e5073ebb10ba661284"
+    },
+    {
+      "path": "tests/integration/access-control.test.ts",
+      "workingTreeSha256": "454401f6ceb5a1e5d9d4b0943c56aa5af0a5cc55d4901cb8403169b1776f89de",
+      "testedSnapshotSha256": "454401f6ceb5a1e5d9d4b0943c56aa5af0a5cc55d4901cb8403169b1776f89de"
+    },
+    {
+      "path": "tests/integration/ai-settings.test.ts",
+      "workingTreeSha256": "ac91cb901692ccd1e955dc84f68cfeafe7f26ed359b9f20b9bada97b3c0c0554",
+      "testedSnapshotSha256": "ac91cb901692ccd1e955dc84f68cfeafe7f26ed359b9f20b9bada97b3c0c0554"
+    },
+    {
+      "path": "tests/integration/api.test.ts",
+      "workingTreeSha256": "9033e2e0cdc0192145cdafa68832bd2917c8a313bf59330b81863a3fc14ca410",
+      "testedSnapshotSha256": "9033e2e0cdc0192145cdafa68832bd2917c8a313bf59330b81863a3fc14ca410"
+    },
+    {
+      "path": "tests/integration/auth-session.test.ts",
+      "workingTreeSha256": "e469f466214c6fb471011fa55faf650f4a85fd357a21f7466b2b28e6da980490",
+      "testedSnapshotSha256": "e469f466214c6fb471011fa55faf650f4a85fd357a21f7466b2b28e6da980490"
+    },
+    {
+      "path": "tests/integration/authoring.test.ts",
+      "workingTreeSha256": "ce674c19269ec6a565a48b0d0493640b02841c664b1791ea3a0f6fdb795fc7f5",
+      "testedSnapshotSha256": "ce674c19269ec6a565a48b0d0493640b02841c664b1791ea3a0f6fdb795fc7f5"
+    },
+    {
+      "path": "tests/integration/avalai-hints.test.ts",
+      "workingTreeSha256": "d36578bedfa7f79bfa12838a4e4ef377beb1bea7ea6144b6155036b3ca6d8ab0",
+      "testedSnapshotSha256": "d36578bedfa7f79bfa12838a4e4ef377beb1bea7ea6144b6155036b3ca6d8ab0"
+    },
+    {
+      "path": "tests/integration/class-groups.test.ts",
+      "workingTreeSha256": "4010a0cf18b1fd4c53da9ea838dec021084e8852d8ca545f63aa1da000194f97",
+      "testedSnapshotSha256": "4010a0cf18b1fd4c53da9ea838dec021084e8852d8ca545f63aa1da000194f97"
+    },
+    {
+      "path": "tests/integration/course-membership.test.ts",
+      "workingTreeSha256": "1f8043325cf464553bcc8ec11068d80c9e2183aa7d821b224456fd5a0181f51a",
+      "testedSnapshotSha256": "1f8043325cf464553bcc8ec11068d80c9e2183aa7d821b224456fd5a0181f51a"
+    },
+    {
+      "path": "tests/integration/courses.test.ts",
+      "workingTreeSha256": "13bd1866d66c05d56b6d69cc6bcec79dd14d96286e13afced3f1599cb5a7a861",
+      "testedSnapshotSha256": "13bd1866d66c05d56b6d69cc6bcec79dd14d96286e13afced3f1599cb5a7a861"
+    },
+    {
+      "path": "tests/integration/curriculum-catalog.test.ts",
+      "workingTreeSha256": "000effa2fb6381eebcdabe681fbb4fcd43188878e7fb3e555f81f1ee8e2e5392",
+      "testedSnapshotSha256": "000effa2fb6381eebcdabe681fbb4fcd43188878e7fb3e555f81f1ee8e2e5392"
+    },
+    {
+      "path": "tests/integration/difficulty.test.ts",
+      "workingTreeSha256": "e336cb960336b0db4c13c6413d5c3e1faaa8ffc4b30d38be6cbf12124aecdc01",
+      "testedSnapshotSha256": "e336cb960336b0db4c13c6413d5c3e1faaa8ffc4b30d38be6cbf12124aecdc01"
+    },
+    {
+      "path": "tests/integration/document-limits.test.ts",
+      "workingTreeSha256": "88fc7643ad190cd78f3ec66c56023b95353e25185707119d0787571f7835116e",
+      "testedSnapshotSha256": "88fc7643ad190cd78f3ec66c56023b95353e25185707119d0787571f7835116e"
+    },
+    {
+      "path": "tests/integration/document-pipeline.test.ts",
+      "workingTreeSha256": "7c9084656f00d882c26e2585009e30e0523a72987d79e15b6e6658bd959da8cb",
+      "testedSnapshotSha256": "7c9084656f00d882c26e2585009e30e0523a72987d79e15b6e6658bd959da8cb"
+    },
+    {
+      "path": "tests/integration/email-verification.test.ts",
+      "workingTreeSha256": "e02bda7237a16b0a9f40ef6aec1751ca5a9de4aa339942a98d372264ceb7612d",
+      "testedSnapshotSha256": "e02bda7237a16b0a9f40ef6aec1751ca5a9de4aa339942a98d372264ceb7612d"
+    },
+    {
+      "path": "tests/integration/exam-import.test.ts",
+      "workingTreeSha256": "bacb45bbe06cf33915fee5c2773f37312de4b3d780b2779fa0d1a59a86b397e8",
+      "testedSnapshotSha256": "bacb45bbe06cf33915fee5c2773f37312de4b3d780b2779fa0d1a59a86b397e8"
+    },
+    {
+      "path": "tests/integration/feedback-mode.test.ts",
+      "workingTreeSha256": "e1ec30e0987ded48d2acae7de8bbb7c5c135f046d4418ae3946ff4a07fc91267",
+      "testedSnapshotSha256": "e1ec30e0987ded48d2acae7de8bbb7c5c135f046d4418ae3946ff4a07fc91267"
+    },
+    {
+      "path": "tests/integration/full-individual-journey.test.ts",
+      "workingTreeSha256": "85c9bc8568417d716f5e647efe73ce17ce8ccddaf9015464441becf559fc0aaf",
+      "testedSnapshotSha256": "85c9bc8568417d716f5e647efe73ce17ce8ccddaf9015464441becf559fc0aaf"
+    },
+    {
+      "path": "tests/integration/image-import.test.ts",
+      "workingTreeSha256": "489f48477f4be2e1b21b608381f020655b7c101f60ab8207dabb7f228a017b2a",
+      "testedSnapshotSha256": "489f48477f4be2e1b21b608381f020655b7c101f60ab8207dabb7f228a017b2a"
+    },
+    {
+      "path": "tests/integration/integrity.test.ts",
+      "workingTreeSha256": "7b4464505b3b7252b5b3cc64337928bd2e73f88ff47dd38a4fa59daf80f12895",
+      "testedSnapshotSha256": "7b4464505b3b7252b5b3cc64337928bd2e73f88ff47dd38a4fa59daf80f12895"
+    },
+    {
+      "path": "tests/integration/learning.test.ts",
+      "workingTreeSha256": "f3f5a6a71f70aad86a983c6543320a7355aa2f4def11c8a51b086029aaa73333",
+      "testedSnapshotSha256": "f3f5a6a71f70aad86a983c6543320a7355aa2f4def11c8a51b086029aaa73333"
+    },
+    {
+      "path": "tests/integration/mail-outbox.test.ts",
+      "workingTreeSha256": "d03f22c96037f8c42361c2b5d4e8d7144bf45beb52ee1a8fe97356e050aa58ea",
+      "testedSnapshotSha256": "d03f22c96037f8c42361c2b5d4e8d7144bf45beb52ee1a8fe97356e050aa58ea"
+    },
+    {
+      "path": "tests/integration/mission-collection.test.ts",
+      "workingTreeSha256": "7900dd53c51371f96981eb45fbbf607154e32ee4ca653998b471059a21573ba8",
+      "testedSnapshotSha256": "7900dd53c51371f96981eb45fbbf607154e32ee4ca653998b471059a21573ba8"
+    },
+    {
+      "path": "tests/integration/mission-selection.test.ts",
+      "workingTreeSha256": "91cc824809072263f9fe1383e40b26997530275d00c93107f9810dc12536ef87",
+      "testedSnapshotSha256": "91cc824809072263f9fe1383e40b26997530275d00c93107f9810dc12536ef87"
+    },
+    {
+      "path": "tests/integration/parents.test.ts",
+      "workingTreeSha256": "49e1463f89d2266eac9a7c1352fc4e558be61a176b56ceb0e00c0d01b3c819ba",
+      "testedSnapshotSha256": "49e1463f89d2266eac9a7c1352fc4e558be61a176b56ceb0e00c0d01b3c819ba"
+    },
+    {
+      "path": "tests/integration/password-reset.test.ts",
+      "workingTreeSha256": "49c2c4f4d902526a6b06361e84facbf03e9f0d9e3a70cf6b3bb1b2b987cbce57",
+      "testedSnapshotSha256": "49c2c4f4d902526a6b06361e84facbf03e9f0d9e3a70cf6b3bb1b2b987cbce57"
+    },
+    {
+      "path": "tests/integration/phone-invitations.test.ts",
+      "workingTreeSha256": "df6a1b0ba024a36f63c5630a8fef0e513e8ef82fc0908f3f821217d08d8f3c54",
+      "testedSnapshotSha256": "df6a1b0ba024a36f63c5630a8fef0e513e8ef82fc0908f3f821217d08d8f3c54"
+    },
+    {
+      "path": "tests/integration/phone-otp.test.ts",
+      "workingTreeSha256": "1140659ce2cc31b36f2ce517801741465c69f02328cdbbaaa76c5f74943cfcb8",
+      "testedSnapshotSha256": "1140659ce2cc31b36f2ce517801741465c69f02328cdbbaaa76c5f74943cfcb8"
+    },
+    {
+      "path": "tests/integration/pilot.test.ts",
+      "workingTreeSha256": "e5b1f363847f61c76650e19625794985da1ce614b59d916d05e87569718c3450",
+      "testedSnapshotSha256": "e5b1f363847f61c76650e19625794985da1ce614b59d916d05e87569718c3450"
+    },
+    {
+      "path": "tests/integration/question-assets.test.ts",
+      "workingTreeSha256": "819cca7de9fa427152378b50a2d5c80670652146a5da74f5d329b322a6f4caef",
+      "testedSnapshotSha256": "819cca7de9fa427152378b50a2d5c80670652146a5da74f5d329b322a6f4caef"
+    },
+    {
+      "path": "tests/integration/question-bank.test.ts",
+      "workingTreeSha256": "f3c98faf6512c33d77d38d483fdecb724224b5fe814308a2eafe51d2e0c5c7b4",
+      "testedSnapshotSha256": "f3c98faf6512c33d77d38d483fdecb724224b5fe814308a2eafe51d2e0c5c7b4"
+    },
+    {
+      "path": "tests/integration/question-revisions.test.ts",
+      "workingTreeSha256": "a96acc24880f027c878f1e34c217c8e39cf164584315c19c40ef2e14ff240a93",
+      "testedSnapshotSha256": "a96acc24880f027c878f1e34c217c8e39cf164584315c19c40ef2e14ff240a93"
+    },
+    {
+      "path": "tests/integration/question-source.test.ts",
+      "workingTreeSha256": "f320c8a7d487d71926cb0b9593b09983b8d768d7e6753414ac5cc372174ed5db",
+      "testedSnapshotSha256": "f320c8a7d487d71926cb0b9593b09983b8d768d7e6753414ac5cc372174ed5db"
+    },
+    {
+      "path": "tests/integration/question-visuals.test.ts",
+      "workingTreeSha256": "e2214e8345548b932f54db3520557d6894f3086873dc12fae792ca7406773756",
+      "testedSnapshotSha256": "e2214e8345548b932f54db3520557d6894f3086873dc12fae792ca7406773756"
+    },
+    {
+      "path": "tests/integration/remediation.test.ts",
+      "workingTreeSha256": "10f40ea7d613b08b866a4bd1c17a071e1f506858fe3b552db3e41b6f04909cd4",
+      "testedSnapshotSha256": "10f40ea7d613b08b866a4bd1c17a071e1f506858fe3b552db3e41b6f04909cd4"
+    },
+    {
+      "path": "tests/integration/report-details.test.ts",
+      "workingTreeSha256": "e47f44ba07af56516feb8e4e1d4de84e9d72a589d08c094cc13fb9ca3aa49080",
+      "testedSnapshotSha256": "e47f44ba07af56516feb8e4e1d4de84e9d72a589d08c094cc13fb9ca3aa49080"
+    },
+    {
+      "path": "tests/integration/resource-removal.test.ts",
+      "workingTreeSha256": "5328e344b55209d2e079fb75c0d2bcdc3d58c7c0f548d3fe8df15d57ce92b0e2",
+      "testedSnapshotSha256": "5328e344b55209d2e079fb75c0d2bcdc3d58c7c0f548d3fe8df15d57ce92b0e2"
+    },
+    {
+      "path": "tests/integration/reviewed-samples.test.ts",
+      "workingTreeSha256": "d929b967b2162e4d9ad1f7b65d7a6860908b70ec5cc2400a4e640dc30e2fb486",
+      "testedSnapshotSha256": "d929b967b2162e4d9ad1f7b65d7a6860908b70ec5cc2400a4e640dc30e2fb486"
+    },
+    {
+      "path": "tests/integration/student-dashboard.test.ts",
+      "workingTreeSha256": "6b127d86748875dc7220bfd213e6b074f23d22585d9ca38acf42a25a292325e1",
+      "testedSnapshotSha256": "6b127d86748875dc7220bfd213e6b074f23d22585d9ca38acf42a25a292325e1"
+    },
+    {
+      "path": "tests/integration/student-signup.test.ts",
+      "workingTreeSha256": "4f9700454d4e74ed8dd96f149b1478416d338252cb5c1cb8795caeae7cc48be4",
+      "testedSnapshotSha256": "4f9700454d4e74ed8dd96f149b1478416d338252cb5c1cb8795caeae7cc48be4"
+    },
+    {
+      "path": "tests/integration/tutor.test.ts",
+      "workingTreeSha256": "1564e311897db1d7a9f9b5271297dd656d9e5bc4673c8a7941112ca1fcb9aeaa",
+      "testedSnapshotSha256": "1564e311897db1d7a9f9b5271297dd656d9e5bc4673c8a7941112ca1fcb9aeaa"
+    },
+    {
+      "path": "tests/unit/ai.test.ts",
+      "workingTreeSha256": "57a4c6ebd6b8863d4de38fc352f2be025cbc0132e283458bc5b405cf7b4cd23b",
+      "testedSnapshotSha256": "57a4c6ebd6b8863d4de38fc352f2be025cbc0132e283458bc5b405cf7b4cd23b"
+    },
+    {
+      "path": "tests/unit/authoring.test.ts",
+      "workingTreeSha256": "5ad8f03e8da2ed85312853eab36989f2e7b10c94a3fbf83b2619a7dd554c4807",
+      "testedSnapshotSha256": "5ad8f03e8da2ed85312853eab36989f2e7b10c94a3fbf83b2619a7dd554c4807"
+    },
+    {
+      "path": "tests/unit/avalai.test.ts",
+      "workingTreeSha256": "3f74496c514ae38c4f94087fbb0080f38b03db507fcf49c052c87798c741fe3d",
+      "testedSnapshotSha256": "3f74496c514ae38c4f94087fbb0080f38b03db507fcf49c052c87798c741fe3d"
+    },
+    {
+      "path": "tests/unit/curriculum-catalog.test.ts",
+      "workingTreeSha256": "150f490674feb42a2a7a6da85878d54846438751175c209b20e5edff98be3bdb",
+      "testedSnapshotSha256": "150f490674feb42a2a7a6da85878d54846438751175c209b20e5edff98be3bdb"
+    },
+    {
+      "path": "tests/unit/deployment-config.test.mjs",
+      "workingTreeSha256": "058ce9a8c581508ceda2c1290f62a7868f43d5a8666ed8c652c1c2c9cb8922ac",
+      "testedSnapshotSha256": "058ce9a8c581508ceda2c1290f62a7868f43d5a8666ed8c652c1c2c9cb8922ac"
+    },
+    {
+      "path": "tests/unit/dev-port.test.mjs",
+      "workingTreeSha256": "409833979f76412d47067383d03b59f17e9aaee11c58415eebd47613c5f4ba57",
+      "testedSnapshotSha256": "409833979f76412d47067383d03b59f17e9aaee11c58415eebd47613c5f4ba57"
+    },
+    {
+      "path": "tests/unit/document-layout.test.ts",
+      "workingTreeSha256": "9caba222ddbeba3c315085b77a31d8a03bf79f553da115311681a37e2633f5eb",
+      "testedSnapshotSha256": "9caba222ddbeba3c315085b77a31d8a03bf79f553da115311681a37e2633f5eb"
+    },
+    {
+      "path": "tests/unit/domain.test.ts",
+      "workingTreeSha256": "d2431a1c578e6112fbc3c50a15ea008bab35e595b9b8cbde0076f01530ac1243",
+      "testedSnapshotSha256": "d2431a1c578e6112fbc3c50a15ea008bab35e595b9b8cbde0076f01530ac1243"
+    },
+    {
+      "path": "tests/unit/evaluation.test.ts",
+      "workingTreeSha256": "5bef7dd62f84284402ee0a1296855d9430869218e8548b808951e52c6a11179a",
+      "testedSnapshotSha256": "5bef7dd62f84284402ee0a1296855d9430869218e8548b808951e52c6a11179a"
+    },
+    {
+      "path": "tests/unit/exam-import-route.test.ts",
+      "workingTreeSha256": "05eee2ed164fd7a6a6a82defa85a96442604b4c191fb01bc7a7db0df91aec2f4",
+      "testedSnapshotSha256": "05eee2ed164fd7a6a6a82defa85a96442604b4c191fb01bc7a7db0df91aec2f4"
+    },
+    {
+      "path": "tests/unit/exam-import.test.ts",
+      "workingTreeSha256": "0dee5ca33a6993a5fad642900a30ee5a02e56a4ddc31ad53468506f6c4530376",
+      "testedSnapshotSha256": "0dee5ca33a6993a5fad642900a30ee5a02e56a4ddc31ad53468506f6c4530376"
+    },
+    {
+      "path": "tests/unit/learning.test.ts",
+      "workingTreeSha256": "97d4bc1fab336de1501261d6d1345563cdb99e7db036a616cd3da5bcd2451e5e",
+      "testedSnapshotSha256": "97d4bc1fab336de1501261d6d1345563cdb99e7db036a616cd3da5bcd2451e5e"
+    },
+    {
+      "path": "tests/unit/question-source.test.ts",
+      "workingTreeSha256": "6ae013ace71c553512897bcc1056708b508d53b7ba5ffc78f1d4df1a3144e9c0",
+      "testedSnapshotSha256": "6ae013ace71c553512897bcc1056708b508d53b7ba5ffc78f1d4df1a3144e9c0"
+    },
+    {
+      "path": "tests/unit/question-visuals.test.ts",
+      "workingTreeSha256": "197c6e5c69b218a44af9c51c438e5076093479750590082def57d0a80620b752",
+      "testedSnapshotSha256": "197c6e5c69b218a44af9c51c438e5076093479750590082def57d0a80620b752"
+    },
+    {
+      "path": "tests/unit/state.test.ts",
+      "workingTreeSha256": "db83f2f05ceaed83e02f174b9263887b0749fbb502cb320beb431a69d8c96038",
+      "testedSnapshotSha256": "db83f2f05ceaed83e02f174b9263887b0749fbb502cb320beb431a69d8c96038"
+    },
+    {
+      "path": "tests/unit/topic-selector.test.ts",
+      "workingTreeSha256": "ade305e31aba8dad9672f531c4179039ccf0c469fae5192658eabd537e2d0219",
+      "testedSnapshotSha256": "ade305e31aba8dad9672f531c4179039ccf0c469fae5192658eabd537e2d0219"
+    },
+    {
+      "path": "tests/unit/worker-loop.test.ts",
+      "workingTreeSha256": "76e08a85b0927b281dfebf1250edf09e9d6d8bfeb1cf8200bdad54629099d8df",
+      "testedSnapshotSha256": "76e08a85b0927b281dfebf1250edf09e9d6d8bfeb1cf8200bdad54629099d8df"
+    },
+    {
+      "path": "tsconfig.json",
+      "workingTreeSha256": "c692f49f84f65b0a70d83edc7a10f470a3c057b8bee96942ac513c32928f707f",
+      "testedSnapshotSha256": "c692f49f84f65b0a70d83edc7a10f470a3c057b8bee96942ac513c32928f707f"
+    }
+  ]
+}

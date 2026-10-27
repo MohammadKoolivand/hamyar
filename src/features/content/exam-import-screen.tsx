@@ -43,6 +43,7 @@ export function ExamImportScreen({
     family: "school",
     administration: "final",
   });
+  const showTrack = Number(grade) >= 10 || source?.family === "konkur";
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
@@ -225,7 +226,7 @@ export function ExamImportScreen({
                   title: title.trim() || `${subject} · ${year || "آزمون جدید"}`,
                   subject,
                   ...(grade ? { grade } : {}),
-                  ...(track ? { track } : {}),
+                  ...(showTrack && track ? { track } : {}),
                   ...(year ? { year: Number(year) } : {}),
                   source,
                   ocrLanguage,
@@ -279,7 +280,7 @@ export function ExamImportScreen({
                   <option value="">تعیین نشده</option>
                   {Array.from({ length: 41 }, (_, i) => 1410 - i).map((y) => (
                     <option key={y} value={y}>
-                      {fa(y)}
+                      {y.toLocaleString("fa-IR", { useGrouping: false })}
                     </option>
                   ))}
                 </select>
@@ -288,7 +289,10 @@ export function ExamImportScreen({
                 <select
                   className={style}
                   value={grade}
-                  onChange={(e) => setGrade(e.target.value)}
+                  onChange={(e) => {
+                    setGrade(e.target.value);
+                    setTrack("");
+                  }}
                 >
                   <option value="">چندپایه / تعیین نشده</option>
                   {Array.from({ length: 12 }, (_, i) => String(i + 1)).map(
@@ -300,27 +304,29 @@ export function ExamImportScreen({
                   )}
                 </select>
               </Field>
-              <Field title="رشته یا گروه (اختیاری)">
-                <select
-                  className={style}
-                  value={track}
-                  onChange={(e) => setTrack(e.target.value)}
-                >
-                  <option value="">مشترک / تعیین نشده</option>
-                  {[
-                    "ریاضی و فیزیک",
-                    "علوم تجربی",
-                    "علوم انسانی",
-                    "معارف اسلامی",
-                    "هنر",
-                    "زبان",
-                  ].map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </Field>
+              {showTrack && (
+                <Field title="رشته یا گروه (اختیاری)">
+                  <select
+                    className={style}
+                    value={track}
+                    onChange={(e) => setTrack(e.target.value)}
+                  >
+                    <option value="">مشترک / تعیین نشده</option>
+                    {[
+                      "ریاضی و فیزیک",
+                      "علوم تجربی",
+                      "علوم انسانی",
+                      "معارف اسلامی",
+                      "هنر",
+                      "زبان",
+                    ].map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              )}
             </div>
             <details className="rounded-xl border border-slate-200 p-3">
               <summary className="cursor-pointer text-sm text-[#233B8F]">

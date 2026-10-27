@@ -164,6 +164,26 @@ export function parseQuestions(
           continue;
         }
       }
+      // A direct text-layer heading may continue the question sequence even
+      // when the previous options were incomplete. Require a dash separator,
+      // substantial heading width and the same right edge as the prior heading.
+      // OCR and inset/short option-like lines remain ambiguous for human review.
+      const previousHeading = collected[0];
+      const alignedTextHeading = Boolean(
+        current &&
+        current.number !== null &&
+        a &&
+        !a[1] &&
+        Number(a[2]) === current.number + 1 &&
+        ["-", "–", "ـ"].includes(a[3] ?? "") &&
+        line.method === "text" &&
+        previousHeading?.method === "text" &&
+        line.page === previousHeading.page &&
+        line.width >= previousHeading.width * 0.5 &&
+        Math.abs(
+          line.x + line.width - previousHeading.x - previousHeading.width,
+        ) <= Math.max(8, sizes[line.page].width * 0.015),
+      );
       // OCR may lose one option marker or turn ')' into '.'. During a partial
       // option block a bare low-number anchor is ambiguous, not a new question.
       // Keep its raw text for review; never invent the missing option(s). Explicit
@@ -172,6 +192,7 @@ export function parseQuestions(
         current &&
         current.options.length > 0 &&
         current.options.length < 4 &&
+        !alignedTextHeading &&
         a &&
         !a[1] &&
         Number(a[2]) >= 1 &&

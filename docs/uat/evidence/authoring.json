@@ -1,0 +1,86 @@
+{
+  "provider": "local_ollama",
+  "scientificReview": "MANUAL_REQUIRED",
+  "runs": [
+    {
+      "index": 1,
+      "parsed": true,
+      "milliseconds": 13328,
+      "question": {
+        "statement": "عدد سه را با عدد چهار جمع کنید.",
+        "reference": "7",
+        "options": [
+          "5",
+          "6",
+          "7"
+        ],
+        "hints": [
+          "چهار عددی است که بعد از آن چهار می‌شود.",
+          "عدد سه را چهار بیفزایید.",
+          "جمع دو عددی است که می‌شود 7."
+        ]
+      },
+      "provider": "ollama",
+      "model": "qwen2.5:3b",
+      "promptVersion": "question-draft-fa-v1",
+      "usage": {
+        "inputTokens": 222,
+        "outputTokens": 119
+      }
+    },
+    {
+      "index": 2,
+      "parsed": true,
+      "milliseconds": 9207,
+      "question": {
+        "statement": "عدد سه را با عدد چهار جمع کنید.",
+        "reference": "7",
+        "options": [
+          "5",
+          "6",
+          "7"
+        ],
+        "hints": [
+          "جمع دو عدد می‌شود.",
+          "عدد سه و چهار را بیایید ببینید.",
+          "پاسخ مرجع فقط عدد 7 است."
+        ]
+      },
+      "provider": "ollama",
+      "model": "qwen2.5:3b",
+      "promptVersion": "question-draft-fa-v1",
+      "usage": {
+        "inputTokens": 222,
+        "outputTokens": 105
+      }
+    },
+    {
+      "index": 3,
+      "parsed": true,
+      "milliseconds": 9764,
+      "question": {
+        "statement": "عدد سه را با عدد چهار جمع کنید.",
+        "reference": "7",
+        "options": [
+          "5",
+          "6",
+          "7"
+        ],
+        "hints": [
+          "جمع 3 و 4 چقدر است؟",
+          "برخی از اعداد را به ترتیب جمع کنید.",
+          "پاسخ مرجع فقط عدد 7 است."
+        ]
+      },
+      "provider": "ollama",
+      "model": "qwen2.5:3b",
+      "promptVersion": "question-draft-fa-v1",
+      "usage": {
+        "inputTokens": 222,
+        "outputTokens": 108
+      }
+    }
+  ],
+  "parsed": 3,
+  "published": 0
+}

@@ -1,0 +1,132 @@
+diff --git a/public/sw.js b/public/sw.js
+index 3b6eb2d..ea5f80f 100644
+--- a/public/sw.js
++++ b/public/sw.js
+@@ -1,6 +1,6 @@
+ /* global self, caches, URL, fetch */
+-const CACHE = "hamyar-next-3fc1fc28d5a8";
+-const SHELL = ["/","/_next/static/chunks/4bd1b696-c7408084347438ae.js","/_next/static/chunks/580-533f0ed8ae2abbd0.js","/_next/static/chunks/774-e816e067120c637e.js","/_next/static/chunks/794-3c1567673e1f8cb7.js","/_next/static/chunks/953-42adfcdf4537660c.js","/_next/static/chunks/d3ac728e-5ec6e712818d6bbc.js","/_next/static/chunks/framework-ea4f97ca039bd777.js","/_next/static/chunks/main-6bbff23ea139b22e.js","/_next/static/chunks/main-app-bd8af9883e0eb318.js","/_next/static/chunks/polyfills-42372ed130431b0a.js","/_next/static/chunks/webpack-567771a42e268cd4.js","/_next/static/css/3e8e1e03038a29bb.css","/_next/static/media/4b4ebe20759bdbf2.p.ttf","/_next/static/media/fcf6bd7943ceb169.p.ttf","/_next/static/oZScukBhGN7pNIZ3cpb5q/_buildManifest.js","/_next/static/oZScukBhGN7pNIZ3cpb5q/_ssgManifest.js","/_next/static/chunks/app/layout-2355d78d1334fd1f.js","/_next/static/chunks/app/page-f16b30e26a4377b5.js","/_next/static/chunks/app/[section]/page-53bc5ba23f3afc70.js","/_next/static/chunks/app/_global-error/page-bc9a772f5cd173f6.js","/_next/static/chunks/app/_not-found/page-6dc43050004ab4f5.js","/_next/static/chunks/app/verify-email/page-e6461a82eeec9f48.js","/_next/static/chunks/app/api/[...path]/route-bc9a772f5cd173f6.js","/_next/static/chunks/next/dist/client/components/builtin/app-error-bc9a772f5cd173f6.js","/_next/static/chunks/next/dist/client/components/builtin/forbidden-bc9a772f5cd173f6.js","/_next/static/chunks/next/dist/client/components/builtin/global-error-f636d659ec9f79a5.js","/_next/static/chunks/next/dist/client/components/builtin/not-found-bc9a772f5cd173f6.js","/_next/static/chunks/next/dist/client/components/builtin/unauthorized-bc9a772f5cd173f6.js","/icon.svg","/manifest.webmanifest"];
++const CACHE = "hamyar-next-7b15457c28b4";
++const SHELL = ["/","/_next/static/0NHyqVhNiaVr9RNCJWIBX/_buildManifest.js","/_next/static/0NHyqVhNiaVr9RNCJWIBX/_ssgManifest.js","/_next/static/chunks/4bd1b696-c7408084347438ae.js","/_next/static/chunks/580-533f0ed8ae2abbd0.js","/_next/static/chunks/774-1dfe7b67b17b3960.js","/_next/static/chunks/794-3c1567673e1f8cb7.js","/_next/static/chunks/953-42adfcdf4537660c.js","/_next/static/chunks/d3ac728e-5ec6e712818d6bbc.js","/_next/static/chunks/framework-ea4f97ca039bd777.js","/_next/static/chunks/main-6bbff23ea139b22e.js","/_next/static/chunks/main-app-bd8af9883e0eb318.js","/_next/static/chunks/polyfills-42372ed130431b0a.js","/_next/static/chunks/webpack-567771a42e268cd4.js","/_next/static/css/32537a83cb1606ea.css","/_next/static/media/4b4ebe20759bdbf2.p.ttf","/_next/static/media/fcf6bd7943ceb169.p.ttf","/_next/static/chunks/app/layout-2355d78d1334fd1f.js","/_next/static/chunks/app/page-f16b30e26a4377b5.js","/_next/static/chunks/app/[section]/page-53bc5ba23f3afc70.js","/_next/static/chunks/app/_global-error/page-bc9a772f5cd173f6.js","/_next/static/chunks/app/_not-found/page-6dc43050004ab4f5.js","/_next/static/chunks/app/verify-email/page-e6461a82eeec9f48.js","/_next/static/chunks/app/api/[...path]/route-bc9a772f5cd173f6.js","/_next/static/chunks/next/dist/client/components/builtin/app-error-bc9a772f5cd173f6.js","/_next/static/chunks/next/dist/client/components/builtin/forbidden-bc9a772f5cd173f6.js","/_next/static/chunks/next/dist/client/components/builtin/global-error-f636d659ec9f79a5.js","/_next/static/chunks/next/dist/client/components/builtin/not-found-bc9a772f5cd173f6.js","/_next/static/chunks/next/dist/client/components/builtin/unauthorized-bc9a772f5cd173f6.js","/icon.svg","/manifest.webmanifest"];
+ self.addEventListener("install", (event) => {
+   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
+ });
+diff --git a/src/components/ui/difficulty-gauge.tsx b/src/components/ui/difficulty-gauge.tsx
+index f0e0903..6ab397d 100644
+--- a/src/components/ui/difficulty-gauge.tsx
++++ b/src/components/ui/difficulty-gauge.tsx
+@@ -11,9 +11,9 @@ export function DifficultyGauge({ value }: { value?: Difficulty }) {
+       role="img"
+       aria-label={`درجه سختی: ${label}`}
+       title={`درجه سختی: ${label}`}
+-      className="inline-flex shrink-0 flex-col items-center rounded-xl border border-blue-100/80 bg-white/60 px-2 py-1 shadow-sm backdrop-blur-md"
++      className="inline-flex h-7 w-10 shrink-0 items-center justify-center align-middle"
+     >
+-      <svg viewBox="0 0 88 57" className="h-12 w-20" aria-hidden="true">
++      <svg viewBox="0 0 88 57" className="h-7 w-10" aria-hidden="true">
+         <path
+           d="M12 46 A32 32 0 0 1 28 18.3"
+           fill="none"
+@@ -49,9 +49,6 @@ export function DifficultyGauge({ value }: { value?: Difficulty }) {
+         )}
+         <circle cx="44" cy="46" r="4" className="fill-[#233B8F]" />
+       </svg>
+-      <span className="text-[10px] leading-4 text-slate-600">
+-        {value ? "درجه سختی" : "تعیین نشده"}
+-      </span>
+     </span>
+   );
+ }
+diff --git a/src/features/content/exam-import-screen.tsx b/src/features/content/exam-import-screen.tsx
+index 765f6f9..5210e2c 100644
+--- a/src/features/content/exam-import-screen.tsx
++++ b/src/features/content/exam-import-screen.tsx
+@@ -43,6 +43,7 @@ export function ExamImportScreen({
+     family: "school",
+     administration: "final",
+   });
++  const showTrack = Number(grade) >= 10 || source?.family === "konkur";
+   const [busy, setBusy] = useState(false),
+     [error, setError] = useState(""),
+     [notice, setNotice] = useState("");
+@@ -225,7 +226,7 @@ export function ExamImportScreen({
+                   title: title.trim() || `${subject} · ${year || "آزمون جدید"}`,
+                   subject,
+                   ...(grade ? { grade } : {}),
+-                  ...(track ? { track } : {}),
++                  ...(showTrack && track ? { track } : {}),
+                   ...(year ? { year: Number(year) } : {}),
+                   source,
+                   ocrLanguage,
+@@ -279,7 +280,7 @@ export function ExamImportScreen({
+                   <option value="">تعیین نشده</option>
+                   {Array.from({ length: 41 }, (_, i) => 1410 - i).map((y) => (
+                     <option key={y} value={y}>
+-                      {fa(y)}
++                      {y.toLocaleString("fa-IR", { useGrouping: false })}
+                     </option>
+                   ))}
+                 </select>
+@@ -288,7 +289,10 @@ export function ExamImportScreen({
+                 <select
+                   className={style}
+                   value={grade}
+-                  onChange={(e) => setGrade(e.target.value)}
++                  onChange={(e) => {
++                    setGrade(e.target.value);
++                    setTrack("");
++                  }}
+                 >
+                   <option value="">چندپایه / تعیین نشده</option>
+                   {Array.from({ length: 12 }, (_, i) => String(i + 1)).map(
+@@ -300,27 +304,29 @@ export function ExamImportScreen({
+                   )}
+                 </select>
+               </Field>
+-              <Field title="رشته یا گروه (اختیاری)">
+-                <select
+-                  className={style}
+-                  value={track}
+-                  onChange={(e) => setTrack(e.target.value)}
+-                >
+-                  <option value="">مشترک / تعیین نشده</option>
+-                  {[
+-                    "ریاضی و فیزیک",
+-                    "علوم تجربی",
+-                    "علوم انسانی",
+-                    "معارف اسلامی",
+-                    "هنر",
+-                    "زبان",
+-                  ].map((t) => (
+-                    <option key={t} value={t}>
+-                      {t}
+-                    </option>
+-                  ))}
+-                </select>
+-              </Field>
++              {showTrack && (
++                <Field title="رشته یا گروه (اختیاری)">
++                  <select
++                    className={style}
++                    value={track}
++                    onChange={(e) => setTrack(e.target.value)}
++                  >
++                    <option value="">مشترک / تعیین نشده</option>
++                    {[
++                      "ریاضی و فیزیک",
++                      "علوم تجربی",
++                      "علوم انسانی",
++                      "معارف اسلامی",
++                      "هنر",
++                      "زبان",
++                    ].map((t) => (
++                      <option key={t} value={t}>
++                        {t}
++                      </option>
++                    ))}
++                  </select>
++                </Field>
++              )}
+             </div>
+             <details className="rounded-xl border border-slate-200 p-3">
+               <summary className="cursor-pointer text-sm text-[#233B8F]">
