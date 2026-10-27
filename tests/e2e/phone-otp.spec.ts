@@ -66,3 +66,48 @@ test("public phone OTP signup verifies mobile and enters real student dashboard 
     await f.close();
   }
 });
+
+
+test("public teacher self-registration creates a dedicated teacher session and workspace", async ({
+  page,
+}) => {
+  process.env.AUTH_OTP_SECRET = Buffer.alloc(32, 19).toString("base64");
+  let code = "";
+  const f = await fixture({
+    sms: {
+      name: "controlled_sms",
+      configured: () => true,
+      sendOtp: async (_phone, value) => {
+        code = value;
+      },
+    },
+  });
+  try {
+    await routeBackend(page, f.app);
+    await page.goto("/");
+    await page.getByRole("button", { name: "حساب جدید می‌سازم" }).click();
+    await page.getByLabel("شماره موبایل", { exact: true }).fill("۰۹۱۲۰۰۰۰۰۸۸");
+    await page.getByLabel("نام و نام خانوادگی").fill("معلم آزمایشی مستقل");
+    await page.getByLabel("نقش شما").selectOption("teacher");
+    await page.getByRole("button", { name: "دریافت کد تأیید" }).click();
+    expect(code).toMatch(/^\\d{6}$/);
+    await page.getByLabel("کد یک‌بارمصرف").fill(code);
+    await page.getByRole("button", { name: "تأیید کد و ورود" }).click();
+    await expect(page).toHaveURL(/\\/dashboard$/);
+    await expect(page.getByText("فضای کار معلم", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "دانش‌آموزان", exact: true })).toBeVisible();
+    const me = await page.evaluate(async () => (await fetch("/api/auth/me")).json());
+    expect(me.role).toBe("teacher");
+    expect(me.name).toBe("معلم آزمایشی مستقل");
+    expect(me.phone).toBe("09120000088");
+    expect(me.phoneVerified).toBe(true);
+    expect(await page.evaluate(async () => (await fetch("/api/students")).status)).toBe(200);
+    await page.reload();
+    await expect(page.getByText("فضای کار معلم", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "خروج", exact: true }).click();
+    await expect(page.getByLabel("شماره موبایل", { exact: true })).toBeVisible();
+  } finally {
+    await page.unrouteAll({ behavior: "wait" });
+    await f.close();
+  }
+});
