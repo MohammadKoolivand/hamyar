@@ -1,17 +1,10 @@
+import { registerSyntheticUser } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 test("question collection filters, pages, modal and bulk add preserve all selected questions", async ({
   page,
 }) => {
-  await page.goto("/homeworks");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم صفحه‌بندی");
   const stamp = Date.now();
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(`pages-${stamp}@test.dev`);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await registerSyntheticUser(page, "معلم صفحه‌بندی");
   await expect(
     page.getByRole("button", { name: "مأموریت‌ها", exact: true }),
   ).toBeVisible();
