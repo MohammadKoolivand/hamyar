@@ -1,3 +1,4 @@
+import { registerSyntheticUser, syntheticPhone } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { Binary } from "mongodb";
@@ -5,21 +6,15 @@ import { connect } from "../../src/server/db";
 test("teacher edits question, choices, difficulty and persistent image crop", async ({
   page,
 }) => {
-  const email = `edit-${Date.now()}@test.dev`;
-  await page.goto("/content");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم ویرایش سؤال");
-  await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(email);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /ورود به هدهده/ }).click();
+  const phone = syntheticPhone();
+  await registerSyntheticUser(page, "معلم ویرایش سؤال", "teacher", phone);
   await expect(
     page.getByRole("heading", { name: "معلم ویرایش سؤال", exact: true }),
   ).toBeVisible();
   const { client, db } = await connect();
   const assetId = randomUUID();
   try {
-    const teacher = await db.collection("users").findOne({ email });
+    const teacher = await db.collection("users").findOne({ phone });
     expect(teacher).toBeTruthy();
     await db.collection("questionAssets").insertOne({
       _id: assetId as never,
