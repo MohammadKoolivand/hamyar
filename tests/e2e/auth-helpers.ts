@@ -32,14 +32,15 @@ export async function loginSyntheticUser(
     data: { email: phone, password },
   });
   expect(response.status(), await response.text()).toBe(200);
-  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15000 });
   await expect(page.getByRole("button", { name: "خروج", exact: true })).toBeVisible();
 }
 export async function useFixtureSession(page: Page, cookie: string) {
   const [name, ...value] = cookie.split("=");
   if (name !== "session" || !value.length) throw new Error("Invalid test fixture cookie");
+  const baseURL = process.env.E2E_BASE_URL ?? "http://127.0.0.1:5174";
   await page.context().addCookies([{
-    name, value: value.join("="), url: new URL(page.url()).origin,
+    name, value: value.join("="), url: new URL(baseURL).origin,
     httpOnly: true, sameSite: "Strict",
   }]);
   await page.goto("/dashboard");
