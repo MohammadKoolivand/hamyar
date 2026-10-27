@@ -5,6 +5,7 @@ import {
   type Page,
 } from "@playwright/test";
 import { randomUUID } from "node:crypto";
+import { registerSyntheticUser, loginSyntheticUser, syntheticPhone } from "./auth-helpers";
 import { chooseParent, chooseTopic } from "./curriculum-helpers";
 import { textPdf } from "../helpers/pdf";
 
@@ -27,30 +28,8 @@ function respectReadLimit(page: Page) {
   };
 }
 const password = "UatSyntheticPass123!";
-async function signup(
-  page: Page,
-  role: "teacher" | "student",
-  identity: string,
-  name: string,
-) {
-  await page.goto("/");
-  await page
-    .getByRole("button", {
-      name: role === "teacher" ? "ثبت‌نام معلم" : "ثبت‌نام دانش‌آموز",
-      exact: true,
-    })
-    .click();
-  await page.getByLabel("نام و نام خانوادگی").fill(name);
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(identity);
-  await page.getByLabel("رمز عبور").fill(password);
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
-  await expect(
-    page.getByRole("button", { name: "خروج", exact: true }),
-  ).toBeVisible();
+async function signup(page: Page, role: "teacher" | "student", identity: string, name: string) {
+  await registerSyntheticUser(page, name, role, identity, password);
 }
 
 for (const cohort of [1, 2])
@@ -60,7 +39,7 @@ for (const cohort of [1, 2])
   }, info) => {
     test.setTimeout(300000);
     const suffix = randomUUID(),
-      teacherEmail = `uat-a-${suffix}@test.dev`;
+      teacherEmail = syntheticPhone();
     const phone = `091${String(Date.now() + cohort).slice(-8)}`;
     const parentPhone = `093${String(Date.now() + cohort).slice(-8)}`;
     const contexts: BrowserContext[] = [];
@@ -83,9 +62,6 @@ for (const cohort of [1, 2])
         viewport: { width: 390, height: 844 },
       });
       contexts.push(context);
-      await context.addInitScript(() =>
-        localStorage.setItem("auth-method", "password"),
-      );
       const p = await context.newPage();
       p.on("pageerror", (e) => errors.push(e.message));
       respectReadLimit(p);
@@ -459,16 +435,13 @@ for (const cohort of [1, 2])
         .getByTestId("parent-invitation-token")
         .innerText();
       const parentPage = await personPage();
-      await parentPage.goto(parentInvite);
-      await parentPage.getByLabel("نام و نام خانوادگی").fill("Parent A UAT");
-      await parentPage
-        .getByLabel("شماره موبایل دعوت‌شده", { exact: true })
-        .fill(parentPhone);
-      await parentPage.getByLabel("رمز عبور").fill(password);
-      await parentPage
-        .getByRole("button", { name: "ساخت حساب", exact: true })
-        .click();
-      await parentPage.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+      const parentInviteToken = new URL(parentInvite).searchParams.get("invite");
+      expect(parentInviteToken).toBeTruthy();
+      const parentClaim = await parentPage.request.post("/api/invitations/accept", {
+        data: { name: "Parent A UAT", phone: parentPhone, password, token: parentInviteToken },
+      });
+      expect(parentClaim.ok(), await parentClaim.text()).toBe(true);
+      await loginSyntheticUser(parentPage, parentPhone, password);
       await expect(
         parentPage.getByRole("heading", { name: "پنل اولیا", exact: true }),
       ).toBeVisible();
@@ -486,7 +459,7 @@ for (const cohort of [1, 2])
       await signup(
         other,
         "teacher",
-        `uat-b-${suffix}@test.dev`,
+        syntheticPhone(),
         "Teacher B UAT",
       );
       expect((await other.request.get(path + "/report")).status()).toBe(404);
@@ -496,13 +469,7 @@ for (const cohort of [1, 2])
       await studentPage
         .getByRole("button", { name: "خروج", exact: true })
         .click();
-      await studentPage
-        .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-        .fill(phone);
-      await studentPage.getByLabel("رمز عبور").fill(password);
-      await studentPage
-        .getByRole("button", { name: /^ورود به هدهده$/ })
-        .click();
+      await loginSyntheticUser(studentPage, phone, password);
       await expect(
         studentPage.getByRole("button", { name: "خروج", exact: true }),
       ).toBeVisible();
