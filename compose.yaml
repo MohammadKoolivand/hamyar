@@ -2,6 +2,9 @@ services:
   mongo:
     image: mongo:8
     command: ["mongod", "--replSet", "hamyar-rs", "--bind_ip_all"]
+    # CI-only override for MongoDB 8 rseq startup guard on hosted kernels.
+    environment:
+      GLIBC_TUNABLES: "${HODHOD_MONGO_GLIBC_TUNABLES:-glibc.pthread.rseq=0}"
     ports: ["127.0.0.1:27017:27017"]
     volumes: ["hamyar-mongo:/data/db"]
     healthcheck:
