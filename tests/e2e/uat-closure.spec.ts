@@ -1,23 +1,20 @@
+import { useFixtureSession } from "./auth-helpers";
 import { test, expect, type Page } from "@playwright/test";
 import { fixture } from "../helpers/fixture";
 import { routeBackend } from "../helpers/browser-backend";
 test.use({ serviceWorkers: "block" });
-async function login(page: Page, email: string) {
+async function login(page: Page, cookie: string) {
   await page.goto("/");
-  await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(email);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
-  await expect(
-    page.getByRole("button", { name: "خروج", exact: true }),
-  ).toBeVisible();
+  await useFixtureSession(page, cookie);
 }
+
 test("TEACH-003/004/005: teacher dashboard counts real students, publication and completion after reload", async ({
   page,
 }, info) => {
   const f = await fixture();
   await routeBackend(page, f.app);
   try {
-    await login(page, "t@test.dev");
+    await login(page, f.teacher);
     const stat = (name: string) =>
       page
         .locator(".glass-stat")
@@ -53,7 +50,7 @@ test("QB-013: incomplete question preserves entered form text when validation fa
   const f = await fixture();
   await routeBackend(page, f.app);
   try {
-    await login(page, "t@test.dev");
+    await login(page, f.teacher);
     await page.goto("/content-new");
     await page.getByRole("button", { name: "سؤال آزاد", exact: true }).click();
     await page.getByLabel("روش پاسخ", { exact: true }).selectOption("numeric");
@@ -86,15 +83,12 @@ test("PR-035/EDGE-012: second browser context sees saved response; refresh durin
 }) => {
   const f = await fixture();
   const context = await browser.newContext();
-  await context.addInitScript(() =>
-    localStorage.setItem("auth-method", "password"),
-  );
   const other = await context.newPage();
   await routeBackend(page, f.app);
   await routeBackend(other, f.app);
   try {
-    await login(page, "s@test.dev");
-    await login(other, "s@test.dev");
+    await login(page, f.student);
+    await login(other, f.student);
     await page.goto(`/practice?assignment=${f.assignment._id}`);
     await page.getByLabel("پاسخ شما", { exact: true }).fill("2");
     await page
@@ -140,7 +134,7 @@ test("LINK-004: invitation deep link opens in signed-in student account and bind
       { email: "s@test.dev" },
       f.teacher,
     );
-    await login(page, "s@test.dev");
+    await login(page, f.student);
     await page.goto(`/?invite=${invite.token}`);
     await expect(
       page.getByRole("button", { name: "خروج", exact: true }),
