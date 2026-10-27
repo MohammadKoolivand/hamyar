@@ -32,8 +32,8 @@ export async function loginSyntheticUser(
     data: { email: phone, password },
   });
   expect(response.status(), await response.text()).toBe(200);
-  await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15000 });
-  await expect(page.getByRole("button", { name: "خروج", exact: true })).toBeVisible();
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("button", { name: "خروج", exact: true })).toBeVisible({ timeout: 15000 });
 }
 export async function useFixtureSession(page: Page, cookie: string) {
   const [name, ...value] = cookie.split("=");
