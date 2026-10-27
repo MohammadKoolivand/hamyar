@@ -4,7 +4,6 @@ import {
   type BrowserContext,
   type Page,
 } from "@playwright/test";
-import { randomUUID } from "node:crypto";
 import { registerSyntheticUser, loginSyntheticUser, syntheticPhone } from "./auth-helpers";
 import { chooseParent, chooseTopic } from "./curriculum-helpers";
 import { textPdf } from "../helpers/pdf";
@@ -38,8 +37,7 @@ for (const cohort of [1, 2])
     browser,
   }, info) => {
     test.setTimeout(300000);
-    const suffix = randomUUID(),
-      teacherEmail = syntheticPhone();
+    const teacherEmail = syntheticPhone();
     const phone = `091${String(Date.now() + cohort).slice(-8)}`;
     const parentPhone = `093${String(Date.now() + cohort).slice(-8)}`;
     const contexts: BrowserContext[] = [];
