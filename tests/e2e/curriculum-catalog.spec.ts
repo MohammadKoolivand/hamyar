@@ -1,17 +1,10 @@
+import { registerSyntheticUser } from "./auth-helpers";
 import { chooseTopic } from "./curriculum-helpers";
 import { test, expect } from "@playwright/test";
 test("secondary catalog filter → import → preserved after reload → author a real question", async ({
   page,
 }) => {
-  await page.goto("/");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم فهرست درسی");
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(`catalog-${Date.now()}@test.dev`);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await registerSyntheticUser(page, "معلم فهرست درسی");
   await page.getByRole("button", { name: "منابع آموزشی", exact: true }).click();
   await page
     .getByRole("heading", { name: "کتاب‌ها و مباحث درسی", exact: true })
