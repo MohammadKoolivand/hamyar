@@ -1,3 +1,4 @@
+import { useFixtureSession } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 import { fixture } from "../helpers/fixture";
 import { createContext } from "../../src/server/context";
@@ -6,7 +7,11 @@ test.use({ serviceWorkers: "block" });
 test("super admin creates scoped secretary and secretary uses a separate operational panel", async ({
   page,
 }, testInfo) => {
-  const f = await fixture();
+  let smsCode = "";
+  const f = await fixture({
+    sms: { name: "controlled_sms", configured: () => true,
+      sendOtp: async (_phone, code) => { smsCode = code; } },
+  });
   try {
     await bootstrapSuperadmin(createContext(f.db), {
       name: "مدیر آزمایشی",
@@ -35,12 +40,13 @@ test("super admin creates scoped secretary and secretary uses a separate operati
         body: reply.rawPayload,
       });
     });
+    const firstAdmin = await f.request("/api/auth/login", {
+      email: "admin@ui.test", password: "AdminStrongPass123!",
+    });
+    expect(firstAdmin.statusCode).toBe(200);
+    const adminCookie = "session=" + firstAdmin.cookies[0].value;
     await page.goto("/");
-    await page
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill("admin@ui.test");
-    await page.getByLabel("رمز عبور").fill("AdminStrongPass123!");
-    await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+    await useFixtureSession(page, adminCookie);;
     await expect(
       page.getByRole("heading", {
         name: "مدیریت سامانه و دسترسی‌ها",
@@ -49,9 +55,8 @@ test("super admin creates scoped secretary and secretary uses a separate operati
     ).toBeVisible();
     await page.getByLabel("نام کاربر", { exact: true }).fill("منشی آزمایشی");
     await page
-      .getByLabel("ایمیل کاربر", { exact: true })
-      .fill("secretary@ui.test");
-    await page.getByLabel("رمز اولیه", { exact: true }).fill("StaffStrong123!");
+      .getByLabel("شماره موبایل کاربر", { exact: true })
+      .fill("09120000177");
     await page.getByRole("button", { name: "ایجاد حساب", exact: true }).click();
     await expect(page.getByRole("status")).toContainText("حساب ساخته شد");
     await page
@@ -78,11 +83,12 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       fullPage: true,
     });
     await page.getByRole("button", { name: "خروج", exact: true }).click();
-    await page
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill("secretary@ui.test");
-    await page.getByLabel("رمز عبور").fill("StaffStrong123!");
-    await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+    const secretaryOtp = await f.post("/api/auth/otp/request", { phone: "09120000177" });
+    const secretaryLogin = await f.request("/api/auth/otp/verify", {
+      phone: "09120000177", challengeId: secretaryOtp.challengeId, code: smsCode,
+    });
+    expect(secretaryLogin.statusCode).toBe(200);
+    await useFixtureSession(page, "session=" + secretaryLogin.cookies[0].value);;
     await expect(
       page.getByRole("heading", { name: "امور اجرایی", exact: true }),
     ).toBeVisible();
@@ -126,24 +132,13 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       fullPage: true,
     });
     await page.getByRole("button", { name: "خروج", exact: true }).click();
-    await expect(
-      page.getByLabel("ایمیل یا شماره موبایل", { exact: true }),
-    ).toBeVisible();
-    await page.goto("/?invite=" + inviteToken);
-    await page.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز دعوت موبایلی");
-    await page
-      .getByLabel("شماره موبایل دعوت‌شده", { exact: true })
-      .fill("۰۹۱۲۳۴۵۶۷۸۹");
-    await page.getByLabel("رمز عبور").fill("StrongPass123!");
-    await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-    await expect(
-      page.getByLabel("ایمیل یا شماره موبایل", { exact: true }),
-    ).toBeVisible();
-    await page
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill("+989123456789");
-    await page.getByLabel("رمز عبور").fill("StrongPass123!");
-    await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+    const studentOtp = await f.post("/api/auth/otp/request", { phone: "09123456789" });
+    const studentLogin = await f.request("/api/auth/otp/verify", {
+      phone: "09123456789", challengeId: studentOtp.challengeId, code: smsCode,
+      name: "دانش‌آموز دعوت موبایلی", invitationToken: inviteToken,
+    });
+    expect(studentLogin.statusCode).toBe(200, studentLogin.body);
+    await useFixtureSession(page, "session=" + studentLogin.cookies[0].value);;
     await expect(
       page.getByRole("button", { name: "خروج", exact: true }),
     ).toBeVisible();
@@ -185,14 +180,12 @@ test("parent portal has a valid child selector without hydration errors and revo
       token: invite.token,
     });
     await routeBackend(page, f.app);
+    const parentLogin = await f.request("/api/auth/login", {
+      email: "09120000092", password: "StrongPass123!",
+    });
+    expect(parentLogin.statusCode).toBe(200, parentLogin.body);
     await page.goto("/");
-    await page
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill("09120000092");
-    await page.getByLabel("رمز عبور").fill("StrongPass123!");
-    await page
-      .getByRole("button", { name: "ورود به هدهده", exact: true })
-      .click();
+    await useFixtureSession(page, "session=" + parentLogin.cookies[0].value);;
     await expect(
       page.getByRole("heading", { name: "پنل اولیا", exact: true }),
     ).toBeVisible();
