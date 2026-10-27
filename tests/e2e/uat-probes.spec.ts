@@ -1,3 +1,4 @@
+import { useFixtureSession } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 import { fixture } from "../helpers/fixture";
 import { routeBackend } from "../helpers/browser-backend";
@@ -10,7 +11,7 @@ test("UAT unknown route returns 404 and reduced-motion disables transition", asy
   expect(response?.status()).toBe(404);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const button = page.getByRole("button", { name: /^ورود به هدهده$/ });
+  const button = page.getByRole("button", { name: "دریافت کد تأیید", exact: true });
   await expect(button).toBeVisible();
   expect(
     await button.evaluate((el) => getComputedStyle(el).transitionDuration),
@@ -53,11 +54,7 @@ test("UAT formula options render MathML, invalid formula stays readable and host
     const a = await f.c("assignments").findOne({ missionId: mission._id });
     await routeBackend(page, f.app);
     await page.goto("/");
-    await page
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill("s@test.dev");
-    await page.getByLabel("رمز عبور").fill("StrongPass123!");
-    await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+    await useFixtureSession(page, f.student);
     await expect(
       page.getByRole("button", { name: "خروج", exact: true }),
     ).toBeVisible();
@@ -105,17 +102,10 @@ test("UAT remembered session survives closing and relaunching a real persistent 
       serviceWorkers: "block" as const,
     };
     context = await chromium.launchPersistentContext(profile, options);
-    await context.addInitScript(() =>
-      localStorage.setItem("auth-method", "password"),
-    );
     let page = await context.newPage();
     await routeBackend(page, f.app);
     await page.goto("/");
-    await page
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill("s@test.dev");
-    await page.getByLabel("رمز عبور").fill("StrongPass123!");
-    await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+    await useFixtureSession(page, f.student);
     await expect(
       page.getByRole("button", { name: "خروج", exact: true }),
     ).toBeVisible();
