@@ -155,7 +155,7 @@ export async function buildApp(
   });
   registerAccessManagement(app, ctx);
   const { linkInvitation } = registerIdentity(app, ctx);
-  registerPhoneAuth(app, ctx, sms, linkInvitation);
+  registerPhoneAuth(app, ctx, sms, linkInvitation, db.databaseName);
   registerPasswordReset(app, ctx, resetMailer);
   registerEmailVerification(app, ctx);
   registerCourses(app, ctx);

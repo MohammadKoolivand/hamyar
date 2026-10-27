@@ -248,7 +248,7 @@ export function CoursesScreen({
                 <div>
                   <strong>{request.studentName}</strong>
                   <p className="text-xs text-slate-500" dir="ltr">
-                    {request.studentEmail}
+                    {request.studentPhone || "شماره ثبت نشده"}
                   </p>
                   <p className="text-sm text-slate-600">
                     {request.courseTitle}

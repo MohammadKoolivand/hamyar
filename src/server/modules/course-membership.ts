@@ -92,7 +92,7 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
     const students = actor.role === "teacher"
       ? await c("users").find({
           _id: { $in: rows.map((v) => v.studentId) }, role: "student",
-        }).project({ _id: 1, name: 1, email: 1 }).toArray()
+        }).project({ _id: 1, name: 1, phone: 1 }).toArray()
       : [];
     const studentMap = new Map(students.map((v) => [v._id, v]));
     return rows.flatMap((v) => {
@@ -107,7 +107,7 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
         history: v.history ?? [],
         ...(actor.role === "teacher" ? {
           studentName: student?.name ?? "دانش‌آموز",
-          studentEmail: student?.email ?? "",
+          studentPhone: student?.phone ?? "",
         } : {}),
       }];
     });

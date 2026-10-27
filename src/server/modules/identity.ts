@@ -153,7 +153,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
         scryptSync(b.password, safeSalt, 64),
       );
       if (!passwordMatches || !u || u.disabledAt)
-        fail(401, "شماره موبایل، ایمیل یا رمز نادرست است");
+        fail(401, "اطلاعات ورود نادرست است");
       const token = randomBytes(32).toString("hex");
       await ctx.boundary("after_login_credentials_verified");
       await ctx.transaction(async (session) => {

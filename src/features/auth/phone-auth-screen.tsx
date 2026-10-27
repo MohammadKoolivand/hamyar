@@ -53,7 +53,7 @@ export function PhoneAuthScreen() {
       </div>
       <section className="glass-panel grid gap-5 p-6 sm:p-8">
         <h1 className="text-xl font-bold">
-          {challenge ? "کد تأیید را وارد کنید" : "ورود یا ثبت‌نام در هدهده"}
+          {challenge ? "کد تأیید را وارد کنید" : "ورود یا ثبت‌نام در هدهد"}
         </h1>
         <p className="text-sm leading-7 text-slate-500">
           {challenge

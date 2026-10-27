@@ -46,10 +46,9 @@ export function AccessConsole({
   const [notice, setNotice] = useState("");
   const [search, setSearch] = useState("");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [role, setRole] = useState<Role>("secretary");
-  const [inviteEmail, setInviteEmail] = useState("");
+  const [invitePhone, setInvitePhone] = useState("");
   const [inviteRole, setInviteRole] = useState<"student" | "parent">("student");
   const [studentId, setStudentId] = useState("");
   const [token, setToken] = useState("");
@@ -156,13 +155,12 @@ export function AccessConsole({
               onSubmit={(e) => {
                 e.preventDefault();
                 void run(async () => {
-                  await api("/admin/users", { name, email, password, role });
-                  setPassword("");
-                  setEmail("");
+                  await api("/admin/users", { name, phone, role });
+                  setPhone("");
                   setName("");
                   await reload();
                   setNotice(
-                    "حساب ساخته شد؛ رمز اولیه را از مسیر امن در اختیار صاحب حساب بگذارید.",
+                    "حساب ساخته شد؛ صاحب حساب با شماره موبایل و کد تأیید وارد می‌شود.",
                   );
                 });
               }}
@@ -182,19 +180,8 @@ export function AccessConsole({
                   type="tel"
                   dir="ltr"
                   className={style}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Field>
-              <Field title="رمز اولیه">
-                <input
-                  required
-                  type="password"
-                  minLength={10}
-                  autoComplete="new-password"
-                  className={style}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                 />
               </Field>
               <Field title="نقش حساب">
@@ -466,7 +453,7 @@ export function AccessConsole({
                     const result = await api<{ token: string }>(
                       `/staff/workspaces/${teacherId}/invitations`,
                       {
-                        phone: inviteEmail,
+                        phone: invitePhone,
                         role: inviteRole,
                         ...(inviteRole === "parent" ? { studentId } : {}),
                       },
@@ -484,8 +471,8 @@ export function AccessConsole({
                     autoComplete="tel"
                     placeholder="09123456789"
                     className={style}
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
+                    value={invitePhone}
+                    onChange={(e) => setInvitePhone(e.target.value)}
                   />
                 </Field>
                 <Field title="نوع دعوت">

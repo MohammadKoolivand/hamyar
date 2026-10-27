@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "admin:bootstrap": "node --env-file-if-exists=.env --import tsx scripts/bootstrap-superadmin.ts",
+    "seed:demo-users": "node --env-file-if-exists=.env --import tsx scripts/seed-demo-users.ts",
     "worker:exams": "node --env-file-if-exists=.env --import tsx scripts/exam-worker.ts",
     "ocr:setup": "node scripts/setup-ocr.mjs",
     "dev": "node scripts/check-dev-port.mjs && next dev --hostname 127.0.0.1 --port 5174",

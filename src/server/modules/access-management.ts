@@ -1,4 +1,4 @@
-import { invitationContactSchema, accountContact } from "../../lib/phone";
+import { invitationContactSchema, accountContact, phoneSchema } from "../../lib/phone";
 import type { ClientSession } from "mongodb";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
@@ -60,10 +60,27 @@ export function registerAccessManagement(app: FastifyInstance, ctx: Context) {
   });
   app.post("/api/admin/users", async (r) => {
     const actor = await user(r, "super_admin");
-    const b = ctx.credentials
-      .extend({ name: z.string().trim().min(2).max(100), role: roleSchema })
-      .parse(r.body);
-    const salt = ctx.randomBytes(16).toString("hex");
+    const b = z.union([
+      z.object({
+        name: z.string().trim().min(2).max(100),
+        phone: phoneSchema,
+        role: roleSchema,
+      }).strict(),
+      // Legacy integration compatibility; not used by the website UI.
+      ctx.credentials.extend({
+        name: z.string().trim().min(2).max(100),
+        role: roleSchema,
+      }),
+    ]).parse(r.body);
+    const contact = "phone" in b
+      ? { phone: b.phone, phoneVerified: false }
+      : accountContact(b.email);
+    const passwordHash = "password" in b
+      ? (() => {
+          const salt = ctx.randomBytes(16).toString("hex");
+          return salt + ":" + ctx.scryptSync(b.password, salt, 64).toString("hex");
+        })()
+      : undefined;
     const uid = id();
     return ctx.transaction(async (session) => {
       await assertAdmin(actor._id, session);
@@ -71,10 +88,9 @@ export function registerAccessManagement(app: FastifyInstance, ctx: Context) {
         {
           _id: uid,
           name: b.name,
-          ...accountContact(b.email),
+          ...contact,
           role: b.role,
-          passwordHash:
-            salt + ":" + ctx.scryptSync(b.password, salt, 64).toString("hex"),
+          ...(passwordHash ? { passwordHash } : {}),
           createdBy: actor._id,
           createdAt: now(),
         },
@@ -93,7 +109,7 @@ export function registerAccessManagement(app: FastifyInstance, ctx: Context) {
       return {
         _id: uid,
         name: b.name,
-        ...accountContact(b.email),
+        ...contact,
         role: b.role,
       };
     });

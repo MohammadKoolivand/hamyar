@@ -2,7 +2,7 @@
 import { AccessConsole } from "@/features/access/access-console";
 import { clsx } from "clsx";
 
-import React, { useState, useEffect, type FormEvent } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Sparkles,
   LayoutDashboard,
@@ -70,12 +70,8 @@ export default function HamyarApp() {
     >([]),
     [active, setActive] = useState<Assignment | null>(null),
     [report, setReport] = useState<Report | null>(null);
-  const [mode, setMode] = useState("login"),
-    [email, setEmail] = useState(""),
-    [password, setPassword] = useState(""),
-    [name, setName] = useState(""),
-    [token, setToken] = useState("");
-  const [inviteEmail, setInviteEmail] = useState(""),
+  const [token, setToken] = useState("");
+  const [invitePhone, setInvitePhone] = useState(""),
     [inviteToken, setInviteToken] = useState("");
   const [nodeTitle, setNodeTitle] = useState(""),
     [nodeKind, setNodeKind] = useState("subject"),
@@ -203,9 +199,7 @@ export default function HamyarApp() {
       void restoreLocation();
     };
     window.addEventListener("popstate", handleHistory);
-    const sessionCheck = window.location.hash.startsWith("#reset=")
-      ? Promise.reject(new Error("Reset flow"))
-      : api<User>("/auth/me");
+    const sessionCheck = api<User>("/auth/me");
     sessionCheck
       .then(async (u) => {
         setMe(u);
@@ -216,13 +210,8 @@ export default function HamyarApp() {
         setPage(pageFromPath(window.location.pathname));
       })
       .finally(() => setLoading(false));
-    const invitation = new URLSearchParams(window.location.search).get(
-      "invite",
-    );
-    if (invitation) {
-      setToken(invitation);
-      setMode("accept");
-    }
+    const invitation = new URLSearchParams(window.location.search).get("invite");
+    if (invitation) setToken(invitation);
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production")
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     return () => window.removeEventListener("popstate", handleHistory);
@@ -237,49 +226,6 @@ export default function HamyarApp() {
       .forEach((k) => sessionStorage.removeItem(k));
     // A new document discards every in-memory private form/report, including unpublished references.
     window.location.replace("/");
-  }
-  async function auth(e: FormEvent) {
-    e.preventDefault();
-    await run(async () => {
-      if (mode !== "login") {
-        if (mode === "accept") {
-          await api("/invitations/accept", {
-            name,
-            ...(email.includes("@") ? { email } : { phone: email }),
-            password,
-            token,
-          });
-          setToken("");
-          const url = new URL(window.location.href);
-          url.searchParams.delete("invite");
-          window.history.replaceState(
-            window.history.state,
-            "",
-            url.pathname + url.search + url.hash,
-          );
-          setNotice("دعوت پذیرفته شد. اکنون با همان حساب وارد شوید.");
-        } else {
-          await api("/auth/register", {
-            name,
-            email,
-            password,
-            role: mode === "register-student" ? "student" : "teacher",
-          });
-          setNotice("حساب ساخته شد. اکنون وارد شوید.");
-        }
-        setMode("login");
-        return;
-      }
-      const u = await api<User>("/auth/login", { email, password });
-      setMe(u);
-      setPassword("");
-      await refresh(u);
-      if (
-        ["practice", "report"].includes(pageFromPath(window.location.pathname))
-      ) {
-        await restoreLocation();
-      }
-    });
   }
   async function open(a: Assignment) {
     await run(async () => {
@@ -308,7 +254,7 @@ export default function HamyarApp() {
         role="status"
         className="mx-auto my-[7vh] max-w-[1020px] glass-note p-3.5 leading-[1.9]"
       >
-        در حال اتصال به هدهده…
+        در حال اتصال به هدهد…
       </div>
     );
   const feedback = (
@@ -328,24 +274,7 @@ export default function HamyarApp() {
       )}
     </>
   );
-  if (!me)
-    return (
-      <AuthScreen
-        mode={mode}
-        name={name}
-        email={email}
-        password={password}
-        token={token}
-        busy={busy}
-        feedback={feedback}
-        auth={auth}
-        setMode={setMode}
-        setName={setName}
-        setEmail={setEmail}
-        setPassword={setPassword}
-        setToken={setToken}
-      />
-    );
+  if (!me) return <AuthScreen />;
   if (me.role === "super_admin" || me.role === "secretary")
     return <AccessConsole me={me} onLogout={logout} />;
   if (me.role === "parent")
@@ -412,7 +341,7 @@ export default function HamyarApp() {
             <small className="text-xs leading-loose text-slate-500">
               معلم آموزش می‌دهد،
               <br />
-              هدهده راهنمایی می‌کند.
+              هدهد راهنمایی می‌کند.
             </small>
           </div>
         </footer>
@@ -432,7 +361,7 @@ export default function HamyarApp() {
         <header className="glass-header mb-2 flex h-fit self-start items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-2.5 max-[650px]:mb-2 max-[650px]:[&_h1]:text-[22px]">
           <div>
             <small className="text-xs leading-loose text-slate-500">
-              هدهده / {teacher ? "پنل معلم" : "یادگیری"}
+              هدهد / {teacher ? "پنل معلم" : "یادگیری"}
             </small>
             <h1 className="text-[28px] font-bold text-[#17305E]">
               {nav.find((n) => n[0] === page)?.[1] ??
@@ -524,12 +453,12 @@ export default function HamyarApp() {
           <StudentsScreen
             students={students}
             courses={courses}
-            inviteEmail={inviteEmail}
+            invitePhone={invitePhone}
             inviteToken={inviteToken}
             busy={busy}
             run={run}
             refresh={refresh}
-            setInviteEmail={setInviteEmail}
+            setInvitePhone={setInvitePhone}
             setInviteToken={setInviteToken}
           />
         )}
@@ -653,7 +582,7 @@ export default function HamyarApp() {
           />
         )}
         <footer className="text-xs leading-loose text-slate-500 p-5 text-center">
-          هدهده · تمرین و تحلیل یادگیری تحت هدایت معلم · نسخه توسعه
+          هدهد · تمرین و تحلیل یادگیری تحت هدایت معلم · نسخه توسعه
         </footer>
       </main>
     </div>

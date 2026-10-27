@@ -11,22 +11,22 @@ import { Plus } from "lucide-react";
 export function StudentsScreen({
   students,
   courses,
-  inviteEmail,
+  invitePhone,
   inviteToken,
   busy,
   run,
   refresh,
-  setInviteEmail,
+  setInvitePhone,
   setInviteToken,
 }: {
   students: User[];
   courses: Course[];
-  inviteEmail: string;
+  invitePhone: string;
   inviteToken: string;
   busy: boolean;
   run: (fn: () => Promise<void>) => Promise<void>;
   refresh: () => Promise<void>;
-  setInviteEmail: (v: string) => void;
+  setInvitePhone: (v: string) => void;
   setInviteToken: (v: string) => void;
 }) {
   const [inviteCourseId, setInviteCourseId] = useState("");
@@ -42,7 +42,7 @@ export function StudentsScreen({
             e.preventDefault();
             run(async () => {
               const d = await api<{ token: string }>("/invitations", {
-                phone: inviteEmail,
+                phone: invitePhone,
                 ...(inviteCourseId ? { courseId: inviteCourseId } : {}),
               });
               setInviteToken(d.token);
@@ -58,8 +58,8 @@ export function StudentsScreen({
               autoComplete="tel"
               placeholder="09123456789"
               dir="ltr"
-              value={inviteEmail}
-              onChange={(e) => setInviteEmail(e.target.value)}
+              value={invitePhone}
+              onChange={(e) => setInvitePhone(e.target.value)}
               className="w-full min-h-[46px] glass-field p-3"
             />
           </Field>

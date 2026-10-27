@@ -11,11 +11,27 @@ import { phoneSchema, normalizePhone } from "../../lib/phone";
 import type { Context } from "../context";
 import type { Row } from "../db";
 import type { SmsProvider } from "../auth/sms";
-export function developmentOtpBypass() {
-  return (
-    process.env.NODE_ENV === "development" &&
-    process.env.AUTH_OTP_DEV_BYPASS === "true"
-  );
+// Never accept arbitrary codes against deployed hosts or real databases.
+// Only an explicitly named, loopback-only MongoDB development database is allowed.
+export function developmentOtpBypass(activeDatabase?: string) {
+  if (
+    (activeDatabase !== undefined && activeDatabase !== process.env.MONGO_DB) ||
+    process.env.NODE_ENV !== "development" ||
+    process.env.AUTH_OTP_DEV_BYPASS !== "true" ||
+    !/^(hodhodeh_dev|hodhod_dev|hamyar_dev)(?:_[a-z0-9_-]+)?$/.test(process.env.MONGO_DB ?? "")
+  ) return false;
+  try {
+    const origin = new URL(process.env.APP_ORIGIN ?? "");
+    const mongo = new URL(process.env.MONGO_URL ?? "");
+    return (
+      origin.protocol === "http:" &&
+      ["localhost", "127.0.0.1"].includes(origin.hostname) &&
+      mongo.protocol === "mongodb:" &&
+      ["localhost", "127.0.0.1"].includes(mongo.hostname)
+    );
+  } catch {
+    return false;
+  }
 }
 const developmentSecret = randomBytes(32);
 function secret() {
@@ -38,6 +54,7 @@ export function registerPhoneAuth(
     uid: string,
     session: ClientSession,
   ) => Promise<void>,
+  activeDatabase: string,
 ) {
   app.post(
     "/api/auth/otp/request",
@@ -52,7 +69,9 @@ export function registerPhoneAuth(
     },
     async (r) => {
       const { phone } = z.object({ phone: phoneSchema }).strict().parse(r.body);
-      const bypass = developmentOtpBypass();
+      const bypass = developmentOtpBypass(activeDatabase);
+      if (process.env.AUTH_OTP_DEV_BYPASS === "true" && !bypass)
+        ctx.fail(503, "حالت آزمایشی فقط روی محیط توسعه محلی و دیتابیس آزمایشی مجاز است.");
       if (!bypass && !sms.configured())
         ctx.fail(
           503,
@@ -169,7 +188,9 @@ export function registerPhoneAuth(
       } catch {
         ctx.fail(503, "ورود پیامکی هنوز آماده نیست.");
       }
-      const bypass = developmentOtpBypass();
+      const bypass = developmentOtpBypass(activeDatabase);
+      if (process.env.AUTH_OTP_DEV_BYPASS === "true" && !bypass)
+        ctx.fail(503, "حالت آزمایشی فقط روی محیط توسعه محلی و دیتابیس آزمایشی مجاز است.");
       const sessionToken = ctx.randomBytes(32).toString("hex");
       const result = await ctx.transaction(async (session) => {
         const query = {

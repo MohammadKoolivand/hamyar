@@ -5,12 +5,12 @@ import { api } from "@/lib/api";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 export function ParentInvitation({ studentId }: { studentId: string }) {
-  const [email, setEmail] = useState(""),
+  const [phone, setPhone] = useState(""),
     [token, setToken] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [parents, setParents] = useState<
-      { _id: string; name: string; email?: string; phone?: string }[]
+      { _id: string; name: string; phone?: string }[]
     >([]);
   const refresh = () =>
     api<typeof parents>(`/students/${studentId}/parents`).then(setParents);
@@ -42,7 +42,7 @@ export function ParentInvitation({ studentId }: { studentId: string }) {
           e.preventDefault();
           void run(async () => {
             const d = await api<{ token: string }>("/invitations", {
-              phone: email,
+              phone,
               role: "parent",
               studentId,
             });
@@ -58,8 +58,8 @@ export function ParentInvitation({ studentId }: { studentId: string }) {
             autoComplete="tel"
             placeholder="09123456789"
             dir="ltr"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             className="min-w-0 rounded-xl border border-slate-300 p-3"
           />
         </Field>

@@ -24,11 +24,11 @@ test("course join requests require owner approval and do not leak other students
 
     const list = (await f.request("/api/course-requests", undefined, f.teacher)).json();
     assert.equal(list.length, 1);
-    assert.equal(list[0].studentEmail, "s@test.dev");
+    assert.equal(list[0].studentPhone, "");
     assert.equal(list[0].status, "pending");
     const studentView = (await f.request("/api/course-requests", undefined, f.student)).json();
     assert.equal(studentView.length, 1);
-    assert.equal(studentView[0].studentEmail, undefined);
+    assert.equal(studentView[0].studentPhone, undefined);
     assert.ok(!JSON.stringify(studentView).includes("tokenHash"));
 
     await f.post("/api/auth/register", {

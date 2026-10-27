@@ -13,7 +13,7 @@ export interface CourseMembershipRequest {
   courseTitle: string;
   subject: string;
   studentName?: string;
-  studentEmail?: string;
+  studentPhone?: string;
   history: MembershipEvent[];
 }
 export interface EnrollmentHistory {
