@@ -1,0 +1,17 @@
+
+> test:e2e
+> node scripts/run-e2e.mjs tests/e2e/uat-closure.spec.ts --output /private/tmp/hodhod-closure-focused
+
+
+Running 4 tests using 1 worker
+
+(node:25451) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25451) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/e2e/uat-closure.spec.ts:14:1 › TEACH-003/004/005: teacher dashboard counts real students, publication and completion after reload (15.3s)
+  ✓  2 tests/e2e/uat-closure.spec.ts:50:1 › QB-013: incomplete question preserves entered form text when validation fails (5.5s)
+  ✓  3 tests/e2e/uat-closure.spec.ts:81:1 › PR-035/EDGE-012: second browser context sees saved response; refresh during delayed server read stays consistent (10.0s)
+  ✓  4 tests/e2e/uat-closure.spec.ts:130:1 › LINK-004: invitation deep link opens in signed-in student account and binds the existing account (7.0s)
+
+  4 passed (51.7s)

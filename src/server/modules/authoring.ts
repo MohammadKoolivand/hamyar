@@ -1,3 +1,4 @@
+import { assessHint, hintTexts, HINT_SAFETY_VERSION } from "../ai/hint-safety";
 import { difficultySchema, difficultyLabels } from "../../lib/difficulty";
 import { difficultyMetadata } from "../../lib/difficulty";
 import { visualKind } from "../../lib/question-visuals";
@@ -7,12 +8,20 @@ import type { ClientSession } from "mongodb";
 import { z } from "zod";
 import type { Context } from "../context";
 import { questionSchema, type QuestionInput } from "../domain";
-import type { QuestionGenerator } from "../ai/question-generator";
+import {
+  generatedQuestion,
+  type QuestionGenerator,
+} from "../ai/question-generator";
 export async function validateQuestion(
   ctx: Context,
   ownerId: string,
   b: QuestionInput,
 ) {
+  if (hintTexts(b).some((text) => assessHint(b, text) !== "clear"))
+    ctx.fail(
+      400,
+      "راهنما پاسخ را آشکار می‌کند؛ آن را اصلاح یا حذف کنید. پاسخ مرجع خصوصی حفظ می‌شود.",
+    );
   if (b.topicId) {
     const topic = await ctx.owned("curriculum", b.topicId, ownerId);
     if (topic.kind !== "topic") ctx.fail(400, "مبحث را انتخاب کنید");
@@ -162,7 +171,7 @@ export function registerAuthoring(
         // Drafts are untrusted authoring material. Keep a structurally bounded draft
         // with explicit correction flags; only approval may pass the full grading schema.
         const candidate = {
-          ...output.question,
+          ...generatedQuestion.parse(output.question),
           ...(b.difficulty ? { difficulty: b.difficulty } : {}),
           ...(b.visualKind && b.visualKind !== "none"
             ? { visualKind: b.visualKind }
@@ -174,9 +183,18 @@ export function registerAuthoring(
         };
         const checked = questionSchema.safeParse(candidate);
         const question = checked.success ? checked.data : candidate;
-        const validationIssues = checked.success
-          ? []
-          : checked.error.issues.map((issue) => issue.message);
+        const validationIssues = [
+          ...(checked.success
+            ? []
+            : checked.error.issues.map((issue) => issue.message)),
+          ...hintTexts(candidate).flatMap((text, index) =>
+            assessHint(candidate, text, true) === "clear"
+              ? []
+              : [
+                  `راهنمای ${index + 1} نیازمند اصلاح یا حذف است؛ ایمنی خروجی خام مدل تأیید نشد.`,
+                ],
+          ),
+        ];
         return ctx.atomic(
           r,
           u._id,
@@ -247,6 +265,18 @@ export function registerAuthoring(
         if (!draft) ctx.fail(404, "پیش‌نویس یافت نشد");
         if (draft!.state !== "pending_review")
           ctx.fail(409, "این پیش‌نویس قبلاً تعیین تکلیف شده است");
+        // Rephrasing a generated full solution is not proof of safety. AI-reviewed
+        // banks accept only the bounded conceptual vocabulary; other prose stays
+        // in the private draft, even if whitespace or punctuation was edited.
+        if (
+          hintTexts(b.question).some(
+            (text) => assessHint(b.question, text, true) !== "clear",
+          )
+        )
+          ctx.fail(
+            400,
+            "ایمنی راهنمای AI تأیید نشد؛ راهنما را حذف کنید یا یک راهنمای مفهومی مانند «مفهوم مرتبط را مرور کن.» بنویسید.",
+          );
         const requiredKind = draft!.question.visualKind;
         if (
           requiredKind &&
@@ -268,6 +298,7 @@ export function registerAuthoring(
           session,
           {
             origin: "ai_reviewed",
+            hintSafetyVersion: HINT_SAFETY_VERSION,
             sourceDraftId: did,
             provider: draft!.provider,
             model: draft!.model,

@@ -1,0 +1,2 @@
+# Reviewed synthetic UAT execution evidence only; no env, traces or database archives.
+!*.log

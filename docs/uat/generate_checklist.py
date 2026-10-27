@@ -71,10 +71,33 @@ assign('AI','008','FAIL','evidence/authoring.json; UAT_BUG_REPORT.md','UAT-AI-00
 
 assign('OPS','010-013','PASS','evidence/backup.log; scripts/verify-backup.ts','توقف فقط نویسندگان UAT؛ بکاپ ۴۴ collection و ۲۳۴۹ سند، restore به DB تصادفی، برابری hash سند و index و ثبات مبدأ تأیید شد')
 assign('T','014','PASS','evidence/backup.log','بکاپ واقعی با بازیابی در DB تازه؛ هیچ داده واقعی هدف نبود')
+# Closure run: only fresh dedicated execution evidence supersedes the baseline.
+assign('AI','008','PASS','tests/integration/hint-safety.test.ts; closure-evidence/leak-before.log; closure-evidence/ai-regression.log; closure-evidence/backend-final.log','P0 closure: baseline approval accepted a leaking hint; server now blocks/reviews raw AI prose, guards legacy delivery, preserves private references and healthy conceptual hints. Semantic limits: UAT_CLOSURE_REPORT.md')
+assign('LINK','004','PASS','tests/e2e/uat-closure.spec.ts; closure-evidence/ui-focused.log','Signed-in student opens invitation deep link and claims it without duplicate account')
+assign('TEACH','003-005','PASS','tests/e2e/uat-closure.spec.ts; closure-evidence/ui-focused.log','Real teacher counters: students=1, assignments 1→2, completed 0→1 after reload')
+assign('QB','013','PASS','tests/e2e/uat-closure.spec.ts; closure-evidence/ui-focused.log','Invalid numeric reference rejected; entered statement/reference remain in form')
+assign('OCR','014,030','PASS','tests/integration/document-columns.test.ts; closure-evidence/pdf-before.json; closure-evidence/pdf-after.json; closure-evidence/remaining-backend.log','Actual two-page/two-column PDF: 4→8 detected headings after fix; encrypted and corrupt PDFs rejected. Synthetic layout is not all national PDFs')
+assign('PR','035','PASS','tests/e2e/uat-closure.spec.ts; closure-evidence/ui-focused.log','Second independent browser context sees the one saved server attempt')
+assign('GROUP','014','PASS','tests/integration/closure-boundaries.test.ts; closure-evidence/remaining-backend.log','50 active enrolled members accepted, 51 rejected and revoked enrollment denied')
+assign('SEC','009','PASS','tests/integration/closure-boundaries.test.ts; closure-evidence/operations.json','Private sentinel/reference/password/hash absent from student APIs and real production log capture; not a universal secrecy proof')
+assign('OPS','001-002,008-009,022','PASS','closure-operations-probe.ts; closure-evidence/operations.json','Owned temporary mongod: unavailable startup rejected, outage500, reconnect preserves session/data; request IDs/log redaction; 30 synthetic real backend reads concurrency5 errors0. Not public capacity qualification')
+assign('OPS','019','PASS','tests/unit/deployment-config.test.mjs; closure-evidence/rollback.log','Actual rollback function executed with controlled systemctl/link/move commands; prior code/services restored, no database restore invocation. Not deployment on destination')
+assign('OPS','016,023-024','BLOCKED','UAT_BLOCKERS.md','Destination release SHA/cgroup enforcement and named responsible operator not verified; local source/metrics/runbook evidence retained')
+assign('EDGE','012','PASS','tests/e2e/uat-closure.spec.ts; closure-evidence/ui-focused.log','Refresh during a delayed real backend read preserves saved response and single attempt')
+assign('UI','027','BLOCKED','closure-evidence/firefox-profile-failure.log; closure-evidence/firefox-retry.log','Firefox downloaded; two actual launch attempts fail before page load due inaccessible profile folder. No app assertion executed in Firefox')
+
+assign('GOLD','001-010','PASS','tests/e2e/uat-golden.spec.ts; closure-evidence/golden-final.log','Fresh closure production build: two complete independent cohorts, strict counters/history/privacy assertions')
+assign('OPS','010-013','PASS','closure-evidence/backup.log; closure-evidence/restart.log','Fresh quiesced closure backup: 44 collections, 2059 documents; isolated restore, document/index hashes equal, source unchanged')
+assign('T','001-006,008-009,011-014','PASS','environment.json; FINAL_SOURCE_MANIFEST.json; closure-evidence/build.log; closure-evidence/backup.log','Fresh closure environment 5177 / owned replica27189; synthetic data only')
+for row in cases:
+ if row['status']=='PASS' and not row['id'].startswith('T-'):
+  for proof in ['closure-evidence/backend-final.log','closure-evidence/ordinary-final.log','closure-evidence/golden-final.log']:
+   if proof not in row['evidence']: row['evidence'] += '; '+proof
+
 # Cases without a dedicated executed assertion remain explicitly NOT_RUN, not assumed successful.
 for r in cases:
  r['priority']='P0' if r['id'].split('-')[0] in ['SEC','AUTH','GOLD','EVAL'] else 'P1'
- if r['id']=='AI-008': r['priority']='P2'
+ if r['id']=='AI-008': r['priority']='P0'
  if r['status']=='NOT_RUN': r['reason']='در این اجرا assertion مستقل و کافی برای تمام عبارت این مورد ثبت نشده؛ وجود کد/تست مجاور PASS محسوب نشد'
 (root/'cases.json').write_text(json.dumps(cases,ensure_ascii=False,indent=2)+'\n')
 def render():
@@ -82,6 +105,6 @@ def render():
  rows=['# چک‌لیست جامع UAT','', '۴۳۰ مورد محصول + ۱۴ پیش‌نیاز محیط = ۴۴۴ شناسه. وضعیت‌ها فقط متعلق به اجرای تازه هستند؛ شمارش تست خودکار با شمارش موارد پذیرش یکسان نیست.','', '| ID | بخش / معیار | اولویت | وضعیت | شواهد | علت شکست/محدودیت |','|---|---|---|---|---|---|']
  for r in cases: rows.append('| '+' | '.join(str(r[k]).replace('|','/').replace('\n',' ') for k in ['id','description','priority','status','evidence','reason'])+' |')
  (root/'UAT_MASTER_CHECKLIST.md').write_text('\n'.join(rows)+'\n')
- (root/'COUNTS.json').write_text(json.dumps({'businessCases':430,'setupCases':14,'product':dict(counts),'setup':dict(collections.Counter(r['status'] for r in cases if r['id'].startswith('T-')))},ensure_ascii=False,indent=2)+'\n')
+ (root/'COUNTS.json').write_text(json.dumps({'businessCases':430,'setupCases':14,'product':{k:counts[k] for k in ['PASS','FAIL','BLOCKED','NOT_RUN','MANUAL_REQUIRED','NOT_IMPLEMENTED','OUT_OF_SCOPE']},'setup':dict(collections.Counter(r['status'] for r in cases if r['id'].startswith('T-')))},ensure_ascii=False,indent=2)+'\n')
 render()
 print((root/'COUNTS.json').read_text())

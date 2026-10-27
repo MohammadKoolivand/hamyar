@@ -1,0 +1,290 @@
+
+> test:e2e
+> node scripts/run-e2e.mjs --output /private/tmp/hodhod-closure-e2e-final
+
+
+Running 42 tests using 1 worker
+
+(node:27121) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/e2e/access-roles.spec.ts:6:1 › super admin creates scoped secretary and secretary uses a separate operational panel (7.4s)
+  ✓   2 tests/e2e/access-roles.spec.ts:160:1 › parent portal has a valid child selector without hydration errors and revocation removes data (3.7s)
+  ✓   3 tests/e2e/ai-settings.spec.ts:6:1 › teacher selects an AvalAI model with controlled external catalog transport, persists it and sees it in authoring (5.0s)
+  ✓   4 tests/e2e/curriculum-catalog.spec.ts:3:1 › secondary catalog filter → import → preserved after reload → author a real question (5.8s)
+  ✓   5 tests/e2e/design-system.spec.ts:3:1 › reference-inspired luminous glass identity is consistent on login and mobile (1.8s)
+  ✓   6 tests/e2e/difficulty.spec.ts:4:1 › teacher selects 20 hard questions and edits filtered difficulty (4.9s)
+  ✓   7 tests/e2e/email-verification.spec.ts:7:1 › email verification UI confirms ownership once, strips token and supports mobile RTL (SMTP transport controlled) (2.9s)
+  ✓   8 tests/e2e/exam-import.spec.ts:3:1 › PDF exam upload persists, extracts real text, saves corrections and approves/rejects into the actual bank (8.3s)
+  ✓   9 tests/e2e/flow.spec.ts:4:1 › UI: teacher creates content and invite; student solves; both see evidence (9.7s)
+  ✓  10 tests/e2e/flow.spec.ts:267:1 › PWA shell works offline without caching private API data (1.1s)
+  ✓  11 tests/e2e/flow.spec.ts:294:1 › Next Node.js API preserves private response and payload limits (57ms)
+  ✓  12 tests/e2e/flow.spec.ts:313:1 › licensed local fonts load and layout uses Tailwind utilities (803ms)
+  -  13 tests/e2e/flow.spec.ts:338:1 › real AI question draft → teacher edit/approve or reject; parent read-only portal
+  ✓  14 tests/e2e/flow.spec.ts:498:1 › public login uses bright frosted-glass surfaces (1.1s)
+  ✓  15 tests/e2e/flow.spec.ts:520:1 › student registers without invitation and later joins teacher with existing account (4.1s)
+  ✓  16 tests/e2e/flow.spec.ts:642:1 › student requests a course, teacher approves, and leaving keeps history (4.2s)
+  ✘  17 tests/e2e/flow.spec.ts:730:1 › teacher publishes one group assignment to two students and sees separate reports (737ms)
+(node:27773) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  18 tests/e2e/flow.spec.ts:862:1 › teacher assigns one corrective practice from a student's wrong answer (3.5s)
+  ✓  19 tests/e2e/mission-file-import.spec.ts:4:1 › mission keeps its draft while image OCR is reviewed and approved questions are added (7.2s)
+  ✓  20 tests/e2e/mission-pagination.spec.ts:2:1 › question collection filters, pages, modal and bulk add preserve all selected questions (8.2s)
+  ✓  21 tests/e2e/navigation-layout.spec.ts:3:1 › each navigation section resolves to a standalone URL on direct load (11.3s)
+  ✓  22 tests/e2e/navigation-layout.spec.ts:28:1 › logged-in teacher navigation supports deep links, refresh, Back and Forward; header fits content (15.1s)
+  ✓  23 tests/e2e/navigation-layout.spec.ts:110:1 › all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime errors (19.8s)
+  ✓  24 tests/e2e/password-reset.spec.ts:5:1 › password recovery UI uses one-time token and invalidates every old session (SMTP dependency controlled) (4.7s)
+  ✓  25 tests/e2e/phone-otp.spec.ts:8:1 › public phone OTP signup verifies mobile and enters real student dashboard (SMS controlled) (4.0s)
+  ✓  26 tests/e2e/practice-selection.spec.ts:9:3 › answers save on navigation and finish with immediate feedback (3.5s)
+  ✓  27 tests/e2e/practice-selection.spec.ts:9:3 › answers save on navigation and finish with end feedback (4.0s)
+  ✓  28 tests/e2e/practice-selection.spec.ts:9:3 › answers save on navigation and finish with legacy-drafts feedback (2.5s)
+  ✓  29 tests/e2e/practice-selection.spec.ts:9:3 › answers save on navigation and finish with unanswered feedback (2.2s)
+  ✓  30 tests/e2e/question-bank.spec.ts:3:1 › bank-focused page separates resources and authoring; metadata and dependent filters persist (4.1s)
+  ✓  31 tests/e2e/question-edit.spec.ts:5:1 › teacher edits question, choices, difficulty and persistent image crop (3.3s)
+  ✓  32 tests/e2e/question-source.spec.ts:2:1 › exam taxonomy is visible in bank and saved from authoring with category-specific filters (3.2s)
+  ✓  33 tests/e2e/question-visuals.spec.ts:3:1 › teacher edits chart, diagram and formula; approved visual question persists and student sees the same media (4.6s)
+  ✓  34 tests/e2e/uat-closure.spec.ts:14:1 › TEACH-003/004/005: teacher dashboard counts real students, publication and completion after reload (3.2s)
+  ✘  35 tests/e2e/uat-closure.spec.ts:50:1 › QB-013: incomplete question preserves entered form text when validation fails (3.6s)
+(node:28787) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  36 tests/e2e/uat-closure.spec.ts:81:1 › PR-035/EDGE-012: second browser context sees saved response; refresh during delayed server read stays consistent (7.3s)
+  ✓  37 tests/e2e/uat-closure.spec.ts:130:1 › LINK-004: invitation deep link opens in signed-in student account and binds the existing account (3.0s)
+  ✘  38 tests/e2e/uat-golden.spec.ts:57:3 › UAT GOLD cohort 1: actual UI five questions, independent/helped results, remediation, parent and isolation (3.6m)
+
+
+  1) tests/e2e/flow.spec.ts:730:1 › teacher publishes one group assignment to two students and sees separate reports 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      774 |     },
+      775 |   });
+    > 776 |   expect(questionResponse.ok()).toBe(true);
+          |                                 ^
+      777 |
+      778 |   const contexts = [];
+      779 |   try {
+        at /private/tmp/hodhod-closure-82ntl0ht/tests/e2e/flow.spec.ts:776:33
+
+    Error Context: ../hodhod-closure-e2e-final/flow-teacher-publishes-one-72e15-s-and-sees-separate-reports/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-e2e-final/flow-teacher-publishes-one-72e15-s-and-sees-separate-reports/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-e2e-final/flow-teacher-publishes-one-72e15-s-and-sees-separate-reports/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/e2e/uat-closure.spec.ts:50:1 › QB-013: incomplete question preserves entered form text when validation fails 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('alert')
+    Expected: visible
+    Error: strict mode violation: getByRole('alert') resolved to 2 elements:
+        1) <div role="alert" class="bg-rose-50 text-rose-800 rounded-[14px] p-3.5 leading-[1.9]">اطلاعات ورودی معتبر نیست</div> aka getByText('اطلاعات ورودی معتبر نیست')
+        2) <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div> aka locator('[id="__next-route-announcer__"]')
+
+    Call log:
+      - Expect "toBeVisible" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+
+
+      67 |       .getByRole("button", { name: "تأیید و ذخیره سؤال", exact: true })
+      68 |       .click();
+    > 69 |     await expect(page.getByRole("alert")).toBeVisible();
+         |                                           ^
+      70 |     await expect(page.getByLabel("صورت سؤال", { exact: true })).toHaveValue(
+      71 |       "این متن نباید پس از خطای ورودی پاک شود.",
+      72 |     );
+        at /private/tmp/hodhod-closure-82ntl0ht/tests/e2e/uat-closure.spec.ts:69:43
+
+    Error Context: ../hodhod-closure-e2e-final/uat-closure-QB-013-incompl-9b232--text-when-validation-fails/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-e2e-final/uat-closure-QB-013-incompl-9b232--text-when-validation-fails/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-e2e-final/uat-closure-QB-013-incompl-9b232--text-when-validation-fails/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) tests/e2e/uat-golden.spec.ts:57:3 › UAT GOLD cohort 1: actual UI five questions, independent/helped results, remediation, parent and isolation 
+
+    Test was interrupted.
+
+    Error: locator.click: Test ended.
+    Browser logs:
+
+    <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_chromiumdev_profile-jIrlYl --remote-debugging-pipe --no-startup-window
+    <launched> pid=28802
+    [pid=28802][err] Trying to load the allocator multiple times. This is *not* supported.
+    [pid=28802][err] [28808:152039:1027/181920.565251:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181920.565650:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181920.570273:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181920.570361:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181920.572659:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181920.572729:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181920.573228:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181920.573296:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181920.573538:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181920.573603:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181920.996058:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181920.996172:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181920.996846:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181920.996932:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181921.005205:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181921.005299:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181921.005662:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181921.005739:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181921.005996:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181921.006048:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.574770:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.574872:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.578004:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.578094:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.578939:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.578998:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.579250:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.579301:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.579458:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.579504:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.888982:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.889109:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.902347:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.902449:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.904269:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.904349:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.904539:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.904621:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181923.904865:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181923.904958:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181924.676795:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181924.676915:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28802:152037:1027/181927.530825:ERROR:base/process/process_mac.cc:45] task_policy_set TASK_CATEGORY_POLICY: (os/kern) invalid argument (4)
+    [pid=28802][err] [28802:152037:1027/181927.530851:ERROR:base/process/process_mac.cc:90] task_policy_set TASK_SUPPRESSION_POLICY: (os/kern) invalid argument (4)
+    [pid=28802][err] [28802:152037:1027/181927.676587:ERROR:base/process/process_mac.cc:45] task_policy_set TASK_CATEGORY_POLICY: (os/kern) invalid argument (4)
+    [pid=28802][err] [28802:152037:1027/181927.676609:ERROR:base/process/process_mac.cc:90] task_policy_set TASK_SUPPRESSION_POLICY: (os/kern) invalid argument (4)
+    [pid=28802][err] [28808:152039:1027/181927.786528:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.786745:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181927.788681:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.788763:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181927.790055:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.790134:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181927.790286:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.790341:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181927.790488:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.790542:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181927.966019:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.966098:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181927.969727:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.969792:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181927.972284:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.972345:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181927.972477:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.972527:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181927.972665:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181927.972715:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181929.995471:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181929.995562:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28802:152037:1027/181930.652105:ERROR:base/process/process_mac.cc:45] task_policy_set TASK_CATEGORY_POLICY: (os/kern) invalid argument (4)
+    [pid=28802][err] [28802:152037:1027/181930.652135:ERROR:base/process/process_mac.cc:90] task_policy_set TASK_SUPPRESSION_POLICY: (os/kern) invalid argument (4)
+    [pid=28802][err] [28808:152039:1027/181930.774946:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181930.775035:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181930.776732:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181930.776816:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181930.777188:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181930.777241:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181930.777388:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181930.777463:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181930.777607:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181930.777656:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181931.031321:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181931.031418:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181931.035933:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181931.036023:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181931.040701:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181931.040782:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181931.040950:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181931.041020:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181931.041186:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181931.041252:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181931.338355:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181931.338451:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/181931.633839:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/181931.633929:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182110.886868:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182110.887002:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182110.890773:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182110.890865:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182110.896239:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182110.896363:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182110.896616:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182110.896687:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182110.896854:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182110.896919:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182111.481304:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182111.481403:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182111.514778:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182111.514873:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182111.520103:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182111.520198:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182111.520544:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182111.520607:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182111.520942:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182111.521007:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152039:1027/182111.855689:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] [28808:152114:1027/182111.855808:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=28802][err] Trying to load the allocator multiple times. This is *not* supported.
+    [pid=28802][err] WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+    [pid=28802][err] I0000 00:00:1793096540.363430  160020 environment.cc:526] Selected adapter: Apple M3, arch=metal-3, vendor=apple, backend=Metal, adapterType=Integrated GPU
+    [pid=28802][err] I0000 00:00:1793096540.449673  160069 environment.cc:526] Selected adapter: Apple M3, arch=metal-3, vendor=apple, backend=Metal, adapterType=Integrated GPU
+    [pid=28802][err] [28802:152037:1027/182304.195935:ERROR:base/process/process_mac.cc:45] task_policy_set TASK_CATEGORY_POLICY: (os/kern) invalid argument (4)
+    [pid=28802][err] [28802:152037:1027/182304.195955:ERROR:base/process/process_mac.cc:90] task_policy_set TASK_SUPPRESSION_POLICY: (os/kern) invalid argument (4)
+    [pid=28802] <gracefully close start>
+    Call log:
+      - waiting for getByRole('button', { name: 'پایان تمرین و گزارش', exact: true })
+        - locator resolved to <button disabled type="button" class="min-h-11 cursor-pointer rounded-lg px-2 text-sm text-slate-500 underline-offset-4 hover:text-[#233B8F] hover:underline disabled:opacity-50">پایان تمرین و گزارش</button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+          - waiting 100ms
+        7 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+          - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+
+
+      430 |       await studentPage
+      431 |         .getByRole("button", { name: "پایان تمرین و گزارش", exact: true })
+    > 432 |         .click();
+          |          ^
+      433 |       expect(
+      434 |         await (
+      435 |           await studentPage.request.get(
+        at /private/tmp/hodhod-closure-82ntl0ht/tests/e2e/uat-golden.spec.ts:432:10
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-e2e-final/uat-golden-UAT-GOLD-cohort-b26a9-iation-parent-and-isolation/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-e2e-final/uat-golden-UAT-GOLD-cohort-b26a9-iation-parent-and-isolation/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    tests/e2e/flow.spec.ts:730:1 › teacher publishes one group assignment to two students and sees separate reports 
+    tests/e2e/uat-closure.spec.ts:50:1 › QB-013: incomplete question preserves entered form text when validation fails 
+  1 interrupted
+    tests/e2e/uat-golden.spec.ts:57:3 › UAT GOLD cohort 1: actual UI five questions, independent/helped results, remediation, parent and isolation 
+  1 skipped
+  4 did not run
+  34 passed (6.8m)

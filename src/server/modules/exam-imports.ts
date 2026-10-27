@@ -64,11 +64,74 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
             { projection: { leaseToken: 0 } },
           )
         : null,
+      sourcePages: await c("examImportPages")
+        .find(
+          { examId: e._id, kind: "question", expiresAt: { $gt: new Date() } },
+          { projection: { _id: 0, page: 1 } },
+        )
+        .sort({ page: 1 })
+        .toArray(),
       items: await c("examImportItems")
         .find({ examId: e._id })
         .sort({ createdAt: 1, _id: 1 })
         .toArray(),
     };
+  });
+  app.post("/api/exam-imports/:eid/items/:iid/source-image", async (r) => {
+    const { u, e } = await getExam(r);
+    const iid = z
+      .string()
+      .uuid()
+      .parse((r.params as { iid: string }).iid);
+    const { page } = z
+      .object({ page: z.number().int().min(1).max(100) })
+      .strict()
+      .parse(r.body);
+    return ctx.transaction(async (session) => {
+      const item = await c("examImportItems").findOne(
+        { _id: iid, examId: e._id, ownerId: u._id, state: "pending" },
+        { session },
+      );
+      if (!item || e.state !== "review")
+        return fail(409, "فقط پیش‌نویس در حال بررسی قابل اصلاح است");
+      const source = await c("examImportPages").findOne(
+        {
+          examId: e._id,
+          ownerId: u._id,
+          kind: "question",
+          page,
+          expiresAt: { $gt: new Date() },
+        },
+        { session },
+      );
+      if (!source)
+        return fail(
+          404,
+          "صفحه اصلی موجود نیست یا مهلت نگهداری آن تمام شده است",
+        );
+      // Reuse one private page asset across retries; approval promotes it through the existing pipeline.
+      await c("examImportPreviewAssets").updateOne(
+        { _id: source._id },
+        {
+          $setOnInsert: {
+            ownerId: u._id,
+            examId: e._id,
+            data: source.data,
+            width: source.width,
+            height: source.height,
+            expiresAt: source.expiresAt,
+          },
+        },
+        { upsert: true, session },
+      );
+      return {
+        kind: "image",
+        assetId: source._id,
+        width: source.width,
+        height: source.height,
+        caption: `تصویر سؤال از صفحه ${page} منبع آزمون`,
+      };
+    });
   });
   app.post(
     "/api/exam-imports/:eid/files/:kind",

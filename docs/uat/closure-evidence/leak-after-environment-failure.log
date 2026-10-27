@@ -1,0 +1,296 @@
+TAP version 13
+# Subtest: AI-LEAK-001: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 1 - AI-LEAK-001: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 5027.634333
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:43:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-002: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 2 - AI-LEAK-002: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 5005.419041
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:43:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-003: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 3 - AI-LEAK-003: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 5005.581667
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:43:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-004: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 4 - AI-LEAK-004: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 5005.523667
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:43:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-005: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 5 - AI-LEAK-005: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 5004.995666
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:43:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-006: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 6 - AI-LEAK-006: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 5004.73625
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:43:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-007: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 7 - AI-LEAK-007: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 5004.557709
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:43:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-008: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 8 - AI-LEAK-008: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 5004.182958
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:43:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-010: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 9 - AI-LEAK-010: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 5012.995958
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:43:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-009: malformed generator output fails closed
+not ok 10 - AI-LEAK-009: malformed generator output fails closed
+  ---
+  duration_ms: 5004.001833
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:3758'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:107:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-011/015: healthy conceptual hint persists and remains usable; rejected legacy hints never consume quota
+not ok 11 - AI-LEAK-011/015: healthy conceptual hint persists and remains usable; rejected legacy hints never consume quota
+  ---
+  duration_ms: 5003.787916
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:4356'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:137:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-012: independent assessment rejects hints
+not ok 12 - AI-LEAK-012: independent assessment rejects hints
+  ---
+  duration_ms: 5003.42125
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:5116'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:177:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+# Subtest: AI-LEAK-013/014: injection and arbitrary provider answer cannot reach student
+not ok 13 - AI-LEAK-013/014: injection and arbitrary provider answer cannot reach student
+  ---
+  duration_ms: 5003.840459
+  type: 'test'
+  location: '/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:1:5491'
+  failureType: 'testCodeFailure'
+  error: 'connect ECONNREFUSED 127.0.0.1:27019'
+  code: 'ERR_TEST_FAILURE'
+  name: 'MongoServerSelectionError'
+  stack: |-
+    Topology.selectServer (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:635:30)
+    async Topology._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:467:22)
+    async Topology.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/sdam/topology.ts:404:7)
+    async topologyConnect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:695:9)
+    async MongoClient._connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:707:7)
+    async MongoClient.connect (/Users/mohammadkoolivand/Desktop/HamYar/node_modules/mongodb/src/mongo_client.ts:619:7)
+    async connect (/Users/mohammadkoolivand/Desktop/HamYar/src/server/db.ts:9:3)
+    async fixture (/Users/mohammadkoolivand/Desktop/HamYar/tests/helpers/fixture.ts:25:26)
+    async TestContext.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/tests/integration/hint-safety.test.ts:201:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 0
+# fail 13
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 67108.625583

@@ -1,0 +1,5 @@
+
+> verify:backup
+> node --env-file-if-exists=.env --import tsx scripts/verify-backup.ts
+
+{"result":"pass","collections":44,"documents":2059,"bytes":360721,"archive":"/private/tmp/hodhod-closure-82ntl0ht/.private/backups/hodhodeh_audit_closure_1027-1793097488910.archive.gz","restoredToIsolatedDatabase":true}

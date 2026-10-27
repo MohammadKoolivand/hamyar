@@ -78,3 +78,19 @@ test("deployment preflight reports only codes and never secrets; optional SMS is
   assert.ok(!result.stdout.includes(secret));
   assert.ok(!result.stderr.includes(secret));
 });
+test("OPS-019: actual rollback function restores previous code/services and never invokes database restore", async () => {
+  const { readFileSync } = await import("node:fs");
+  const source = readFileSync("ops/deploy-staging.sh", "utf8");
+  const body = source.match(/rollback\(\) \{([\s\S]*?)\n\}/)?.[1];
+  assert.ok(body);
+  const script = `previous=/fixture/previous\nmail_active=true\n` +
+    `systemctl(){ echo "systemctl $*"; }\nln(){ echo "ln $*"; }\nmv(){ echo "mv $*"; }\nmongorestore(){ echo "FORBIDDEN_DATABASE_RESTORE"; return 9; }\n` +
+    `rollback(){${body}\n}\nrollback\n`;
+  const r = spawnSync("bash", ["-c", script], { encoding: "utf8" });
+  assert.equal(r.status, 1);
+  assert.match(r.stdout, /ln -sfn \/fixture\/previous \/srv\/hodhod.rollback/);
+  assert.match(r.stdout, /systemctl start hodhod-web hodhod-exam-worker/);
+  assert.match(r.stdout, /systemctl start hodhod-mail-worker/);
+  assert.ok(!r.stdout.includes("FORBIDDEN_DATABASE_RESTORE"));
+  assert.match(r.stderr, /Database was not rolled back/);
+});

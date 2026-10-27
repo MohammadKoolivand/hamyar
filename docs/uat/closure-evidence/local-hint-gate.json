@@ -1,0 +1,60 @@
+{
+  "provider": "real local Ollama",
+  "published": 0,
+  "runs": [
+    {
+      "index": 1,
+      "parsed": true,
+      "hints": [
+        {
+          "text": "جمع دو عدد می‌شود.",
+          "state": "review"
+        },
+        {
+          "text": "عدد سه و چهار را بفرمایید.",
+          "state": "review"
+        },
+        {
+          "text": "پاسخ مرجع 7 است.",
+          "state": "blocked"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "parsed": true,
+      "hints": [
+        {
+          "text": "جمع دو عدد صحیح می‌شود.",
+          "state": "review"
+        },
+        {
+          "text": "عدد سه و چهار را بفرسم.",
+          "state": "review"
+        },
+        {
+          "text": "پاسخ مرجع فقط عدد 7 است.",
+          "state": "blocked"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "parsed": true,
+      "hints": [
+        {
+          "text": "جمع دو عدد می تواند عددی بزرگتر از هر دو از آنها باشد.",
+          "state": "review"
+        },
+        {
+          "text": "عدد سه و چهار را به ترتیب جمع کنید.",
+          "state": "review"
+        },
+        {
+          "text": "پاسخ مرجع عدد 7 است.",
+          "state": "blocked"
+        }
+      ]
+    }
+  ]
+}

@@ -1,54 +1,175 @@
 {
-  "baseCommit": "4356a58b3f6a50119e38b1e6710f4668bf8c61f0",
+  "baseCommit": "6eb7a6acc79d64a6e756a6ca963e87ef7a07fcee",
+  "branch": "main",
   "uncommittedChanges": true,
   "pushed": false,
-  "counts": {
-    "businessCases": 430,
-    "setupCases": 14,
-    "product": {
-      "PASS": 392,
-      "BLOCKED": 7,
-      "NOT_RUN": 20,
-      "NOT_IMPLEMENTED": 3,
-      "MANUAL_REQUIRED": 7,
-      "FAIL": 1
-    },
-    "setup": {
-      "PASS": 12,
-      "BLOCKED": 2
-    }
+  "environment": {
+    "workspace": "/private/tmp/hodhod-closure-82ntl0ht",
+    "database": "hodhodeh_audit_closure_1027",
+    "replica": "closure-rs",
+    "mongoPort": 27189,
+    "webPort": 5177,
+    "provider": "mock-approved-hints",
+    "realSms": false,
+    "realSmtp": false,
+    "paidInference": false,
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "node": "v22.23.2",
+    "baseCommit": "6eb7a6acc79d64a6e756a6ca963e87ef7a07fcee"
   },
+  "baseline": {
+    "PASS": 392,
+    "FAIL": 1,
+    "BLOCKED": 7,
+    "NOT_RUN": 20,
+    "MANUAL_REQUIRED": 7,
+    "NOT_IMPLEMENTED": 3,
+    "OUT_OF_SCOPE": 0
+  },
+  "final": {
+    "PASS": 410,
+    "FAIL": 0,
+    "BLOCKED": 10,
+    "NOT_RUN": 0,
+    "MANUAL_REQUIRED": 7,
+    "NOT_IMPLEMENTED": 3,
+    "OUT_OF_SCOPE": 0
+  },
+  "totalBusinessCases": 430,
+  "setupCases": {
+    "PASS": 12,
+    "BLOCKED": 2
+  },
+  "completionPercentage": 100,
+  "passPercentage": 95.35,
+  "aiLeakage": "FIXED_WITH_BOUNDED_RAW_AI_GATE_AND_DOCUMENTED_SEMANTIC_LIMITS",
   "automated": {
     "unit": {
-      "passed": 47,
+      "passed": 50,
       "failed": 0,
       "skipped": 0
     },
     "integration": {
-      "passed": 85,
+      "passed": 102,
       "failed": 0,
       "skipped": 0
     },
-    "e2e": {
-      "passed": 37,
+    "chromeE2e": {
+      "passed": 41,
       "failed": 0,
-      "skipped": 1,
-      "skipReason": "Existing optional real Ollama browser test; primary UAT provider mock. Separate real local inference probes performed."
+      "skipped": 1
+    },
+    "firefox": {
+      "state": "BLOCKED",
+      "pageAssertionsExecuted": 0,
+      "launchFailuresPerBatch": 7,
+      "batchesAttempted": 2
     }
   },
-  "golden": "PASS: two cohorts, repeated in final full suite",
+  "golden": "PASS: two fresh cohorts on final build",
+  "integrity": "PASS: assignmentsNeedingReview=0",
+  "backupRestore": "PASS: 44 collections / 2059 documents / source unchanged / isolated restore",
+  "restart": "PASS: same session and full report preserved",
+  "knownOpenBugs": {
+    "P0": 0,
+    "P1": 0,
+    "P2": 0
+  },
   "readiness": {
     "educationalCore": "CONDITIONALLY READY",
     "controlledPilot": "NOT READY",
     "publicRelease": "NOT READY"
   },
-  "openBugs": {
-    "P0Known": 0,
-    "P1Known": 0,
-    "P2": 1
-  },
-  "notes": [
-    "Known-open bug counts do not clear untested or blocked acceptance cases.",
-    "AI-008 acceptance failure is a real generated-content quality failure, despite passing transport/schema automated tests."
+  "changedFiles": [
+    "docs/uat/COUNTS.json",
+    "docs/uat/FINAL_RESULTS.json",
+    "docs/uat/FINAL_SOURCE_MANIFEST.json",
+    "docs/uat/UAT_BLOCKERS.md",
+    "docs/uat/UAT_BUG_REPORT.md",
+    "docs/uat/UAT_CHANGED_FILES.md",
+    "docs/uat/UAT_CLOSURE_REPORT.md",
+    "docs/uat/UAT_EXECUTION_REPORT.md",
+    "docs/uat/UAT_FEATURE_DECISIONS.md",
+    "docs/uat/UAT_FIX_SUMMARY.md",
+    "docs/uat/UAT_GOLDEN_JOURNEY.md",
+    "docs/uat/UAT_HUMAN_REVIEW.md",
+    "docs/uat/UAT_MASTER_CHECKLIST.md",
+    "docs/uat/UAT_RELEASE_READINESS.md",
+    "docs/uat/UAT_STATUS_CHANGES.md",
+    "docs/uat/cases.json",
+    "docs/uat/closure-evidence/.gitignore",
+    "docs/uat/closure-evidence/ai-regression.log",
+    "docs/uat/closure-evidence/backend-final.log",
+    "docs/uat/closure-evidence/backup.log",
+    "docs/uat/closure-evidence/baseline-cases.json",
+    "docs/uat/closure-evidence/build.log",
+    "docs/uat/closure-evidence/credential-presence.json",
+    "docs/uat/closure-evidence/dns.log",
+    "docs/uat/closure-evidence/e2e-interrupted-harness.log",
+    "docs/uat/closure-evidence/environment.json",
+    "docs/uat/closure-evidence/firefox-profile-failure.log",
+    "docs/uat/closure-evidence/firefox-retry.log",
+    "docs/uat/closure-evidence/github-actions.json",
+    "docs/uat/closure-evidence/golden-before-final-validator.log",
+    "docs/uat/closure-evidence/golden-final.log",
+    "docs/uat/closure-evidence/health.json",
+    "docs/uat/closure-evidence/hint-false-positive.log",
+    "docs/uat/closure-evidence/https.log",
+    "docs/uat/closure-evidence/install.log",
+    "docs/uat/closure-evidence/integrity.log",
+    "docs/uat/closure-evidence/leak-after-environment-failure.log",
+    "docs/uat/closure-evidence/leak-after.log",
+    "docs/uat/closure-evidence/leak-before-environment-failure.log",
+    "docs/uat/closure-evidence/leak-before.log",
+    "docs/uat/closure-evidence/lint.log",
+    "docs/uat/closure-evidence/local-authoring.json",
+    "docs/uat/closure-evidence/local-hint-gate.json",
+    "docs/uat/closure-evidence/local-hints.log",
+    "docs/uat/closure-evidence/operations-first-harness.log",
+    "docs/uat/closure-evidence/operations-second-harness.log",
+    "docs/uat/closure-evidence/operations.json",
+    "docs/uat/closure-evidence/ordinary-before-false-positive.log",
+    "docs/uat/closure-evidence/ordinary-final.log",
+    "docs/uat/closure-evidence/pdf-after.json",
+    "docs/uat/closure-evidence/pdf-before.json",
+    "docs/uat/closure-evidence/remaining-backend.log",
+    "docs/uat/closure-evidence/restart.log",
+    "docs/uat/closure-evidence/rollback.log",
+    "docs/uat/closure-evidence/root-lint.log",
+    "docs/uat/closure-evidence/root-typecheck.log",
+    "docs/uat/closure-evidence/ssh-fingerprint.log",
+    "docs/uat/closure-evidence/ssh-pinned.log",
+    "docs/uat/closure-evidence/ssh.log",
+    "docs/uat/closure-evidence/typecheck.log",
+    "docs/uat/closure-evidence/ui-focused.log",
+    "docs/uat/closure-operations-probe.ts",
+    "docs/uat/closure-restart-probe.ts",
+    "docs/uat/environment.json",
+    "docs/uat/generate_checklist.py",
+    "docs/uat/pdf-closure-probe.ts",
+    "src/server/ai/hint-safety.ts",
+    "src/server/ai/tutor.ts",
+    "src/server/imports/document-engine.ts",
+    "src/server/imports/text-columns.ts",
+    "src/server/modules/authoring.ts",
+    "src/server/modules/practice.ts",
+    "tests/e2e/uat-closure.spec.ts",
+    "tests/fixtures/uat-closure/columns.pdf",
+    "tests/fixtures/uat-closure/encrypted.pdf",
+    "tests/integration/closure-boundaries.test.ts",
+    "tests/integration/document-columns.test.ts",
+    "tests/integration/hint-safety.test.ts",
+    "tests/unit/deployment-config.test.mjs",
+    "tests/unit/hint-safety.test.ts",
+    "tests/unit/text-columns.test.ts"
+  ],
+  "regressionTestsAdded": [
+    "tests/integration/hint-safety.test.ts",
+    "tests/integration/document-columns.test.ts",
+    "tests/integration/closure-boundaries.test.ts",
+    "tests/unit/hint-safety.test.ts",
+    "tests/unit/text-columns.test.ts",
+    "tests/unit/deployment-config.test.mjs (extended)",
+    "tests/e2e/uat-closure.spec.ts"
   ]
 }

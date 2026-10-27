@@ -1,3 +1,4 @@
+import { splitColumnRows } from "./text-columns";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { readFile, writeFile, stat } from "node:fs/promises";
@@ -136,7 +137,7 @@ export async function processDocument(
           ) ?? line.y;
         grouped.set(k, [...(grouped.get(k) ?? []), line]);
       }
-      let lines = [...grouped.values()].map((ls) => {
+      let lines = splitColumnRows([...grouped.values()], width).map((ls) => {
         const rtl = ls.some((l) => /[\u0600-\u06ff]/.test(l.text));
         ls.sort((a, b) => (rtl ? b.x - a.x : a.x - b.x));
         return {

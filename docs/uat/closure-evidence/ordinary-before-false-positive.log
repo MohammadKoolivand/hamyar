@@ -1,0 +1,83 @@
+
+> test:e2e
+> node scripts/run-e2e.mjs --grep-invert UAT GOLD cohort --output /private/tmp/hodhod-closure-final-ordinary
+
+
+Running 40 tests using 1 worker
+
+(node:30652) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/e2e/access-roles.spec.ts:6:1 › super admin creates scoped secretary and secretary uses a separate operational panel (6.8s)
+  ✓   2 tests/e2e/access-roles.spec.ts:160:1 › parent portal has a valid child selector without hydration errors and revocation removes data (2.1s)
+  ✓   3 tests/e2e/ai-settings.spec.ts:6:1 › teacher selects an AvalAI model with controlled external catalog transport, persists it and sees it in authoring (2.9s)
+  ✓   4 tests/e2e/curriculum-catalog.spec.ts:3:1 › secondary catalog filter → import → preserved after reload → author a real question (1.8s)
+  ✓   5 tests/e2e/design-system.spec.ts:3:1 › reference-inspired luminous glass identity is consistent on login and mobile (754ms)
+  ✓   6 tests/e2e/difficulty.spec.ts:4:1 › teacher selects 20 hard questions and edits filtered difficulty (2.6s)
+  ✓   7 tests/e2e/email-verification.spec.ts:7:1 › email verification UI confirms ownership once, strips token and supports mobile RTL (SMTP transport controlled) (2.4s)
+  ✓   8 tests/e2e/exam-import.spec.ts:3:1 › PDF exam upload persists, extracts real text, saves corrections and approves/rejects into the actual bank (6.5s)
+  ✓   9 tests/e2e/flow.spec.ts:4:1 › UI: teacher creates content and invite; student solves; both see evidence (5.6s)
+  ✓  10 tests/e2e/flow.spec.ts:267:1 › PWA shell works offline without caching private API data (516ms)
+  ✓  11 tests/e2e/flow.spec.ts:294:1 › Next Node.js API preserves private response and payload limits (28ms)
+  ✓  12 tests/e2e/flow.spec.ts:313:1 › licensed local fonts load and layout uses Tailwind utilities (366ms)
+  -  13 tests/e2e/flow.spec.ts:338:1 › real AI question draft → teacher edit/approve or reject; parent read-only portal
+  ✓  14 tests/e2e/flow.spec.ts:498:1 › public login uses bright frosted-glass surfaces (519ms)
+  ✓  15 tests/e2e/flow.spec.ts:520:1 › student registers without invitation and later joins teacher with existing account (2.3s)
+  ✓  16 tests/e2e/flow.spec.ts:642:1 › student requests a course, teacher approves, and leaving keeps history (2.2s)
+  ✘  17 tests/e2e/flow.spec.ts:730:1 › teacher publishes one group assignment to two students and sees separate reports (381ms)
+(node:31151) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  18 tests/e2e/flow.spec.ts:862:1 › teacher assigns one corrective practice from a student's wrong answer (1.5s)
+  ✓  19 tests/e2e/mission-file-import.spec.ts:4:1 › mission keeps its draft while image OCR is reviewed and approved questions are added (3.8s)
+  ✓  20 tests/e2e/mission-pagination.spec.ts:2:1 › question collection filters, pages, modal and bulk add preserve all selected questions (2.7s)
+  ✓  21 tests/e2e/navigation-layout.spec.ts:3:1 › each navigation section resolves to a standalone URL on direct load (834ms)
+  ✓  22 tests/e2e/navigation-layout.spec.ts:28:1 › logged-in teacher navigation supports deep links, refresh, Back and Forward; header fits content (1.1s)
+  ✓  23 tests/e2e/navigation-layout.spec.ts:110:1 › all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime errors (2.1s)
+  ✓  24 tests/e2e/password-reset.spec.ts:5:1 › password recovery UI uses one-time token and invalidates every old session (SMTP dependency controlled) (2.2s)
+  ✓  25 tests/e2e/phone-otp.spec.ts:8:1 › public phone OTP signup verifies mobile and enters real student dashboard (SMS controlled) (2.5s)
+  ✓  26 tests/e2e/practice-selection.spec.ts:9:3 › answers save on navigation and finish with immediate feedback (1.3s)
+  ✓  27 tests/e2e/practice-selection.spec.ts:9:3 › answers save on navigation and finish with end feedback (1.7s)
+  ✓  28 tests/e2e/practice-selection.spec.ts:9:3 › answers save on navigation and finish with legacy-drafts feedback (828ms)
+  ✓  29 tests/e2e/practice-selection.spec.ts:9:3 › answers save on navigation and finish with unanswered feedback (1.2s)
+  ✓  30 tests/e2e/question-bank.spec.ts:3:1 › bank-focused page separates resources and authoring; metadata and dependent filters persist (2.0s)
+  ✓  31 tests/e2e/question-edit.spec.ts:5:1 › teacher edits question, choices, difficulty and persistent image crop (1.6s)
+  ✓  32 tests/e2e/question-source.spec.ts:2:1 › exam taxonomy is visible in bank and saved from authoring with category-specific filters (1.7s)
+  ✓  33 tests/e2e/question-visuals.spec.ts:3:1 › teacher edits chart, diagram and formula; approved visual question persists and student sees the same media (2.2s)
+  ✓  34 tests/e2e/uat-closure.spec.ts:14:1 › TEACH-003/004/005: teacher dashboard counts real students, publication and completion after reload (2.3s)
+  ✓  35 tests/e2e/uat-closure.spec.ts:50:1 › QB-013: incomplete question preserves entered form text when validation fails (2.1s)
+  ✓  36 tests/e2e/uat-closure.spec.ts:81:1 › PR-035/EDGE-012: second browser context sees saved response; refresh during delayed server read stays consistent (4.0s)
+  ✓  37 tests/e2e/uat-closure.spec.ts:130:1 › LINK-004: invitation deep link opens in signed-in student account and binds the existing account (2.3s)
+  ✓  38 tests/e2e/uat-probes.spec.ts:6:1 › UAT unknown route returns 404 and reduced-motion disables transition (369ms)
+  ✓  39 tests/e2e/uat-probes.spec.ts:20:1 › UAT formula options render MathML, invalid formula stays readable and hostile HTML remains text (2.6s)
+  ✓  40 tests/e2e/uat-probes.spec.ts:90:1 › UAT remembered session survives closing and relaunching a real persistent Chrome profile (5.1s)
+
+
+  1) tests/e2e/flow.spec.ts:730:1 › teacher publishes one group assignment to two students and sees separate reports 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      774 |     },
+      775 |   });
+    > 776 |   expect(questionResponse.ok()).toBe(true);
+          |                                 ^
+      777 |
+      778 |   const contexts = [];
+      779 |   try {
+        at /private/tmp/hodhod-closure-82ntl0ht/tests/e2e/flow.spec.ts:776:33
+
+    Error Context: ../hodhod-closure-final-ordinary/flow-teacher-publishes-one-72e15-s-and-sees-separate-reports/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-final-ordinary/flow-teacher-publishes-one-72e15-s-and-sees-separate-reports/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-final-ordinary/flow-teacher-publishes-one-72e15-s-and-sees-separate-reports/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/e2e/flow.spec.ts:730:1 › teacher publishes one group assignment to two students and sees separate reports 
+  1 skipped
+  38 passed (1.5m)

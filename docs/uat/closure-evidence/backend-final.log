@@ -1,0 +1,926 @@
+
+> test
+> node --import tsx --test --test-concurrency=4 --test-timeout=120000 tests/unit/*.test.ts tests/unit/*.test.mjs tests/integration/*.test.ts
+
+TAP version 13
+# Subtest: five roles have distinct server permissions, delegated staff scope, revocation and no public escalation
+ok 1 - five roles have distinct server permissions, delegated staff scope, revocation and no public escalation
+  ---
+  duration_ms: 5054.2195
+  type: 'test'
+  ...
+# Subtest: parent access is tied to verified child links and stays read-only
+ok 2 - parent access is tied to verified child links and stays read-only
+  ---
+  duration_ms: 3258.582958
+  type: 'test'
+  ...
+# Subtest: teacher model persists privately and selects the actual AvalAI request; drafts still require approval
+ok 3 - teacher model persists privately and selects the actual AvalAI request; drafts still require approval
+  ---
+  duration_ms: 4710.197
+  type: 'test'
+  ...
+# Subtest: a model can be selected without a server key but generation stays unavailable
+ok 4 - a model can be selected without a server key but generation stays unavailable
+  ---
+  duration_ms: 3049.06725
+  type: 'test'
+  ...
+# Subtest: real MongoDB: teacher → invitation → mission → practice → reports and isolation
+ok 5 - real MongoDB: teacher → invitation → mission → practice → reports and isolation
+  ---
+  duration_ms: 5568.474916
+  type: 'test'
+  ...
+# Subtest: login validates credentials, creates a secure session, and logout revokes only that session
+ok 6 - login validates credentials, creates a secure session, and logout revokes only that session
+  ---
+  duration_ms: 4604.171125
+  type: 'test'
+  ...
+# Subtest: missing or malformed password hashes reject login without internal errors or sessions
+ok 7 - missing or malformed password hashes reject login without internal errors or sessions
+  ---
+  duration_ms: 3229.537458
+  type: 'test'
+  ...
+# Subtest: a login verified before password reset cannot resurrect an old-password session
+ok 8 - a login verified before password reset cannot resurrect an old-password session
+  ---
+  duration_ms: 3061.187375
+  type: 'test'
+  ...
+# Subtest: authentication rate limit rejects excess attempts while Origin and expired sessions fail closed
+ok 9 - authentication rate limit rejects excess attempts while Origin and expired sessions fail closed
+  ---
+  duration_ms: 2998.631583
+  type: 'test'
+  ...
+# Subtest: administrative access changes invalidate a pending login even when the original role is restored
+ok 10 - administrative access changes invalidate a pending login even when the original role is restored
+  ---
+  duration_ms: 3329.040291
+  type: 'test'
+  ...
+# Subtest: generated questions stay private drafts until edited teacher approval; replay/reject/isolation
+ok 11 - generated questions stay private drafts until edited teacher approval; replay/reject/isolation
+  ---
+  duration_ms: 3625.160333
+  type: 'test'
+  ...
+# Subtest: unavailable generator cannot add questions; invalid numeric reference requires teacher correction
+ok 12 - unavailable generator cannot add questions; invalid numeric reference requires teacher correction
+  ---
+  duration_ms: 6271.388542
+  type: 'test'
+  ...
+# Subtest: question version/draft approval rollback together at the final write boundary
+ok 13 - question version/draft approval rollback together at the final write boundary
+  ---
+  duration_ms: 2964.985041
+  type: 'test'
+  ...
+# Subtest: AvvalAI hints use the teacher model, record usage and never charge quota on provider failure
+ok 14 - AvvalAI hints use the teacher model, record usage and never charge quota on provider failure
+  ---
+  duration_ms: 3621.301917
+  type: 'test'
+  ...
+# Subtest: group task fans out only to actively enrolled class members, with isolated evidence and reports
+ok 15 - group task fans out only to actively enrolled class members, with isolated evidence and reports
+  ---
+  duration_ms: 4351.466042
+  type: 'test'
+  ...
+# Subtest: group publishing rejects inactive recipients atomically without partial assignment
+ok 16 - group publishing rejects inactive recipients atomically without partial assignment
+  ---
+  duration_ms: 3453.738
+  type: 'test'
+  ...
+# Subtest: GROUP-014: exact 50 active enrolled members allowed; 51 and revoked enrollment denied
+ok 17 - GROUP-014: exact 50 active enrolled members allowed; 51 and revoked enrollment denied
+  ---
+  duration_ms: 3308.806083
+  type: 'test'
+  ...
+# Subtest: SEC-009/OPS-008: student endpoints never return private reference/password/hash; every error has request ID
+ok 18 - SEC-009/OPS-008: student endpoints never return private reference/password/hash; every error has request ID
+  ---
+  duration_ms: 2861.018292
+  type: 'test'
+  ...
+# Subtest: course join requests require owner approval and do not leak other students
+ok 19 - course join requests require owner approval and do not leak other students
+  ---
+  duration_ms: 3326.193125
+  type: 'test'
+  ...
+# Subtest: revocation freezes unfinished assignments but retains history and permits reapproval
+ok 20 - revocation freezes unfinished assignments but retains history and permits reapproval
+  ---
+  duration_ms: 2366.100917
+  type: 'test'
+  ...
+# Subtest: course enrollments isolate teachers and students; missions preserve course provenance
+ok 21 - course enrollments isolate teachers and students; missions preserve course provenance
+  ---
+  duration_ms: 3268.399209
+  type: 'test'
+  ...
+# Subtest: catalog import is transactional, repeat/concurrent safe, preserves custom content and private per teacher
+ok 22 - catalog import is transactional, repeat/concurrent safe, preserves custom content and private per teacher
+  ---
+  duration_ms: 3325.967042
+  type: 'test'
+  ...
+# Subtest: difficulty metadata, bulk edits and exact 20-question selection are persisted and scoped
+ok 23 - difficulty metadata, bulk edits and exact 20-question selection are persisted and scoped
+  ---
+  duration_ms: 3117.896291
+  type: 'test'
+  ...
+# Subtest: OCR-014/OCR-030: genuine two-page two-column PDF keeps eight headings; corrupt and password PDF fail closed
+ok 24 - OCR-014/OCR-030: genuine two-page two-column PDF keeps eight headings; corrupt and password PDF fail closed
+  ---
+  duration_ms: 769.542417
+  type: 'test'
+  ...
+# Subtest: real document reader rejects a genuine 101-page PDF before rasterization and corrupt PDF fails closed
+ok 25 - real document reader rejects a genuine 101-page PDF before rasterization and corrupt PDF fails closed
+  ---
+  duration_ms: 463.322166
+  type: 'test'
+  ...
+# Subtest: durable local PDF jobs match actual key numbers, preserve images on publish and delete source safely
+ok 26 - durable local PDF jobs match actual key numbers, preserve images on publish and delete source safely
+  ---
+  duration_ms: 9080.054333
+  type: 'test'
+  ...
+# Subtest: scanned and mixed Persian PDFs really run OCR; formulas and image keys remain human-reviewed
+ok 27 - scanned and mixed Persian PDFs really run OCR; formulas and image keys remain human-reviewed
+  ---
+  duration_ms: 7902.4115
+  type: 'test'
+  ...
+# Subtest: email ownership: generic requests, encrypted delivery, one-use confirmation, session revocation, verified reset and secure change
+ok 28 - email ownership: generic requests, encrypted delivery, one-use confirmation, session revocation, verified reset and secure change
+  ---
+  duration_ms: 7240.102708
+  type: 'test'
+  ...
+# Subtest: a login checked before email verification cannot recreate a revoked session
+ok 29 - a login checked before email verification cannot recreate a revoked session
+  ---
+  duration_ms: 2630.6545
+  type: 'test'
+  ...
+# Subtest: exam PDF upload/download/extraction/save/review is durable, private, atomic and idempotent
+ok 30 - exam PDF upload/download/extraction/save/review is durable, private, atomic and idempotent
+  ---
+  duration_ms: 8302.102583
+  type: 'test'
+  ...
+# Subtest: textless PDF stays review-only, manual fallback works and ordinary JSON request limits stay unchanged
+ok 31 - textless PDF stays review-only, manual fallback works and ordinary JSON request limits stay unchanged
+  ---
+  duration_ms: 4550.465125
+  type: 'test'
+  ...
+# Subtest: teacher can defer student feedback until completion, including reports/dashboard/mastery and idempotent attempts
+ok 32 - teacher can defer student feedback until completion, including reports/dashboard/mastery and idempotent attempts
+  ---
+  duration_ms: 6860.007792
+  type: 'test'
+  ...
+# Subtest: 12-step individual learning journey: five questions, recovery and parent isolation
+ok 33 - 12-step individual learning journey: five questions, recovery and parent isolation
+  ---
+  duration_ms: 5066.797292
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-001: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+ok 34 - AI-LEAK-001: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 2957.334709
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-002: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+ok 35 - AI-LEAK-002: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 2743.273792
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-003: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+ok 36 - AI-LEAK-003: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 2532.102875
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-004: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+ok 37 - AI-LEAK-004: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 3173.740917
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-005: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+ok 38 - AI-LEAK-005: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 3994.377625
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-006: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+ok 39 - AI-LEAK-006: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 3033.478542
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-007: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+ok 40 - AI-LEAK-007: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 4192.78025
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-008: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+ok 41 - AI-LEAK-008: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 4195.351375
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-010: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+ok 42 - AI-LEAK-010: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 4483.173292
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-009: malformed generator output fails closed
+ok 43 - AI-LEAK-009: malformed generator output fails closed
+  ---
+  duration_ms: 3009.912416
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-011/015: healthy conceptual hint persists and remains usable; rejected legacy hints never consume quota
+ok 44 - AI-LEAK-011/015: healthy conceptual hint persists and remains usable; rejected legacy hints never consume quota
+  ---
+  duration_ms: 3372.9265
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-012: independent assessment rejects hints
+ok 45 - AI-LEAK-012: independent assessment rejects hints
+  ---
+  duration_ms: 3190.341666
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-013/014: injection and arbitrary provider answer cannot reach student
+ok 46 - AI-LEAK-013/014: injection and arbitrary provider answer cannot reach student
+  ---
+  duration_ms: 4272.866625
+  type: 'test'
+  ...
+# Subtest: AI-LEAK-014 legacy event: student reload hides unsafe historical text while teacher audit is retained
+ok 47 - AI-LEAK-014 legacy event: student reload hides unsafe historical text while teacher audit is retained
+  ---
+  duration_ms: 3676.985916
+  type: 'test'
+  ...
+# Subtest: raster exam upload normalizes to private PDF and rejects corrupt images and unauthorized users
+ok 48 - raster exam upload normalizes to private PDF and rejects corrupt images and unauthorized users
+  ---
+  duration_ms: 3534.506792
+  type: 'test'
+  ...
+# Subtest: attempt rollback and retry after after_attempt_counter
+ok 49 - attempt rollback and retry after after_attempt_counter
+  ---
+  duration_ms: 2991.586917
+  type: 'test'
+  ...
+# Subtest: attempt rollback and retry after after_attempt_insert
+ok 50 - attempt rollback and retry after after_attempt_insert
+  ---
+  duration_ms: 2934.622417
+  type: 'test'
+  ...
+# Subtest: attempt rollback and retry after after_evaluation_insert
+ok 51 - attempt rollback and retry after after_evaluation_insert
+  ---
+  duration_ms: 2814.121834
+  type: 'test'
+  ...
+# Subtest: attempt rollback and retry after after_learning_evidence
+ok 52 - attempt rollback and retry after after_learning_evidence
+  ---
+  duration_ms: 3879.973958
+  type: 'test'
+  ...
+# Subtest: attempt rollback and retry after before_operation_record
+ok 53 - attempt rollback and retry after before_operation_record
+  ---
+  duration_ms: 3360.098209
+  type: 'test'
+  ...
+# Subtest: hint rollback and retry after after_hint_counter
+ok 54 - hint rollback and retry after after_hint_counter
+  ---
+  duration_ms: 4015.979084
+  type: 'test'
+  ...
+# Subtest: hint rollback and retry after after_hint_insert
+ok 55 - hint rollback and retry after after_hint_insert
+  ---
+  duration_ms: 4420.916083
+  type: 'test'
+  ...
+# Subtest: lost response after commit survives app restart and replays the same evidence
+ok 56 - lost response after commit survives app restart and replays the same evidence
+  ---
+  duration_ms: 4327.68575
+  type: 'test'
+  ...
+# Subtest: concurrent identical requests consume one quota; changed payload conflicts
+ok 57 - concurrent identical requests consume one quota; changed payload conflicts
+  ---
+  duration_ms: 3020.825333
+  type: 'test'
+  ...
+# Subtest: distinct concurrent submissions respect the attempt limit without orphan evaluations
+ok 58 - distinct concurrent submissions respect the attempt limit without orphan evaluations
+  ---
+  duration_ms: 3231.414917
+  type: 'test'
+  ...
+# Subtest: completion serializes with an uncommitted attempt; terminal states reject writes
+ok 59 - completion serializes with an uncommitted attempt; terminal states reject writes
+  ---
+  duration_ms: 3408.379792
+  type: 'test'
+  ...
+# Subtest: review rollback preserves pending state; retries have a single audit/history entry
+ok 60 - review rollback preserves pending state; retries have a single audit/history entry
+  ---
+  duration_ms: 4042.000083
+  type: 'test'
+  ...
+# Subtest: cancellation is terminal, repeated cancellation is safe, cancelled missions cannot publish
+ok 61 - cancellation is terminal, repeated cancellation is safe, cancelled missions cannot publish
+  ---
+  duration_ms: 3662.813833
+  type: 'test'
+  ...
+# Subtest: publication/invitation rollback after after_assignment_insert
+ok 62 - publication/invitation rollback after after_assignment_insert
+  ---
+  duration_ms: 3220.423625
+  type: 'test'
+  ...
+# Subtest: publication/invitation rollback after after_invited_user_insert
+ok 63 - publication/invitation rollback after after_invited_user_insert
+  ---
+  duration_ms: 2842.259792
+  type: 'test'
+  ...
+# Subtest: completion failure is rolled back; a repeated review racing completion stays consistent
+ok 64 - completion failure is rolled back; a repeated review racing completion stays consistent
+  ---
+  duration_ms: 6912.486875
+  type: 'test'
+  ...
+# Subtest: client expected counters prevent stale intents while replay returns the acknowledged result
+ok 65 - client expected counters prevent stale intents while replay returns the acknowledged result
+  ---
+  duration_ms: 6412.058791
+  type: 'test'
+  ...
+# Subtest: symbolic and rubric answers use versioned policy and uncertain work reaches teacher review
+ok 66 - symbolic and rubric answers use versioned policy and uncertain work reaches teacher review
+  ---
+  duration_ms: 3399.764875
+  type: 'test'
+  ...
+# Subtest: persistent evidence/notebook/mastery and teacher override use only authorized canonical work
+ok 67 - persistent evidence/notebook/mastery and teacher override use only authorized canonical work
+  ---
+  duration_ms: 4439.692209
+  type: 'test'
+  ...
+# Subtest: concurrent missions sharing a skill retain all evidence and a consistent mastery projection
+ok 68 - concurrent missions sharing a skill retain all evidence and a consistent mastery projection
+  ---
+  duration_ms: 4020.349583
+  type: 'test'
+  ...
+# Subtest: encrypted durable mail survives retry and lease recovery; stale tokens and concurrent consumers are safe
+ok 69 - encrypted durable mail survives retry and lease recovery; stale tokens and concurrent consumers are safe
+  ---
+  duration_ms: 4160.189834
+  type: 'test'
+  ...
+# Subtest: a complete collection above the old 30-question cap is saved and assigned intact
+ok 70 - a complete collection above the old 30-question cap is saved and assigned intact
+  ---
+  duration_ms: 5860.159791
+  type: 'test'
+  ...
+# Subtest: mixed difficulty quotas select exact unique owned current versions and reject invalid or insufficient plans
+ok 71 - mixed difficulty quotas select exact unique owned current versions and reject invalid or insufficient plans
+  ---
+  duration_ms: 4079.185083
+  type: 'test'
+  ...
+# Subtest: parent invitation creates scoped read-only access; private teacher notes and other children isolated; revocation works
+ok 72 - parent invitation creates scoped read-only access; private teacher notes and other children isolated; revocation works
+  ---
+  duration_ms: 4582.466791
+  type: 'test'
+  ...
+# Subtest: password reset: no enumeration, one-time token, expiration and revoke all sessions
+ok 73 - password reset: no enumeration, one-time token, expiration and revoke all sessions
+  ---
+  duration_ms: 3872.173625
+  type: 'test'
+  ...
+# Subtest: password reset replies before slow SMTP completes, for an existing or missing account
+ok 74 - password reset replies before slow SMTP completes, for an existing or missing account
+  ---
+  duration_ms: 3884.877792
+  type: 'test'
+  ...
+# Subtest: failed password reset delivery is durably retried without exposing the account
+ok 75 - failed password reset delivery is durably retried without exposing the account
+  ---
+  duration_ms: 4084.241125
+  type: 'test'
+  ...
+# Subtest: mobile invitations normalize Iran formats, bind accounts and protect tokens
+ok 76 - mobile invitations normalize Iran formats, bind accounts and protect tokens
+  ---
+  duration_ms: 5153.796875
+  type: 'test'
+  ...
+# Subtest: existing email student can claim a phone-bound invite without a duplicate account
+ok 77 - existing email student can claim a phone-bound invite without a duplicate account
+  ---
+  duration_ms: 4433.674041
+  type: 'test'
+  ...
+# Subtest: phone OTP: verified signup/login, single use, cooldown, five wrong guesses, expiration and role boundaries
+ok 78 - phone OTP: verified signup/login, single use, cooldown, five wrong guesses, expiration and role boundaries
+  ---
+  duration_ms: 3912.914084
+  type: 'test'
+  ...
+# Subtest: OTP has no fake production success when SMS is absent or fails
+ok 79 - OTP has no fake production success when SMS is absent or fails
+  ---
+  duration_ms: 7804.954
+  type: 'test'
+  ...
+# Subtest: Melipayamak adapter sends approved pattern over HTTPS and validates acceptance (controlled HTTP)
+ok 80 - Melipayamak adapter sends approved pattern over HTTPS and validates acceptance (controlled HTTP)
+  ---
+  duration_ms: 11.759458
+  type: 'test'
+  ...
+# Subtest: OTP invitation binds the verified phone to parent scope; disabled accounts stay denied
+ok 81 - OTP invitation binds the verified phone to parent scope; disabled accounts stay denied
+  ---
+  duration_ms: 3967.087959
+  type: 'test'
+  ...
+# Subtest: OTP challenge and throttle collections have TTL cleanup indexes
+ok 82 - OTP challenge and throttle collections have TTL cleanup indexes
+  ---
+  duration_ms: 3492.380625
+  type: 'test'
+  ...
+# Subtest: pilot single-process authenticated rate cap is enforced without writes or private errors
+ok 83 - pilot single-process authenticated rate cap is enforced without writes or private errors
+  ---
+  duration_ms: 4578.518667
+  type: 'test'
+  ...
+# Subtest: original question images stay private, assigned students may see images but not answer documents
+ok 84 - original question images stay private, assigned students may see images but not answer documents
+  ---
+  duration_ms: 4113.733708
+  type: 'test'
+  ...
+# Subtest: question bank stores optional year/difficulty and free questions, validates metadata and isolates teacher data
+ok 85 - question bank stores optional year/difficulty and free questions, validates metadata and isolates teacher data
+  ---
+  duration_ms: 3935.674541
+  type: 'test'
+  ...
+# Subtest: question revisions preserve assigned versions, latest bank, ownership and idempotency
+ok 86 - question revisions preserve assigned versions, latest bank, ownership and idempotency
+  ---
+  duration_ms: 3273.169958
+  type: 'test'
+  ...
+# Subtest: image crop metadata is bounded and cannot escape original image
+ok 87 - image crop metadata is bounded and cannot escape original image
+  ---
+  duration_ms: 1.126584
+  type: 'test'
+  ...
+# Subtest: source categories persist in immutable question versions and are private; invalid combinations rejected
+ok 88 - source categories persist in immutable question versions and are private; invalid combinations rejected
+  ---
+  duration_ms: 7463.026541
+  type: 'test'
+  ...
+# Subtest: visual authoring survives review, immutable version, mission snapshot and student projection without private answer
+ok 89 - visual authoring survives review, immutable version, mission snapshot and student projection without private answer
+  ---
+  duration_ms: 7587.426167
+  type: 'test'
+  ...
+# Subtest: teacher can publish one individual remediation from verified incorrect latest answer, idempotently
+ok 90 - teacher can publish one individual remediation from verified incorrect latest answer, idempotently
+  ---
+  duration_ms: 7687.79475
+  type: 'test'
+  ...
+# Subtest: remediation is course-scoped and requires active enrollment, including on publication
+ok 91 - remediation is course-scoped and requires active enrollment, including on publication
+  ---
+  duration_ms: 6582.578917
+  type: 'test'
+  ...
+# Subtest: report includes ordered questions, actual answers and keys after submission, including deliberately unanswered questions
+ok 92 - report includes ordered questions, actual answers and keys after submission, including deliberately unanswered questions
+  ---
+  duration_ms: 6800.164791
+  type: 'test'
+  ...
+# Subtest: explicitly submitting entirely unanswered work produces yellow-ready question rows without fake attempts
+ok 93 - explicitly submitting entirely unanswered work produces yellow-ready question rows without fake attempts
+  ---
+  duration_ms: 3274.913084
+  type: 'test'
+  ...
+# Subtest: resource removal archives owned subtree, preserves question history and supports official reimport
+ok 94 - resource removal archives owned subtree, preserves question history and supports official reimport
+  ---
+  duration_ms: 6736.506042
+  type: 'test'
+  ...
+# Subtest: reviewed source import is additive, atomic, private, dry by default and repeat safe
+ok 95 - reviewed source import is additive, atomic, private, dry by default and repeat safe
+  ---
+  duration_ms: 3471.732042
+  type: 'test'
+  ...
+# Subtest: source publication and exam dates remain distinct and validated
+ok 96 - source publication and exam dates remain distinct and validated
+  ---
+  duration_ms: 1.066584
+  type: 'test'
+  ...
+# Subtest: student dashboard groups lessons, counts real evaluations, and keeps legacy work separate
+ok 97 - student dashboard groups lessons, counts real evaluations, and keeps legacy work separate
+  ---
+  duration_ms: 4294.280125
+  type: 'test'
+  ...
+# Subtest: independent student signs up without teacher, then claims email-bound invitations using the same account
+ok 98 - independent student signs up without teacher, then claims email-bound invitations using the same account
+  ---
+  duration_ms: 2566.250792
+  type: 'test'
+  ...
+# Subtest: tutor sends only active relationship context, selects according to submitted work and records provenance
+ok 99 - tutor sends only active relationship context, selects according to submitted work and records provenance
+  ---
+  duration_ms: 2369.140625
+  type: 'test'
+  ...
+# Subtest: levels zero/independent/full-solution permissions are enforced outside the model
+ok 100 - levels zero/independent/full-solution permissions are enforced outside the model
+  ---
+  duration_ms: 1522.663292
+  type: 'test'
+  ...
+# Subtest: unapproved provider text never consumes quota or loses submitted work
+ok 101 - unapproved provider text never consumes quota or loses submitted work
+  ---
+  duration_ms: 1733.74475
+  type: 'test'
+  ...
+# Subtest: orchestrator timeout keeps quota and previous attempts intact
+ok 102 - orchestrator timeout keeps quota and previous attempts intact
+  ---
+  duration_ms: 1795.767542
+  type: 'test'
+  ...
+# Subtest: Ollama maps only a validated index to teacher-approved text; no model prose is displayed
+ok 103 - Ollama maps only a validated index to teacher-approved text; no model prose is displayed
+  ---
+  duration_ms: 21.678458
+  type: 'test'
+  ...
+# Subtest: prompt/answer leakage and invalid model responses are rejected
+ok 104 - prompt/answer leakage and invalid model responses are rejected
+  ---
+  duration_ms: 4.405208
+  type: 'test'
+  ...
+# Subtest: provider timeout aborts transport and marks unavailable
+ok 105 - provider timeout aborts transport and marks unavailable
+  ---
+  duration_ms: 6.054
+  type: 'test'
+  ...
+# Subtest: fallback is explicit and real/mock/unavailable states remain distinguishable
+ok 106 - fallback is explicit and real/mock/unavailable states remain distinguishable
+  ---
+  duration_ms: 316.889708
+  type: 'test'
+  ...
+# Subtest: authoring sends only bounded teacher curriculum; validates JSON and never executes model content
+ok 107 - authoring sends only bounded teacher curriculum; validates JSON and never executes model content
+  ---
+  duration_ms: 45.398041
+  type: 'test'
+  ...
+# Subtest: AvalAI forwards the selected model, server-only credential, bounded curriculum and usage
+ok 108 - AvalAI forwards the selected model, server-only credential, bounded curriculum and usage
+  ---
+  duration_ms: 27.217791
+  type: 'test'
+  ...
+# Subtest: model discovery only exposes chat models and caches the live list
+ok 109 - model discovery only exposes chat models and caches the live list
+  ---
+  duration_ms: 0.7735
+  type: 'test'
+  ...
+# Subtest: missing keys, upstream failures, truncation and invalid JSON fail closed
+ok 110 - missing keys, upstream failures, truncation and invalid JSON fail closed
+  ---
+  duration_ms: 2.107166
+  type: 'test'
+  ...
+# Subtest: numeric JSON references normalize to the internal string contract without relaxing other answer types
+ok 111 - numeric JSON references normalize to the internal string contract without relaxing other answer types
+  ---
+  duration_ms: 1.312792
+  type: 'test'
+  ...
+# Subtest: Iran secondary catalog covers grades/tracks, retains distinct physics editions and has no empty chapters
+ok 112 - Iran secondary catalog covers grades/tracks, retains distinct physics editions and has no empty chapters
+  ---
+  duration_ms: 0.899834
+  type: 'test'
+  ...
+# Subtest: catalog identities are stable, UUIDs valid, nodes connected and tenant scoped; path handles cycles
+ok 113 - catalog identities are stable, UUIDs valid, nodes connected and tenant scoped; path handles cycles
+  ---
+  duration_ms: 24.059209
+  type: 'test'
+  ...
+# Subtest: official supplements remain distinct and do not invent missing geology chapters
+ok 114 - official supplements remain distinct and do not invent missing geology chapters
+  ---
+  duration_ms: 0.126209
+  type: 'test'
+  ...
+# Subtest: upper secondary official book codes map to distinct grade/track books; corrected titles retain old topic identities
+ok 115 - upper secondary official book codes map to distinct grade/track books; corrected titles retain old topic identities
+  ---
+  duration_ms: 0.362666
+  type: 'test'
+  ...
+# Subtest: deployment guard rejects wrong database, insecure origin and unsafe mail configuration
+ok 116 - deployment guard rejects wrong database, insecure origin and unsafe mail configuration
+  ---
+  duration_ms: 1.352208
+  type: 'test'
+  ...
+# Subtest: deployment preflight reports only codes and never secrets; optional SMS is truthful
+ok 117 - deployment preflight reports only codes and never secrets; optional SMS is truthful
+  ---
+  duration_ms: 59.1945
+  type: 'test'
+  ...
+# Subtest: OPS-019: actual rollback function restores previous code/services and never invokes database restore
+ok 118 - OPS-019: actual rollback function restores previous code/services and never invokes database restore
+  ---
+  duration_ms: 24.594917
+  type: 'test'
+  ...
+# Subtest: dev port probe reports a free port
+ok 119 - dev port probe reports a free port
+  ---
+  duration_ms: 6.382166
+  type: 'test'
+  ...
+# Subtest: dev port probe does not kill or take over an occupied port
+ok 120 - dev port probe does not kill or take over an occupied port
+  ---
+  duration_ms: 0.557417
+  type: 'test'
+  ...
+# Subtest: Persian/Arabic normalization, questions, multiline and inline options keep actual numbers
+ok 121 - Persian/Arabic normalization, questions, multiline and inline options keep actual numbers
+  ---
+  duration_ms: 1.998417
+  type: 'test'
+  ...
+# Subtest: keys match numbers, reject duplicates, invalid and uncertain keys, and do not use array position
+ok 122 - keys match numbers, reject duplicates, invalid and uncertain keys, and do not use array position
+  ---
+  duration_ms: 0.547042
+  type: 'test'
+  ...
+# Subtest: duplicate numbers and unnumbered pages are explicit review cases
+ok 123 - duplicate numbers and unnumbered pages are explicit review cases
+  ---
+  duration_ms: 0.169
+  type: 'test'
+  ...
+# Subtest: damaged option numbering cannot promote an orphan option into a question anchor
+ok 124 - damaged option numbering cannot promote an orphan option into a question anchor
+  ---
+  duration_ms: 0.244042
+  type: 'test'
+  ...
+# Subtest: two-column RTL layout, continuation pages and low OCR confidence remain reviewable
+ok 125 - two-column RTL layout, continuation pages and low OCR confidence remain reviewable
+  ---
+  duration_ms: 0.156375
+  type: 'test'
+  ...
+# Subtest: aligned sequential text headings remain separate after incomplete options; option-like dash lines stay conservative
+ok 126 - aligned sequential text headings remain separate after incomplete options; option-like dash lines stay conservative
+  ---
+  duration_ms: 0.171042
+  type: 'test'
+  ...
+# Subtest: Persian numeric answers normalize and tolerance is respected
+ok 127 - Persian numeric answers normalize and tolerance is respected
+  ---
+  duration_ms: 1.072375
+  type: 'test'
+  ...
+# Subtest: essay is never automatically marked correct
+ok 128 - essay is never automatically marked correct
+  ---
+  duration_ms: 0.073
+  type: 'test'
+  ...
+# Subtest: invalid numeric and multiple choice references are rejected
+ok 129 - invalid numeric and multiple choice references are rejected
+  ---
+  duration_ms: 2.048542
+  type: 'test'
+  ...
+# Subtest: numeric: signed Persian/Arabic, decimals, scientific notation and relative/absolute tolerance
+ok 130 - numeric: signed Persian/Arabic, decimals, scientific notation and relative/absolute tolerance
+  ---
+  duration_ms: 0.915084
+  type: 'test'
+  ...
+# Subtest: symbolic: exact fractions, polynomial equivalence, explicit real assumptions
+ok 131 - symbolic: exact fractions, polynomial equivalence, explicit real assumptions
+  ---
+  duration_ms: 2.623125
+  type: 'test'
+  ...
+# Subtest: unsupported domains/syntax/precision route to review, never an unjustified incorrect grade
+ok 132 - unsupported domains/syntax/precision route to review, never an unjustified incorrect grade
+  ---
+  duration_ms: 0.537958
+  type: 'test'
+  ...
+# Subtest: rubric-based short/essay responses remain human reviewed and preserve reference/rubric
+ok 133 - rubric-based short/essay responses remain human reviewed and preserve reference/rubric
+  ---
+  duration_ms: 1.799
+  type: 'test'
+  ...
+# Subtest: deterministic algebra property corpus: expansion and scaled linear equations
+ok 134 - deterministic algebra property corpus: expansion and scaled linear equations
+  ---
+  duration_ms: 17.978583
+  type: 'test'
+  ...
+# Subtest: exam import has an independent, refreshable route
+ok 135 - exam import has an independent, refreshable route
+  ---
+  duration_ms: 0.593334
+  type: 'test'
+  ...
+# Subtest: PDF text is really extracted, numbered question candidates stay drafts and empty files have an honest fallback
+ok 136 - PDF text is really extracted, numbered question candidates stay drafts and empty files have an honest fallback
+  ---
+  duration_ms: 39.422833
+  type: 'test'
+  ...
+# Subtest: healthy teacher operand/count mentions are not rejected as final answers; raw AI and explicit results stay guarded
+ok 137 - healthy teacher operand/count mentions are not rejected as final answers; raw AI and explicit results stay guarded
+  ---
+  duration_ms: 1.851708
+  type: 'test'
+  ...
+# Subtest: assisted correction does not inflate first-attempt independent success or resolve a mistake
+ok 138 - assisted correction does not inflate first-attempt independent success or resolve a mistake
+  ---
+  duration_ms: 0.738041
+  type: 'test'
+  ...
+# Subtest: mastery requires varied independent evidence; repeated same-question practice is insufficient
+ok 139 - mastery requires varied independent evidence; repeated same-question practice is insufficient
+  ---
+  duration_ms: 0.101709
+  type: 'test'
+  ...
+# Subtest: mistake resolution needs two independent, distinct followups in the same relationship
+ok 140 - mistake resolution needs two independent, distinct followups in the same relationship
+  ---
+  duration_ms: 0.074875
+  type: 'test'
+  ...
+# Subtest: eight UI source views keep final separate from coordinated national exams; reject unrelated dimensions
+ok 141 - eight UI source views keep final separate from coordinated national exams; reject unrelated dimensions
+  ---
+  duration_ms: 7.718959
+  type: 'test'
+  ...
+# Subtest: visual data validates ranges, bounds, complexity and required content
+ok 142 - visual data validates ranges, bounds, complexity and required content
+  ---
+  duration_ms: 6.368375
+  type: 'test'
+  ...
+# Subtest: safe mathematical rendering produces actual SVG and MathML, escapes text and rejects external resources
+ok 143 - safe mathematical rendering produces actual SVG and MathML, escapes text and rejects external resources
+  ---
+  duration_ms: 6.695875
+  type: 'test'
+  ...
+# Subtest: topology guard rejects standalone instead of assuming transactions
+ok 144 - topology guard rejects standalone instead of assuming transactions
+  ---
+  duration_ms: 0.779583
+  type: 'test'
+  ...
+# Subtest: state transitions cannot reopen, complete a draft, or write cancelled/submitted assignments
+ok 145 - state transitions cannot reopen, complete a draft, or write cancelled/submitted assignments
+  ---
+  duration_ms: 0.128125
+  type: 'test'
+  ...
+# Subtest: OCR-014: repeated headings on both halves survive same-baseline joining; options alone do not split a page
+ok 146 - OCR-014: repeated headings on both halves survive same-baseline joining; options alone do not split a page
+  ---
+  duration_ms: 1.222375
+  type: 'test'
+  ...
+# Subtest: topic paths select nearest grade/book/chapter and carry each book track without mixing repeated names
+ok 147 - topic paths select nearest grade/book/chapter and carry each book track without mixing repeated names
+  ---
+  duration_ms: 20.60325
+  type: 'test'
+  ...
+# Subtest: custom topics without hierarchy remain selectable; malformed ancestor cycles terminate
+ok 148 - custom topics without hierarchy remain selectable; malformed ancestor cycles terminate
+  ---
+  duration_ms: 0.656625
+  type: 'test'
+  ...
+# Subtest: ancestor selection handles orphan roots and cycles; related skills do not leak from another topic
+ok 149 - ancestor selection handles orphan roots and cycles; related skills do not leak from another topic
+  ---
+  duration_ms: 0.329208
+  type: 'test'
+  ...
+# Subtest: worker recovers from network errors with bounded backoff and resets delay after work
+ok 150 - worker recovers from network errors with bounded backoff and resets delay after work
+  ---
+  duration_ms: 1.255459
+  type: 'test'
+  ...
+# Subtest: worker retries cap at thirty seconds and respects shutdown between cycles
+ok 151 - worker retries cap at thirty seconds and respects shutdown between cycles
+  ---
+  duration_ms: 0.203875
+  type: 'test'
+  ...
+# Subtest: worker does not hide programming or validation errors behind infinite retries
+ok 152 - worker does not hide programming or validation errors behind infinite retries
+  ---
+  duration_ms: 0.193375
+  type: 'test'
+  ...
+1..152
+# tests 152
+# suites 0
+# pass 152
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 115491.481458

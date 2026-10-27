@@ -1,9 +1,14 @@
 {
-  "baseCommit": "4356a58b3f6a50119e38b1e6710f4668bf8c61f0",
-  "timestampUtc": "2026-10-27T05:10:56.694554+00:00",
-  "snapshot": "/private/tmp/hodhodeh-uat-y2ny62dl",
-  "notes": "Working tree includes initial owner changes and UAT OCR fix. Hashes exclude env/private/artifacts. Root-only formatting differences in tests do not change product behavior. This is not a committed deployment.",
+  "baseCommit": "6eb7a6acc79d64a6e756a6ca963e87ef7a07fcee",
+  "snapshot": "/private/tmp/hodhod-closure-82ntl0ht",
+  "allProductSourceHashesMatch": true,
+  "notes": "Backend suite executed in root; browser production build in snapshot. Test/docs-only differences may exist. No commit or push in this task.",
   "files": [
+    {
+      "path": "config/ocr-models.lock.json",
+      "workingTreeSha256": "90b2e2302d995d814cdade9fb2d2c6634ea4c0684f138887b8ce556bdd6ed65c",
+      "testedSnapshotSha256": "90b2e2302d995d814cdade9fb2d2c6634ea4c0684f138887b8ce556bdd6ed65c"
+    },
     {
       "path": "next.config.mjs",
       "workingTreeSha256": "62b067d1ef18fc223fc873354c29388e8829e66a446ca9aea3a6fa7cf6f5e19f",
@@ -23,31 +28,6 @@
       "path": "playwright.config.ts",
       "workingTreeSha256": "f5ff50520a6cd153e88c5c994ef4d7036dcc312bbd1adf3155610d7107fce817",
       "testedSnapshotSha256": "f5ff50520a6cd153e88c5c994ef4d7036dcc312bbd1adf3155610d7107fce817"
-    },
-    {
-      "path": "public/app-icon.svg",
-      "workingTreeSha256": "dc4dd6f67f4f18067c802ab54f927d3b933536359bc8b6edb8d6237f43cc6698",
-      "testedSnapshotSha256": "dc4dd6f67f4f18067c802ab54f927d3b933536359bc8b6edb8d6237f43cc6698"
-    },
-    {
-      "path": "public/icon.svg",
-      "workingTreeSha256": "f60651daf276fafedb2725c13d61cf9b3fa812792d74c9f02b4843aef6e4a143",
-      "testedSnapshotSha256": "f60651daf276fafedb2725c13d61cf9b3fa812792d74c9f02b4843aef6e4a143"
-    },
-    {
-      "path": "public/licenses/Poppins-OFL.txt",
-      "workingTreeSha256": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b",
-      "testedSnapshotSha256": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b"
-    },
-    {
-      "path": "public/manifest.webmanifest",
-      "workingTreeSha256": "49764e5f72c83dd5583b56b6223d3a60b4bef7608b5126e61b11eab12988e543",
-      "testedSnapshotSha256": "49764e5f72c83dd5583b56b6223d3a60b4bef7608b5126e61b11eab12988e543"
-    },
-    {
-      "path": "public/sw.js",
-      "workingTreeSha256": "6b0102991a454398563ea61ac542bb7d7de220d376fd4d2d8e358dfdc69ecd63",
-      "testedSnapshotSha256": "d140346d05e9c91270677b80d5b7821bf869b2c87a68082a4f953dbe5429169c"
     },
     {
       "path": "scripts/audit-integrity.ts",
@@ -480,6 +460,11 @@
       "testedSnapshotSha256": "d66844ad5697e98ac466b571bacd5452ff050c62bc26a5a13515fe5f1ae2cef7"
     },
     {
+      "path": "src/server/ai/hint-safety.ts",
+      "workingTreeSha256": "9ca42f710653387c13a5760e00c5244b114710b74158d6270465fa76aa1d5c44",
+      "testedSnapshotSha256": "9ca42f710653387c13a5760e00c5244b114710b74158d6270465fa76aa1d5c44"
+    },
+    {
       "path": "src/server/ai/ollama.ts",
       "workingTreeSha256": "0fa13fd64c0ecbe5660813241e1e56e793dafdaa570a724380ce5935edf0c5f7",
       "testedSnapshotSha256": "0fa13fd64c0ecbe5660813241e1e56e793dafdaa570a724380ce5935edf0c5f7"
@@ -496,8 +481,8 @@
     },
     {
       "path": "src/server/ai/tutor.ts",
-      "workingTreeSha256": "359045a6d55bcc55ecf0901ca523b12035e6bacc08472a4896e7d37eec26f1e5",
-      "testedSnapshotSha256": "359045a6d55bcc55ecf0901ca523b12035e6bacc08472a4896e7d37eec26f1e5"
+      "workingTreeSha256": "336dfc5ffa0811e4463abff630f687800ddba07a8d0cc96836be514b3ecc5092",
+      "testedSnapshotSha256": "336dfc5ffa0811e4463abff630f687800ddba07a8d0cc96836be514b3ecc5092"
     },
     {
       "path": "src/server/ai/types.ts",
@@ -571,8 +556,8 @@
     },
     {
       "path": "src/server/imports/document-engine.ts",
-      "workingTreeSha256": "4f9470d65e0da285b1237b2e893413fba8208a88b4cf7f43506c0b0107eac94a",
-      "testedSnapshotSha256": "4f9470d65e0da285b1237b2e893413fba8208a88b4cf7f43506c0b0107eac94a"
+      "workingTreeSha256": "779e83c2d5bef50cf286c355cfb57d28a4a9a2d9efd327daf287bfb53203b12f",
+      "testedSnapshotSha256": "779e83c2d5bef50cf286c355cfb57d28a4a9a2d9efd327daf287bfb53203b12f"
     },
     {
       "path": "src/server/imports/image-pdf.ts",
@@ -598,6 +583,11 @@
       "path": "src/server/imports/reviewed-samples.ts",
       "workingTreeSha256": "cb5ef6f5e44f9e94a4d3a7972a86a68920c5a0c55370d202c9a3b3c50ca0689e",
       "testedSnapshotSha256": "cb5ef6f5e44f9e94a4d3a7972a86a68920c5a0c55370d202c9a3b3c50ca0689e"
+    },
+    {
+      "path": "src/server/imports/text-columns.ts",
+      "workingTreeSha256": "db14cb6c9b34d47b8f94457dda7e094384d770ce597f70b9a8fb4c0e0085e979",
+      "testedSnapshotSha256": "db14cb6c9b34d47b8f94457dda7e094384d770ce597f70b9a8fb4c0e0085e979"
     },
     {
       "path": "src/server/imports/worker-loop.ts",
@@ -631,8 +621,8 @@
     },
     {
       "path": "src/server/modules/authoring.ts",
-      "workingTreeSha256": "e501eda0ecfdb420a747e77ae5afdac551d45ac2800ebbf4bc6acff595e4679e",
-      "testedSnapshotSha256": "e501eda0ecfdb420a747e77ae5afdac551d45ac2800ebbf4bc6acff595e4679e"
+      "workingTreeSha256": "930395008a87c6184b5a132c49eab3b6761235a3e045a3c642b3bc785eb9430c",
+      "testedSnapshotSha256": "930395008a87c6184b5a132c49eab3b6761235a3e045a3c642b3bc785eb9430c"
     },
     {
       "path": "src/server/modules/class-groups.ts",
@@ -691,8 +681,8 @@
     },
     {
       "path": "src/server/modules/practice.ts",
-      "workingTreeSha256": "87f51b43ad15e04ecec610826d1bcc148d02b16a8153eaf2d4cba36b3246162b",
-      "testedSnapshotSha256": "87f51b43ad15e04ecec610826d1bcc148d02b16a8153eaf2d4cba36b3246162b"
+      "workingTreeSha256": "884f73926d21b3b4fb395b8afeed2850f3f4a321809499a2c1c9c6d7fe6298fc",
+      "testedSnapshotSha256": "884f73926d21b3b4fb395b8afeed2850f3f4a321809499a2c1c9c6d7fe6298fc"
     },
     {
       "path": "src/server/modules/remediation.ts",
@@ -810,6 +800,11 @@
       "testedSnapshotSha256": "7bb695df7740c33d93b5b5ea0b00cbd652c057b0c5b9ba5fb368ab6aa7d42836"
     },
     {
+      "path": "tests/e2e/uat-closure.spec.ts",
+      "workingTreeSha256": "d1075c487560cb1fb136f3f5205f9641b59b60b9f9b8f65844a43e55f18b2002",
+      "testedSnapshotSha256": "5e5d1d2ef36f706d55532039ee87afb9b00fc1a1951848e49f38aaaabef68187"
+    },
+    {
       "path": "tests/e2e/uat-golden.spec.ts",
       "workingTreeSha256": "400083c19c8c98764700d1d4522efbdab33d2479fe4a525267fe88e3428ef329",
       "testedSnapshotSha256": "400083c19c8c98764700d1d4522efbdab33d2479fe4a525267fe88e3428ef329"
@@ -865,6 +860,16 @@
       "testedSnapshotSha256": "6e1e746676d938e197d3380519614d293a2dbc3ace7f02604e6a931bf7c45092"
     },
     {
+      "path": "tests/fixtures/uat-closure/columns.pdf",
+      "workingTreeSha256": "7b8071e25ea4163341e5a92c5e7b95541f00f2c7290d532b7e8722d98fca0611",
+      "testedSnapshotSha256": "7b8071e25ea4163341e5a92c5e7b95541f00f2c7290d532b7e8722d98fca0611"
+    },
+    {
+      "path": "tests/fixtures/uat-closure/encrypted.pdf",
+      "workingTreeSha256": "de4b9e9d86540865fbccba7a6848daab31b65ab736df9d8123fd0aba2f3f7b83",
+      "testedSnapshotSha256": "de4b9e9d86540865fbccba7a6848daab31b65ab736df9d8123fd0aba2f3f7b83"
+    },
+    {
       "path": "tests/helpers/browser-backend.ts",
       "workingTreeSha256": "a59b9056184631723647544c863dd06ac7a1d60bdd2d77548799ed8a7a6d902e",
       "testedSnapshotSha256": "a59b9056184631723647544c863dd06ac7a1d60bdd2d77548799ed8a7a6d902e"
@@ -915,6 +920,11 @@
       "testedSnapshotSha256": "4010a0cf18b1fd4c53da9ea838dec021084e8852d8ca545f63aa1da000194f97"
     },
     {
+      "path": "tests/integration/closure-boundaries.test.ts",
+      "workingTreeSha256": "5b8f5916a1c1d4d51f92bab6e875855f995a517800c47bacf28d4e75c695f4bc",
+      "testedSnapshotSha256": "5b8f5916a1c1d4d51f92bab6e875855f995a517800c47bacf28d4e75c695f4bc"
+    },
+    {
       "path": "tests/integration/course-membership.test.ts",
       "workingTreeSha256": "1f8043325cf464553bcc8ec11068d80c9e2183aa7d821b224456fd5a0181f51a",
       "testedSnapshotSha256": "1f8043325cf464553bcc8ec11068d80c9e2183aa7d821b224456fd5a0181f51a"
@@ -933,6 +943,11 @@
       "path": "tests/integration/difficulty.test.ts",
       "workingTreeSha256": "e336cb960336b0db4c13c6413d5c3e1faaa8ffc4b30d38be6cbf12124aecdc01",
       "testedSnapshotSha256": "e336cb960336b0db4c13c6413d5c3e1faaa8ffc4b30d38be6cbf12124aecdc01"
+    },
+    {
+      "path": "tests/integration/document-columns.test.ts",
+      "workingTreeSha256": "37957ce1ff7005f52058bb5056fa9b33b348497dda9de433874bdaeb215d0a97",
+      "testedSnapshotSha256": "37957ce1ff7005f52058bb5056fa9b33b348497dda9de433874bdaeb215d0a97"
     },
     {
       "path": "tests/integration/document-limits.test.ts",
@@ -963,6 +978,11 @@
       "path": "tests/integration/full-individual-journey.test.ts",
       "workingTreeSha256": "85c9bc8568417d716f5e647efe73ce17ce8ccddaf9015464441becf559fc0aaf",
       "testedSnapshotSha256": "85c9bc8568417d716f5e647efe73ce17ce8ccddaf9015464441becf559fc0aaf"
+    },
+    {
+      "path": "tests/integration/hint-safety.test.ts",
+      "workingTreeSha256": "e7dcac61bc4a2988f4978b42e02b09b1a2dc66848d49f6765a0507b3c475dbfb",
+      "testedSnapshotSha256": "e7dcac61bc4a2988f4978b42e02b09b1a2dc66848d49f6765a0507b3c475dbfb"
     },
     {
       "path": "tests/integration/image-import.test.ts",
@@ -1101,7 +1121,7 @@
     },
     {
       "path": "tests/unit/deployment-config.test.mjs",
-      "workingTreeSha256": "058ce9a8c581508ceda2c1290f62a7868f43d5a8666ed8c652c1c2c9cb8922ac",
+      "workingTreeSha256": "b176fe9cee09011458e034632208eb77036f0afcda9a0c7f38ff34441d247999",
       "testedSnapshotSha256": "058ce9a8c581508ceda2c1290f62a7868f43d5a8666ed8c652c1c2c9cb8922ac"
     },
     {
@@ -1135,6 +1155,11 @@
       "testedSnapshotSha256": "0dee5ca33a6993a5fad642900a30ee5a02e56a4ddc31ad53468506f6c4530376"
     },
     {
+      "path": "tests/unit/hint-safety.test.ts",
+      "workingTreeSha256": "0443e9d8ceeb6c35559469ea035f6d2f94d3f945e45f4c59576dad19203f24dc",
+      "testedSnapshotSha256": "0443e9d8ceeb6c35559469ea035f6d2f94d3f945e45f4c59576dad19203f24dc"
+    },
+    {
       "path": "tests/unit/learning.test.ts",
       "workingTreeSha256": "97d4bc1fab336de1501261d6d1345563cdb99e7db036a616cd3da5bcd2451e5e",
       "testedSnapshotSha256": "97d4bc1fab336de1501261d6d1345563cdb99e7db036a616cd3da5bcd2451e5e"
@@ -1155,6 +1180,11 @@
       "testedSnapshotSha256": "db83f2f05ceaed83e02f174b9263887b0749fbb502cb320beb431a69d8c96038"
     },
     {
+      "path": "tests/unit/text-columns.test.ts",
+      "workingTreeSha256": "749863cb5713aa73f41975974991016847d6d3238bdf4ec557caac384fe25f76",
+      "testedSnapshotSha256": "749863cb5713aa73f41975974991016847d6d3238bdf4ec557caac384fe25f76"
+    },
+    {
       "path": "tests/unit/topic-selector.test.ts",
       "workingTreeSha256": "ade305e31aba8dad9672f531c4179039ccf0c469fae5192658eabd537e2d0219",
       "testedSnapshotSha256": "ade305e31aba8dad9672f531c4179039ccf0c469fae5192658eabd537e2d0219"
@@ -1163,11 +1193,6 @@
       "path": "tests/unit/worker-loop.test.ts",
       "workingTreeSha256": "76e08a85b0927b281dfebf1250edf09e9d6d8bfeb1cf8200bdad54629099d8df",
       "testedSnapshotSha256": "76e08a85b0927b281dfebf1250edf09e9d6d8bfeb1cf8200bdad54629099d8df"
-    },
-    {
-      "path": "tsconfig.json",
-      "workingTreeSha256": "c692f49f84f65b0a70d83edc7a10f470a3c057b8bee96942ac513c32928f707f",
-      "testedSnapshotSha256": "c692f49f84f65b0a70d83edc7a10f470a3c057b8bee96942ac513c32928f707f"
     }
   ]
 }

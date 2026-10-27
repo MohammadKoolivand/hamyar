@@ -1,0 +1,29 @@
+/Users/mohammadkoolivand/Desktop/HamYar/docs/uat/closure-operations-probe.ts:156
+          : reject(new Error(`Log probe failed: ${code} ${err}`)),
+                   ^
+
+Error: Log probe failed: 1 node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+403 !== 500
+
+    at <anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/docs/uat/closure-operations-probe.ts:34:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 403,
+  expected: 500,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.23.2
+
+    at ChildProcess.<anonymous> (/Users/mohammadkoolivand/Desktop/HamYar/docs/uat/closure-operations-probe.ts:156:20)
+    at ChildProcess.emit (node:events:519:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:293:12)
+
+Node.js v22.23.2

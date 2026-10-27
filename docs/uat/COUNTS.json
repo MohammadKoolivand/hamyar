@@ -2,12 +2,13 @@
   "businessCases": 430,
   "setupCases": 14,
   "product": {
-    "PASS": 392,
-    "BLOCKED": 7,
-    "NOT_RUN": 20,
-    "NOT_IMPLEMENTED": 3,
+    "PASS": 410,
+    "FAIL": 0,
+    "BLOCKED": 10,
+    "NOT_RUN": 0,
     "MANUAL_REQUIRED": 7,
-    "FAIL": 1
+    "NOT_IMPLEMENTED": 3,
+    "OUT_OF_SCOPE": 0
   },
   "setup": {
     "PASS": 12,

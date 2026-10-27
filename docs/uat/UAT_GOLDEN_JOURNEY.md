@@ -1,3 +1,7 @@
+# Closure تازه — ۲۰۲۶/۱۰/۲۷
+
+گیت نهایی روی base6eb7a6a+diff، snapshot5177 و replica27189 اجرا شد: دو cohort جدید با validator نهایی PASS؛ مدرک closure-evidence/golden-final.log. همه پنج پاسخ و شمارنده/تاریخچه/تقویت/parent/isolation/ورود مجدد مثل شرح زیر با assertion دقیق تکرار شدند. backup/restart تازه هم همان session/report را حفظ کرد. شرح قدیمی پایین baseline است و شواهد تازه جایگزین اعداد محیط آن هستند.
+
 # Golden Journey مستقل — نتیجه PASS با محدودیت محیط
 
 مدرک: `tests/e2e/uat-golden.spec.ts` و `evidence/golden-final.log`، **دو cohort تازه موفق** در Chrome واقعی و HTTP واقعی snapshot 5176؛ بدون جعل پاسخ API. دیتابیس و همه هویت‌ها مصنوعی‌اند. مسیر ورود رسمیِ رمز عبور موجود استفاده شد؛ این مدرک ارسال OTP واقعی ملی‌پیامک نیست.

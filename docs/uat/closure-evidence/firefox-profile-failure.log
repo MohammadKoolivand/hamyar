@@ -1,0 +1,283 @@
+
+> test:e2e
+> node scripts/run-e2e.mjs tests/e2e/uat-closure.spec.ts tests/e2e/navigation-layout.spec.ts --browser=firefox --output /private/tmp/hodhod-closure-firefox
+
+
+Running 7 tests using 1 worker
+
+(node:27225) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [firefox] › tests/e2e/navigation-layout.spec.ts:3:1 › each navigation section resolves to a standalone URL on direct load (7ms)
+(node:27275) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [firefox] › tests/e2e/navigation-layout.spec.ts:28:1 › logged-in teacher navigation supports deep links, refresh, Back and Forward; header fits content (2ms)
+(node:27298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [firefox] › tests/e2e/navigation-layout.spec.ts:110:1 › all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime errors (3ms)
+(node:27314) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [firefox] › tests/e2e/uat-closure.spec.ts:14:1 › TEACH-003/004/005: teacher dashboard counts real students, publication and completion after reload (8ms)
+(node:27352) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [firefox] › tests/e2e/uat-closure.spec.ts:50:1 › QB-013: incomplete question preserves entered form text when validation fails (8ms)
+(node:27394) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  6 [firefox] › tests/e2e/uat-closure.spec.ts:81:1 › PR-035/EDGE-012: second browser context sees saved response; refresh during delayed server read stays consistent (2ms)
+(node:27418) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  7 [firefox] › tests/e2e/uat-closure.spec.ts:130:1 › LINK-004: invitation deep link opens in signed-in student account and binds the existing account (2ms)
+
+
+  1) [firefox] › tests/e2e/navigation-layout.spec.ts:3:1 › each navigation section resolves to a standalone URL on direct load 
+
+    Error: browserType.launch: Failed to launch the browser process.
+    Browser logs:
+
+    <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-Z9YYOo -juggler-pipe -silent
+    <launched> pid=27240
+    [pid=27240][err] *** You are running in headless mode.
+    [pid=27240][err] Could not find profile folder.
+    [pid=27240] <process did exit: exitCode=1, signal=null>
+    [pid=27240] starting temporary directories cleanup
+    Call log:
+      - <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-Z9YYOo -juggler-pipe -silent
+      - <launched> pid=27240
+      - [pid=27240][err] *** You are running in headless mode.
+      - [pid=27240][err] Could not find profile folder.
+      - [pid=27240] <process did exit: exitCode=1, signal=null>
+      - [pid=27240] starting temporary directories cleanup
+      - [pid=27240] <gracefully close start>
+      - [pid=27240] <kill>
+      - [pid=27240] <skipped force kill spawnedProcess.killed=false processClosed=true>
+      - [pid=27240] finished temporary directories cleanup
+      - [pid=27240] <gracefully close end>
+
+
+    Error Context: ../hodhod-closure-firefox/navigation-layout-each-nav-354d6-andalone-URL-on-direct-load-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-firefox/navigation-layout-each-nav-354d6-andalone-URL-on-direct-load-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-firefox/navigation-layout-each-nav-354d6-andalone-URL-on-direct-load-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [firefox] › tests/e2e/navigation-layout.spec.ts:28:1 › logged-in teacher navigation supports deep links, refresh, Back and Forward; header fits content 
+
+    Error: browserType.launch: Failed to launch the browser process.
+    Browser logs:
+
+    <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-JdHcqq -juggler-pipe -silent
+    <launched> pid=27297
+    [pid=27297][err] *** You are running in headless mode.
+    [pid=27297][err] Could not find profile folder.
+    [pid=27297] <process did exit: exitCode=1, signal=null>
+    [pid=27297] starting temporary directories cleanup
+    Call log:
+      - <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-JdHcqq -juggler-pipe -silent
+      - <launched> pid=27297
+      - [pid=27297][err] *** You are running in headless mode.
+      - [pid=27297][err] Could not find profile folder.
+      - [pid=27297] <process did exit: exitCode=1, signal=null>
+      - [pid=27297] starting temporary directories cleanup
+      - [pid=27297] <gracefully close start>
+      - [pid=27297] <kill>
+      - [pid=27297] <skipped force kill spawnedProcess.killed=false processClosed=true>
+      - [pid=27297] finished temporary directories cleanup
+      - [pid=27297] <gracefully close end>
+
+
+    Error Context: ../hodhod-closure-firefox/navigation-layout-logged-i-4c101-Forward-header-fits-content-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-firefox/navigation-layout-logged-i-4c101-Forward-header-fits-content-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-firefox/navigation-layout-logged-i-4c101-Forward-header-fits-content-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [firefox] › tests/e2e/navigation-layout.spec.ts:110:1 › all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime errors 
+
+    Error: browserType.launch: Failed to launch the browser process.
+    Browser logs:
+
+    <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-YTeefJ -juggler-pipe -silent
+    <launched> pid=27299
+    [pid=27299][err] *** You are running in headless mode.
+    [pid=27299][err] Could not find profile folder.
+    [pid=27299] <process did exit: exitCode=1, signal=null>
+    [pid=27299] starting temporary directories cleanup
+    Call log:
+      - <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-YTeefJ -juggler-pipe -silent
+      - <launched> pid=27299
+      - [pid=27299][err] *** You are running in headless mode.
+      - [pid=27299][err] Could not find profile folder.
+      - [pid=27299] <process did exit: exitCode=1, signal=null>
+      - [pid=27299] starting temporary directories cleanup
+      - [pid=27299] <gracefully close start>
+      - [pid=27299] <kill>
+      - [pid=27299] <skipped force kill spawnedProcess.killed=false processClosed=true>
+      - [pid=27299] finished temporary directories cleanup
+      - [pid=27299] <gracefully close end>
+
+
+    Error Context: ../hodhod-closure-firefox/navigation-layout-all-teac-d388d-load-without-runtime-errors-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-firefox/navigation-layout-all-teac-d388d-load-without-runtime-errors-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-firefox/navigation-layout-all-teac-d388d-load-without-runtime-errors-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [firefox] › tests/e2e/uat-closure.spec.ts:14:1 › TEACH-003/004/005: teacher dashboard counts real students, publication and completion after reload 
+
+    Error: browserType.launch: Failed to launch the browser process.
+    Browser logs:
+
+    <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-tIdCI5 -juggler-pipe -silent
+    <launched> pid=27351
+    [pid=27351][err] *** You are running in headless mode.
+    [pid=27351][err] Could not find profile folder.
+    [pid=27351] <process did exit: exitCode=1, signal=null>
+    [pid=27351] starting temporary directories cleanup
+    Call log:
+      - <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-tIdCI5 -juggler-pipe -silent
+      - <launched> pid=27351
+      - [pid=27351][err] *** You are running in headless mode.
+      - [pid=27351][err] Could not find profile folder.
+      - [pid=27351] <process did exit: exitCode=1, signal=null>
+      - [pid=27351] starting temporary directories cleanup
+      - [pid=27351] <gracefully close start>
+      - [pid=27351] <kill>
+      - [pid=27351] <skipped force kill spawnedProcess.killed=false processClosed=true>
+      - [pid=27351] finished temporary directories cleanup
+      - [pid=27351] <gracefully close end>
+
+
+    Error Context: ../hodhod-closure-firefox/uat-closure-TEACH-003-004--dfc3d-and-completion-after-reload-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-firefox/uat-closure-TEACH-003-004--dfc3d-and-completion-after-reload-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-firefox/uat-closure-TEACH-003-004--dfc3d-and-completion-after-reload-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [firefox] › tests/e2e/uat-closure.spec.ts:50:1 › QB-013: incomplete question preserves entered form text when validation fails 
+
+    Error: browserType.launch: Failed to launch the browser process.
+    Browser logs:
+
+    <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-PcwO8E -juggler-pipe -silent
+    <launched> pid=27391
+    [pid=27391][err] *** You are running in headless mode.
+    [pid=27391][err] Could not find profile folder.
+    [pid=27391] <process did exit: exitCode=1, signal=null>
+    [pid=27391] starting temporary directories cleanup
+    Call log:
+      - <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-PcwO8E -juggler-pipe -silent
+      - <launched> pid=27391
+      - [pid=27391][err] *** You are running in headless mode.
+      - [pid=27391][err] Could not find profile folder.
+      - [pid=27391] <process did exit: exitCode=1, signal=null>
+      - [pid=27391] starting temporary directories cleanup
+      - [pid=27391] <gracefully close start>
+      - [pid=27391] <kill>
+      - [pid=27391] <skipped force kill spawnedProcess.killed=false processClosed=true>
+      - [pid=27391] finished temporary directories cleanup
+      - [pid=27391] <gracefully close end>
+
+
+    Error Context: ../hodhod-closure-firefox/uat-closure-QB-013-incompl-9b232--text-when-validation-fails-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-firefox/uat-closure-QB-013-incompl-9b232--text-when-validation-fails-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-firefox/uat-closure-QB-013-incompl-9b232--text-when-validation-fails-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [firefox] › tests/e2e/uat-closure.spec.ts:81:1 › PR-035/EDGE-012: second browser context sees saved response; refresh during delayed server read stays consistent 
+
+    Error: browserType.launch: Failed to launch the browser process.
+    Browser logs:
+
+    <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-TgDO0E -juggler-pipe -silent
+    <launched> pid=27417
+    [pid=27417][err] *** You are running in headless mode.
+    [pid=27417][err] Could not find profile folder.
+    [pid=27417] <process did exit: exitCode=1, signal=null>
+    [pid=27417] starting temporary directories cleanup
+    Call log:
+      - <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-TgDO0E -juggler-pipe -silent
+      - <launched> pid=27417
+      - [pid=27417][err] *** You are running in headless mode.
+      - [pid=27417][err] Could not find profile folder.
+      - [pid=27417] <process did exit: exitCode=1, signal=null>
+      - [pid=27417] starting temporary directories cleanup
+      - [pid=27417] <gracefully close start>
+      - [pid=27417] <kill>
+      - [pid=27417] <skipped force kill spawnedProcess.killed=false processClosed=true>
+      - [pid=27417] finished temporary directories cleanup
+      - [pid=27417] <gracefully close end>
+
+
+    Error Context: ../hodhod-closure-firefox/uat-closure-PR-035-EDGE-01-cd5b0-erver-read-stays-consistent-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-firefox/uat-closure-PR-035-EDGE-01-cd5b0-erver-read-stays-consistent-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-firefox/uat-closure-PR-035-EDGE-01-cd5b0-erver-read-stays-consistent-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [firefox] › tests/e2e/uat-closure.spec.ts:130:1 › LINK-004: invitation deep link opens in signed-in student account and binds the existing account 
+
+    Error: browserType.launch: Failed to launch the browser process.
+    Browser logs:
+
+    <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-Y82goX -juggler-pipe -silent
+    <launched> pid=27433
+    [pid=27433][err] *** You are running in headless mode.
+    [pid=27433][err] Could not find profile folder.
+    [pid=27433] <process did exit: exitCode=1, signal=null>
+    [pid=27433] starting temporary directories cleanup
+    Call log:
+      - <launching> /private/tmp/hodhod-closure-browsers/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/cx/6tsq94xx2bx49jkftgj2hv5m0000gn/T/playwright_firefoxdev_profile-Y82goX -juggler-pipe -silent
+      - <launched> pid=27433
+      - [pid=27433][err] *** You are running in headless mode.
+      - [pid=27433][err] Could not find profile folder.
+      - [pid=27433] <process did exit: exitCode=1, signal=null>
+      - [pid=27433] starting temporary directories cleanup
+      - [pid=27433] <gracefully close start>
+      - [pid=27433] <kill>
+      - [pid=27433] <skipped force kill spawnedProcess.killed=false processClosed=true>
+      - [pid=27433] finished temporary directories cleanup
+      - [pid=27433] <gracefully close end>
+
+
+    Error Context: ../hodhod-closure-firefox/uat-closure-LINK-004-invit-03da7--binds-the-existing-account-firefox/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../hodhod-closure-firefox/uat-closure-LINK-004-invit-03da7--binds-the-existing-account-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace ../hodhod-closure-firefox/uat-closure-LINK-004-invit-03da7--binds-the-existing-account-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7 failed
+    [firefox] › tests/e2e/navigation-layout.spec.ts:3:1 › each navigation section resolves to a standalone URL on direct load 
+    [firefox] › tests/e2e/navigation-layout.spec.ts:28:1 › logged-in teacher navigation supports deep links, refresh, Back and Forward; header fits content 
+    [firefox] › tests/e2e/navigation-layout.spec.ts:110:1 › all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime errors 
+    [firefox] › tests/e2e/uat-closure.spec.ts:14:1 › TEACH-003/004/005: teacher dashboard counts real students, publication and completion after reload 
+    [firefox] › tests/e2e/uat-closure.spec.ts:50:1 › QB-013: incomplete question preserves entered form text when validation fails 
+    [firefox] › tests/e2e/uat-closure.spec.ts:81:1 › PR-035/EDGE-012: second browser context sees saved response; refresh during delayed server read stays consistent 
+    [firefox] › tests/e2e/uat-closure.spec.ts:130:1 › LINK-004: invitation deep link opens in signed-in student account and binds the existing account 

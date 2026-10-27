@@ -1,0 +1,1 @@
+{"model":"qwen2.5:3b","promptVersion":"teacher-choice-v1","startHint":"Start by subtracting 5 from both sides.","afterWorkHint":"You already have 2x = 10. Think about removing the remaining coefficient of x.","usage":[{"inputTokens":145,"outputTokens":12},{"inputTokens":202,"outputTokens":15}],"status":"PASS"}

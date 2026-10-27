@@ -1,0 +1,33 @@
+TAP version 13
+# Subtest: AI-LEAK-002: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+not ok 1 - AI-LEAK-002: raw generated unsafe/uncertain hint cannot be approved or fetched by student
+  ---
+  duration_ms: 2775.117209
+  type: 'test'
+  location: '/private/tmp/hodhod-closure-82ntl0ht/tests/integration/hint-safety.test.ts:1:2221'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"_id":"27275e88-1b0b-48ed-a663-131b11771353","questionId":"08a1e115-5704-405a-a1a8-974568b9b7ca","ownerId":"fe1330bf-8b6a-4266-a7d1-b731403c8384","version":1,"verifiedBy":"fe1330bf-8b6a-4266-a7d1-b731403c8384","verifiedAt":"2026-10-27T09:01:51.795Z","topicId":"3c3ba046-bb89-4f86-b381-d8fb5dd8c819","skillIds":[],"statement":"صورت سؤال ریاضی یا فیزیک","type":"numeric","reference":"7","options":[],"tolerance":0,"hints":["پاسخ مرجع فقط عدد 7 است."],"difficulty":"medium","difficultyAssessment":{"method":"heuristic_v1","needsReview":true,"reason":"متن برای ارزیابی کافی نیست؛ متوسط موقت تا بررسی معلم"},"origin":"ai_reviewed","sourceDraftId":"1d9235f9-21a3-4aff-9a86-678a18622036","provider":"controlled-external","model":"unsafe-fixture","promptVersion":"closure-v1"}
+    
+    200 !== 400
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 400
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/private/tmp/hodhod-closure-82ntl0ht/tests/integration/hint-safety.test.ts:72:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4436.462791

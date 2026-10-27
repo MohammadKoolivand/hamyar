@@ -1,0 +1,86 @@
+{
+  "provider": "local_ollama",
+  "scientificReview": "MANUAL_REQUIRED",
+  "runs": [
+    {
+      "index": 1,
+      "parsed": true,
+      "milliseconds": 18561,
+      "question": {
+        "statement": "عدد سه را با عدد چهار جمع کنید.",
+        "reference": "7",
+        "options": [
+          "5",
+          "6",
+          "7"
+        ],
+        "hints": [
+          "جمع دو عدد می‌شود.",
+          "عدد سه و چهار را بفرمایید.",
+          "پاسخ مرجع 7 است."
+        ]
+      },
+      "provider": "ollama",
+      "model": "qwen2.5:3b",
+      "promptVersion": "question-draft-fa-v1",
+      "usage": {
+        "inputTokens": 222,
+        "outputTokens": 100
+      }
+    },
+    {
+      "index": 2,
+      "parsed": true,
+      "milliseconds": 11987,
+      "question": {
+        "statement": "عدد سه را با عدد چهار جمع کنید.",
+        "reference": "7",
+        "options": [
+          "5",
+          "6",
+          "7"
+        ],
+        "hints": [
+          "جمع دو عدد صحیح می‌شود.",
+          "عدد سه و چهار را بفرسم.",
+          "پاسخ مرجع فقط عدد 7 است."
+        ]
+      },
+      "provider": "ollama",
+      "model": "qwen2.5:3b",
+      "promptVersion": "question-draft-fa-v1",
+      "usage": {
+        "inputTokens": 222,
+        "outputTokens": 103
+      }
+    },
+    {
+      "index": 3,
+      "parsed": true,
+      "milliseconds": 14133,
+      "question": {
+        "statement": "عدد سه را با عدد چهار جمع کنید.",
+        "reference": "7",
+        "options": [
+          "5",
+          "6",
+          "7"
+        ],
+        "hints": [
+          "جمع دو عدد می تواند عددی بزرگتر از هر دو از آنها باشد.",
+          "عدد سه و چهار را به ترتیب جمع کنید.",
+          "پاسخ مرجع عدد 7 است."
+        ]
+      },
+      "provider": "ollama",
+      "model": "qwen2.5:3b",
+      "promptVersion": "question-draft-fa-v1",
+      "usage": {
+        "inputTokens": 222,
+        "outputTokens": 125
+      }
+    }
+  ],
+  "parsed": 3,
+  "published": 0
+}

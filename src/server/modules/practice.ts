@@ -1,3 +1,4 @@
+import { assessHint, HINT_SAFETY_VERSION } from "../ai/hint-safety";
 import { feedbackVisible } from "../../lib/practice-answer";
 import type { AvalaiClient } from "../ai/avalai";
 import type { FastifyInstance } from "fastify";
@@ -66,7 +67,25 @@ export function registerPractice(
         result: e.result,
         method: e.method,
       })),
-      hints: await c("hintEvents").find({ assignmentId: a._id }).toArray(),
+      hints: (
+        await c("hintEvents").find({ assignmentId: a._id }).toArray()
+      ).filter((h) => {
+        if (u.role === "teacher") return true;
+        if (h.provider === "teacher-solution")
+          return Boolean(
+            a.policy.allowFullSolution && a.policy.maxHintLevel >= 4,
+          );
+        const q = questions.find((q) => q._id === h.questionVersionId);
+        return (
+          q &&
+          assessHint(
+            { reference: q.reference, type: q.type, options: q.options },
+            h.text,
+            q.origin === "ai_reviewed" &&
+              q.hintSafetyVersion !== HINT_SAFETY_VERSION,
+          ) === "clear"
+        );
+      }),
     };
   });
   const itemSchema = z.object({ questionId: z.string().uuid() });

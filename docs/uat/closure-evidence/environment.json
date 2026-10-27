@@ -1,0 +1,14 @@
+{
+  "workspace": "/private/tmp/hodhod-closure-82ntl0ht",
+  "database": "hodhodeh_audit_closure_1027",
+  "replica": "closure-rs",
+  "mongoPort": 27189,
+  "webPort": 5177,
+  "provider": "mock-approved-hints",
+  "realSms": false,
+  "realSmtp": false,
+  "paidInference": false,
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "node": "v22.23.2",
+  "baseCommit": "6eb7a6acc79d64a6e756a6ca963e87ef7a07fcee"
+}

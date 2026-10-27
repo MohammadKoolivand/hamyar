@@ -1,0 +1,15 @@
+
+> test:e2e
+> node scripts/run-e2e.mjs tests/e2e/uat-golden.spec.ts --fully-parallel --workers=2 --output /private/tmp/hodhod-closure-final-golden
+
+
+Running 2 tests using 2 workers
+
+(node:30706) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30705) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 tests/e2e/uat-golden.spec.ts:57:3 › UAT GOLD cohort 2: actual UI five questions, independent/helped results, remediation, parent and isolation (3.6m)
+  ✓  1 tests/e2e/uat-golden.spec.ts:57:3 › UAT GOLD cohort 1: actual UI five questions, independent/helped results, remediation, parent and isolation (3.6m)
+
+  2 passed (3.6m)

@@ -1,0 +1,5 @@
+
+> audit:integrity
+> node --env-file-if-exists=.env --import tsx scripts/audit-integrity.ts
+
+{"assignmentsNeedingReview":0}

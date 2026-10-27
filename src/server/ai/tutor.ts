@@ -1,3 +1,4 @@
+import { assessHint, HINT_SAFETY_VERSION } from "./hint-safety";
 import { z } from "zod";
 import type { Context } from "../context";
 import type { Row } from "../db";
@@ -57,6 +58,15 @@ export async function guide(
   let candidates = bank
     .filter((item) => item.level === level)
     .map((item) => item.text)
+    .filter(
+      (text) =>
+        assessHint(
+          { reference: q.reference, type: q.type, options: q.options },
+          text,
+          q.origin === "ai_reviewed" &&
+            q.hintSafetyVersion !== HINT_SAFETY_VERSION,
+        ) === "clear",
+    )
     .filter((text) => !previous.some((h) => h.text === text));
   // Before any submitted attempt, keep the first teacher-approved introductory hint only.
   if (!work) candidates = candidates.slice(0, 1);

@@ -11,7 +11,10 @@ import { SourceEditor } from "./source-editor";
 import { TopicSelector } from "./topic-selector";
 import { VisualEditor } from "./visual-editor";
 import { QuestionPresentation } from "@/components/question-presentation";
-import { questionVisualsSchema } from "@/lib/question-visuals";
+import {
+  type QuestionVisual,
+  questionVisualsSchema,
+} from "@/lib/question-visuals";
 import {
   MAX_PDF_BYTES,
   type ExamImport,
@@ -20,7 +23,10 @@ import {
 import type { QuestionSource } from "@/lib/question-source";
 import type { Node } from "@/lib/types";
 const style = "glass-field min-h-11 w-full min-w-0 p-3";
-type Detail = ExamImport & { items: ExamImportItem[] };
+type Detail = ExamImport & {
+  items: ExamImportItem[];
+  sourcePages?: { page: number }[];
+};
 export function ExamImportScreen({
   nodes,
   onApproved,
@@ -762,6 +768,7 @@ export function ExamImportScreen({
                             : old.filter((id) => id !== item._id),
                         );
                       }}
+                      sourcePages={exam.sourcePages ?? []}
                       item={item}
                       index={index}
                       nodes={nodes}
@@ -792,6 +799,7 @@ export function ExamImportScreen({
   );
 }
 function ReviewItem({
+  sourcePages,
   item,
   selected,
   onSelected,
@@ -800,6 +808,7 @@ function ReviewItem({
   busy,
   review,
 }: {
+  sourcePages: { page: number }[];
   item: ExamImportItem;
   selected: boolean;
   onSelected: (value: boolean) => void;
@@ -809,6 +818,12 @@ function ReviewItem({
   review: (body: unknown) => Promise<void>;
 }) {
   const [sourceZoom, setSourceZoom] = useState(false);
+  const [sourcePage, setSourcePage] = useState(
+    String(item.extraction?.regions[0]?.page ?? sourcePages[0]?.page ?? 1),
+  );
+  const [imageBusy, setImageBusy] = useState(false);
+  const [imageError, setImageError] = useState("");
+  const [cropSource, setCropSource] = useState(false);
   const [q, setQ] = useState(item.question),
     [confirmed, setConfirmed] = useState(false),
     [reason, setReason] = useState(""),
@@ -1032,12 +1047,84 @@ function ReviewItem({
               }}
             />
           )}
-          <details>
+          <details open={cropSource || undefined}>
             <summary className="cursor-pointer text-sm text-[#233B8F]">
               افزودن یا اصلاح نمودار، شکل و فرمول
             </summary>
-            <div className="mt-3">
+            <div className="mt-3 grid gap-3">
+              <p className="text-xs leading-6 text-slate-600">
+                برای شکل پیچیده، تصویر اصلی را نگه دارید. اگر برش ناقص است، صفحه
+                اصلی را انتخاب و تصویر را دوباره کراپ کنید؛ متن و گزینه‌ها تغییر
+                نمی‌کنند.
+              </p>
+              {sourcePages.length > 0 && (
+                <div className="flex flex-wrap items-end gap-2">
+                  <Field title="صفحه اصلی PDF">
+                    <select
+                      className={style}
+                      value={sourcePage}
+                      disabled={busy || imageBusy}
+                      onChange={(e) => setSourcePage(e.target.value)}
+                    >
+                      {sourcePages.map(({ page }) => (
+                        <option key={page} value={page}>
+                          صفحه {fa(page)}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Button
+                    type="button"
+                    disabled={busy || imageBusy}
+                    onClick={async () => {
+                      setImageBusy(true);
+                      setImageError("");
+                      try {
+                        const visual = await api<QuestionVisual>(
+                          `/exam-imports/${item.examId}/items/${item._id}/source-image`,
+                          { page: Number(sourcePage) },
+                        );
+                        setQ((current) => {
+                          const visuals = [...(current.visuals ?? [])];
+                          const index = visuals.findIndex(
+                            (v) => v.kind === "image",
+                          );
+                          if (index >= 0) visuals[index] = visual;
+                          else if (visuals.length < 3) visuals.push(visual);
+
+                          return { ...current, visuals };
+                        });
+                        setConfirmed(false);
+                        setCropSource(true);
+                      } catch (error) {
+                        setImageError(
+                          error instanceof Error
+                            ? error.message
+                            : "دریافت تصویر ناموفق بود",
+                        );
+                      } finally {
+                        setImageBusy(false);
+                      }
+                    }}
+                  >
+                    {imageBusy
+                      ? "دریافت تصویر…"
+                      : "جایگزینی تصویر اول از صفحه اصلی"}
+                  </Button>
+                </div>
+              )}
+              {imageError && (
+                <p role="alert" className="text-sm text-rose-700">
+                  {imageError}
+                </p>
+              )}
               <VisualEditor
+                key={
+                  cropSource
+                    ? q.visuals?.find((v) => v.kind === "image")?.assetId
+                    : "original"
+                }
+                cropOpen={cropSource}
                 value={q.visuals ?? []}
                 disabled={busy}
                 onChange={(visuals) => {

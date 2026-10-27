@@ -1,12 +1,11 @@
-# UAT — خلاصه اصلاحات
+# خلاصه اصلاحات Closure
 
-| قابلیت | مشکل | اصلاح | فایل | تست و نتیجه | ریسک |
-|---|---|---|---|---|---|
-| ورود PDF واقعی | ادغام سؤال ۳ و ۴ پس از گزینه ناقص سؤال ۲ | تشخیص محافظه‌کارانه heading متن با شماره متوالی و هندسه هم‌تراز | src/server/imports/layout.ts | رگرسیون ابتدا fail، سپس ۶/۶ pass؛ نمونه واقعی از ۴ به ۶ شماره رسید؛ backend نهایی ۱۳۲/۱۳۲ | نیاز به review متن/کلید همچنان برقرار |
-| پوشش تصویر و محدودیت سند | نبود assertion مستقل JPG/WebP، حجم، ابعاد و ۱۰۰صفحه | تقویت تست موجود و fixture معتبر ۱۰۱صفحه‌ای | tests/integration/image-import.test.ts; document-limits.test.ts | JPG/PNG/WebP و PDF.js؛ رد ۲۵MP، ۲۰MB+۱ و ۱۰۱صفحه؛ backend موفق | کد محصول این قسمت تغییر نکرد |
-| پذیرش پیوسته | نبود Golden پنج‌سؤالی کامل UI در یک test | دو cohort مستقل؛ ثبت‌نام رسمی و UI واقعی تا والد/تقویت | tests/e2e/uat-golden.spec.ts | وضعیت نهایی در UAT_GOLDEN_JOURNEY.md و evidence/e2e-final.log | سرعت کنترل‌شده؛ تست ظرفیت نیست |
-| مرورگر | شکاف در persistent browser / فرمول گزینه / motion / 404 | سه probe واقعی Chrome و fixture backend واقعی | tests/e2e/uat-probes.spec.ts | اجرای اولیه ۳/۳ pass؛ هر سه در گیت نهایی ۳۷ pass/یک skip نیز موفق شدند | شبیه‌ساز عرض، Safari/Android واقعی نیست |
+| تغییر | فایل‌های اصلی | علت و اثبات |
+|---|---|---|
+| کنترل مصرف راهنمای AI | ai/hint-safety.ts؛ ai/tutor.ts؛ modules/authoring.ts؛ modules/practice.ts | تأیید نشدن خروجی خام نامطمئن، schema خروجی، guard قبل از ذخیره/تحویل و فیلتر رویداد تاریخی؛ مرجع و audit خصوصی حفظ شد |
+| حفظ راهنمای سالم | hint-safety.ts؛ tests/unit/hint-safety.test.ts | ذکر تعداد/operand معلم با افشای جواب یکی نیست؛ رگرسیون گروه قدیمی حفظ شد و gate raw AI محافظه‌کار ماند |
+| PDF دو‌ستونی | imports/text-columns.ts؛ document-engine.ts | قبل۴از۸، بعد۸از۸؛ جداسازی فقط با heading تکراری در هر دو نیمه؛ unit+PDF integration |
+| پوشش پذیرش | tests/integration/hint-safety.test.ts؛ document-columns.test.ts؛ closure-boundaries.test.ts؛ tests/e2e/uat-closure.spec.ts |۱۵شناسه leak، مرزگروه۵۰/۵۱، خصوصی‌بودن داده، شمارنده معلم، فرم، مرورگر دوم، تأخیر و دعوت |
+| عملیات | tests/unit/deployment-config.test.mjs؛ docs/uat/closure-operations-probe.ts | rollback کد بدون restore، قطع/وصل mongod اختصاصی و log production با حذف sentinel |
 
-گیج کوچک و اصلاح جداکننده سال/شرط رشته از قبل در working tree مالک بودند. آن‌ها حفظ و در snapshot آزموده شدند؛ به‌عنوان اصلاح کشف‌شده این ممیزی گزارش نمی‌شوند. هیچ push، force push، نصب سیستمی، تغییر DNS/SSH/Firewall، ارسال واقعی SMS/SMTP یا inference پولی انجام نشد.
-
-گیت نهایی: typecheck، lint و production build موفق؛ backend ۱۳۲ pass/صفر fail/صفر skip؛ مرورگر ۳۷ pass/صفر fail/یک skip اختیاری مدل واقعی. باگ OCR بسته و مورد کیفیت پیش‌نویس AI-008 صریحاً FAIL/P2 باز است.
+فیچر مهلت/فیلتر/نمایش نسخه ساخته نشد؛ تصمیم POST_MVP پیشنهادی مستند شد. هفت داوری انسانی و Gate داده کودک بسته اعلام نشدند. کد و داده قبلی حفظ شدند؛ push/deploy/تنظیم مقصد یا سرویس پولی انجام نشد. نتایج عددی نهایی در FINAL_RESULTS.json و گزارش اجرای تازه است؛ evidence قدیمی baseline محسوب می‌شود.

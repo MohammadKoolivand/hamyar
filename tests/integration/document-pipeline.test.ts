@@ -90,7 +90,57 @@ test("durable local PDF jobs match actual key numbers, preserve images on publis
       404,
     );
     const first = detail.items[0];
-    const assetId = first.question.visuals[0].assetId;
+    const sourceRoute = `${path}/items/${first._id}/source-image`;
+    assert.equal(
+      (await f.request(sourceRoute, { page: 1 }, other)).statusCode,
+      404,
+    );
+    assert.equal(
+      (await f.request(sourceRoute, { page: 1 }, f.student)).statusCode,
+      403,
+    );
+    assert.equal(
+      (await f.request(sourceRoute, { page: 100 }, f.teacher)).statusCode,
+      404,
+    );
+    assert.equal(
+      (await f.request(sourceRoute, { page: 0 }, f.teacher)).statusCode,
+      400,
+    );
+    assert.ok(detail.sourcePages.some((p: { page: number }) => p.page === 1));
+    const sourceImage = await f.post(sourceRoute, { page: 1 }, f.teacher);
+    assert.equal(sourceImage.kind, "image");
+    assert.equal(
+      (await f.post(sourceRoute, { page: 1 }, f.teacher)).assetId,
+      sourceImage.assetId,
+    );
+    assert.equal(
+      (
+        await f.request(
+          `/api/question-assets/${sourceImage.assetId}`,
+          undefined,
+          other,
+        )
+      ).statusCode,
+      404,
+    );
+    const corrected = {
+      ...first.question,
+      visuals: [
+        { ...sourceImage, crop: { x: 5, y: 5, width: 90, height: 40 } },
+      ],
+    };
+    await f.post(
+      `${path}/items/${first._id}/review`,
+      { action: "save", question: corrected },
+      f.teacher,
+    );
+    const saved = (await f.request(path, undefined, f.teacher))
+      .json()
+      .items.find((i: { _id: string }) => i._id === first._id);
+    assert.deepEqual(saved.question.visuals[0].crop, corrected.visuals[0].crop);
+    assert.equal(saved.question.statement, first.question.statement);
+    const assetId = sourceImage.assetId;
     assert.equal(
       (await f.request(`/api/question-assets/${assetId}`, undefined, f.student))
         .statusCode,
