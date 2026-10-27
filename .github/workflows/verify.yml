@@ -30,9 +30,12 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Start MongoDB replica set
+        env:
+          # Work around the MongoDB 8 per-CPU rseq guard on newer GitHub runner kernels.
+          HODHOD_MONGO_GLIBC_TUNABLES: glibc.pthread.rseq=1
         run: |
           docker compose up -d mongo
-          # MongoDB 8 cannot launch on Ubuntu 26.04 / Linux 6.19; pin Ubuntu 24.04.
+          # GitHub ubuntu-24.04 runners may use a newer Linux kernel: verify actual health.
           for i in $(seq 1 45); do
             if [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q mongo)")" = "healthy" ]; then
               echo "Replica set healthy"; exit 0
