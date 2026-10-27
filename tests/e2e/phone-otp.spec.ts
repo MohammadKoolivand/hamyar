@@ -90,6 +90,7 @@ test("public teacher self-registration creates a dedicated teacher session and w
     await page.getByLabel("نام و نام خانوادگی").fill("معلم آزمایشی مستقل");
     await page.getByLabel("نقش شما").selectOption("teacher");
     await page.getByRole("button", { name: "دریافت کد تأیید" }).click();
+    await expect(page.getByRole("status")).toContainText("کد تأیید");
     expect(code).toMatch(/^\d{6}$/);
     await page.getByLabel("کد یک‌بارمصرف").fill(code);
     await page.getByRole("button", { name: "تأیید کد و ورود" }).click();
