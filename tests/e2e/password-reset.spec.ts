@@ -20,7 +20,7 @@ test("legacy recovery API preserves one-use, non-enumerating reset while phone-o
     const confirm = await f.request("/api/auth/password-reset/confirm", {
       token: deliveredToken, password: "NewStrongPass456!",
     });
-    expect(confirm.statusCode).toBe(200, confirm.body);
+    expect(confirm.statusCode).toBe(200);
     expect((await f.request("/api/auth/me", undefined, f.teacher)).statusCode).toBe(401);
     expect((await f.request("/api/auth/password-reset/confirm", {
       token: deliveredToken, password: "AnotherStrong456!",
