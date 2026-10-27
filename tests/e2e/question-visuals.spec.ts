@@ -1,3 +1,4 @@
+import { registerSyntheticUser } from "./auth-helpers";
 import { chooseTopic } from "./curriculum-helpers";
 import { test, expect } from "@playwright/test";
 test("teacher edits chart, diagram and formula; approved visual question persists and student sees the same media", async ({
@@ -7,15 +8,7 @@ test("teacher edits chart, diagram and formula; approved visual question persist
 }, testInfo) => {
   const suffix = Date.now();
   const base = baseURL!;
-  await page.goto("/content");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم سؤال تصویری");
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(`visual-${suffix}@test.dev`);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await registerSyntheticUser(page, "معلم سؤال تصویری");
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
