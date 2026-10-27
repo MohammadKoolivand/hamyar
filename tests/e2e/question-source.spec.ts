@@ -1,16 +1,9 @@
+import { registerSyntheticUser } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 test("exam taxonomy is visible in bank and saved from authoring with category-specific filters", async ({
   page,
 }, testInfo) => {
-  await page.goto("/content");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم دسته‌بندی");
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(`taxonomy-${Date.now()}@test.dev`);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await registerSyntheticUser(page, "معلم دسته‌بندی");
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
