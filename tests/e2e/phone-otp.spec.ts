@@ -90,10 +90,10 @@ test("public teacher self-registration creates a dedicated teacher session and w
     await page.getByLabel("نام و نام خانوادگی").fill("معلم آزمایشی مستقل");
     await page.getByLabel("نقش شما").selectOption("teacher");
     await page.getByRole("button", { name: "دریافت کد تأیید" }).click();
-    expect(code).toMatch(/^\\d{6}$/);
+    expect(code).toMatch(/^\d{6}$/);
     await page.getByLabel("کد یک‌بارمصرف").fill(code);
     await page.getByRole("button", { name: "تأیید کد و ورود" }).click();
-    await expect(page).toHaveURL(/\\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByText("فضای کار معلم", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "دانش‌آموزان", exact: true })).toBeVisible();
     const me = await page.evaluate(async () => (await fetch("/api/auth/me")).json());
