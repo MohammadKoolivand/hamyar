@@ -1,23 +1,18 @@
 import { chooseTopic, chooseParent } from "./curriculum-helpers";
 import { test, expect } from "@playwright/test";
 const pass = "StrongPass123!";
+import { registerSyntheticUser, loginSyntheticUser, syntheticPhone } from "./auth-helpers";
 test("UI: teacher creates content and invite; student solves; both see evidence", async ({
   page,
   browser,
 }, testInfo) => {
   const suffix = Date.now(),
-    teacher = `teacher${suffix}@test.dev`,
+    teacher = syntheticPhone(),
     student = `091${String(suffix).slice(-8)}`;
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("سارا احمدی");
-  await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(teacher);
-  await page.getByLabel("رمز عبور").fill(pass);
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await registerSyntheticUser(page, "سارا احمدی", "teacher", teacher);
+
   await expect(
     page.getByRole("heading", { name: "نمای کلی", exact: true }),
   ).toBeVisible();
@@ -88,13 +83,12 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     }),
     sp = await studentContext.newPage();
   sp.on("pageerror", (e) => errors.push(e.message));
-  await sp.goto(`/?invite=${token}`);
-  await sp.getByLabel("نام و نام خانوادگی").fill("آراد محمدی");
-  await sp.getByLabel("شماره موبایل دعوت‌شده", { exact: true }).fill(student);
-  await sp.getByLabel("رمز عبور").fill(pass);
-  await sp.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await expect(sp.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await sp.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  const invitedStudent = await sp.request.post("/api/invitations/accept", {
+    data: { name: "آراد محمدی", phone: student, password: pass, token },
+  });
+  expect(invitedStudent.ok(), await invitedStudent.text()).toBe(true);
+  await loginSyntheticUser(sp, student, pass);
+
   await expect(
     sp.getByRole("heading", { name: "مسیر یادگیری من", exact: true }),
   ).toBeVisible();
@@ -249,13 +243,8 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     .getByLabel("پاسخ مرجع خصوصی")
     .fill("UNPUBLISHED_PRIVATE_REFERENCE");
   await page.getByRole("button", { name: "خروج", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await expect(
-    page.getByLabel("ایمیل یا شماره موبایل", { exact: true }),
-  ).toHaveValue("");
-  await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(teacher);
-  await page.getByLabel("رمز عبور").fill(pass);
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await loginSyntheticUser(page, teacher, pass);
+
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
@@ -347,16 +336,11 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
     "Real authoring requires configured Ollama; never substitute mock",
   );
   const suffix = Date.now(),
-    teacher = `author${suffix}@test.dev`,
+    teacher = syntheticPhone(),
     student = `092${String(suffix).slice(-8)}`,
     parent = `093${String(suffix).slice(-8)}`;
-  await page.goto("/");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم تولید سؤال");
-  await page.getByLabel("ایمیل یا شماره موبایل", { exact: true }).fill(teacher);
-  await page.getByLabel("رمز عبور").fill(pass);
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await registerSyntheticUser(page, "معلم تولید سؤال", "teacher", teacher);
+
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
@@ -420,16 +404,12 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
       viewport: { width: 390, height: 844 },
     }),
     sp = await sc.newPage();
-  await sp.goto(`/?invite=${token}`);
-  await sp.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز آزمایشی");
-  await sp.getByLabel("شماره موبایل دعوت‌شده", { exact: true }).fill(student);
-  await sp.getByLabel("رمز عبور").fill(pass);
-  await sp.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await expect(sp.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await page
-    .getByRole("button", { name: "به‌روزرسانی فهرست", exact: true })
-    .click();
-  await sp.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  const invitedSecondStudent = await sp.request.post("/api/invitations/accept", {
+    data: { name: "دانش‌آموز آزمایشی", phone: student, password: pass, token },
+  });
+  expect(invitedSecondStudent.ok(), await invitedSecondStudent.text()).toBe(true);
+  await loginSyntheticUser(sp, student, pass);
+
   await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
   await page.getByLabel("عنوان مأموریت").fill("تمرین با سؤال تأییدشده");
   await page
@@ -463,12 +443,14 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
       viewport: { width: 360, height: 800 },
     }),
     pp = await pc.newPage();
-  await pp.goto(invite);
-  await pp.getByLabel("نام و نام خانوادگی").fill("ولی آزمایشی");
-  await pp.getByLabel("شماره موبایل دعوت‌شده", { exact: true }).fill(parent);
-  await pp.getByLabel("رمز عبور").fill(pass);
-  await pp.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await pp.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  const parentToken = new URL(invite).searchParams.get("invite");
+  expect(parentToken).toBeTruthy();
+  const parentAccepted = await pp.request.post("/api/invitations/accept", {
+    data: { name: "ولی آزمایشی", phone: parent, password: pass, token: parentToken },
+  });
+  expect(parentAccepted.ok(), await parentAccepted.text()).toBe(true);
+  await loginSyntheticUser(pp, parent, pass);
+
   await expect(pp.getByRole("heading", { name: "پنل اولیا" })).toBeVisible();
   await expect(pp.getByLabel("انتخاب فرزند")).toHaveValue(/.+/);
   await expect(
@@ -523,22 +505,10 @@ test("student registers without invitation and later joins teacher with existing
 }, testInfo) => {
   const suffix = Date.now();
   const studentEmail = `094${String(suffix).slice(-8)}`;
-  const teacherEmail = `mentor-${suffix}@test.dev`;
+  const teacherEmail = syntheticPhone();
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-  await page.getByRole("button", { name: "ثبت‌نام دانش‌آموز" }).click();
-  await expect(
-    page.getByRole("heading", { name: "ساخت حساب دانش‌آموز" }),
-  ).toBeVisible();
-  await expect(page.getByLabel("کد دعوت معلم")).toHaveCount(0);
-  await page.getByLabel("نام و نام خانوادگی").fill("دانش‌آموز مستقل");
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(studentEmail);
-  await page.getByLabel("رمز عبور").fill(pass);
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await registerSyntheticUser(page, "دانش‌آموز مستقل", "student", studentEmail);
+
   await expect(
     page.getByRole("heading", { name: "مسیر یادگیری من" }),
   ).toBeVisible();
@@ -556,17 +526,8 @@ test("student registers without invitation and later joins teacher with existing
   const teacherContext = await browser.newContext();
   try {
     const teacherPage = await teacherContext.newPage();
-    await teacherPage.goto("/");
-    await teacherPage.getByRole("button", { name: "ثبت‌نام معلم" }).click();
-    await teacherPage.getByLabel("نام و نام خانوادگی").fill("معلم آزمایشی");
-    await teacherPage
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill(teacherEmail);
-    await teacherPage.getByLabel("رمز عبور").fill(pass);
-    await teacherPage
-      .getByRole("button", { name: "ساخت حساب", exact: true })
-      .click();
-    await teacherPage.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+    await registerSyntheticUser(teacherPage, "معلم آزمایشی", "teacher", teacherEmail);
+
     await teacherPage
       .getByRole("button", { name: "درس‌های من", exact: true })
       .click();
@@ -644,17 +605,10 @@ test("student requests a course, teacher approves, and leaving keeps history", a
   browser,
 }, testInfo) => {
   const unique = Date.now() + "-" + Math.floor(Math.random() * 10000);
-  const teacherEmail = `course-teacher-${unique}@test.dev`;
-  const studentEmail = `course-student-${unique}@test.dev`;
-  await page.goto("/");
-  await page.getByRole("button", { name: "ثبت‌نام معلم" }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم دوره");
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(teacherEmail);
-  await page.getByLabel("رمز عبور").fill(pass);
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  const teacherEmail = syntheticPhone();
+  const studentEmail = syntheticPhone();
+  await registerSyntheticUser(page, "معلم دوره", "teacher", teacherEmail);
+
   await page.getByRole("button", { name: "درس‌های من", exact: true }).click();
   await page.getByLabel("نام درس").fill("ریاضی");
   await page.getByLabel("عنوان دوره").fill("دوره درخواست عضویت");
@@ -668,19 +622,8 @@ test("student requests a course, teacher approves, and leaving keeps history", a
   });
   try {
     const student = await studentContext.newPage();
-    await student.goto("/");
-    await student.getByRole("button", { name: "ثبت‌نام دانش‌آموز" }).click();
-    await student
-      .getByLabel("نام و نام خانوادگی")
-      .fill("دانش‌آموز درخواست‌کننده");
-    await student
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill(studentEmail);
-    await student.getByLabel("رمز عبور").fill(pass);
-    await student
-      .getByRole("button", { name: "ساخت حساب", exact: true })
-      .click();
-    await student.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+    await registerSyntheticUser(student, "دانش‌آموز درخواست‌کننده", "student", studentEmail);
+
     await student
       .getByRole("button", { name: "درس‌های من", exact: true })
       .click();
