@@ -5,7 +5,8 @@ import { normalizePhone } from "@/lib/phone";
 import { Brand } from "@/components/ui/brand";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-export function PhoneAuthScreen({ onPassword }: { onPassword: () => void }) {
+export function PhoneAuthScreen() {
+  const [developmentBypass, setDevelopmentBypass] = useState(false);
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [challenge, setChallenge] = useState("");
@@ -34,10 +35,12 @@ export function PhoneAuthScreen({ onPassword }: { onPassword: () => void }) {
   }, [remaining]);
   async function request() {
     const result = await api<{
+      developmentBypass?: boolean;
       challengeId: string;
       resendAfter: number;
       message: string;
     }>("/auth/otp/request", { phone: normalizePhone(phone) });
+    setDevelopmentBypass(result.developmentBypass === true);
     setChallenge(result.challengeId);
     setCode("");
     setRemaining(result.resendAfter);
@@ -54,7 +57,9 @@ export function PhoneAuthScreen({ onPassword }: { onPassword: () => void }) {
         </h1>
         <p className="text-sm leading-7 text-slate-500">
           {challenge
-            ? `کد پیامکی برای ${normalizePhone(phone)} ارسال شده و پنج دقیقه معتبر است.`
+            ? developmentBypass
+              ? "حالت توسعه: پیامکی ارسال نشده؛ یک کد شش‌رقمی دلخواه وارد کنید."
+              : `کد پیامکی برای ${normalizePhone(phone)} ارسال شده و پنج دقیقه معتبر است.`
             : "با شماره موبایل خودتان وارد شوید؛ نیازی به رمز عبور نیست."}
         </p>
         <form
@@ -220,13 +225,6 @@ export function PhoneAuthScreen({ onPassword }: { onPassword: () => void }) {
             </button>
           </div>
         )}
-        <button
-          type="button"
-          className="text-xs text-slate-500 underline"
-          onClick={onPassword}
-        >
-          ورود با رمز عبور حساب قبلی
-        </button>
       </section>
     </main>
   );

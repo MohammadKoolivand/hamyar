@@ -176,10 +176,10 @@ export function AccessConsole({
                   onChange={(e) => setName(e.target.value)}
                 />
               </Field>
-              <Field title="ایمیل کاربر">
+              <Field title="شماره موبایل کاربر">
                 <input
                   required
-                  type="email"
+                  type="tel"
                   dir="ltr"
                   className={style}
                   value={email}
@@ -224,7 +224,7 @@ export function AccessConsole({
             </Field>
             <PagedList
               items={users.filter((u) =>
-                `${u.name} ${u.phone ?? u.email} ${roleLabels[u.role]}`.includes(
+                `${u.name} ${u.phone ?? "شماره ثبت نشده"} ${roleLabels[u.role]}`.includes(
                   search,
                 ),
               )}
@@ -431,7 +431,7 @@ export function AccessConsole({
                   <div key={u._id} className="glass-option p-3">
                     <p>{u.name}</p>
                     <p className="text-xs text-slate-500" dir="ltr">
-                      {u.phone ?? u.email}
+                      {u.phone ?? "شماره ثبت نشده"}
                     </p>
                   </div>
                 )}
@@ -554,7 +554,7 @@ function AccountRow({
       <div>
         <p className="font-bold">{user.name}</p>
         <p dir="ltr" className="text-xs text-slate-500">
-          {user.phone ?? user.email}
+          {user.phone ?? "شماره ثبت نشده"}
         </p>
       </div>
       <Field title={`نقش ${user.name}`}>

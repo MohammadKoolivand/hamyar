@@ -1,4 +1,9 @@
-import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
+import {
+  createHmac,
+  randomBytes,
+  randomInt,
+  timingSafeEqual,
+} from "node:crypto";
 import type { ClientSession } from "mongodb";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
@@ -6,7 +11,15 @@ import { phoneSchema, normalizePhone } from "../../lib/phone";
 import type { Context } from "../context";
 import type { Row } from "../db";
 import type { SmsProvider } from "../auth/sms";
+export function developmentOtpBypass() {
+  return (
+    process.env.NODE_ENV === "development" &&
+    process.env.AUTH_OTP_DEV_BYPASS === "true"
+  );
+}
+const developmentSecret = randomBytes(32);
 function secret() {
+  if (developmentOtpBypass()) return developmentSecret;
   const key = Buffer.from(process.env.AUTH_OTP_SECRET ?? "", "base64");
   if (key.length !== 32) throw new Error("Configure AUTH_OTP_SECRET");
   return key;
@@ -39,7 +52,8 @@ export function registerPhoneAuth(
     },
     async (r) => {
       const { phone } = z.object({ phone: phoneSchema }).strict().parse(r.body);
-      if (!sms.configured())
+      const bypass = developmentOtpBypass();
+      if (!bypass && !sms.configured())
         ctx.fail(
           503,
           "ارسال کد پیامکی هنوز تنظیم نشده است؛ با پشتیبانی تماس بگیرید.",
@@ -90,13 +104,14 @@ export function registerPhoneAuth(
           challengeId,
           codeHash: digest(challengeId, phone, code),
           state: "sending",
+          developmentBypass: bypass,
           attempts: 0,
           expiresAt: new Date(at.getTime() + 300000),
         },
         { upsert: true },
       );
       try {
-        await sms.sendOtp(phone, code);
+        if (!bypass) await sms.sendOtp(phone, code);
       } catch {
         await ctx.c("otpChallenges").deleteOne({ _id: key, challengeId });
         ctx.fail(503, "ارسال کد انجام نشد؛ کمی بعد دوباره تلاش کنید.");
@@ -116,7 +131,10 @@ export function registerPhoneAuth(
         challengeId,
         expiresIn: 300,
         resendAfter: 60,
-        message: "کد تأیید به شماره واردشده ارسال شد.",
+        developmentBypass: bypass,
+        message: bypass
+          ? "حالت توسعه: پیامک ارسال نمی‌شود؛ هر کد شش‌رقمی پذیرفته می‌شود."
+          : "کد تأیید به شماره واردشده ارسال شد.",
       };
     },
   );
@@ -151,6 +169,7 @@ export function registerPhoneAuth(
       } catch {
         ctx.fail(503, "ورود پیامکی هنوز آماده نیست.");
       }
+      const bypass = developmentOtpBypass();
       const sessionToken = ctx.randomBytes(32).toString("hex");
       const result = await ctx.transaction(async (session) => {
         const query = {
@@ -168,7 +187,9 @@ export function registerPhoneAuth(
             { session, returnDocument: "after" },
           );
         if (!challenge) return null;
+        if (Boolean(challenge.developmentBypass) !== bypass) return null;
         if (
+          !bypass &&
           !timingSafeEqual(
             Buffer.from(challenge.codeHash, "hex"),
             Buffer.from(digest(b.challengeId, b.phone, b.code), "hex"),
@@ -204,8 +225,8 @@ export function registerPhoneAuth(
             name: b.name,
             role: inv ? (inv.role ?? "student") : b.role!,
             phone: b.phone,
-            phoneVerified: true,
-            phoneVerifiedAt: ctx.now(),
+            phoneVerified: !bypass,
+            ...(!bypass ? { phoneVerifiedAt: ctx.now() } : {}),
             createdAt: ctx.now(),
           };
           await ctx.c("users").insertOne(user, { session });
@@ -215,7 +236,9 @@ export function registerPhoneAuth(
         await ctx.c("users").updateOne(
           { _id: user._id, disabledAt: { $exists: false } },
           {
-            $set: { phoneVerified: true, phoneVerifiedAt: ctx.now() },
+            $set: bypass
+              ? { lastDevelopmentLoginAt: ctx.now() }
+              : { phoneVerified: true, phoneVerifiedAt: ctx.now() },
             $inc: { authRevision: 1 },
           },
           { session },
@@ -249,13 +272,16 @@ export function registerPhoneAuth(
           {
             _id: ctx.id(),
             actorId: user._id,
-            action: "otp_login",
+            action: bypass ? "development_otp_login" : "otp_login",
             resourceId: user._id,
             createdAt: ctx.now(),
           },
           { session },
         );
-        return ctx.safe({ ...user, phoneVerified: true });
+        return ctx.safe({
+          ...user,
+          phoneVerified: bypass ? Boolean(user.phoneVerified) : true,
+        });
       });
       if (!result)
         ctx.fail(400, "کد نامعتبر، منقضی یا بیش از حد امتحان شده است.");

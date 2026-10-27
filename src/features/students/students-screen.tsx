@@ -111,7 +111,7 @@ export function StudentsScreen({
             <div key={s._id} className="grid gap-3 glass-option p-[18px]">
               <h3 className="text-base font-bold">{s.name}</h3>
               <small dir="ltr" className="text-xs leading-loose text-slate-500">
-                {s.phone ?? s.email}
+                {s.phone ?? "شماره ثبت نشده"}
               </small>
               <ParentInvitation studentId={s._id} />
             </div>

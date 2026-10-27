@@ -85,7 +85,7 @@ export function ParentInvitation({ studentId }: { studentId: string }) {
           <div key={p._id} className="mt-3 grid gap-2 rounded-xl border p-3">
             <p>{p.name}</p>
             <p dir="ltr" className="break-all text-xs">
-              {p.phone ?? p.email}
+              {p.phone ?? "شماره ثبت نشده"}
             </p>
             <Button
               variant="outline"
