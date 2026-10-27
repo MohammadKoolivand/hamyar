@@ -1,3 +1,4 @@
+import { useFixtureSession } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 import { fixture } from "../helpers/fixture";
 test.use({ serviceWorkers: "block" });
@@ -40,12 +41,7 @@ test("teacher selects 20 hard questions and edits filtered difficulty", async ({
         body: response.rawPayload,
       });
     });
-    await page.goto("/");
-    await page
-      .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-      .fill("t@test.dev");
-    await page.getByLabel("رمز عبور").fill("StrongPass123!");
-    await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+    await useFixtureSession(page, f.teacher);
     await expect(
       page.getByRole("button", { name: "خروج", exact: true }),
     ).toBeVisible();
