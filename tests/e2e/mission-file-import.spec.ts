@@ -1,3 +1,4 @@
+import { registerSyntheticUser } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 import sharp from "sharp";
 
@@ -5,15 +6,7 @@ test("mission keeps its draft while image OCR is reviewed and approved questions
   page,
 }) => {
   test.setTimeout(120000);
-  await page.goto("/homeworks");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم ورود فایل");
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(`scan-mission-${Date.now()}@test.dev`);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /^ورود به هدهده$/ }).click();
+  await registerSyntheticUser(page, "معلم ورود فایل");
   await expect(
     page.getByRole("button", { name: "خروج", exact: true }),
   ).toBeVisible();
