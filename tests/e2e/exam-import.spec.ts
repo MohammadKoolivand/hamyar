@@ -1,17 +1,10 @@
+import { registerSyntheticUser } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 import { textPdf } from "../helpers/pdf";
 test("PDF exam upload persists, extracts real text, saves corrections and approves/rejects into the actual bank", async ({
   page,
 }, testInfo) => {
-  await page.goto("/exam-import");
-  await page.getByRole("button", { name: "ثبت‌نام معلم", exact: true }).click();
-  await page.getByLabel("نام و نام خانوادگی").fill("معلم ورود آزمون");
-  await page
-    .getByLabel("ایمیل یا شماره موبایل", { exact: true })
-    .fill(`exam-${Date.now()}@test.dev`);
-  await page.getByLabel("رمز عبور").fill("StrongPass123!");
-  await page.getByRole("button", { name: "ساخت حساب", exact: true }).click();
-  await page.getByRole("button", { name: /ورود به هدهده/ }).click();
+  await registerSyntheticUser(page, "معلم ورود آزمون");
   await page.getByRole("button", { name: "ورود آزمون", exact: true }).click();
   await page
     .getByText("عنوان دلخواه و زبان اسکن (اختیاری)", { exact: true })
