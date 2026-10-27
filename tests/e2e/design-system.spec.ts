@@ -4,13 +4,13 @@ test("reference-inspired luminous glass identity is consistent on login and mobi
   page,
 }, testInfo) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" })).toBeVisible();
   await expect(page.locator(".hy-brand")).toBeVisible();
   const mark = page.locator(".hy-brand img");
   await expect(mark).toHaveAttribute("src", /icon\.svg/);
   const icon = await page.request.get("/icon.svg");
   expect(icon.ok()).toBe(true);
-  expect(await icon.text()).toContain('aria-label="هدهده"');
+  expect(await icon.text()).toContain('aria-label="هدهد"');
   expect(await icon.text()).toContain('<path fill="#171717"');
 
   const visual = await page.evaluate(() => {
@@ -42,7 +42,7 @@ test("reference-inspired luminous glass identity is consistent on login and mobi
 
   await page.setViewportSize({ width: 360, height: 780 });
   await page.reload();
-  await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" })).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -55,7 +55,7 @@ test("reference-inspired luminous glass identity is consistent on login and mobi
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   const duration = await page
-    .getByRole("button", { name: /^ورود به هدهده$/ })
+    .getByRole("button", { name: "دریافت کد تأیید", exact: true })
     .evaluate((el) => getComputedStyle(el).transitionDuration);
   expect(duration).toMatch(/^(0s|0ms)(,\s*(0s|0ms))*$/);
 });
