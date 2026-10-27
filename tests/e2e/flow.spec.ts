@@ -276,7 +276,7 @@ test("PWA shell works offline without caching private API data", async ({
   expect(urls.some((u) => new URL(u).pathname.startsWith("/api/"))).toBe(false);
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole("heading", { name: "خوش آمدید" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" })).toBeVisible();
   await context.setOffline(false);
 });
 
@@ -303,7 +303,7 @@ test("licensed local fonts load and layout uses Tailwind utilities", async ({
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("heading", { name: "خوش آمدید" }).waitFor();
+  await page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" }).waitFor();
   const fonts = await page.evaluate(async () => {
     const style = getComputedStyle(document.documentElement);
     const latin = style.getPropertyValue("--font-latin");
@@ -604,7 +604,6 @@ test("student requests a course, teacher approves, and leaving keeps history", a
   page,
   browser,
 }, testInfo) => {
-  const unique = Date.now() + "-" + Math.floor(Math.random() * 10000);
   const teacherEmail = syntheticPhone();
   const studentEmail = syntheticPhone();
   await registerSyntheticUser(page, "معلم دوره", "teacher", teacherEmail);
