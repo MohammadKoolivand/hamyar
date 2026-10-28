@@ -43,6 +43,16 @@ export async function loginSyntheticUser(
   await expect(page.getByRole("button", { name: "خروج", exact: true }))
     .toBeVisible({ timeout: 15000 });
 }
+// Logout completes in the browser only after /api/auth/logout resolves and the
+// app replaces the document with "/". Waiting for the replacement document's
+// phone form makes that redirect observable, so callers never race it with a
+// page.goto() (which Playwright reports as "navigation interrupted").
+export async function logoutSyntheticUser(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "خروج", exact: true }).click();
+  await expect(page.getByLabel("شماره موبایل", { exact: true }))
+    .toBeVisible({ timeout: 15000 });
+  await page.waitForLoadState("load");
+}
 export async function useFixtureSession(page: Page, cookie: string) {
   const [name, ...value] = cookie.split("=");
   if (name !== "session" || !value.length) throw new Error("Invalid test fixture cookie");

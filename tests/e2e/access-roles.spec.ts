@@ -1,4 +1,4 @@
-import { useFixtureSession } from "./auth-helpers";
+import { logoutSyntheticUser, useFixtureSession } from "./auth-helpers";
 import { test, expect } from "@playwright/test";
 import { fixture } from "../helpers/fixture";
 import { createContext } from "../../src/server/context";
@@ -84,7 +84,11 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       path: testInfo.outputPath("superadmin.png"),
       fullPage: true,
     });
-    await page.getByRole("button", { name: "خروج", exact: true }).click();
+    await logoutSyntheticUser(page);
+    // The next session must start from a genuinely signed-out browser.
+    expect(
+      await page.evaluate(async () => (await fetch("/api/auth/me")).status),
+    ).toBe(401);
     const secretaryOtp = await f.post("/api/auth/otp/request", { phone: "09120000177" });
     const secretaryLogin = await f.request("/api/auth/otp/verify", {
       phone: "09120000177", challengeId: secretaryOtp.challengeId, code: smsCode,
@@ -133,7 +137,7 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       path: testInfo.outputPath("secretary-mobile.png"),
       fullPage: true,
     });
-    await page.getByRole("button", { name: "خروج", exact: true }).click();
+    await logoutSyntheticUser(page);
     const studentOtp = await f.post("/api/auth/otp/request", { phone: "09123456789" });
     const studentLogin = await f.request("/api/auth/otp/verify", {
       phone: "09123456789", challengeId: studentOtp.challengeId, code: smsCode,
@@ -150,6 +154,8 @@ test("super admin creates scoped secretary and secretary uses a separate operati
       ),
     ).toBe("09123456789");
   } finally {
+    // Let in-flight route handlers finish before the Fastify app is closed.
+    await page.unrouteAll({ behavior: "wait" });
     await f.close();
   }
 });
