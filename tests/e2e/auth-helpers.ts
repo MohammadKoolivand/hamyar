@@ -28,12 +28,20 @@ export async function loginSyntheticUser(
   phone: string,
   password = fixturePassword,
 ): Promise<void> {
+  // After logout the application performs window.location.replace("/").
+  // Do not race that navigation with the next authenticated page.goto().
+  if (page.url() !== "about:blank") {
+    await expect(page.getByLabel("شماره موبایل", { exact: true }))
+      .toBeVisible({ timeout: 15000 });
+    await page.waitForLoadState("load");
+  }
   const response = await page.request.post("/api/auth/login", {
     data: { email: phone, password },
   });
   expect(response.status(), await response.text()).toBe(200);
-  await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expect(page.getByRole("button", { name: "خروج", exact: true })).toBeVisible({ timeout: 15000 });
+  await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("button", { name: "خروج", exact: true }))
+    .toBeVisible({ timeout: 15000 });
 }
 export async function useFixtureSession(page: Page, cookie: string) {
   const [name, ...value] = cookie.split("=");
@@ -42,6 +50,8 @@ export async function useFixtureSession(page: Page, cookie: string) {
   await page.context().addCookies([{
     name, value: value.join("="), url: new URL(baseURL).origin,
     httpOnly: true, sameSite: "Strict",
+    // Match the seven-day persistent session set by the actual login endpoint.
+    expires: Math.floor(Date.now() / 1000) + 7 * 86400,
   }]);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("button", { name: "خروج", exact: true })).toBeVisible({ timeout: 15000 });
