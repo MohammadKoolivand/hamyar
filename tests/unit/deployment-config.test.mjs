@@ -83,7 +83,8 @@ test("OPS-019: actual rollback function restores previous code/services and neve
   const source = readFileSync("ops/deploy-staging.sh", "utf8");
   const body = source.match(/rollback\(\) \{([\s\S]*?)\n\}/)?.[1];
   assert.ok(body);
-  const script = `previous=/fixture/previous\nmail_active=true\n` +
+  const script =
+    `previous=/fixture/previous\nmail_active=true\n` +
     `systemctl(){ echo "systemctl $*"; }\nln(){ echo "ln $*"; }\nmv(){ echo "mv $*"; }\nmongorestore(){ echo "FORBIDDEN_DATABASE_RESTORE"; return 9; }\n` +
     `rollback(){${body}\n}\nrollback\n`;
   const r = spawnSync("bash", ["-c", script], { encoding: "utf8" });
@@ -93,4 +94,28 @@ test("OPS-019: actual rollback function restores previous code/services and neve
   assert.match(r.stdout, /systemctl start hodhod-mail-worker/);
   assert.ok(!r.stdout.includes("FORBIDDEN_DATABASE_RESTORE"));
   assert.match(r.stderr, /Database was not rolled back/);
+});
+
+test("token SMS preflight validates vendor endpoint and OTP key without leaking token", () => {
+  const endpoint =
+    "https://console.melipayamak.com/api/send/shared/private-token";
+  const configured = {
+    ...base,
+    MELIPAYAMAK_SHARED_ENDPOINT: endpoint,
+    MELIPAYAMAK_OTP_BODY_ID: "573237",
+    AUTH_OTP_SECRET: Buffer.alloc(32, 3).toString("base64"),
+  };
+  assert.deepEqual(deploymentChecks(configured).errors, []);
+  assert.deepEqual(deploymentChecks(configured).warnings, []);
+  assert.ok(
+    deploymentChecks({ ...configured, AUTH_OTP_SECRET: "" }).errors.includes(
+      "OTP_SECRET_INVALID",
+    ),
+  );
+  const invalid = deploymentChecks({
+    ...configured,
+    MELIPAYAMAK_SHARED_ENDPOINT: "https://evil.test/private-token",
+  });
+  assert.ok(invalid.errors.includes("SMS_SHARED_ENDPOINT_INVALID"));
+  assert.ok(!JSON.stringify(invalid).includes("private-token"));
 });

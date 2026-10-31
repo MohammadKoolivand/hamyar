@@ -42,9 +42,27 @@ export function deploymentChecks(env, role = "web") {
   if (role === "web") {
     if (!["mock", "ollama"].includes(env.AI_PROVIDER ?? "mock"))
       errors.push("AI_PROVIDER_INVALID");
+    let sharedSms = false;
+    if (env.MELIPAYAMAK_SHARED_ENDPOINT) {
+      try {
+        const url = new URL(env.MELIPAYAMAK_SHARED_ENDPOINT);
+        sharedSms =
+          url.origin === "https://console.melipayamak.com" &&
+          /^\/api\/send\/shared\/[A-Za-z0-9_-]+$/.test(url.pathname) &&
+          !url.username &&
+          !url.password &&
+          !url.search &&
+          !url.hash;
+      } catch {
+        /* Report only a code; the endpoint contains a secret. */
+      }
+      if (!sharedSms) errors.push("SMS_SHARED_ENDPOINT_INVALID");
+    }
     const sms =
-      env.MELIPAYAMAK_USERNAME &&
-      env.MELIPAYAMAK_PASSWORD &&
+      (sharedSms ||
+        (!env.MELIPAYAMAK_SHARED_ENDPOINT &&
+          env.MELIPAYAMAK_USERNAME &&
+          env.MELIPAYAMAK_PASSWORD)) &&
       /^\d+$/.test(env.MELIPAYAMAK_OTP_BODY_ID ?? "");
     if (!sms) warnings.push("REAL_SMS_NOT_CONFIGURED");
     else if (!key32(env.AUTH_OTP_SECRET)) errors.push("OTP_SECRET_INVALID");
