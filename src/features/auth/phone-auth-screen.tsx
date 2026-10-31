@@ -13,6 +13,7 @@ export function PhoneAuthScreen() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("student");
   const [register, setRegister] = useState(false);
+  const [completeProfile, setCompleteProfile] = useState(false);
   const [invite, setInvite] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -42,6 +43,7 @@ export function PhoneAuthScreen() {
     }>("/auth/otp/request", { phone: normalizePhone(phone) });
     setDevelopmentBypass(result.developmentBypass === true);
     setChallenge(result.challengeId);
+    setCompleteProfile(false);
     setCode("");
     setRemaining(result.resendAfter);
     setNotice(result.message);
@@ -53,14 +55,20 @@ export function PhoneAuthScreen() {
       </div>
       <section className="glass-panel grid gap-5 p-6 sm:p-8">
         <h1 className="text-xl font-bold">
-          {challenge ? "کد تأیید را وارد کنید" : "ورود یا ثبت‌نام در هدهد"}
+          {completeProfile
+            ? "تکمیل حساب کاربری"
+            : challenge
+              ? "کد تأیید را وارد کنید"
+              : "ورود یا ثبت‌نام در هدهد"}
         </h1>
         <p className="text-sm leading-7 text-slate-500">
-          {challenge
-            ? developmentBypass
-              ? "حالت توسعه: پیامکی ارسال نشده؛ یک کد شش‌رقمی دلخواه وارد کنید."
-              : `کد پیامکی برای ${normalizePhone(phone)} ارسال شده و پنج دقیقه معتبر است.`
-            : "با شماره موبایل خودتان وارد شوید؛ نیازی به رمز عبور نیست."}
+          {completeProfile
+            ? "شماره موبایل تأیید شد؛ نام و نقش خود را انتخاب کنید. نیازی به کد دوباره نیست."
+            : challenge
+              ? developmentBypass
+                ? "حالت توسعه: پیامکی ارسال نشده؛ یک کد شش‌رقمی دلخواه وارد کنید."
+                : `کد پیامکی برای ${normalizePhone(phone)} ارسال شده و پنج دقیقه معتبر است.`
+              : "با شماره موبایل خودتان وارد شوید؛ نیازی به رمز عبور نیست."}
         </p>
         <form
           className="grid gap-4"
@@ -89,8 +97,14 @@ export function PhoneAuthScreen() {
               window.location.replace("/dashboard");
             } catch (err) {
               const message = (err as Error).message;
-              setError(message);
-              if (message.includes("نام و نقش")) setRegister(true);
+              if (message.includes("نام و نقش")) {
+                setRegister(true);
+                setCompleteProfile(true);
+              } else {
+                setError(message);
+                if (completeProfile && message.includes("کد نامعتبر"))
+                  setCompleteProfile(false);
+              }
             } finally {
               setBusy(false);
             }
@@ -111,7 +125,7 @@ export function PhoneAuthScreen() {
                 onChange={(e) => setPhone(e.target.value)}
               />
             </Field>
-          ) : (
+          ) : !completeProfile ? (
             <Field title="کد یک‌بارمصرف">
               <input
                 className="glass-field min-h-12 w-full p-3 text-center text-xl tracking-[0.4em]"
@@ -131,7 +145,7 @@ export function PhoneAuthScreen() {
                 }
               />
             </Field>
-          )}
+          ) : null}
           {register && (
             <>
               <Field title="نام و نام خانوادگی">
@@ -167,9 +181,11 @@ export function PhoneAuthScreen() {
           <Button disabled={busy}>
             {busy
               ? "در حال بررسی…"
-              : challenge
-                ? "تأیید کد و ورود"
-                : "دریافت کد تأیید"}
+              : completeProfile
+                ? "تکمیل ثبت‌نام و ورود"
+                : challenge
+                  ? "تأیید کد و ورود"
+                  : "دریافت کد تأیید"}
           </Button>
         </form>
         {error && (
@@ -198,6 +214,8 @@ export function PhoneAuthScreen() {
               disabled={busy}
               onClick={() => {
                 setChallenge("");
+                setCompleteProfile(false);
+                setCode("");
                 setError("");
                 setNotice("");
               }}
@@ -206,6 +224,7 @@ export function PhoneAuthScreen() {
             </button>
             <button
               type="button"
+              hidden={completeProfile}
               disabled={busy || remaining > 0}
               onClick={async () => {
                 setBusy(true);

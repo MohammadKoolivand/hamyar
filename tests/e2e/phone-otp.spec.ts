@@ -67,7 +67,6 @@ test("public phone OTP signup verifies mobile and enters real student dashboard 
   }
 });
 
-
 test("public teacher self-registration creates a dedicated teacher session and workspace", async ({
   page,
 }) => {
@@ -95,18 +94,83 @@ test("public teacher self-registration creates a dedicated teacher session and w
     await page.getByLabel("کد یک‌بارمصرف").fill(code);
     await page.getByRole("button", { name: "تأیید کد و ورود" }).click();
     await expect(page).toHaveURL(/\/dashboard$/);
-    await expect(page.getByText("فضای کار معلم", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "دانش‌آموزان", exact: true })).toBeVisible();
-    const me = await page.evaluate(async () => (await fetch("/api/auth/me")).json());
+    await expect(
+      page.getByText("فضای کار معلم", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "دانش‌آموزان", exact: true }),
+    ).toBeVisible();
+    const me = await page.evaluate(async () =>
+      (await fetch("/api/auth/me")).json(),
+    );
     expect(me.role).toBe("teacher");
     expect(me.name).toBe("معلم آزمایشی مستقل");
     expect(me.phone).toBe("09120000088");
     expect(me.phoneVerified).toBe(true);
-    expect(await page.evaluate(async () => (await fetch("/api/students")).status)).toBe(200);
+    expect(
+      await page.evaluate(async () => (await fetch("/api/students")).status),
+    ).toBe(200);
     await page.reload();
-    await expect(page.getByText("فضای کار معلم", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("فضای کار معلم", { exact: true }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "خروج", exact: true }).click();
-    await expect(page.getByLabel("شماره موبایل", { exact: true })).toBeVisible();
+    await expect(
+      page.getByLabel("شماره موبایل", { exact: true }),
+    ).toBeVisible();
+  } finally {
+    await page.unrouteAll({ behavior: "wait" });
+    await f.close();
+  }
+});
+
+test("new phone completes profile after one OTP without asking for a second code", async ({
+  page,
+}) => {
+  process.env.AUTH_OTP_SECRET = Buffer.alloc(32, 19).toString("base64");
+  let code = "";
+  let sends = 0;
+  const f = await fixture({
+    sms: {
+      name: "controlled_sms",
+      configured: () => true,
+      sendOtp: async (_phone, value) => {
+        code = value;
+        sends++;
+      },
+    },
+  });
+  try {
+    await routeBackend(page, f.app);
+    await page.goto("/");
+    await page.getByLabel("شماره موبایل", { exact: true }).fill("09120000123");
+    await page
+      .getByRole("button", { name: "دریافت کد تأیید", exact: true })
+      .click();
+    await expect(page.getByLabel("کد یک‌بارمصرف")).toBeVisible();
+    await page.getByLabel("کد یک‌بارمصرف").fill(code);
+    await page
+      .getByRole("button", { name: "تأیید کد و ورود", exact: true })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "تکمیل حساب کاربری" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("کد یک‌بارمصرف")).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: /ارسال دوباره/ }),
+    ).toBeHidden();
+    await page.getByLabel("نام و نام خانوادگی").fill("کاربر تکمیل پروفایل");
+    await page.getByLabel("نقش شما").selectOption("teacher");
+    await page
+      .getByRole("button", { name: "تکمیل ثبت‌نام و ورود", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    expect(sends).toBe(1);
+    const me = await page.evaluate(async () =>
+      (await fetch("/api/auth/me")).json(),
+    );
+    expect(me.role).toBe("teacher");
+    expect(me.phoneVerified).toBe(true);
   } finally {
     await page.unrouteAll({ behavior: "wait" });
     await f.close();
