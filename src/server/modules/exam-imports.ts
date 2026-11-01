@@ -26,6 +26,28 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     const { eid } = params.parse(r.params);
     return { u, e: await owned("examImports", eid, u._id) };
   };
+  // A source transcription import used SHA256 item identities. Keep those
+  // existing drafts editable without accepting arbitrary non-UUID identifiers.
+  const itemIdentifier = async (
+    raw: unknown,
+    examId: string,
+    ownerId: string,
+  ) => {
+    const uuid = z.uuid().safeParse(raw);
+    if (uuid.success) return uuid.data;
+    const legacy = z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .parse(raw);
+    const item = await c("examImportItems").findOne({
+      _id: legacy,
+      examId,
+      ownerId,
+      maintenanceLatexRevision: 2,
+    });
+    if (!item) fail(404, "پیش‌نویس یافت نشد");
+    return legacy;
+  };
   app.get("/api/exam-imports", async (r) => {
     const u = await user(r, "teacher");
     return c("examImports")
@@ -79,10 +101,11 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
   });
   app.post("/api/exam-imports/:eid/items/:iid/source-image", async (r) => {
     const { u, e } = await getExam(r);
-    const iid = z
-      .string()
-      .uuid()
-      .parse((r.params as { iid: string }).iid);
+    const iid = await itemIdentifier(
+      (r.params as { iid: string }).iid,
+      e._id,
+      u._id,
+    );
     const { page } = z
       .object({ page: z.number().int().min(1).max(100) })
       .strict()
@@ -477,10 +500,11 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
   });
   app.post("/api/exam-imports/:eid/items/:iid/review", async (r) => {
     const { u, e } = await getExam(r),
-      iid = z
-        .string()
-        .uuid()
-        .parse((r.params as { iid: string }).iid);
+      iid = await itemIdentifier(
+        (r.params as { iid: string }).iid,
+        e._id,
+        u._id,
+      );
     const b = z
       .discriminatedUnion("action", [
         z.object({ action: z.literal("defer") }),

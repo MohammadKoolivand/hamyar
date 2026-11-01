@@ -252,3 +252,105 @@ test("textless PDF stays review-only, manual fallback works and ordinary JSON re
     await f.close();
   }
 });
+
+test("source-transcribed legacy draft identifiers remain editable and approvable only in their owning exam", async () => {
+  const f = await fixture();
+  try {
+    const exam = await f.post(
+      "/api/exam-imports",
+      {
+        title: "Legacy source draft",
+        subject: "ریاضی",
+        year: 1405,
+        source: {
+          family: "konkur",
+          group: "mathematics",
+          location: "domestic",
+        },
+      },
+      f.teacher,
+    );
+    const legacy = createHash("sha256")
+      .update(exam._id + ":source-question")
+      .digest("hex");
+    const owner = (
+      await f.request("/api/auth/me", undefined, f.teacher)
+    ).json();
+    const question = {
+      statement: "مقدار $\\sqrt{۴}$ کدام است؟",
+      type: "choice",
+      options: ["$۱$", "$۲$"],
+      reference: "$۲$",
+      hints: [],
+      classification: "free",
+    };
+    await f.c("examImportItems").insertOne({
+      _id: legacy,
+      examId: exam._id,
+      ownerId: owner._id,
+      state: "pending",
+      maintenanceLatexRevision: 2,
+      question,
+    });
+    const path = `/api/exam-imports/${exam._id}/items/${legacy}/review`;
+    await f.post(
+      path,
+      { action: "save", originalNumber: 1, question },
+      f.teacher,
+    );
+    assert.equal(
+      (await f.c("examImportItems").findOne({ _id: legacy }))!.originalNumber,
+      1,
+    );
+    const other = await f.post(
+      "/api/exam-imports",
+      {
+        title: "Other exam",
+        subject: "ریاضی",
+        source: {
+          family: "konkur",
+          group: "mathematics",
+          location: "domestic",
+        },
+      },
+      f.teacher,
+    );
+    assert.equal(
+      (
+        await f.request(
+          `/api/exam-imports/${other._id}/items/${legacy}/review`,
+          { action: "save", question },
+          f.teacher,
+        )
+      ).statusCode,
+      404,
+    );
+    assert.equal(
+      (await f.request(path, { action: "save", question }, f.student))
+        .statusCode,
+      403,
+    );
+    const unknown = "f".repeat(64);
+    assert.equal(
+      (
+        await f.request(
+          `/api/exam-imports/${exam._id}/items/${unknown}/review`,
+          { action: "save", question },
+          f.teacher,
+        )
+      ).statusCode,
+      404,
+    );
+    await f.post(
+      path,
+      { action: "approve", originalNumber: 1, confirmed: true, question },
+      f.teacher,
+    );
+    assert.equal(
+      (await f.c("examImportItems").findOne({ _id: legacy }))!.state,
+      "approved",
+    );
+  } finally {
+    await f.close();
+  }
+});
