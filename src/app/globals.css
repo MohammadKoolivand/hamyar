@@ -246,7 +246,7 @@
 }
 
 .hy-question-text math mi {
-  font-family: "Times New Roman", "STIX Two Math", serif;
+  font-family: "Times New Roman", var(--font-question-math), "STIX Two Math", serif;
   font-weight: 700;
   font-style: normal;
   text-transform: none;
