@@ -39,7 +39,7 @@ export function MathText({ text }: { text: string }) {
     /(\$\$[\s\S]{1,1000}?\$\$|\$[^$\n]{1,1000}\$|\\\([\s\S]{1,1000}?\\\))/g,
   );
   return (
-    <>
+    <span className="hy-question-text">
       {pieces.map((s, i) =>
         s.startsWith("$$") ? (
           <MathFormula key={i} latex={s.slice(2, -2)} />
@@ -51,7 +51,7 @@ export function MathText({ text }: { text: string }) {
           <span key={i}>{s}</span>
         ),
       )}
-    </>
+    </span>
   );
 }
 const colors = ["#233B8F", "#12867F", "#AE7014", "#983CA7"];

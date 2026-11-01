@@ -14,6 +14,22 @@ const persian = localFont({
   display: "swap",
   adjustFontFallback: false,
 });
+const questionText = localFont({
+  src: "../assets/fonts/AmiriQuestion-Bold.ttf",
+  variable: "--font-question-text",
+  preload: false,
+  weight: "700",
+  display: "swap",
+  adjustFontFallback: false,
+});
+const questionMath = localFont({
+  src: "../assets/fonts/STIXTwoMath-Regular.ttf",
+  variable: "--font-question-math",
+  preload: false,
+  weight: "400",
+  display: "swap",
+  adjustFontFallback: false,
+});
 export const metadata: Metadata = {
   title: "هدهد | راهنمای هوشمند یادگیری",
   description:
@@ -30,7 +46,7 @@ export default function RootLayout({
     <html
       lang="fa"
       dir="rtl"
-      className={`${poppins.variable} ${persian.variable}`}
+      className={`${poppins.variable} ${persian.variable} ${questionText.variable} ${questionMath.variable}`}
     >
       <body className="hamyar-ambient min-h-screen text-[#17305E] [font-family:var(--font-persian),var(--font-latin),Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
         {children}

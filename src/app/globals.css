@@ -228,3 +228,19 @@
   .glass-hero {border-radius:22px;}
   .glass-panel {border-radius:21px;}
 }
+
+/* Printed-question typography: shared by review, bank and practice. */
+.hy-question-text {
+  font-family: var(--font-question-text), "Amiri", "Times New Roman", serif;
+  font-size: 1.15em;
+  font-weight: 700;
+  line-height: 1.9;
+  color: #111827;
+}
+.hy-question-text math {
+  font-family: var(--font-question-math), "STIX Two Math", math;
+  font-size: 1em;
+  font-weight: 400;
+  math-style: normal;
+  color: inherit;
+}
