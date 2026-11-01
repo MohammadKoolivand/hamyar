@@ -92,6 +92,19 @@ test("PDF exam upload persists, extracts real text, saves corrections and approv
   await options.press("Enter");
   await options.pressSequentially("$۰.۴$");
   await expect(options).toHaveValue("$۰.۲$\n$۰.۴$");
+  const correctOption = page.getByLabel("پاسخ مرجع سؤال 1", { exact: true });
+  await correctOption.selectOption("$۰.۴$");
+  await expect(correctOption).toHaveValue("$۰.۴$");
+  await page
+    .getByRole("checkbox", { name: /متن، پاسخ، تقسیم سؤال/ })
+    .first()
+    .check();
+  await expect(
+    page.getByRole("button", {
+      name: "تأیید و ورود سؤال ۱ به بانک",
+      exact: true,
+    }),
+  ).toBeEnabled();
   await page
     .getByLabel("روش پاسخ سؤال 1", { exact: true })
     .selectOption("numeric");
