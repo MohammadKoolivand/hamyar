@@ -231,7 +231,7 @@
 
 /* Printed-question typography: shared by review, bank and practice. */
 .hy-question-text {
-  font-family: var(--font-question-text), "Amiri", "Times New Roman", serif;
+  font-family: var(--font-question-text), "B Nazanin", "Times New Roman", serif;
   font-size: 1.15em;
   font-weight: 700;
   line-height: 1.9;
@@ -243,4 +243,15 @@
   font-weight: 400;
   math-style: normal;
   color: inherit;
+}
+
+.hy-question-text math mi {
+  font-family: "Times New Roman", "STIX Two Math", serif;
+  font-weight: 700;
+  font-style: normal;
+  text-transform: none;
+}
+.hy-question-text math mn {
+  font-family: var(--font-question-text), "B Nazanin", serif;
+  font-weight: 700;
 }

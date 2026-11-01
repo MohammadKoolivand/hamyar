@@ -15,7 +15,7 @@ const persian = localFont({
   adjustFontFallback: false,
 });
 const questionText = localFont({
-  src: "../assets/fonts/AmiriQuestion-Bold.ttf",
+  src: "../assets/fonts/BNazanin-Bold.ttf",
   variable: "--font-question-text",
   preload: false,
   weight: "700",

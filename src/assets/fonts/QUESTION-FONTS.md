@@ -1,6 +1,8 @@
-Question typography uses locally bundled fonts, so rendering does not require a third-party font service.
+Question typography uses locally bundled text/math fonts; it does not request a third-party font service at runtime.
 
-- `AmiriQuestion-Bold.ttf`: original `Amiri-Bold.ttf` from https://github.com/google/fonts/tree/main/ofl/amiri . License and copyright: `Amiri-OFL.txt`.
-- `STIXTwoMath-Regular.ttf`: https://github.com/google/fonts/tree/main/ofl/stixtwomath . License and copyright: `STIXTwoMath-OFL.txt`.
+- `BNazanin-Bold.ttf`: B Nazanin Bold, copyright (c) 2000 Borna Rayaneh, version 2.01, embedding flags 0. Full font retrieved from https://static.wfonts.com/data/2016/06/16/b-nazanin/BNaznnBd.ttf . The original exam PDF name table identifies this face for Persian question text and mathematical numerals. The embedded PDF font is a subset and cannot cover the entire question bank.
+- Latin mathematical identifiers use local Times New Roman Bold where available, matching the PDF's named face, with STIX fallback on devices without that font.
+- `STIXTwoMath-Regular.ttf`: https://github.com/google/fonts/tree/main/ofl/stixtwomath . Copyright/license: `STIXTwoMath-OFL.txt`. Provides native MathML geometry and missing operators.
+- `AmiriQuestion-Bold.ttf`: previous unused substitute from https://github.com/google/fonts/tree/main/ofl/amiri . Copyright/license: `Amiri-OFL.txt`.
 
-These are print-style substitutes. They are not claimed to be the unidentified embedded fonts in the exam PDF. The general application UI retains its existing font. Question fonts are not preloaded on pages that do not display questions.
+PDF operators also name Symbol and MT Extra. Native MathML is retained for accessible fractions, roots and positioning; exact pixel-for-pixel reproduction of the PDF's equation layout is not claimed. The application UI retains its existing font. Question fonts are not preloaded on pages without questions.
