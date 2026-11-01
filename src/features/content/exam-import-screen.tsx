@@ -830,15 +830,28 @@ function ReviewItem({
     [originalNumber, setOriginalNumber] = useState(
       item.originalNumber ? String(item.originalNumber) : "",
     );
-  const valid =
-    q.statement.trim().length >= 3 &&
-    !!q.reference.trim() &&
-    (q.classification !== "topic" || !!q.topicId) &&
-    (q.type !== "choice" ||
-      (q.options.length >= 2 &&
-        q.options.every((option) => option.trim().length > 0) &&
-        q.options.includes(q.reference))) &&
-    questionVisualsSchema.safeParse(q.visuals ?? []).success;
+  const reviewErrors: string[] = [];
+  if (q.statement.trim().length < 3)
+    reviewErrors.push("صورت سؤال را کامل کنید.");
+  if (!q.reference.trim()) reviewErrors.push("پاسخ مرجع را وارد کنید.");
+  if (q.classification === "topic" && !q.topicId)
+    reviewErrors.push("مبحث درسی را انتخاب کنید یا اتصال به مبحث را بردارید.");
+  if (q.type === "choice") {
+    if (q.options.length < 2 || q.options.some((option) => !option.trim()))
+      reviewErrors.push(
+        "حداقل دو گزینه بنویسید؛ هر خط یک گزینه و بدون خط خالی.",
+      );
+    if (q.reference.trim() && !q.options.includes(q.reference))
+      reviewErrors.push(
+        "پاسخ مرجع باید دقیقاً متن یکی از گزینه‌ها باشد، نه شمارهٔ گزینه.",
+      );
+  }
+  const visualValidation = questionVisualsSchema.safeParse(q.visuals ?? []);
+  if (!visualValidation.success)
+    reviewErrors.push(
+      "تصویر یا شکل سؤال نامعتبر است؛ در بخش اصلاح شکل، آن را اصلاح یا حذف کنید.",
+    );
+  const valid = reviewErrors.length === 0;
   if (item.state !== "pending")
     return (
       <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
@@ -994,16 +1007,38 @@ function ReviewItem({
             </Field>
           )}
           <Field title={`پاسخ مرجع سؤال ${index + 1}`}>
-            <textarea
-              required
-              maxLength={2000}
-              className={`${style} min-h-20`}
-              value={q.reference}
-              onChange={(e) => {
-                setQ({ ...q, reference: e.target.value });
-                setConfirmed(false);
-              }}
-            />
+            {q.type === "choice" ? (
+              <select
+                required
+                className={style}
+                value={q.options.includes(q.reference) ? q.reference : ""}
+                onChange={(e) => {
+                  setQ({ ...q, reference: e.target.value });
+                  setConfirmed(false);
+                }}
+              >
+                <option value="">گزینهٔ صحیح را انتخاب کنید</option>
+                {q.options.map(
+                  (option, optionIndex) =>
+                    option.trim() && (
+                      <option key={optionIndex} value={option}>
+                        گزینهٔ {fa(optionIndex + 1)}
+                      </option>
+                    ),
+                )}
+              </select>
+            ) : (
+              <textarea
+                required
+                maxLength={2000}
+                className={`${style} min-h-20`}
+                value={q.reference}
+                onChange={(e) => {
+                  setQ({ ...q, reference: e.target.value });
+                  setConfirmed(false);
+                }}
+              />
+            )}
           </Field>
           <Field title={`درجه سختی سؤال ${index + 1}`}>
             <select
@@ -1166,6 +1201,24 @@ function ReviewItem({
           >
             ذخیره اصلاحات سؤال {fa(index + 1)}
           </Button>
+          {reviewErrors.length > 0 && (
+            <div
+              role="status"
+              className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-7 text-amber-900"
+            >
+              <p>برای فعال‌شدن تأیید:</p>
+              <ul className="list-inside list-disc">
+                {reviewErrors.map((error) => (
+                  <li key={error}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {!confirmed && (
+            <p className="text-sm text-slate-600">
+              پس از تکمیل اطلاعات، تیک تطبیق با PDF را بزنید.
+            </p>
+          )}
           <Button disabled={busy || !valid || !confirmed}>
             تأیید و ورود سؤال {fa(index + 1)} به بانک
           </Button>

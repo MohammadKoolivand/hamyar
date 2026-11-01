@@ -1,7 +1,7 @@
 import { useFixtureSession } from "./auth-helpers";
 import { test, expect, type Page } from "@playwright/test";
 import { fixture } from "../helpers/fixture";
-import { routeBackend } from "../helpers/browser-backend";
+import { routeBackend, drainBackendRoutes } from "../helpers/browser-backend";
 test.use({ serviceWorkers: "block" });
 async function login(page: Page, cookie: string) {
   await page.goto("/");
@@ -40,6 +40,7 @@ test("TEACH-003/004/005: teacher dashboard counts real students, publication and
       fullPage: true,
     });
   } finally {
+    await drainBackendRoutes(page);
     await page.unrouteAll({ behavior: "wait" });
     await f.close();
   }
@@ -73,6 +74,7 @@ test("QB-013: incomplete question preserves entered form text when validation fa
       page.getByLabel("پاسخ مرجع خصوصی", { exact: true }),
     ).toHaveValue("not-a-number");
   } finally {
+    await drainBackendRoutes(page);
     await page.unrouteAll({ behavior: "wait" });
     await f.close();
   }
@@ -117,7 +119,9 @@ test("PR-035/EDGE-012: second browser context sees saved response; refresh durin
       }, f.path),
     ).toBe(1);
   } finally {
+    await drainBackendRoutes(page);
     await page.unrouteAll({ behavior: "wait" });
+    await drainBackendRoutes(other);
     await other.unrouteAll({ behavior: "wait" });
     await context.close();
     await f.close();
@@ -148,6 +152,7 @@ test("LINK-004: invitation deep link opens in signed-in student account and bind
     ).toBeVisible();
     expect(await f.c("users").countDocuments({ email: "s@test.dev" })).toBe(1);
   } finally {
+    await drainBackendRoutes(page);
     await page.unrouteAll({ behavior: "wait" });
     await f.close();
   }

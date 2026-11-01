@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { fixture } from "../helpers/fixture";
-import { routeBackend } from "../helpers/browser-backend";
+import { routeBackend, drainBackendRoutes } from "../helpers/browser-backend";
 test.use({
   serviceWorkers: "block",
   storageState: { cookies: [], origins: [] },
@@ -62,6 +62,7 @@ test("public phone OTP signup verifies mobile and enters real student dashboard 
       page.getByLabel("شماره موبایل", { exact: true }),
     ).toBeVisible();
   } finally {
+    await drainBackendRoutes(page);
     await page.unrouteAll({ behavior: "wait" });
     await f.close();
   }
@@ -119,6 +120,7 @@ test("public teacher self-registration creates a dedicated teacher session and w
       page.getByLabel("شماره موبایل", { exact: true }),
     ).toBeVisible();
   } finally {
+    await drainBackendRoutes(page);
     await page.unrouteAll({ behavior: "wait" });
     await f.close();
   }
@@ -172,6 +174,7 @@ test("new phone completes profile after one OTP without asking for a second code
     expect(me.role).toBe("teacher");
     expect(me.phoneVerified).toBe(true);
   } finally {
+    await drainBackendRoutes(page);
     await page.unrouteAll({ behavior: "wait" });
     await f.close();
   }
