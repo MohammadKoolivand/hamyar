@@ -835,7 +835,9 @@ function ReviewItem({
     !!q.reference.trim() &&
     (q.classification !== "topic" || !!q.topicId) &&
     (q.type !== "choice" ||
-      (q.options.length >= 2 && q.options.includes(q.reference))) &&
+      (q.options.length >= 2 &&
+        q.options.every((option) => option.trim().length > 0) &&
+        q.options.includes(q.reference))) &&
     questionVisualsSchema.safeParse(q.visuals ?? []).success;
   if (item.state !== "pending")
     return (
@@ -984,7 +986,7 @@ function ReviewItem({
                 onChange={(e) => {
                   setQ({
                     ...q,
-                    options: e.target.value.split("\n").filter(Boolean),
+                    options: e.target.value.split("\n"),
                   });
                   setConfirmed(false);
                 }}
