@@ -86,7 +86,7 @@ test("PDF exam upload persists, extracts real text, saves corrections and approv
   await page
     .getByLabel("روش پاسخ سؤال 1", { exact: true })
     .selectOption("choice");
-  const options = page.getByLabel(/^گزینه‌های سؤال 1 ·/);
+  const options = page.getByLabel(/^گزینه‌های سؤال 1 /);
   await options.fill("$۰.۲$");
   await options.press("End");
   await options.press("Enter");
