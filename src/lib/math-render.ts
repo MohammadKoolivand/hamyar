@@ -12,17 +12,21 @@ export function mathMarkup(latex: string, displayMode = true) {
   const parsable = latex.replace(/[۰-۹]/g, (digit) =>
     String(digit.charCodeAt(0) - 0x06f0),
   );
-  const markup = katex.renderToString(parsable, {
-    output: "mathml",
-    displayMode,
-    throwOnError: true,
-    trust: false,
-    strict: "error",
-    maxExpand: 100,
-    maxSize: 10,
-    macros: {},
-  });
-  return /[۰-۹]/.test(latex)
+  const svgRoots = /\\sqrt\b/.test(parsable);
+  const markup = katex.renderToString(
+    svgRoots && !displayMode ? "\\displaystyle " + parsable : parsable,
+    {
+      output: svgRoots ? "htmlAndMathml" : "mathml",
+      displayMode,
+      throwOnError: true,
+      trust: false,
+      strict: "error",
+      maxExpand: 100,
+      maxSize: 10,
+      macros: {},
+    },
+  );
+  const localized = /[۰-۹]/.test(latex)
     ? markup.replace(
         /(<mn\b[^>]*>)([^<]*)(<\/mn>)/g,
         (_match, open, value, close) =>
@@ -33,4 +37,17 @@ export function mathMarkup(latex: string, displayMode = true) {
           close,
       )
     : markup;
+  if (!svgRoots || !/[۰-۹]/.test(latex)) return localized;
+  // Localize only HTML text nodes: SVG path coordinates must remain untouched.
+  return localized.replace(
+    /(<span\b[^>]*>)([0-9.]+)(<\/span>)/g,
+    (_match, open, value, close) =>
+      open +
+      '<span class="hy-math-number">' +
+      value.replace(/[0-9]/g, (digit: string) =>
+        String.fromCharCode(0x06f0 + Number(digit)),
+      ) +
+      "</span>" +
+      close,
+  );
 }

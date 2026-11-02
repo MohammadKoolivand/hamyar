@@ -255,3 +255,16 @@
   font-family: var(--font-question-text), "B Nazanin", serif;
   font-weight: 700;
 }
+
+/* KaTeX draws a radical and its overbar in one SVG path, avoiding native
+   MathML's font-glyph/overbar join at fractional zoom levels. */
+.hy-question-text .katex { font-size: 1em; }
+.hy-question-text .katex .mathnormal {
+  font-family: "Times New Roman", var(--font-question-math), serif;
+  font-weight: 700;
+  font-style: normal;
+}
+.hy-question-text .katex .hy-math-number {
+  font-family: var(--font-question-text), "B Nazanin", serif;
+  font-weight: 700;
+}

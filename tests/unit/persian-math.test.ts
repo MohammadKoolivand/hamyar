@@ -12,3 +12,21 @@ test("Persian-number LaTeX preserves fraction, root, exponent and renders Persia
   assert.match(mathMarkup("x^{2}"), /<mn>2<\/mn>/);
   assert.throws(() => mathMarkup("\\href{https://example.com}{۱۲}"));
 });
+
+test("radicals use continuous SVG outlines and Persian visible digits without changing path coordinates", () => {
+  for (const latex of [
+    "\\sqrt{۲}",
+    "\\sqrt[۳]{۸}",
+    "\\frac{۱}{\\sqrt{۲+\\sqrt{۳}}}",
+  ]) {
+    const markup = mathMarkup(latex, false);
+    assert.match(markup, /class="katex-html" aria-hidden="true"/);
+    assert.match(markup, /<svg\b/);
+    assert.match(markup, /<path\b/);
+    assert.match(markup, /class="hy-math-number">[۰-۹]/);
+    assert.match(markup, /<math\b/);
+    for (const path of markup.matchAll(/\bd="([^"]+)"/g)) {
+      assert.doesNotMatch(path[1], /[۰-۹]/);
+    }
+  }
+});
