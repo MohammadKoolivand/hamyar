@@ -1,4 +1,5 @@
 "use client";
+import { MathText } from "@/components/question-presentation";
 import { PagedList } from "@/components/ui/paged-list";
 
 import { useEffect, useState, type FormEvent } from "react";
@@ -241,7 +242,7 @@ export function IndividualRemediation({
                   }
                 />
                 <span>
-                  {q.statement}
+                  <MathText text={q.statement} />
                   <span className="mt-1 block text-xs text-slate-500">
                     {q.lastResult === "incorrect"
                       ? "آخرین پاسخ نیازمند اصلاح"

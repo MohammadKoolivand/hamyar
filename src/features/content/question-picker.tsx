@@ -8,7 +8,10 @@ import { Eye, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { PagedList } from "@/components/ui/paged-list";
-import { QuestionPresentation } from "@/components/question-presentation";
+import {
+  MathText,
+  QuestionPresentation,
+} from "@/components/question-presentation";
 import {
   sourceCategories,
   sourceCategory,
@@ -326,7 +329,9 @@ export function QuestionPicker({
                 className="size-5 shrink-0 accent-[#233B8F]"
               />
               <span className="min-w-0">
-                <span className="line-clamp-2">{q.statement}</span>
+                <span className="line-clamp-2">
+                  <MathText text={q.statement} />
+                </span>
                 <span className="text-xs text-teal-700">
                   <DifficultyGauge value={q.difficulty} />
                   {q.difficultyAssessment?.needsReview ? " · برآورد اولیه" : ""}
@@ -380,7 +385,7 @@ export function QuestionPicker({
             <div className="grid gap-2 sm:grid-cols-2">
               {preview.options.map((option, i) => (
                 <p key={i} className="glass-option p-3 text-sm">
-                  {fa(i + 1)}. {option}
+                  {fa(i + 1)}. <MathText text={option} />
                 </p>
               ))}
             </div>
