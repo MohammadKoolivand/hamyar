@@ -133,7 +133,12 @@ test("question collection filters, pages, modal and bulk add preserve all select
   await expect(
     modal.getByText("سؤال صفحه‌بندی شماره 11", { exact: true }),
   ).toBeVisible();
-  await expect(modal.getByText("۲. ب", { exact: true })).toBeVisible();
+  const secondOption = modal
+    .getByRole("region", { name: "گزینه‌ها و پاسخ مرجع" })
+    .locator(":scope > div")
+    .nth(1);
+  await expect(secondOption).toContainText("۲.");
+  await expect(secondOption.getByText("ب", { exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(modal).not.toBeVisible();
   await picker.getByRole("button", { name: "صفحه قبل", exact: true }).click();

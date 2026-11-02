@@ -1,6 +1,8 @@
 "use client";
 import {
   QuestionPresentation,
+  QuestionOptionsLayout,
+  QuestionVisualView,
   MathText,
 } from "@/components/question-presentation";
 import { practiceAnswer, feedbackVisible } from "@/lib/practice-answer";
@@ -116,15 +118,13 @@ export function PracticeScreen({
           max={active.questions!.length}
           className="hy-practice-progress w-full accent-[#2EC8C3]"
         />
-        {q.type !== "choice" && (
-          <div className="practice-sheet min-w-0 px-5 py-6">
-            <QuestionPresentation
-              statement={q.statement}
-              visuals={q.visuals}
-              visualLayout={q.visualLayout}
-            />
-          </div>
-        )}
+        <div className="practice-sheet min-w-0 px-5 py-6">
+          <QuestionPresentation
+            statement={q.statement}
+            visuals={q.type === "choice" ? [] : q.visuals}
+            visualLayout={q.visualLayout}
+          />
+        </div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -150,9 +150,7 @@ export function PracticeScreen({
               <legend className="mb-2 text-sm font-medium text-slate-500">
                 برای انتخاب پاسخ روی گزینه بزنید
               </legend>
-              <QuestionPresentation
-                statement={q.statement}
-                visuals={q.visuals}
+              <QuestionOptionsLayout
                 options={q.options}
                 renderOption={(option, i) => (
                   <label
@@ -187,7 +185,11 @@ export function PracticeScreen({
                     </span>
                   </label>
                 )}
-              />
+              >
+                {q.visuals?.map((visual, i) => (
+                  <QuestionVisualView key={i} visual={visual} />
+                ))}
+              </QuestionOptionsLayout>
             </fieldset>
           ) : (
             <Field title="پاسخ شما">

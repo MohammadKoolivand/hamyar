@@ -338,14 +338,22 @@ export function QuestionOptionsLayout({
   children?: React.ReactNode;
 }) {
   const container = useRef<HTMLDivElement>(null);
-  const measure = useRef<HTMLDivElement>(null);
   const [compact, setCompact] = useState(false);
   useEffect(() => {
     const check = () => {
-      if (!container.current || !measure.current) return;
+      if (!container.current) return;
       const widths = Array.from(
-        measure.current.children,
-        (el) => el.getBoundingClientRect().width,
+        container.current.querySelectorAll<HTMLElement>(
+          "[data-option-measure]",
+        ),
+        (el) => {
+          const previous = el.style.cssText;
+          el.style.cssText +=
+            ";position:absolute;width:max-content;max-width:none;white-space:nowrap";
+          const width = el.getBoundingClientRect().width;
+          el.style.cssText = previous;
+          return width;
+        },
       );
       const required =
         (Math.max(0, ...widths) + 56) * options.length +
@@ -356,7 +364,6 @@ export function QuestionOptionsLayout({
     };
     const observer = new ResizeObserver(check);
     if (container.current) observer.observe(container.current);
-    if (measure.current) observer.observe(measure.current);
     let alive = true;
     void document.fonts.ready.then(() => {
       if (alive) check();
@@ -377,21 +384,6 @@ export function QuestionOptionsLayout({
       data-options-layout={compact ? "row" : "stack"}
     >
       <div
-        ref={measure}
-        aria-hidden="true"
-        className="pointer-events-none invisible absolute left-0 top-0 flex w-max gap-4"
-        style={{ contain: "layout", maxWidth: "100%", overflow: "hidden" }}
-      >
-        {options.map((option, i) => (
-          <span
-            key={i}
-            className="w-max shrink-0 whitespace-nowrap text-sm leading-7"
-          >
-            <MathText text={option} />
-          </span>
-        ))}
-      </div>
-      <div
         className={
           !compact && hasVisuals
             ? "grid min-w-0 items-start gap-5 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]"
@@ -411,7 +403,7 @@ export function QuestionOptionsLayout({
         >
           {options.map((option, i) =>
             renderOption ? (
-              <div key={i} className="min-w-0">
+              <div key={i} className="min-w-0" data-option-measure>
                 {renderOption(option, i)}
               </div>
             ) : (
@@ -422,7 +414,11 @@ export function QuestionOptionsLayout({
                 <span className="shrink-0 text-slate-500">
                   {(i + 1).toLocaleString("fa-IR")}.
                 </span>
-                <span className="min-w-0 flex-1 break-words" dir="auto">
+                <span
+                  className="min-w-0 flex-1 break-words"
+                  dir="auto"
+                  data-option-measure
+                >
                   <MathText text={option} />
                 </span>
                 {correctReference === option && (
