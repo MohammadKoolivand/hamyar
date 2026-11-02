@@ -1,4 +1,9 @@
 import katex from "katex";
+export function questionDisplayText(text: string) {
+  // The question source uses plain final heh; leave stored text and answer
+  // matching unchanged, and simplify only the displayed ezafe mark.
+  return text.replace(/هٔ|ۀ/g, "ه");
+}
 export function mathMarkup(latex: string, displayMode = true) {
   if (
     latex.length > 1000 ||

@@ -180,6 +180,48 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       },
     );
   });
+  app.post("/api/curriculum/:nodeId/update", async (r) => {
+    const u = await user(r, "teacher");
+    const nodeId = z
+      .string()
+      .uuid()
+      .parse((r.params as { nodeId: string }).nodeId);
+    const b = z
+      .object({ title: z.string().trim().min(1).max(150) })
+      .strict()
+      .parse(r.body);
+    return ctx.atomic(
+      r,
+      u._id,
+      "curriculum-update",
+      { nodeId, ...b },
+      async (session) => {
+        const existing = await c("curriculum").findOne(
+          { _id: nodeId, ownerId: u._id, archivedAt: { $exists: false } },
+          { session },
+        );
+        if (!existing) ctx.fail(404, "سرفصل یافت نشد");
+        await c("curriculum").updateOne(
+          { _id: nodeId, ownerId: u._id },
+          { $set: { title: b.title, updatedAt: ctx.now() } },
+          { session },
+        );
+        await c("auditLogs").insertOne(
+          {
+            _id: id(),
+            actorId: u._id,
+            action: "update_curriculum",
+            resourceId: nodeId,
+            previousTitle: existing!.title,
+            title: b.title,
+            createdAt: ctx.now(),
+          },
+          { session },
+        );
+        return { ...existing, title: b.title };
+      },
+    );
+  });
   app.post("/api/curriculum", async (r) => {
     const u = await user(r, "teacher"),
       b = z

@@ -30,3 +30,15 @@ test("radicals use continuous SVG outlines and Persian visible digits without ch
     }
   }
 });
+
+test("question display uses plain final heh without changing other hamza letters", async () => {
+  const { questionDisplayText } = await import("../../src/lib/math-render");
+  assert.equal(
+    questionDisplayText("معادلهٔ درجهٔ دوم و ریشۀ مضاعف"),
+    "معادله درجه دوم و ریشه مضاعف",
+  );
+  assert.equal(
+    questionDisplayText("تأثیر، سؤال، مسئله و ه"),
+    "تأثیر، سؤال، مسئله و ه",
+  );
+});

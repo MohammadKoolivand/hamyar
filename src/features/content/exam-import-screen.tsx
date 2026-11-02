@@ -1173,7 +1173,7 @@ function ReviewItem({
           </details>
           <div className="rounded-xl bg-slate-50 p-4">
             <p className="mb-3 text-xs text-slate-500">پیش‌نمایش دانش‌آموز</p>
-            <QuestionPresentation statement={q.statement} visuals={q.visuals} />
+            <QuestionPresentation statement={q.statement} visuals={q.visuals} options={q.type === "choice" ? q.options : undefined} />
           </div>
           <label className="flex items-start gap-2 text-sm leading-7">
             <input

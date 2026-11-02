@@ -16,7 +16,14 @@ import { NodeSelector } from "./node-selector";
 import { AiAuthoring } from "./ai-authoring";
 import { useState, type ReactNode } from "react";
 import type React from "react";
-import { BookOpen, ChevronDown, Layers3, Sparkles, Trash2 } from "lucide-react";
+import {
+  BookOpen,
+  ChevronDown,
+  Layers3,
+  Sparkles,
+  Trash2,
+  Pencil,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { fa } from "@/lib/presentation";
@@ -267,6 +274,29 @@ export function ContentScreen({
                       {kindLabels[n.kind] ?? n.kind}
                     </span>
                     {n.title}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={busy}
+                      aria-label={`ویرایش سرفصل ${n.title}`}
+                      onClick={() => {
+                        const title = window.prompt("عنوان سرفصل", n.title);
+                        if (title === null || title.trim() === n.title) return;
+                        if (!title.trim()) {
+                          setNotice("عنوان سرفصل نمی‌تواند خالی باشد.");
+                          return;
+                        }
+                        void run(async () => {
+                          await api(`/curriculum/${n._id}/update`, {
+                            title: title.trim(),
+                          });
+                          await refresh();
+                          setNotice("سرفصل به‌روز شد؛ ارتباط سؤال‌ها حفظ شد.");
+                        });
+                      }}
+                    >
+                      <Pencil size={16} /> ویرایش
+                    </Button>
                     <Button
                       type="button"
                       disabled={busy}

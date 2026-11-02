@@ -279,15 +279,21 @@ export function QuestionEditor({
                   />
                 </Field>
               ))}
-              <details>
-                <summary className="cursor-pointer text-sm font-bold">
-                  پیش‌نمایش سؤال
-                </summary>
-                <QuestionPresentation
-                  statement={value.statement}
-                  visuals={value.visuals}
-                />
-              </details>
+              <section className="grid gap-4 rounded-2xl border border-blue-100 bg-blue-50/30 p-4">
+                <h3 className="text-sm font-bold text-[#233B8F]">
+                  پیش‌نمایش سؤال برای دانش‌آموز
+                </h3>
+                <div className="grid gap-4 rounded-2xl border border-blue-200 bg-white/80 p-5">
+                  <QuestionPresentation
+                    statement={value.statement}
+                    visuals={value.visuals}
+                    visualLayout={value.visualLayout}
+                    options={
+                      value.type === "choice" ? value.options : undefined
+                    }
+                  />
+                </div>
+              </section>
               <Button type="submit">
                 {busy ? "در حال ذخیره…" : "ذخیره نسخه جدید"}
               </Button>

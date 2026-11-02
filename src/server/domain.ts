@@ -15,6 +15,7 @@ export const questionSchema = z
     skillIds: z.array(z.string().uuid()).max(10).default([]),
     statement: z.string().trim().min(3).max(5000),
     visuals: questionVisualsSchema.optional(),
+    visualLayout: z.enum(["below", "beside"]).optional(),
     visualKind: visualKind.optional(),
     type: z.enum(["numeric", "choice", "short", "essay", "symbolic"]),
     reference: z.string().trim().min(1).max(2000),

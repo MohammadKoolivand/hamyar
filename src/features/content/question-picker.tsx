@@ -381,14 +381,8 @@ export function QuestionPicker({
             <QuestionPresentation
               statement={preview.statement}
               visuals={preview.visuals}
+              options={preview.type === "choice" ? preview.options : undefined}
             />
-            <div className="grid gap-2 sm:grid-cols-2">
-              {preview.options.map((option, i) => (
-                <p key={i} className="glass-option p-3 text-sm">
-                  {fa(i + 1)}. <MathText text={option} />
-                </p>
-              ))}
-            </div>
             <Button
               type="button"
               disabled={disabled}

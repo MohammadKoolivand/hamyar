@@ -80,6 +80,14 @@ test("visual data validates ranges, bounds, complexity and required content", ()
       visuals: [{ kind: "formula", caption: "فرمول", latex: "\\frac{" }],
     }).success,
   );
+  assert.equal(
+    questionSchema.safeParse({ ...base, visualLayout: "beside" }).success,
+    true,
+  );
+  assert.equal(
+    questionSchema.safeParse({ ...base, visualLayout: "above" }).success,
+    false,
+  );
 });
 test("safe mathematical rendering produces actual SVG and MathML, escapes text and rejects external resources", () => {
   const chart = visualTemplate("chart");
@@ -94,6 +102,17 @@ test("safe mathematical rendering produces actual SVG and MathML, escapes text a
   assert.ok(markup.includes("<polyline"));
   assert.ok(markup.includes("<mfrac>"));
   assert.ok(!markup.includes("<img"));
+  const beside = renderToStaticMarkup(
+    createElement(QuestionPresentation, {
+      statement: "متن سؤال تایپ‌شده",
+      visuals: [visualTemplate("geometry")],
+      visualLayout: "beside",
+    }),
+  );
+  assert.ok(
+    beside.includes("md:grid-cols-[minmax(0,1fr)_minmax(220px,0.9fr)]"),
+  );
+  assert.ok(beside.includes("متن سؤال تایپ‌شده"));
   for (const latex of [
     "\\href{https://example.com}{x}",
     "\\includegraphics{https://example.com/x}",

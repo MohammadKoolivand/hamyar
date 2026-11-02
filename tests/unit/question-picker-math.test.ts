@@ -12,6 +12,7 @@ test("mission and class question picker renders LaTeX in the question list", () 
     statement: "مقدار $\\frac{۱۲}{۳}+\\sqrt{۴}$ چیست؟",
     type: "choice",
     options: ["$۶$", "$۸$"],
+    ...{ reference: "$۶$" },
     hints: [],
     classification: "free",
   } satisfies Question;

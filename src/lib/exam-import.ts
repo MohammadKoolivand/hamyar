@@ -21,6 +21,7 @@ export const examDraftSchema = z.object({
   topicId: z.string().uuid().optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
   visuals: questionVisualsSchema.optional(),
+  visualLayout: z.enum(["below", "beside"]).optional(),
 });
 export type ExamMetadata = z.infer<typeof examImportSchema>;
 export interface ExamFile {
@@ -74,6 +75,7 @@ export interface ExamImportItem {
     classification?: "free" | "topic";
     difficulty?: "easy" | "medium" | "hard";
     visuals?: import("./question-visuals").QuestionVisual[];
+    visualLayout?: "below" | "beside";
   };
   extraction?: {
     regions: {

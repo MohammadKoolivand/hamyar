@@ -1,8 +1,8 @@
 "use client";
-import { Crop } from "lucide-react";
+import { Check, Crop } from "lucide-react";
 import Image from "next/image";
-import { useId } from "react";
-import { mathMarkup } from "@/lib/math-render";
+import { useId, useEffect, useRef, useState } from "react";
+import { mathMarkup, questionDisplayText } from "@/lib/math-render";
 import {
   questionVisualSchema,
   type QuestionVisual,
@@ -23,7 +23,12 @@ export function MathFormula({
             ? "inline-block max-w-full align-middle"
             : "block max-w-full overflow-x-auto py-3 text-center text-xl"
         }
-        dangerouslySetInnerHTML={{ __html: mathMarkup(latex, !inline) }}
+        dangerouslySetInnerHTML={{
+          __html: mathMarkup(
+            latex.replace(/\\neg\b/g, "\\mathord{\\sim}"),
+            !inline,
+          ),
+        }}
       />
     );
   } catch {
@@ -48,7 +53,7 @@ export function MathText({ text }: { text: string }) {
         ) : s.startsWith("\\(") ? (
           <MathFormula key={i} latex={s.slice(2, -2)} inline />
         ) : (
-          <span key={i}>{s}</span>
+          <span key={i}>{questionDisplayText(s)}</span>
         ),
       )}
     </span>
@@ -257,33 +262,200 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
 export function QuestionPresentation({
   statement,
   visuals = [],
+  visualLayout = "below",
   onCrop,
+  options,
+  correctReference,
+  renderOption,
 }: {
+  renderOption?: (option: string, index: number) => React.ReactNode;
+  options?: string[];
+  correctReference?: string;
   statement: string;
   visuals?: QuestionVisual[];
+  visualLayout?: "below" | "beside";
   onCrop?: () => void;
 }) {
+  const statementView = (
+    <div className="whitespace-pre-wrap break-words text-sm leading-8">
+      <MathText text={statement} />
+    </div>
+  );
+  const visualsView = visuals.map((v, i) => (
+    <div key={i} className="relative min-w-0">
+      <QuestionVisualView visual={v} />
+      {v.kind === "image" && onCrop && (
+        <button
+          type="button"
+          onClick={onCrop}
+          aria-label="کراپ تصویر سؤال"
+          className="absolute start-3 top-3 flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm text-[#233B8F] shadow-md"
+        >
+          <Crop size={20} />
+          کراپ
+        </button>
+      )}
+    </div>
+  ));
+  if (options !== undefined)
+    return (
+      <div className="grid min-w-0 gap-3">
+        {statementView}
+        <QuestionOptionsLayout
+          options={options}
+          correctReference={correctReference}
+          renderOption={renderOption}
+        >
+          {visualsView}
+        </QuestionOptionsLayout>
+      </div>
+    );
+  if (visualLayout === "beside" && visuals.length > 0)
+    return (
+      <div className="grid min-w-0 items-start gap-4 md:grid-cols-[minmax(0,1fr)_minmax(220px,0.9fr)]">
+        {statementView}
+        <div className="min-w-0">{visualsView}</div>
+      </div>
+    );
   return (
     <div className="min-w-0">
-      <div className="whitespace-pre-wrap break-words text-sm leading-8">
-        <MathText text={statement} />
+      {statementView}
+      {visualsView}
+    </div>
+  );
+}
+
+// Measure rendered mathematical content, rather than counting LaTeX characters.
+export function QuestionOptionsLayout({
+  options,
+  correctReference,
+  children,
+  renderOption,
+}: {
+  renderOption?: (option: string, index: number) => React.ReactNode;
+  options: string[];
+  correctReference?: string;
+  children?: React.ReactNode;
+}) {
+  const container = useRef<HTMLDivElement>(null);
+  const measure = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      if (!container.current || !measure.current) return;
+      const widths = Array.from(
+        measure.current.children,
+        (el) => el.getBoundingClientRect().width,
+      );
+      const required =
+        (Math.max(0, ...widths) + 56) * options.length +
+        Math.max(0, options.length - 1) * 16;
+      setCompact(
+        options.length > 0 && required <= container.current.clientWidth,
+      );
+    };
+    const observer = new ResizeObserver(check);
+    if (container.current) observer.observe(container.current);
+    if (measure.current) observer.observe(measure.current);
+    let alive = true;
+    void document.fonts.ready.then(() => {
+      if (alive) check();
+    });
+    check();
+    return () => {
+      alive = false;
+      observer.disconnect();
+    };
+  }, [options]);
+  const hasVisuals = Array.isArray(children)
+    ? children.length > 0
+    : Boolean(children);
+  return (
+    <div
+      ref={container}
+      className="relative min-w-0"
+      data-options-layout={compact ? "row" : "stack"}
+    >
+      <div
+        ref={measure}
+        aria-hidden="true"
+        className="pointer-events-none invisible absolute left-0 top-0 flex w-max gap-4"
+        style={{ contain: "layout", maxWidth: "100%", overflow: "hidden" }}
+      >
+        {options.map((option, i) => (
+          <span
+            key={i}
+            className="w-max shrink-0 whitespace-nowrap text-sm leading-7"
+          >
+            <MathText text={option} />
+          </span>
+        ))}
       </div>
-      {visuals.map((v, i) => (
-        <div key={i} className="relative">
-          <QuestionVisualView visual={v} />
-          {v.kind === "image" && onCrop && (
-            <button
-              type="button"
-              onClick={onCrop}
-              aria-label="کراپ تصویر سؤال"
-              className="absolute start-3 top-3 flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm text-[#233B8F] shadow-md"
-            >
-              <Crop size={20} />
-              کراپ
-            </button>
+      <div
+        className={
+          !compact && hasVisuals
+            ? "grid min-w-0 items-start gap-5 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]"
+            : "grid min-w-0 gap-4"
+        }
+      >
+        <section
+          aria-label="گزینه‌ها و پاسخ مرجع"
+          className="grid min-w-0 gap-3"
+          style={
+            compact
+              ? {
+                  gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
+                }
+              : undefined
+          }
+        >
+          {options.map((option, i) =>
+            renderOption ? (
+              <div key={i} className="min-w-0">
+                {renderOption(option, i)}
+              </div>
+            ) : (
+              <div
+                key={i}
+                className="flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-white/60 px-3 py-2 text-sm leading-7"
+              >
+                <span className="shrink-0 text-slate-500">
+                  {(i + 1).toLocaleString("fa-IR")}.
+                </span>
+                <span className="min-w-0 flex-1 break-words" dir="auto">
+                  <MathText text={option} />
+                </span>
+                {correctReference === option && (
+                  <span
+                    role="img"
+                    aria-label="پاسخ صحیح"
+                    title="پاسخ صحیح"
+                    className="flex size-4 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-400"
+                  >
+                    <Check size={10} />
+                  </span>
+                )}
+              </div>
+            ),
           )}
-        </div>
-      ))}
+          {!options.length && (
+            <p className="text-sm text-amber-800">
+              گزینه‌ها ثبت نشده‌اند؛ سؤال را ویرایش کنید.
+            </p>
+          )}
+        </section>
+        {hasVisuals && (
+          <div
+            className={
+              compact
+                ? "w-full min-w-0 justify-self-end md:max-w-[40%]"
+                : "min-w-0"
+            }
+          >
+            {children}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

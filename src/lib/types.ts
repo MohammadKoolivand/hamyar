@@ -126,6 +126,8 @@ export interface Question {
   year?: number;
   origin?: string;
   visuals?: QuestionVisual[];
+  visualLayout?: "below" | "beside";
+  reference?: string;
   _id: string;
   statement: string;
   type: string;

@@ -116,9 +116,15 @@ export function PracticeScreen({
           max={active.questions!.length}
           className="hy-practice-progress w-full accent-[#2EC8C3]"
         />
-        <div className="practice-sheet min-w-0 px-5 py-6">
-          <QuestionPresentation statement={q.statement} visuals={q.visuals} />
-        </div>
+        {q.type !== "choice" && (
+          <div className="practice-sheet min-w-0 px-5 py-6">
+            <QuestionPresentation
+              statement={q.statement}
+              visuals={q.visuals}
+              visualLayout={q.visualLayout}
+            />
+          </div>
+        )}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -139,44 +145,49 @@ export function PracticeScreen({
               disabled={
                 busy || finished || p.attempts >= active.policy.maxAttempts
               }
-              className="grid grid-cols-1 gap-2 sm:grid-cols-2"
+              className="grid min-w-0 gap-2"
             >
               <legend className="mb-2 text-sm font-medium text-slate-500">
                 برای انتخاب پاسخ روی گزینه بزنید
               </legend>
-              {q.options.map((option, i) => (
-                <label
-                  key={i}
-                  className="group relative block cursor-pointer has-disabled:cursor-not-allowed has-disabled:opacity-60"
-                >
-                  <input
-                    type="radio"
-                    name={`answer-${q._id}`}
-                    value={option}
-                    checked={answer === option}
-                    required
-                    onChange={() => {
-                      setAnswer(option);
-                      localStorage.setItem(
-                        "draft:" + me._id + ":" + active._id + ":" + q._id,
-                        option,
-                      );
-                    }}
-                    className="peer sr-only"
-                  />
-                  <span className="flex h-full min-h-12 items-center gap-3 rounded-xl border border-slate-200/80 bg-white/40 px-3 py-2.5 text-sm leading-7 backdrop-blur-xl transition-colors hover:border-blue-300 hover:bg-blue-50/50 peer-checked:border-blue-400 peer-checked:bg-blue-50/70 peer-checked:text-[#233B8F] peer-checked:shadow-[0_0_0_1px_rgba(96,165,250,0.3),0_4px_18px_rgba(59,130,246,0.1)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-blue-500">
-                    <span
-                      aria-hidden="true"
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/70 text-xs group-has-checked:border-blue-300 group-has-checked:bg-blue-100/80 group-has-checked:text-blue-800"
-                    >
-                      {fa(i + 1)}
+              <QuestionPresentation
+                statement={q.statement}
+                visuals={q.visuals}
+                options={q.options}
+                renderOption={(option, i) => (
+                  <label
+                    key={i}
+                    className="group relative block cursor-pointer has-disabled:cursor-not-allowed has-disabled:opacity-60"
+                  >
+                    <input
+                      type="radio"
+                      name={`answer-${q._id}`}
+                      value={option}
+                      checked={answer === option}
+                      required
+                      onChange={() => {
+                        setAnswer(option);
+                        localStorage.setItem(
+                          "draft:" + me._id + ":" + active._id + ":" + q._id,
+                          option,
+                        );
+                      }}
+                      className="peer sr-only"
+                    />
+                    <span className="flex h-full min-h-12 items-center gap-3 rounded-xl border border-slate-200/80 bg-white/40 px-3 py-2.5 text-sm leading-7 backdrop-blur-xl transition-colors hover:border-blue-300 hover:bg-blue-50/50 peer-checked:border-blue-400 peer-checked:bg-blue-50/70 peer-checked:text-[#233B8F] peer-checked:shadow-[0_0_0_1px_rgba(96,165,250,0.3),0_4px_18px_rgba(59,130,246,0.1)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-blue-500">
+                      <span
+                        aria-hidden="true"
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/70 text-xs group-has-checked:border-blue-300 group-has-checked:bg-blue-100/80 group-has-checked:text-blue-800"
+                      >
+                        {fa(i + 1)}
+                      </span>
+                      <span className="min-w-0 break-words">
+                        <MathText text={option} />
+                      </span>
                     </span>
-                    <span className="min-w-0 break-words">
-                      <MathText text={option} />
-                    </span>
-                  </span>
-                </label>
-              ))}
+                  </label>
+                )}
+              />
             </fieldset>
           ) : (
             <Field title="پاسخ شما">

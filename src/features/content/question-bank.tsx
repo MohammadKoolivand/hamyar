@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { useState } from "react";
 import { AppLink as Link } from "@/components/app-link";
-import { Plus, LibraryBig, Search, SlidersHorizontal } from "lucide-react";
+import { Plus, LibraryBig, Search, SlidersHorizontal, Pencil } from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { QuestionPresentation } from "@/components/question-presentation";
 import { curriculumTopicChoices } from "@/lib/curriculum";
@@ -554,9 +554,9 @@ export function QuestionBank({
             return (
               <article
                 key={q._id}
-                className="grid min-w-0 gap-4 rounded-2xl border border-slate-200/70 bg-white/85 p-5 sm:p-6"
+                className="relative grid min-w-0 gap-4 rounded-2xl border border-slate-200/70 bg-white/85 p-5 sm:p-6"
               >
-                <div className="flex flex-wrap items-center gap-2 text-xs">
+                <div className="flex flex-wrap items-center gap-2 pl-12 text-xs">
                   <span className="rounded-lg bg-blue-50 px-3 py-1.5 font-medium text-[#233B8F]">
                     سؤال {fa(i + 1)}
                   </span>
@@ -584,16 +584,19 @@ export function QuestionBank({
                     </span>
                   )}
                 </div>
-                <div className="flex justify-end">
+                <div className="absolute left-4 top-4">
                   <Button
                     type="button"
                     variant="outline"
+                    aria-label="ویرایش سؤال"
+                    title="ویرایش سؤال"
+                    className="size-9 min-h-9 rounded-lg p-0"
                     onClick={() => {
                       setCropOpen(false);
                       setEditing(q._id);
                     }}
                   >
-                    ویرایش سؤال
+                    <Pencil size={16} />
                   </Button>
                 </div>
                 {q.origin === "human_revised" && (
@@ -655,6 +658,8 @@ export function QuestionBank({
                 )}
                 <QuestionPresentation
                   statement={q.statement}
+                  options={q.type === "choice" ? q.options : undefined}
+                  correctReference={q.reference}
                   visuals={q.visuals}
                   onCrop={() => {
                     setCropOpen(true);
