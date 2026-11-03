@@ -301,7 +301,7 @@ export function PracticeScreen({
           ?.filter((h) => h.questionVersionId === q._id)
           .map((h) => (
             <div key={h._id} className="glass-note p-3.5 leading-[1.9]">
-              {h.text}
+              <MathText text={h.text} />
               <br />
               <Button
                 type="button"

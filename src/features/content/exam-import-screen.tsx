@@ -1,4 +1,5 @@
 "use client";
+import { normalizeQuestionTextFields } from "@/lib/persian-question-text";
 import { QuestionTextInput } from "@/components/question-text-input";
 import { PagedList } from "@/components/ui/paged-list";
 import { useEffect, useState } from "react";
@@ -825,7 +826,7 @@ function ReviewItem({
   const [imageBusy, setImageBusy] = useState(false);
   const [imageError, setImageError] = useState("");
   const [cropSource, setCropSource] = useState(false);
-  const [q, setQ] = useState(item.question),
+  const [q, setQ] = useState(() => normalizeQuestionTextFields(item.question)),
     [confirmed, setConfirmed] = useState(false),
     [reason, setReason] = useState(""),
     [originalNumber, setOriginalNumber] = useState(

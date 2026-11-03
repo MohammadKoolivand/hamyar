@@ -73,7 +73,10 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
         داده شکل یا نمودار معتبر نیست؛ قبل از تأیید اصلاح کنید.
       </p>
     );
-  const v = checked.data;
+  const v = {
+    ...checked.data,
+    caption: questionDisplayText(checked.data.caption),
+  };
   return (
     <figure
       className="my-3 min-w-0 rounded-2xl border border-slate-200 bg-white p-3"

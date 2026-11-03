@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { QuestionInput } from "@/server/domain";
+import { normalizeQuestionTextFields } from "@/lib/persian-question-text";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -47,7 +48,7 @@ export function QuestionEditor({
     let active = true;
     api<QuestionInput>(`/questions/${versionId}`)
       .then((v) => {
-        if (active) setValue(v);
+        if (active) setValue(normalizeQuestionTextFields(v));
       })
       .catch((e) => {
         if (active) setError(e.message);

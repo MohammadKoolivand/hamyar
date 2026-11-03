@@ -1,3 +1,4 @@
+import { normalizePersianQuestionText } from "../lib/persian-question-text";
 import { questionSourceSchema } from "../lib/question-source";
 import { questionVisualsSchema, visualKind } from "../lib/question-visuals";
 import { mathMarkup } from "../lib/math-render";
@@ -13,13 +14,26 @@ export const questionSchema = z
     difficulty: z.enum(["easy", "medium", "hard"]).optional(),
     year: z.number().int().min(1300).max(1500).optional(),
     skillIds: z.array(z.string().uuid()).max(10).default([]),
-    statement: z.string().trim().min(3).max(5000),
+    statement: z
+      .string()
+      .trim()
+      .min(3)
+      .max(5000)
+      .transform(normalizePersianQuestionText),
     visuals: questionVisualsSchema.optional(),
     visualLayout: z.enum(["below", "beside"]).optional(),
     visualKind: visualKind.optional(),
     type: z.enum(["numeric", "choice", "short", "essay", "symbolic"]),
-    reference: z.string().trim().min(1).max(2000),
-    options: z.array(z.string().min(1)).max(8).default([]),
+    reference: z
+      .string()
+      .trim()
+      .min(1)
+      .max(2000)
+      .transform(normalizePersianQuestionText),
+    options: z
+      .array(z.string().min(1).transform(normalizePersianQuestionText))
+      .max(8)
+      .default([]),
     tolerance: z.number().min(0).max(1e9).default(0),
     relativeTolerance: z.number().min(0).max(1).optional(),
     mathContext: z
@@ -41,7 +55,12 @@ export const questionSchema = z
       )
       .max(12)
       .optional(),
-    hints: z.array(z.string().min(1).max(1000)).max(3).default([]),
+    hints: z
+      .array(
+        z.string().min(1).max(1000).transform(normalizePersianQuestionText),
+      )
+      .max(3)
+      .default([]),
     hintBank: z
       .array(
         z.object({

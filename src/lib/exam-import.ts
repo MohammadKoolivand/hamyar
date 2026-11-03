@@ -1,3 +1,4 @@
+import { normalizePersianQuestionText } from "./persian-question-text";
 import { questionVisualsSchema } from "./question-visuals";
 import { z } from "zod";
 import { questionSourceSchema } from "./question-source";
@@ -12,11 +13,22 @@ export const examImportSchema = z.object({
   ocrLanguage: z.enum(["fas", "eng", "fas+eng"]).default("fas"),
 });
 export const examDraftSchema = z.object({
-  statement: z.string().trim().min(3).max(5000),
-  reference: z.string().max(2000),
+  statement: z
+    .string()
+    .trim()
+    .min(3)
+    .max(5000)
+    .transform(normalizePersianQuestionText),
+  reference: z.string().max(2000).transform(normalizePersianQuestionText),
   type: z.enum(["essay", "numeric", "choice", "short"]),
-  options: z.array(z.string().max(2000)).max(8).default([]),
-  hints: z.array(z.string().max(1000)).max(3).default([]),
+  options: z
+    .array(z.string().max(2000).transform(normalizePersianQuestionText))
+    .max(8)
+    .default([]),
+  hints: z
+    .array(z.string().max(1000).transform(normalizePersianQuestionText))
+    .max(3)
+    .default([]),
   classification: z.enum(["topic", "free"]).optional(),
   topicId: z.string().uuid().optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
