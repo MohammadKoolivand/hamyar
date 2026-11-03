@@ -1,4 +1,5 @@
 "use client";
+import { QuestionTextInput } from "@/components/question-text-input";
 import { PagedList } from "@/components/ui/paged-list";
 import { useEffect, useState } from "react";
 import { FileText, UploadCloud, ArrowRight } from "lucide-react";
@@ -951,14 +952,14 @@ function ReviewItem({
           }}
         >
           <Field title={`صورت سؤال ${index + 1}`}>
-            <textarea
+            <QuestionTextInput
               required
               minLength={3}
               maxLength={5000}
               className={`${style} min-h-28`}
               value={q.statement}
-              onChange={(e) => {
-                setQ({ ...q, statement: e.target.value });
+              onChange={(statement) => {
+                setQ({ ...q, statement });
                 setConfirmed(false);
               }}
             />

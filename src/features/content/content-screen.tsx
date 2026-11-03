@@ -1,4 +1,5 @@
 "use client";
+import { QuestionTextInput } from "@/components/question-text-input";
 import { PagedList } from "@/components/ui/paged-list";
 import { SourceEditor } from "./source-editor";
 import type { QuestionSource } from "@/lib/question-source";
@@ -487,10 +488,10 @@ export function ContentScreen({
                 </Field>
               </div>
               <Field title="صورت سؤال">
-                <textarea
+                <QuestionTextInput
                   required
                   value={statement}
-                  onChange={(e) => setStatement(e.target.value)}
+                  onChange={setStatement}
                   className="w-full min-h-[100px] resize-y glass-field p-3"
                 />
               </Field>

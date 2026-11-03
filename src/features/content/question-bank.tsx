@@ -668,7 +668,7 @@ export function QuestionBank({
                 />
                 <p className="border-t border-slate-100 pt-3 text-xs leading-7 text-slate-500">
                   {q.classification === "free"
-                    ? "سؤال آزاد"
+                    ? "بدون اتصال به مبحث درسی"
                     : c
                       ? [
                           c.grade.title,
@@ -687,6 +687,7 @@ export function QuestionBank({
         <QuestionEditor
           key={editing}
           versionId={editing}
+          nodes={nodes}
           cropOpen={cropOpen}
           onClose={() => setEditing(undefined)}
           onSaved={onSaved}

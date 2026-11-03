@@ -5,15 +5,20 @@ import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { QuestionPresentation } from "@/components/question-presentation";
+import { QuestionTextInput } from "@/components/question-text-input";
+import { TopicSelector } from "./topic-selector";
+import type { Node } from "@/lib/types";
 import { VisualEditor } from "./visual-editor";
 const style = "glass-field min-h-11 w-full p-3 text-sm";
 export function QuestionEditor({
   versionId,
+  nodes,
   cropOpen = false,
   onClose,
   onSaved,
 }: {
   versionId: string;
+  nodes: Node[];
   cropOpen?: boolean;
   onClose: () => void;
   onSaved: () => Promise<unknown> | void;
@@ -125,18 +130,51 @@ export function QuestionEditor({
           >
             <fieldset disabled={busy} className="grid min-w-0 gap-5">
               <Field title="متن سؤال">
-                <textarea
+                <QuestionTextInput
                   required
                   minLength={3}
                   maxLength={5000}
                   rows={5}
                   className={style}
                   value={value.statement}
-                  onChange={(e) =>
-                    change({ ...value, statement: e.target.value })
+                  onChange={(statement) =>
+                    change({ ...value, statement })
                   }
                 />
               </Field>
+              <section className="grid min-w-0 gap-3 rounded-2xl border border-slate-200 p-4">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={value.classification !== "free"}
+                    onChange={(e) =>
+                      change({
+                        ...value,
+                        classification: e.target.checked ? "topic" : "free",
+                        topicId: undefined,
+                        skillIds: [],
+                      })
+                    }
+                  />
+                  اتصال این سؤال به مبحث درسی
+                </label>
+                {value.classification !== "free" && (
+                  <TopicSelector
+                    nodes={nodes}
+                    context="ویرایش سؤال"
+                    topicLabel="مبحث درسی سؤال"
+                    value={value.topicId ?? ""}
+                    onChange={(topicId) =>
+                      change({
+                        ...value,
+                        classification: "topic",
+                        topicId: topicId || undefined,
+                        skillIds: [],
+                      })
+                    }
+                  />
+                )}
+              </section>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field title="درجه سختی">
                   <select

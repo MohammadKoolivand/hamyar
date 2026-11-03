@@ -41,12 +41,16 @@ export function MathFormula({
 }
 export function MathText({ text }: { text: string }) {
   const pieces = text.split(
-    /(\$\$[\s\S]{1,1000}?\$\$|\$[^$\n]{1,1000}\$|\\\([\s\S]{1,1000}?\\\))/g,
+    /(<u>[\s\S]{1,5000}?<\/u>|\$\$[\s\S]{1,1000}?\$\$|\$[^$\n]{1,1000}\$|\\\([\s\S]{1,1000}?\\\))/g,
   );
   return (
     <span className="hy-question-text">
       {pieces.map((s, i) =>
-        s.startsWith("$$") ? (
+        s.startsWith("<u>") && s.endsWith("</u>") ? (
+          <u key={i} className="decoration-1 underline-offset-4">
+            <MathText text={s.slice(3, -4)} />
+          </u>
+        ) : s.startsWith("$$") ? (
           <MathFormula key={i} latex={s.slice(2, -2)} />
         ) : s.startsWith("$") ? (
           <MathFormula key={i} latex={s.slice(1, -1)} inline />
