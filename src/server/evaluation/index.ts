@@ -1,3 +1,4 @@
+import { normalizePersianQuestionText } from "../../lib/persian-question-text";
 import type { QuestionInput } from "../domain";
 import type { EvaluationResult } from "./types";
 import { numeric, normalize, result } from "./numeric";
@@ -5,7 +6,10 @@ import { symbolicCompare } from "./symbolic";
 export type Evaluator = (q: QuestionInput, answer: string) => EvaluationResult;
 const equality: Evaluator = (q, a) =>
   result(
-    normalize(a) === normalize(q.reference) ? "correct" : "incorrect",
+    normalizePersianQuestionText(normalize(a)) ===
+      normalizePersianQuestionText(normalize(q.reference))
+      ? "correct"
+      : "incorrect",
     q.type === "short" ? "rule_based" : "deterministic",
     "exact_normalized_match",
   );

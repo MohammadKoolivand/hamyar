@@ -1,3 +1,4 @@
+import { evaluate } from "../../src/server/evaluation";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -53,4 +54,16 @@ test("plural ها uses ZWNJ without splitting non-plural words or touching math"
     "سوال‌ها و گزینه‌های درست و یاخته‌هایی و سلول‌هایمان؛ تنها رها بها انتهای تنهایی بهایی اژدها اشتها گرانبها. آن‌ها و این‌ها و ده‌ها $xها$";
   assert.equal(normalizePersianQuestionText(input), expected);
   assert.equal(normalizePersianQuestionText(expected), expected);
+});
+
+test("formatting differences never turn a correct short answer into an incorrect answer", () => {
+  const q = questionSchema.parse({
+    classification: "free",
+    statement: "پاسخ کوتاه معتبر",
+    type: "short",
+    reference: "یاخته‌ها",
+  });
+  assert.equal(evaluate(q, "ياختهها").result, "correct");
+  assert.equal(evaluate(q, "یاخته ها").result, "correct");
+  assert.equal(evaluate(q, "هسته").result, "incorrect");
 });
