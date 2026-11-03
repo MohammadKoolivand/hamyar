@@ -1,6 +1,10 @@
 import katex from "katex";
 import { normalizePersianQuestionText } from "./persian-question-text";
-export const questionDisplayText = normalizePersianQuestionText;
+export function questionDisplayText(text: string) {
+  // The bundled print font mis-shapes combining hamza above final heh.
+  // Use the explicit Persian ezafe spelling for display, preserving stored text.
+  return normalizePersianQuestionText(text).replace(/هٔ|ۀ/g, "ه‌ی");
+}
 export function mathMarkup(latex: string, displayMode = true) {
   if (
     latex.length > 1000 ||

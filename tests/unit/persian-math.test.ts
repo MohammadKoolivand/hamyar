@@ -31,14 +31,22 @@ test("radicals use continuous SVG outlines and Persian visible digits without ch
   }
 });
 
-test("question display canonicalizes Persian letters while preserving valid ezafe and other hamza letters", async () => {
+test("question display uses explicit ezafe yeh without changing other hamza letters", async () => {
   const { questionDisplayText } = await import("../../src/lib/math-render");
   assert.equal(
     questionDisplayText("معادلهٔ درجهٔ دوم و ریشۀ مضاعف"),
-    "معادلهٔ درجهٔ دوم و ریشهٔ مضاعف",
+    "معادله‌ی درجه‌ی دوم و ریشه‌ی مضاعف",
   );
   assert.equal(
     questionDisplayText("تأثیر، سؤال، مسئله و ه"),
     "تأثیر، سؤال، مسئله و ه",
+  );
+});
+
+test("final heh ezafe stays readable next to a mathematical identifier", async () => {
+  const { questionDisplayText } = await import("../../src/lib/math-render");
+  assert.equal(
+    questionDisplayText("عرض نقطهٔ A و ناحیۀ اول"),
+    "عرض نقطه‌ی A و ناحیه‌ی اول",
   );
 });
