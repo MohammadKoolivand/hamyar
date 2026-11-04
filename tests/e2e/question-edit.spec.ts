@@ -47,16 +47,31 @@ test("teacher edits question, choices, difficulty and persistent image crop", as
     });
     expect(response.ok(), await response.text()).toBeTruthy();
     const old = await response.json();
+    const topicResponse = await page.request.post("/api/curriculum", {
+      data: { title: "مبحث قابل انتخاب در ویرایش", kind: "topic" },
+    });
+    expect(topicResponse.ok(), await topicResponse.text()).toBeTruthy();
+    const topic = await topicResponse.json();
     await page.goto("/content");
     await page
       .getByRole("button", { name: "کراپ تصویر سؤال", exact: true })
       .click();
     const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("اتصال این سؤال به مبحث درسی").check();
+    await dialog.getByLabel("پایه ویرایش سؤال").selectOption("ungraded");
+    await dialog
+      .getByLabel("درس یا کتاب ویرایش سؤال")
+      .selectOption("unassigned");
+    await dialog.getByLabel("فصل ویرایش سؤال").selectOption("unchaptered");
+    await dialog.getByLabel("مبحث درسی سؤال").selectOption(topic._id);
     await dialog
       .getByLabel("متن سؤال", { exact: true })
       .fill("صورت سؤال پس از ویرایش");
     await dialog.getByLabel("درجه سختی").selectOption("hard");
-    await dialog.getByLabel("گزینه 1", { exact: true }).fill("گزینه تازه");
+    await dialog
+      .getByPlaceholder("مثلاً: $\\sqrt{2}$ یا $\\frac{a}{b}$")
+      .first()
+      .fill("گزینه تازه");
     await dialog.getByRole("radio").first().check();
     const surface = dialog.getByRole("group", {
       name: "انتخاب محدوده برش تصویر",
@@ -96,6 +111,8 @@ test("teacher edits question, choices, difficulty and persistent image crop", as
       version: 2,
       reference: "گزینه تازه",
       difficulty: "hard",
+      classification: "topic",
+      topicId: topic._id,
     });
     expect(bank[0].visuals[0].crop).toEqual({
       x: 10,
@@ -121,4 +138,33 @@ test("teacher edits question, choices, difficulty and persistent image crop", as
   } finally {
     await client.close();
   }
+});
+
+test("bank shows formula choices, correct-answer check and plain final heh after refresh", async ({
+  page,
+}) => {
+  await registerSyntheticUser(page, "معلم نمایش گزینه‌ها");
+  const response = await page.request.post("/api/questions", {
+    data: {
+      classification: "free",
+      statement: "معادلهٔ دارای $\\sqrt[۳]{۸}$ کدام است؟",
+      type: "choice",
+      options: ["گزینه اول", "$\\sqrt{۴}$"],
+      reference: "$\\sqrt{۴}$",
+      hints: [],
+    },
+  });
+  expect(response.ok(), await response.text()).toBeTruthy();
+  await page.goto("/content");
+  const choices = page.getByRole("region", { name: "گزینه‌ها و پاسخ مرجع" });
+  await expect(choices.getByText("گزینه اول", { exact: true })).toBeVisible();
+  await expect(choices.locator(".katex-html .sqrt svg")).toBeVisible();
+  await expect(choices.getByRole("img", { name: "پاسخ صحیح" })).toHaveCount(1);
+  const statement = page
+    .locator(".hy-question-text")
+    .filter({ hasText: "معادله" });
+  await expect(statement).toContainText("معادله‌ی دارای");
+  await expect(statement).not.toContainText("ة");
+  await page.reload();
+  await expect(choices.getByRole("img", { name: "پاسخ صحیح" })).toBeVisible();
 });

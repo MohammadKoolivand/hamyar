@@ -1,5 +1,9 @@
 import { randomInt } from "node:crypto";
 import { difficultySchema } from "../../lib/difficulty";
+import {
+  empiricalDifficultyScore,
+  difficultyBucket,
+} from "../../lib/difficulty";
 import { MAX_MISSION_QUESTIONS } from "../../lib/mission-limits";
 import { difficultyMetadata } from "../../lib/difficulty";
 import { Binary } from "mongodb";
@@ -248,7 +252,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
   });
   app.get("/api/questions", async (r) => {
     const u = await user(r, "teacher");
-    return c("questions")
+    const questions = await c("questions")
       .aggregate([
         { $match: { ownerId: u._id } },
         {
@@ -263,6 +267,50 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         { $replaceRoot: { newRoot: "$version" } },
       ])
       .toArray();
+    const examIds = questions
+      .filter(
+        (q) =>
+          q.origin === "exam_import_reviewed" ||
+          q.originalOrigin === "exam_import_reviewed",
+      )
+      .map((q) => q._id as string);
+    if (!examIds.length) return questions;
+    const examIdSet = new Set(examIds);
+    const stats = await c("questionDifficultyResponses")
+      .aggregate([
+        { $match: { questionVersionId: { $in: examIds } } },
+        {
+          $group: {
+            _id: "$questionVersionId",
+            correct: {
+              $sum: { $cond: [{ $eq: ["$result", "correct"] }, 1, 0] },
+            },
+            incorrect: {
+              $sum: { $cond: [{ $eq: ["$result", "incorrect"] }, 1, 0] },
+            },
+          },
+        },
+      ])
+      .toArray();
+    const byQuestion = new Map(stats.map((row) => [row._id as string, row]));
+    return questions.map((question) => {
+      if (!examIdSet.has(question._id as string)) return question;
+      const row = byQuestion.get(question._id as string),
+        correct = Number(row?.correct ?? 0),
+        incorrect = Number(row?.incorrect ?? 0),
+        participants = correct + incorrect,
+        score = empiricalDifficultyScore(correct, incorrect);
+      return {
+        ...question,
+        difficulty: score === null ? undefined : difficultyBucket(score),
+        difficultyScore: score,
+        difficultyResponses: { correct, incorrect, participants },
+        difficultyAssessment: {
+          method: "student_response_ratio",
+          needsReview: false,
+        },
+      };
+    });
   });
   app.post("/api/questions/select", async (r) => {
     const u = await user(r, "teacher");
@@ -300,8 +348,45 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         ownerId: u._id,
         _id: { $in: current.map((q) => q.currentVersionId) },
       })
-      .project({ _id: 1, difficulty: 1 })
+      .project({ _id: 1, difficulty: 1, origin: 1, originalOrigin: 1 })
       .toArray();
+    const examCandidates = candidates.filter(
+      (q) =>
+        q.origin === "exam_import_reviewed" ||
+        q.originalOrigin === "exam_import_reviewed",
+    );
+    if (examCandidates.length) {
+      const stats = await c("questionDifficultyResponses")
+        .aggregate([
+          {
+            $match: {
+              questionVersionId: { $in: examCandidates.map((q) => q._id) },
+            },
+          },
+          {
+            $group: {
+              _id: "$questionVersionId",
+              correct: {
+                $sum: { $cond: [{ $eq: ["$result", "correct"] }, 1, 0] },
+              },
+              incorrect: {
+                $sum: { $cond: [{ $eq: ["$result", "incorrect"] }, 1, 0] },
+              },
+            },
+          },
+        ])
+        .toArray();
+      const byQuestion = new Map(stats.map((row) => [row._id as string, row]));
+      for (const question of examCandidates) {
+        const row = byQuestion.get(question._id as string),
+          score = empiricalDifficultyScore(
+            Number(row?.correct ?? 0),
+            Number(row?.incorrect ?? 0),
+          );
+        question.difficulty =
+          score === null ? undefined : difficultyBucket(score);
+      }
+    }
     const picked: string[] = [];
     for (const [difficulty, count] of Object.entries(quotas)) {
       const pool = candidates.filter((q) => q.difficulty === difficulty);
@@ -333,12 +418,23 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       "question-difficulty-batch",
       b,
       async (session) => {
-        const rows = await c("questionVersions").countDocuments(
-          { _id: { $in: ids }, ownerId: u._id },
-          { session },
-        );
-        if (rows !== ids.length)
+        const rows = await c("questionVersions")
+          .find({ _id: { $in: ids }, ownerId: u._id }, { session })
+          .project({ origin: 1, originalOrigin: 1 })
+          .toArray();
+        if (rows.length !== ids.length)
           ctx.fail(404, "سؤال متعلق به شما نیست یا یافت نشد");
+        if (
+          rows.some(
+            (q) =>
+              q.origin === "exam_import_reviewed" ||
+              q.originalOrigin === "exam_import_reviewed",
+          )
+        )
+          ctx.fail(
+            409,
+            "سختی سؤال‌های آزمون از پاسخ واقعی دانش‌آموزان محاسبه می‌شود و دستی تغییر نمی‌کند.",
+          );
         await c("questionVersions").updateMany(
           { _id: { $in: ids }, ownerId: u._id },
           {
@@ -371,7 +467,26 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
   });
   app.get("/api/questions/:vid", async (r) => {
     const u = await user(r, "teacher");
-    return owned("questionVersions", (r.params as { vid: string }).vid, u._id);
+    const question = await owned(
+      "questionVersions",
+      (r.params as { vid: string }).vid,
+      u._id,
+    );
+    if (
+      question.origin === "exam_import_reviewed" ||
+      question.originalOrigin === "exam_import_reviewed"
+    ) {
+      const examQuestion = { ...question };
+      delete examQuestion.difficulty;
+      return {
+        ...examQuestion,
+        difficultyAssessment: {
+          method: "student_response_ratio",
+          needsReview: false,
+        },
+      };
+    }
+    return question;
   });
   app.post("/api/questions/:vid/revise", async (r) => {
     const u = await user(r, "teacher"),
@@ -406,9 +521,21 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
             "سؤال قبلاً ویرایش شده؛ صفحه را تازه کنید و دوباره تلاش کنید.",
           );
         // Whitelisted provenance: the previous immutable version retains original review evidence.
+        const examImported =
+          previous!.origin === "exam_import_reviewed" ||
+          previous!.originalOrigin === "exam_import_reviewed";
+        const questionFields = { ...b };
+        if (examImported) delete questionFields.difficulty;
         const row = {
-          ...b,
-          ...difficultyMetadata(b),
+          ...questionFields,
+          ...(examImported
+            ? {
+                difficultyAssessment: {
+                  method: "student_response_ratio",
+                  needsReview: false,
+                },
+              }
+            : difficultyMetadata(b)),
           _id: nextId,
           questionId: previous!.questionId,
           ownerId: u._id,

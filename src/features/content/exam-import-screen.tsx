@@ -572,8 +572,8 @@ export function ExamImportScreen({
                 ))}
               </div>
             )}
-            {exam.statistics?.keyWarnings.map((w) => (
-              <p key={w} className="text-sm text-amber-800">
+            {exam.statistics?.keyWarnings.map((w, i) => (
+              <p key={`${w}-${i}`} className="text-sm text-amber-800">
                 {w}
               </p>
             ))}
@@ -895,9 +895,9 @@ function ReviewItem({
                 اصل کامل صفحه {fa(region.page)}
               </a>
             ))}
-            {item.extraction.warnings.map((w) => (
+            {item.extraction.warnings.map((w, i) => (
               <p
-                key={w}
+                key={`${w}-${i}`}
                 className="rounded-lg bg-amber-50/60 p-2 text-xs text-amber-800"
               >
                 {w}
@@ -952,7 +952,9 @@ function ReviewItem({
             });
           }}
         >
-          <Field title={`صورت سؤال ${index + 1}`}>
+          <Field
+            title={`صورت سؤال ${index + 1} · فرمول‌ها با LaTeX داخل $...$`}
+          >
             <QuestionTextInput
               required
               minLength={3}
@@ -964,6 +966,11 @@ function ReviewItem({
                 setConfirmed(false);
               }}
             />
+            <p className="mt-2 text-xs leading-6 text-slate-500">
+              نمونه: <code dir="ltr">$\sqrt&#123;2&#125;$</code> یا{" "}
+              <code dir="ltr">$\frac&#123;a&#125;&#123;b&#125;$</code>؛ نتیجه در
+              پیش‌نمایش پایین نمایش داده می‌شود.
+            </p>
           </Field>
           <Field title={`شماره سؤال در دفترچه ${index + 1} (اختیاری)`}>
             <input
@@ -994,7 +1001,9 @@ function ReviewItem({
             </select>
           </Field>
           {q.type === "choice" && (
-            <Field title={`گزینه‌های سؤال ${index + 1} (هر خط یک گزینه)`}>
+            <Field
+              title={`گزینه‌های سؤال ${index + 1} · هر خط یک گزینه؛ فرمول با LaTeX داخل $...$`}
+            >
               <textarea
                 className={style}
                 value={q.options.join("\n")}
@@ -1006,6 +1015,11 @@ function ReviewItem({
                   setConfirmed(false);
                 }}
               />
+              <p className="mt-2 text-xs leading-6 text-slate-500">
+                نمونهٔ گزینهٔ فرمولی:{" "}
+                <code dir="ltr">$x^2+\sqrt&#123;3&#125;$</code>. نمایش نهایی هر
+                گزینه در پیش‌نمایش پایین دیده می‌شود.
+              </p>
             </Field>
           )}
           <Field title={`پاسخ مرجع سؤال ${index + 1}`}>
@@ -1042,24 +1056,10 @@ function ReviewItem({
               />
             )}
           </Field>
-          <Field title={`درجه سختی سؤال ${index + 1}`}>
-            <select
-              className={style}
-              value={q.difficulty ?? ""}
-              onChange={(e) =>
-                setQ({
-                  ...q,
-                  difficulty: (e.target.value ||
-                    undefined) as typeof q.difficulty,
-                })
-              }
-            >
-              <option value="">تعیین نشده</option>
-              <option value="easy">آسان</option>
-              <option value="medium">متوسط</option>
-              <option value="hard">سخت</option>
-            </select>
-          </Field>
+          <p className="rounded-xl bg-blue-50 p-3 text-sm leading-6 text-blue-900">
+            سختی این سؤال پس از ثبت پاسخ واقعی دانش‌آموزان، از صفر تا صد محاسبه
+            می‌شود.
+          </p>
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -1171,11 +1171,35 @@ function ReviewItem({
                   setConfirmed(false);
                 }}
               />
+              {(q.visuals ?? []).some((visual) => visual.kind === "image") && (
+                <Field title="جای شکل کنار متن تایپ‌شده">
+                  <select
+                    className={style}
+                    value={q.visualLayout ?? "below"}
+                    disabled={busy}
+                    onChange={(e) => {
+                      setQ({
+                        ...q,
+                        visualLayout: e.target.value as "below" | "beside",
+                      });
+                      setConfirmed(false);
+                    }}
+                  >
+                    <option value="below">زیر متن سؤال</option>
+                    <option value="beside">کنار متن سؤال</option>
+                  </select>
+                </Field>
+              )}
             </div>
           </details>
           <div className="rounded-xl bg-slate-50 p-4">
             <p className="mb-3 text-xs text-slate-500">پیش‌نمایش دانش‌آموز</p>
-            <QuestionPresentation statement={q.statement} visuals={q.visuals} options={q.type === "choice" ? q.options : undefined} />
+            <QuestionPresentation
+              statement={q.statement}
+              visuals={q.visuals}
+              visualLayout={q.visualLayout}
+              options={q.type === "choice" ? q.options : undefined}
+            />
           </div>
           <label className="flex items-start gap-2 text-sm leading-7">
             <input

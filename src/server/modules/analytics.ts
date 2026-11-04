@@ -4,6 +4,7 @@ import type { Context } from "../context";
 import { z } from "zod";
 import type { HintProvider } from "../domain";
 import { recordLearning } from "../learning/service";
+import { recordQuestionDifficultyResponse } from "../learning/question-difficulty";
 export function registerAnalytics(
   app: FastifyInstance,
   ctx: Context,
@@ -73,6 +74,7 @@ export function registerAnalytics(
             type: q?.type ?? "short",
             options: q?.options ?? [],
             visuals: q?.visuals ?? [],
+            visualLayout: q?.visualLayout ?? "below",
             ...(revealKey && q ? { reference: q.reference } : {}),
             answer: last?.answer ?? null,
             result,
@@ -228,6 +230,14 @@ export function registerAnalytics(
               { session },
             )
           : null;
+      if (source && question)
+        await recordQuestionDifficultyResponse(
+          ctx,
+          question,
+          source,
+          b.result,
+          session,
+        );
       if (source && question)
         await recordLearning(
           ctx,

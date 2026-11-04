@@ -333,7 +333,15 @@ export function QuestionPicker({
                   <MathText text={q.statement} />
                 </span>
                 <span className="text-xs text-teal-700">
-                  <DifficultyGauge value={q.difficulty} />
+                  <DifficultyGauge
+                    value={
+                      q.origin === "exam_import_reviewed" ||
+                      q.originalOrigin === "exam_import_reviewed"
+                        ? q.difficultyScore
+                        : q.difficulty
+                    }
+                    sampleCount={q.difficultyResponses?.participants}
+                  />
                   {q.difficultyAssessment?.needsReview ? " · برآورد اولیه" : ""}
                 </span>
               </span>
@@ -363,9 +371,14 @@ export function QuestionPicker({
         {preview && (
           <div className="grid gap-4" dir="rtl">
             <div className="flex items-center justify-between gap-3">
-              <h3 id="question-preview-title" className="font-bold">
-                مشاهده سؤال
-              </h3>
+              <div>
+                <h3 id="question-preview-title" className="font-bold">
+                  پیش‌نمایش سؤال برای دانش‌آموز
+                </h3>
+                <p className="mt-1 text-xs leading-6 text-teal-700">
+                  {sourceSummary(preview.source)}
+                </p>
+              </div>
               <Button
                 type="button"
                 variant="outline"
@@ -375,14 +388,18 @@ export function QuestionPicker({
                 <X size={18} />
               </Button>
             </div>
-            <p className="text-xs text-teal-700">
-              {sourceSummary(preview.source)}
-            </p>
-            <QuestionPresentation
-              statement={preview.statement}
-              visuals={preview.visuals}
-              options={preview.type === "choice" ? preview.options : undefined}
-            />
+            <div className="grid gap-4 rounded-2xl border border-blue-100 bg-blue-50/30 p-4">
+              <div className="grid gap-4 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+                <QuestionPresentation
+                  statement={preview.statement}
+                  visuals={preview.visuals}
+                  visualLayout={preview.visualLayout}
+                  options={
+                    preview.type === "choice" ? preview.options : undefined
+                  }
+                />
+              </div>
+            </div>
             <Button
               type="button"
               disabled={disabled}

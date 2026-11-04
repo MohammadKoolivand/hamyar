@@ -43,6 +43,10 @@ export async function persistQuestion(
 ) {
   const qid = ctx.id(),
     vid = ctx.id();
+  const examImported =
+    (provenance as { origin?: string }).origin === "exam_import_reviewed";
+  const questionFields = { ...b };
+  if (examImported) delete questionFields.difficulty;
   await ctx
     .c("questions")
     .insertOne({ _id: qid, ownerId, currentVersionId: vid }, { session });
@@ -53,8 +57,15 @@ export async function persistQuestion(
     version: 1,
     verifiedBy: ownerId,
     verifiedAt: ctx.now(),
-    ...b,
-    ...difficultyMetadata(b),
+    ...questionFields,
+    ...(examImported
+      ? {
+          difficultyAssessment: {
+            method: "student_response_ratio",
+            needsReview: false,
+          },
+        }
+      : difficultyMetadata(b)),
     ...provenance,
   };
   await ctx.c("questionVersions").insertOne(row, { session });

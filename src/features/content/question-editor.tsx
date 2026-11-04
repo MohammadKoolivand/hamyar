@@ -5,11 +5,14 @@ import { normalizeQuestionTextFields } from "@/lib/persian-question-text";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
-import { QuestionPresentation } from "@/components/question-presentation";
+import {
+  MathText,
+  QuestionPresentation,
+} from "@/components/question-presentation";
 import { QuestionTextInput } from "@/components/question-text-input";
+import { VisualEditor } from "./visual-editor";
 import { TopicSelector } from "./topic-selector";
 import type { Node } from "@/lib/types";
-import { VisualEditor } from "./visual-editor";
 const style = "glass-field min-h-11 w-full p-3 text-sm";
 export function QuestionEditor({
   versionId,
@@ -30,6 +33,17 @@ export function QuestionEditor({
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saved, setSaved] = useState(false);
+  const examQuestion = Boolean(
+    value &&
+    ((value as QuestionInput & { origin?: string; originalOrigin?: string })
+      .origin === "exam_import_reviewed" ||
+      (
+        value as QuestionInput & {
+          origin?: string;
+          originalOrigin?: string;
+        }
+      ).originalOrigin === "exam_import_reviewed"),
+  );
   const change = (next: QuestionInput) => {
     setValue(next);
     setDirty(true);
@@ -77,10 +91,11 @@ export function QuestionEditor({
         </Button>
       </div>
       <p className="mb-5 text-sm leading-7 text-slate-500">
-        نسخهٔ جدید در بانک سؤال ذخیره می‌شود. تمرین‌های قبلی نسخهٔ قبلی را حفظ
-        می‌کنند. پس از تغییر گزینه‌ها، پاسخ صحیح و راهنماها را دوباره بررسی
-        کنید. متن داخل عکس با ویرایش متن تغییر نمی‌کند؛ برای حذف آن بخش، تصویر
-        را برش دهید.
+        گزینه‌ها را در کادرهای جدا وارد کن؛ فرمول LaTeX را داخل $...$ بنویس تا
+        پیش‌نمایشش را ببینی. برای حذف عکس، در بخش «نمودار، شکل و فرمول سؤال» روی
+        «حذف این محتوای سؤال» بزن. نسخهٔ جدید در بانک سؤال ذخیره می‌شود.
+        تمرین‌های قبلی نسخهٔ قبلی را حفظ می‌کنند. پس از تغییر گزینه‌ها، پاسخ
+        صحیح و راهنماها را دوباره بررسی کنید.
       </p>
       {error && (
         <p
@@ -138,9 +153,7 @@ export function QuestionEditor({
                   rows={5}
                   className={style}
                   value={value.statement}
-                  onChange={(statement) =>
-                    change({ ...value, statement })
-                  }
+                  onChange={(statement) => change({ ...value, statement })}
                 />
               </Field>
               <section className="grid min-w-0 gap-3 rounded-2xl border border-slate-200 p-4">
@@ -177,24 +190,31 @@ export function QuestionEditor({
                 )}
               </section>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field title="درجه سختی">
-                  <select
-                    className={style}
-                    value={value.difficulty ?? ""}
-                    onChange={(e) =>
-                      change({
-                        ...value,
-                        difficulty: (e.target.value ||
-                          undefined) as QuestionInput["difficulty"],
-                      })
-                    }
-                  >
-                    <option value="">تعیین نشده</option>
-                    <option value="easy">آسان</option>
-                    <option value="medium">متوسط</option>
-                    <option value="hard">سخت</option>
-                  </select>
-                </Field>
+                {examQuestion ? (
+                  <p className="self-end rounded-xl bg-blue-50 p-3 text-sm leading-6 text-blue-900">
+                    درجه سختی: تعیین نشده؛ پس از پاسخ واقعی دانش‌آموزان محاسبه
+                    می‌شود.
+                  </p>
+                ) : (
+                  <Field title="درجه سختی">
+                    <select
+                      className={style}
+                      value={value.difficulty ?? ""}
+                      onChange={(e) =>
+                        change({
+                          ...value,
+                          difficulty: (e.target.value ||
+                            undefined) as QuestionInput["difficulty"],
+                        })
+                      }
+                    >
+                      <option value="">تعیین نشده</option>
+                      <option value="easy">آسان</option>
+                      <option value="medium">متوسط</option>
+                      <option value="hard">سخت</option>
+                    </select>
+                  </Field>
+                )}
                 <Field title="سال سؤال">
                   <input
                     className={style}
@@ -222,6 +242,8 @@ export function QuestionEditor({
                         <textarea
                           required
                           maxLength={2000}
+                          dir="auto"
+                          placeholder={"مثلاً: $\\sqrt{2}$ یا $\\frac{a}{b}$"}
                           className={style}
                           value={option}
                           onChange={(e) =>
@@ -237,6 +259,20 @@ export function QuestionEditor({
                             })
                           }
                         />
+                        <p className="mt-2 text-xs leading-6 text-slate-500">
+                          فرمول را داخل $...$ بنویس؛ نمونه:{" "}
+                          <code dir="ltr">
+                            $\sqrt{"{"}2{"}"}$
+                          </code>
+                        </p>
+                        {option.trim() && (
+                          <div className="rounded-lg bg-slate-50 p-3 text-sm leading-8">
+                            <span className="text-xs text-slate-500">
+                              پیش‌نمایش:{" "}
+                            </span>
+                            <MathText text={option} />
+                          </div>
+                        )}
                       </Field>
                       <label className="flex items-center gap-2 text-sm">
                         <input
@@ -300,6 +336,25 @@ export function QuestionEditor({
                 value={value.visuals ?? []}
                 onChange={(visuals) => change({ ...value, visuals })}
               />
+              {(value.visuals ?? []).some(
+                (visual) => visual.kind === "image",
+              ) && (
+                <Field title="جای تصویر نسبت به متن سؤال">
+                  <select
+                    className={style}
+                    value={value.visualLayout ?? "below"}
+                    onChange={(e) =>
+                      change({
+                        ...value,
+                        visualLayout: e.target.value as "below" | "beside",
+                      })
+                    }
+                  >
+                    <option value="below">زیر متن سؤال</option>
+                    <option value="beside">کنار متن سؤال</option>
+                  </select>
+                </Field>
+              )}
               {value.hints.map((hint, i) => (
                 <Field key={i} title={`راهنمای ${i + 1}`}>
                   <textarea

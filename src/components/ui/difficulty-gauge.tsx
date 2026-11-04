@@ -1,11 +1,27 @@
 import type { Difficulty } from "@/lib/difficulty";
 import { difficultyLabels } from "@/lib/difficulty";
 
-/** Ordinal difficulty only: no fabricated score or statistical precision. */
-export function DifficultyGauge({ value }: { value?: Difficulty }) {
-  const point =
-    value === "easy" ? [22, 35] : value === "hard" ? [66, 35] : [44, 20];
-  const label = value ? difficultyLabels[value] : "تعیین نشده";
+export function DifficultyGauge({
+  value,
+  sampleCount,
+}: {
+  value?: Difficulty | number | null;
+  sampleCount?: number;
+}) {
+  const empirical = typeof value === "number",
+    progress = empirical ? Math.min(100, Math.max(0, value)) / 100 : 0,
+    point = empirical
+      ? [12 + 64 * progress, 46 - 32 * Math.sin(Math.PI * progress)]
+      : value === "easy"
+        ? [22, 35]
+        : value === "hard"
+          ? [66, 35]
+          : [44, 20];
+  const label = empirical
+    ? `سختی تجربی ${Math.round(value)} از ۱۰۰، بر اساس ${sampleCount ?? 0} پاسخ`
+    : value
+      ? difficultyLabels[value]
+      : "تعیین نشده";
   return (
     <span
       role="img"
@@ -20,7 +36,11 @@ export function DifficultyGauge({ value }: { value?: Difficulty }) {
           stroke="currentColor"
           strokeWidth="7"
           strokeLinecap="round"
-          className={value ? "text-teal-400" : "text-slate-200"}
+          className={
+            value !== undefined && value !== null
+              ? "text-teal-400"
+              : "text-slate-200"
+          }
         />
         <path
           d="M31 16.8 A32 32 0 0 1 57 16.8"
@@ -28,7 +48,11 @@ export function DifficultyGauge({ value }: { value?: Difficulty }) {
           stroke="currentColor"
           strokeWidth="7"
           strokeLinecap="round"
-          className={value ? "text-amber-400" : "text-slate-200"}
+          className={
+            value !== undefined && value !== null
+              ? "text-amber-400"
+              : "text-slate-200"
+          }
         />
         <path
           d="M60 18.3 A32 32 0 0 1 76 46"
@@ -36,9 +60,13 @@ export function DifficultyGauge({ value }: { value?: Difficulty }) {
           stroke="currentColor"
           strokeWidth="7"
           strokeLinecap="round"
-          className={value ? "text-rose-400" : "text-slate-200"}
+          className={
+            value !== undefined && value !== null
+              ? "text-rose-400"
+              : "text-slate-200"
+          }
         />
-        {value && (
+        {value !== undefined && value !== null && (
           <path
             d={`M44 46 L${point[0]} ${point[1]}`}
             stroke="currentColor"

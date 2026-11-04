@@ -12,7 +12,13 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { useState } from "react";
 import { AppLink as Link } from "@/components/app-link";
-import { Plus, LibraryBig, Search, SlidersHorizontal, Pencil } from "lucide-react";
+import {
+  Plus,
+  LibraryBig,
+  Search,
+  SlidersHorizontal,
+  Pencil,
+} from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { QuestionPresentation } from "@/components/question-presentation";
 import { curriculumTopicChoices } from "@/lib/curriculum";
@@ -551,6 +557,9 @@ export function QuestionBank({
         <PagedList items={visible} label="بانک سؤال">
           {(q, i) => {
             const c = q.topicId ? byTopic.get(q.topicId) : undefined;
+            const examQuestion =
+              q.origin === "exam_import_reviewed" ||
+              q.originalOrigin === "exam_import_reviewed";
             return (
               <article
                 key={q._id}
@@ -563,7 +572,17 @@ export function QuestionBank({
                   <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-slate-600">
                     {types[q.type] ?? q.type}
                   </span>
-                  <DifficultyGauge value={q.difficulty} />
+                  <DifficultyGauge
+                    value={examQuestion ? q.difficultyScore : q.difficulty}
+                    sampleCount={q.difficultyResponses?.participants}
+                  />
+                  {examQuestion && (
+                    <span className="text-xs text-slate-500">
+                      {q.difficultyScore == null
+                        ? "سختی پس از پاسخ دانش‌آموزان مشخص می‌شود"
+                        : `${fa(q.difficultyScore)} از ۱۰۰ · بر پایهٔ ${fa(q.difficultyResponses?.participants ?? 0)} پاسخ`}
+                    </span>
+                  )}
                   {q.difficultyAssessment?.needsReview && (
                     <span
                       className="text-amber-700"
@@ -625,6 +644,15 @@ export function QuestionBank({
                         ).toLocaleDateString("fa-IR", { timeZone: "UTC" })}
                       </span>
                     )}
+                    {q.source.questionNumber ? (
+                      <span className="rounded-md bg-blue-50 px-2 py-1 font-medium text-[#233B8F]">
+                        شماره در دفترچه: {fa(q.source.questionNumber)}
+                      </span>
+                    ) : q.origin === "exam_import_reviewed" ? (
+                      <span className="rounded-md bg-amber-50 px-2 py-1 text-amber-800">
+                        شمارهٔ اصلی دفترچه ثبت نشده
+                      </span>
+                    ) : null}
                     {q.source.sourcePage && (
                       <span>صفحهٔ PDF: {fa(q.source.sourcePage)}</span>
                     )}
@@ -661,6 +689,7 @@ export function QuestionBank({
                   options={q.type === "choice" ? q.options : undefined}
                   correctReference={q.reference}
                   visuals={q.visuals}
+                  visualLayout={q.visualLayout}
                   onCrop={() => {
                     setCropOpen(true);
                     setEditing(q._id);

@@ -109,6 +109,9 @@ export async function connect(
       { unique: true },
     );
   await db
+    .collection("questionDifficultyResponses")
+    .createIndex({ questionVersionId: 1, result: 1 });
+  await db
     .collection("hintEvents")
     .createIndex(
       { assignmentId: 1, questionVersionId: 1, level: 1 },

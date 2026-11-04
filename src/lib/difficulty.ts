@@ -2,6 +2,14 @@ import { z } from "zod";
 export const difficultySchema = z.enum(["easy", "medium", "hard"]);
 export const difficultyLabels = { easy: "آسان", medium: "متوسط", hard: "سخت" };
 export type Difficulty = z.infer<typeof difficultySchema>;
+export function empiricalDifficultyScore(correct: number, incorrect: number) {
+  const participants = correct + incorrect;
+  return participants ? Math.round((incorrect / participants) * 100) : null;
+}
+
+export function difficultyBucket(score: number): Difficulty {
+  return score <= 33 ? "easy" : score >= 67 ? "hard" : "medium";
+}
 // A transparent initial estimate, never a calibrated measure or an AI claim.
 export function estimateDifficulty(q: {
   statement: string;

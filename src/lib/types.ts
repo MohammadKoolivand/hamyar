@@ -118,6 +118,12 @@ export interface Question {
   source?: import("./question-source").QuestionSource;
   classification?: "topic" | "free";
   difficulty?: "easy" | "medium" | "hard";
+  difficultyScore?: number | null;
+  difficultyResponses?: {
+    correct: number;
+    incorrect: number;
+    participants: number;
+  };
   difficultyAssessment?: {
     method: string;
     needsReview: boolean;
@@ -125,11 +131,12 @@ export interface Question {
   };
   year?: number;
   origin?: string;
+  originalOrigin?: string;
   visuals?: QuestionVisual[];
   visualLayout?: "below" | "beside";
-  reference?: string;
   _id: string;
   statement: string;
+  reference: string;
   type: string;
   options: string[];
   topicId?: string;
@@ -192,6 +199,7 @@ export interface ReportQuestion {
   type: string;
   options: string[];
   visuals: QuestionVisual[];
+  visualLayout?: "below" | "beside";
   reference?: string;
   answer: string | null;
   result: string;

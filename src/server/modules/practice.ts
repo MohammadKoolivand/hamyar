@@ -8,6 +8,7 @@ import { evaluate, type HintProvider, type QuestionInput } from "../domain";
 import { assertOpen, transition } from "../state";
 import { guide } from "../ai/tutor";
 import { recordLearning } from "../learning/service";
+import { recordQuestionDifficultyResponse } from "../learning/question-difficulty";
 export function registerPractice(
   app: FastifyInstance,
   ctx: Context,
@@ -52,6 +53,7 @@ export function registerPractice(
         _id: q._id,
         statement: q.statement,
         ...(q.visuals ? { visuals: q.visuals } : {}),
+        ...(q.visualLayout ? { visualLayout: q.visualLayout } : {}),
         type: q.type,
         options: q.options,
         skillIds: q.skillIds,
@@ -151,6 +153,13 @@ export function registerPractice(
         createdAt: now(),
       };
       await c("evaluations").insertOne(evaluation, { session });
+      await recordQuestionDifficultyResponse(
+        ctx,
+        q,
+        attempt,
+        evaluation.result,
+        session,
+      );
       await recordLearning(ctx, current!, q, attempt, evaluation, session);
       await c("missions").updateOne(
         { _id: a.missionId },

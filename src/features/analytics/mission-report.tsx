@@ -258,6 +258,7 @@ export function MissionReport({
                 <QuestionPresentation
                   statement={q.statement}
                   visuals={q.visuals}
+                  visualLayout={q.visualLayout}
                 />
               </div>
               {q.type === "choice" ? (
