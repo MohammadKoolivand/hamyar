@@ -15,6 +15,9 @@ import {
   FileUp,
   UsersRound,
   Settings,
+  Search,
+  ClipboardCheck,
+  RotateCcw,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Brand } from "./ui/brand";
@@ -50,6 +53,10 @@ import { ParentDashboard } from "@/features/analytics/parent-dashboard";
 import { LearningDashboard } from "@/features/analytics/learning-dashboard";
 import { CoursesScreen } from "@/features/courses/courses-screen";
 import { ClassGroupsScreen } from "@/features/classes/class-groups-screen";
+import {
+  StudentPracticeHub,
+  StudentSearchScreen,
+} from "@/features/dashboard/student-navigation-screens";
 export default function HamyarApp() {
   const [me, setMe] = useState<User | null>(null),
     [loading, setLoading] = useState(true),
@@ -157,8 +164,25 @@ export default function HamyarApp() {
     setError("");
   }
 
-  async function restoreLocation() {
-    const next = pageFromPath(window.location.pathname);
+  async function restoreLocation(currentUser = me) {
+    let next = pageFromPath(window.location.pathname);
+    if (currentUser?.role === "student") {
+      if (next === "missions") next = "student-missions";
+      if (next === "learning") next = "student-progress";
+    }
+    if (
+      currentUser?.role === "teacher" &&
+      [
+        "student-practice",
+        "student-missions",
+        "student-mistakes",
+        "student-progress",
+        "student-search",
+      ].includes(next)
+    ) {
+      next = "dashboard";
+      window.history.replaceState({}, "", pathForPage(next));
+    }
     if (next !== "practice" && next !== "report") {
       setPage(next);
       return;
@@ -204,13 +228,15 @@ export default function HamyarApp() {
       .then(async (u) => {
         setMe(u);
         await refresh(u);
-        await restoreLocation();
+        await restoreLocation(u);
       })
       .catch(() => {
         setPage(pageFromPath(window.location.pathname));
       })
       .finally(() => setLoading(false));
-    const invitation = new URLSearchParams(window.location.search).get("invite");
+    const invitation = new URLSearchParams(window.location.search).get(
+      "invite",
+    );
     if (invitation) setToken(invitation);
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production")
       navigator.serviceWorker.register("/sw.js").catch(() => {});
@@ -294,10 +320,13 @@ export default function HamyarApp() {
         ["settings", "تنظیمات", Settings],
       ] as const)
     : ([
-        ["dashboard", "مسیر یادگیری من", LayoutDashboard],
-        ["missions", "مأموریت‌های من", Target],
+        ["dashboard", "خانه", LayoutDashboard],
         ["courses", "درس‌های من", BookOpenCheck],
-        ["learning", "یادگیری و مرور", BarChart3],
+        ["student-practice", "تمرین و آزمون", ClipboardCheck],
+        ["student-missions", "مأموریت‌های معلم", Target],
+        ["student-mistakes", "مرور اشتباهات", RotateCcw],
+        ["student-progress", "پیشرفت من", BarChart3],
+        ["student-search", "جست‌وجو", Search],
       ] as const);
   return (
     <div className="min-h-screen min-[651px]:grid min-[651px]:grid-cols-[max-content_minmax(0,1fr)]">
@@ -414,8 +443,11 @@ export default function HamyarApp() {
             showReport={showReport}
           />
         )}
-        {page === "learning" && (
-          <LearningDashboard me={me} students={students} />
+        {(page === "learning" || page === "student-progress") && (
+          <LearningDashboard me={me} students={students} focus="progress" />
+        )}
+        {page === "student-mistakes" && !teacher && (
+          <LearningDashboard me={me} students={students} focus="mistakes" />
         )}
         {page === "dashboard" &&
           (teacher ? (
@@ -516,7 +548,7 @@ export default function HamyarApp() {
             setRelativeTolerance={setRelativeTolerance}
           />
         )}
-        {page === "missions" && (
+        {(page === "missions" || page === "student-missions") && (
           <MissionsScreen
             teacher={teacher}
             courses={courses}
@@ -547,6 +579,26 @@ export default function HamyarApp() {
             setNotice={setNotice}
             showReport={showReport}
             open={open}
+          />
+        )}
+        {page === "student-practice" && !teacher && (
+          <StudentPracticeHub
+            assignments={assignments}
+            courses={courses}
+            busy={busy}
+            open={open}
+            showReport={showReport}
+            setPage={navigatePage}
+          />
+        )}
+        {page === "student-search" && !teacher && (
+          <StudentSearchScreen
+            assignments={assignments}
+            courses={courses}
+            busy={busy}
+            open={open}
+            showReport={showReport}
+            setPage={navigatePage}
           />
         )}
         {page === "practice" && active?.questions && (

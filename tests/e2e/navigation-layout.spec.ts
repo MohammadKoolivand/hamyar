@@ -14,6 +14,11 @@ test("each navigation section resolves to a standalone URL on direct load", asyn
     "/content-new",
     "/resources",
     "/learning",
+    "/student-practice",
+    "/student-missions",
+    "/mistakes",
+    "/progress",
+    "/search",
     "/practice",
     "/report",
   ];
@@ -24,6 +29,38 @@ test("each navigation section resolves to a standalone URL on direct load", asyn
     ).toBeVisible();
     expect(new URL(page.url()).pathname).toBe(route);
   }
+});
+
+test("student navigation exposes the phase-one learning architecture with working deep links", async ({
+  page,
+}) => {
+  await registerSyntheticUser(page, "دانش‌آموز معماری", "student");
+
+  const destinations = [
+    ["خانه", "/dashboard"],
+    ["درس‌های من", "/courses"],
+    ["تمرین و آزمون", "/student-practice"],
+    ["مأموریت‌های معلم", "/student-missions"],
+    ["مرور اشتباهات", "/mistakes"],
+    ["پیشرفت من", "/progress"],
+    ["جست‌وجو", "/search"],
+  ] as const;
+
+  for (const [label, path] of destinations) {
+    await page.getByRole("button", { name: label, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await page.reload();
+    await expect(page.locator("main > header h1")).toHaveText(label);
+  }
+
+  await page.getByLabel("جست‌وجو در درس‌ها و مأموریت‌ها").fill("ریاضی");
+  await expect(page.getByRole("status")).toContainText("۰ نتیجه پیدا شد");
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });
 
 test("logged-in teacher navigation supports deep links, refresh, Back and Forward; header fits content", async ({

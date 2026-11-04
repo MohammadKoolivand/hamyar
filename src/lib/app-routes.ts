@@ -10,6 +10,11 @@ export const tabPaths = {
   settings: "/settings",
   missions: "/homeworks",
   learning: "/learning",
+  "student-practice": "/student-practice",
+  "student-missions": "/student-missions",
+  "student-mistakes": "/mistakes",
+  "student-progress": "/progress",
+  "student-search": "/search",
 } as const;
 
 export type TabPage = keyof typeof tabPaths;

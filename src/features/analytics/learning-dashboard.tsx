@@ -96,10 +96,12 @@ export function LearningDashboard({
   me,
   students,
   subjectId,
+  focus = "all",
 }: {
   me: User;
   students: User[];
   subjectId?: string;
+  focus?: "all" | "mistakes" | "progress";
 }) {
   const [skillFilter, setSkillFilter] = useState("all");
   const [skillTarget, setSkillTarget] = useState(0);
@@ -129,6 +131,16 @@ export function LearningDashboard({
   useEffect(() => {
     if (me.role === "teacher" && !sid && students[0]) setSid(students[0]._id);
   }, [me.role, sid, students]);
+  useEffect(() => {
+    if (!data || focus === "all") return;
+    requestAnimationFrame(() =>
+      document
+        .getElementById(
+          focus === "mistakes" ? "student-mistakes" : "student-progress",
+        )
+        ?.scrollIntoView({ block: "start" }),
+    );
+  }, [data, focus]);
   async function override(skillId: string, status: string, reason: string) {
     setBusy(true);
     setError("");
@@ -178,7 +190,10 @@ export function LearningDashboard({
         </p>
       ) : (
         <>
-          <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <section
+            id="student-progress"
+            className="grid scroll-mt-6 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {[
               [
                 data.independent,
@@ -452,7 +467,10 @@ export function LearningDashboard({
               )}
             </PagedList>
           </section>
-          <section className="grid gap-3 glass-panel p-6">
+          <section
+            id="student-mistakes"
+            className="grid scroll-mt-6 gap-3 glass-panel p-6"
+          >
             <h2 className="text-lg font-bold">دفترچه اشتباهات</h2>
             {!data.mistakes.length && (
               <p className="text-sm text-slate-500">

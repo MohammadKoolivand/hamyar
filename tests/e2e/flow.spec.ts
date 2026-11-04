@@ -1,7 +1,11 @@
 import { chooseTopic, chooseParent } from "./curriculum-helpers";
 import { test, expect } from "@playwright/test";
 const pass = "StrongPass123!";
-import { registerSyntheticUser, loginSyntheticUser, syntheticPhone } from "./auth-helpers";
+import {
+  registerSyntheticUser,
+  loginSyntheticUser,
+  syntheticPhone,
+} from "./auth-helpers";
 test("UI: teacher creates content and invite; student solves; both see evidence", async ({
   page,
   browser,
@@ -90,7 +94,7 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   await loginSyntheticUser(sp, student, pass);
 
   await expect(
-    sp.getByRole("heading", { name: "مسیر یادگیری من", exact: true }),
+    sp.getByRole("heading", { name: "خانه", exact: true }),
   ).toBeVisible();
   await sp.screenshot({
     path: testInfo.outputPath("glass-student-dashboard.png"),
@@ -125,7 +129,9 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     path: testInfo.outputPath("student-dashboard-legacy-mobile.png"),
     fullPage: true,
   });
-  await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
+  await sp
+    .getByRole("button", { name: "مأموریت‌های معلم", exact: true })
+    .click();
   await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
   await expect(
     sp.getByText("حاصل یک به علاوه یک چیست؟", { exact: true }),
@@ -137,14 +143,16 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
   });
   await sp.getByLabel("پاسخ شما", { exact: true }).fill("1");
   // Unsaved input survives feature unmount and a full page reload.
+  await sp.getByRole("button", { name: "خانه", exact: true }).click();
   await sp
-    .getByRole("button", { name: "مسیر یادگیری من", exact: true })
+    .getByRole("button", { name: "مأموریت‌های معلم", exact: true })
     .click();
-  await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
   await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
   await expect(sp.getByLabel("پاسخ شما", { exact: true })).toHaveValue("1");
   await sp.reload();
-  await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
+  await sp
+    .getByRole("button", { name: "مأموریت‌های معلم", exact: true })
+    .click();
   await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
   await expect(sp.getByLabel("پاسخ شما", { exact: true })).toHaveValue("1");
   for (const width of [360, 390, 768, 1280]) {
@@ -276,7 +284,9 @@ test("PWA shell works offline without caching private API data", async ({
   expect(urls.some((u) => new URL(u).pathname.startsWith("/api/"))).toBe(false);
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" }),
+  ).toBeVisible();
   await context.setOffline(false);
 });
 
@@ -303,7 +313,9 @@ test("licensed local fonts load and layout uses Tailwind utilities", async ({
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" }).waitFor();
+  await page
+    .getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" })
+    .waitFor();
   const fonts = await page.evaluate(async () => {
     const style = getComputedStyle(document.documentElement);
     const latin = style.getPropertyValue("--font-latin");
@@ -404,10 +416,20 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
       viewport: { width: 390, height: 844 },
     }),
     sp = await sc.newPage();
-  const invitedSecondStudent = await sp.request.post("/api/invitations/accept", {
-    data: { name: "دانش‌آموز آزمایشی", phone: student, password: pass, token },
-  });
-  expect(invitedSecondStudent.ok(), await invitedSecondStudent.text()).toBe(true);
+  const invitedSecondStudent = await sp.request.post(
+    "/api/invitations/accept",
+    {
+      data: {
+        name: "دانش‌آموز آزمایشی",
+        phone: student,
+        password: pass,
+        token,
+      },
+    },
+  );
+  expect(invitedSecondStudent.ok(), await invitedSecondStudent.text()).toBe(
+    true,
+  );
   await loginSyntheticUser(sp, student, pass);
 
   await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
@@ -425,7 +447,9 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
     page.getByRole("button", { name: "گزارش و شواهد" }),
   ).toBeVisible();
   await sp.reload();
-  await sp.getByRole("button", { name: "مأموریت‌های من", exact: true }).click();
+  await sp
+    .getByRole("button", { name: "مأموریت‌های معلم", exact: true })
+    .click();
   await sp.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
   await sp.getByLabel("پاسخ شما", { exact: true }).fill("7");
   await sp.getByRole("button", { name: "ثبت و بررسی پاسخ" }).click();
@@ -446,7 +470,12 @@ test("real AI question draft → teacher edit/approve or reject; parent read-onl
   const parentToken = new URL(invite).searchParams.get("invite");
   expect(parentToken).toBeTruthy();
   const parentAccepted = await pp.request.post("/api/invitations/accept", {
-    data: { name: "ولی آزمایشی", phone: parent, password: pass, token: parentToken },
+    data: {
+      name: "ولی آزمایشی",
+      phone: parent,
+      password: pass,
+      token: parentToken,
+    },
   });
   expect(parentAccepted.ok(), await parentAccepted.text()).toBe(true);
   await loginSyntheticUser(pp, parent, pass);
@@ -509,9 +538,7 @@ test("student registers without invitation and later joins teacher with existing
   await page.setViewportSize({ width: 390, height: 844 });
   await registerSyntheticUser(page, "دانش‌آموز مستقل", "student", studentEmail);
 
-  await expect(
-    page.getByRole("heading", { name: "مسیر یادگیری من" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "خانه" })).toBeVisible();
   await expect(
     page.getByText("هنوز مأموریتی نداری.", { exact: false }),
   ).toBeVisible();
@@ -526,7 +553,12 @@ test("student registers without invitation and later joins teacher with existing
   const teacherContext = await browser.newContext();
   try {
     const teacherPage = await teacherContext.newPage();
-    await registerSyntheticUser(teacherPage, "معلم آزمایشی", "teacher", teacherEmail);
+    await registerSyntheticUser(
+      teacherPage,
+      "معلم آزمایشی",
+      "teacher",
+      teacherEmail,
+    );
 
     await teacherPage
       .getByRole("button", { name: "درس‌های من", exact: true })
@@ -565,9 +597,7 @@ test("student registers without invitation and later joins teacher with existing
       teacherPage.getByRole("heading", { name: "دانش‌آموز مستقل" }),
     ).toBeVisible();
     await page.reload();
-    await expect(
-      page.getByRole("heading", { name: "مسیر یادگیری من" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "خانه" })).toBeVisible();
     await expect(page.getByTestId("student-course-card")).toHaveCount(1);
     await expect(
       page
@@ -621,7 +651,12 @@ test("student requests a course, teacher approves, and leaving keeps history", a
   });
   try {
     const student = await studentContext.newPage();
-    await registerSyntheticUser(student, "دانش‌آموز درخواست‌کننده", "student", studentEmail);
+    await registerSyntheticUser(
+      student,
+      "دانش‌آموز درخواست‌کننده",
+      "student",
+      studentEmail,
+    );
 
     await student
       .getByRole("button", { name: "درس‌های من", exact: true })
@@ -774,8 +809,8 @@ test("teacher publishes one group assignment to two students and sees separate r
     const secondPage = await contexts[1].newPage();
     await firstPage.goto("/");
     await secondPage.goto("/");
-    await firstPage.getByRole("button", { name: "مأموریت‌های من" }).click();
-    await secondPage.getByRole("button", { name: "مأموریت‌های من" }).click();
+    await firstPage.getByRole("button", { name: "مأموریت‌های معلم" }).click();
+    await secondPage.getByRole("button", { name: "مأموریت‌های معلم" }).click();
     await expect(firstPage.getByText("تکلیف گروهی ریاضی")).toBeVisible();
     await expect(secondPage.getByText("تکلیف گروهی ریاضی")).toBeVisible();
     await firstPage.getByRole("button", { name: "شروع / ادامه تمرین" }).click();
@@ -948,7 +983,7 @@ test("teacher assigns one corrective practice from a student's wrong answer", as
 
     const studentPage = await context.newPage();
     await studentPage.goto("/");
-    await studentPage.getByRole("button", { name: "مأموریت‌های من" }).click();
+    await studentPage.getByRole("button", { name: "مأموریت‌های معلم" }).click();
     await expect(
       studentPage.getByText("تمرین تقویتی اختصاصی", { exact: true }),
     ).toBeVisible();
