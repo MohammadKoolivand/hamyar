@@ -32,6 +32,7 @@ import { registerAnalytics } from "./modules/analytics";
 import { registerLearning } from "./modules/learning";
 import { registerAuthoring } from "./modules/authoring";
 import type { QuestionGenerator } from "./ai/question-generator";
+import { isAllowedRequestOrigin } from "./security/request-origin";
 export async function buildApp(
   db: Db,
   provider: HintProvider = new MockProvider(),
@@ -128,7 +129,7 @@ export async function buildApp(
         fail(403, "مبدأ نامعتبر است");
         return;
       }
-      if (origin.origin !== allowedOrigin.origin)
+      if (!isAllowedRequestOrigin(origin, allowedOrigin))
         fail(403, "مبدأ درخواست مجاز نیست");
     }
   });

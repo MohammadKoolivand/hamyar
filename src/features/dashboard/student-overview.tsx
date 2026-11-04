@@ -212,14 +212,15 @@ export function StudentOverview({
         <>
           <section aria-label="دسترسی سریع" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[
-              { label: "تمرین و آزمون", detail: `${count(readyAssignments.length)} تمرین آماده`, icon: PlayCircle, page: "student-practice" },
-              { label: "مأموریت‌های معلم", detail: `${count(data.summary.assignments)} مأموریت`, icon: Target, page: "student-missions" },
-              { label: "مرور اشتباهات", detail: "تمرین دوباره و اصلاح", icon: RotateCcw, page: "student-mistakes" },
-              { label: "پیشرفت من", detail: `${count(data.summary.completed)} مأموریت تکمیل‌شده`, icon: BarChart3, page: "student-progress" },
+              { label: "تمرین و آزمون", ariaLabel: "باز کردن تمرین‌های آماده", detail: `${count(readyAssignments.length)} تمرین آماده`, icon: PlayCircle, page: "student-practice" },
+              { label: "مأموریت‌های معلم", ariaLabel: "باز کردن تکلیف‌های من", detail: `${count(data.summary.assignments)} مأموریت`, icon: Target, page: "student-missions" },
+              { label: "مرور اشتباهات", ariaLabel: "باز کردن مرور اشتباهات", detail: "تمرین دوباره و اصلاح", icon: RotateCcw, page: "student-mistakes" },
+              { label: "پیشرفت من", ariaLabel: "باز کردن گزارش پیشرفت", detail: `${count(data.summary.completed)} مأموریت تکمیل‌شده`, icon: BarChart3, page: "student-progress" },
             ].map((item) => (
               <button
                 key={item.label}
                 type="button"
+                aria-label={item.ariaLabel}
                 onClick={() => setPage(item.page)}
                 className="glass-panel grid cursor-pointer gap-3 p-4 text-right transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2457b8] motion-reduce:transform-none"
               >

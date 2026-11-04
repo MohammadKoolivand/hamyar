@@ -49,13 +49,13 @@ test("student navigation exposes the phase-one learning architecture with workin
     page.getByRole("heading", { name: "درس‌های من", exact: true }),
   ).toBeVisible();
   for (const action of [
-    "تمرین و آزمون",
-    "مأموریت‌های معلم",
-    "مرور اشتباهات",
-    "پیشرفت من",
+    "باز کردن تمرین‌های آماده",
+    "باز کردن تکلیف‌های من",
+    "باز کردن مرور اشتباهات",
+    "باز کردن گزارش پیشرفت",
   ]) {
     await expect(
-      page.getByRole("button", { name: new RegExp(action) }).last(),
+      page.getByRole("button", { name: action, exact: true }),
     ).toBeVisible();
   }
 
