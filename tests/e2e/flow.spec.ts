@@ -223,7 +223,7 @@ test("UI: teacher creates content and invite; student solves; both see evidence"
     path: testInfo.outputPath("teacher-report-desktop.png"),
     fullPage: true,
   });
-  await sp.getByRole("button", { name: "یادگیری و مرور", exact: true }).click();
+  await sp.getByRole("button", { name: "مرور اشتباهات", exact: true }).click();
   await expect(
     sp.getByRole("heading", { name: "دفترچه اشتباهات", exact: true }),
   ).toBeVisible();
