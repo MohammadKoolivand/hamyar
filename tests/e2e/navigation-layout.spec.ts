@@ -36,6 +36,29 @@ test("student navigation exposes the phase-one learning architecture with workin
 }) => {
   await registerSyntheticUser(page, "دانش‌آموز معماری", "student");
 
+  await expect(
+    page.getByRole("heading", { name: "سلام دانش‌آموز معماری، خوش آمدی" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "جست‌وجو در درس‌ها و مأموریت‌ها",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "درس‌های من", exact: true }),
+  ).toBeVisible();
+  for (const action of [
+    "تمرین و آزمون",
+    "مأموریت‌های معلم",
+    "مرور اشتباهات",
+    "پیشرفت من",
+  ]) {
+    await expect(
+      page.getByRole("button", { name: new RegExp(action) }).last(),
+    ).toBeVisible();
+  }
+
   const destinations = [
     ["خانه", "/dashboard"],
     ["درس‌های من", "/courses"],

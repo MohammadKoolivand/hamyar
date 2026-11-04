@@ -66,7 +66,7 @@ export function PhoneAuthScreen() {
             ? "شماره موبایل تأیید شد؛ نام و نقش خود را انتخاب کنید. نیازی به کد دوباره نیست."
             : challenge
               ? developmentBypass
-                ? "حالت توسعه: پیامکی ارسال نشده؛ یک کد شش‌رقمی دلخواه وارد کنید."
+                ? "حالت توسعه: پیامکی ارسال نشده؛ هر کد عددی دلخواه را وارد کنید."
                 : `کد پیامکی برای ${normalizePhone(phone)} ارسال شده و پنج دقیقه معتبر است.`
               : "با شماره موبایل خودتان وارد شوید؛ نیازی به رمز عبور نیست."}
         </p>
@@ -132,15 +132,15 @@ export function PhoneAuthScreen() {
                 dir="ltr"
                 inputMode="numeric"
                 autoComplete="one-time-code"
-                maxLength={6}
-                minLength={6}
+                maxLength={developmentBypass ? 12 : 6}
+                minLength={developmentBypass ? 1 : 6}
                 required
                 value={code}
                 onChange={(e) =>
                   setCode(
                     normalizePhone(e.target.value)
                       .replace(/\D/g, "")
-                      .slice(0, 6),
+                      .slice(0, developmentBypass ? 12 : 6),
                   )
                 }
               />

@@ -1,6 +1,19 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { developmentOtpBypass } from "../../src/server/modules/phone-auth";
+import {
+  developmentOtpBypass,
+  validOtpCode,
+} from "../../src/server/modules/phone-auth";
+
+test("development bypass accepts any short numeric code while production requires six digits", () => {
+  assert.equal(validOtpCode("1", true), true);
+  assert.equal(validOtpCode("1234", true), true);
+  assert.equal(validOtpCode("۱۲۳۴", true), false);
+  assert.equal(validOtpCode("anything", true), false);
+  assert.equal(validOtpCode("1234", false), false);
+  assert.equal(validOtpCode("123456", false), true);
+  assert.equal(validOtpCode("1234567", false), false);
+});
 
 test("development OTP bypass needs an explicit loopback app and development database", () => {
   const names = ["NODE_ENV", "AUTH_OTP_DEV_BYPASS", "APP_ORIGIN", "MONGO_URL", "MONGO_DB"] as const;

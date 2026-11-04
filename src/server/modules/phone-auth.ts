@@ -33,6 +33,9 @@ export function developmentOtpBypass(activeDatabase?: string) {
     return false;
   }
 }
+export function validOtpCode(code: string, bypass: boolean) {
+  return bypass ? /^\d{1,12}$/.test(code) : /^\d{6}$/.test(code);
+}
 const developmentSecret = randomBytes(32);
 function secret() {
   if (developmentOtpBypass()) return developmentSecret;
@@ -152,7 +155,7 @@ export function registerPhoneAuth(
         resendAfter: 60,
         developmentBypass: bypass,
         message: bypass
-          ? "حالت توسعه: پیامک ارسال نمی‌شود؛ هر کد شش‌رقمی پذیرفته می‌شود."
+          ? "حالت توسعه: پیامک ارسال نمی‌شود؛ هر کد عددی دلخواه پذیرفته می‌شود."
           : "کد تأیید به شماره واردشده ارسال شد.",
       };
     },
@@ -176,7 +179,7 @@ export function registerPhoneAuth(
           code: z
             .string()
             .transform(normalizePhone)
-            .pipe(z.string().regex(/^\d{6}$/)),
+            .pipe(z.string().regex(/^\d{1,12}$/)),
           name: z.string().trim().min(2).max(100).optional(),
           role: z.enum(["teacher", "student"]).optional(),
           invitationToken: z.string().min(20).max(100).optional(),
@@ -191,6 +194,7 @@ export function registerPhoneAuth(
       const bypass = developmentOtpBypass(activeDatabase);
       if (process.env.AUTH_OTP_DEV_BYPASS === "true" && !bypass)
         ctx.fail(503, "حالت آزمایشی فقط روی محیط توسعه محلی و دیتابیس آزمایشی مجاز است.");
+      if (!validOtpCode(b.code, bypass)) ctx.fail(400, "کد تأیید نامعتبر است.");
       const sessionToken = ctx.randomBytes(32).toString("hex");
       const result = await ctx.transaction(async (session) => {
         const query = {

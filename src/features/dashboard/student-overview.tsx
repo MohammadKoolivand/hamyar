@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, BookOpenCheck, CheckCircle2, ClipboardList } from "lucide-react";
+import {
+  ArrowLeft,
+  BarChart3,
+  BookOpenCheck,
+  CheckCircle2,
+  ClipboardList,
+  PlayCircle,
+  RotateCcw,
+  Search,
+  Target,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StudentJoinTeacher } from "@/features/students/join-teacher";
 import type { Assignment, DashboardCourse, DashboardMission, StudentDashboardData, User } from "@/lib/types";
@@ -37,6 +47,15 @@ export function StudentOverview({
     : courseList;
   const legacyVisible = !selectedExists && !!data?.legacy.assignments;
   const byId = new Map(assignments.map((a) => [a._id, a]));
+  const readyAssignments = assignments.filter((assignment) =>
+    ["published", "in_progress"].includes(assignment.state),
+  );
+  const nextAssignment =
+    readyAssignments.find((assignment) => assignment.state === "in_progress") ??
+    readyAssignments[0];
+  const nextCourse = courseList.find(
+    (course) => course.courseId === nextAssignment?.courseId,
+  );
 
   function missionRow(mission: DashboardMission) {
     const assignment = byId.get(mission._id);
@@ -141,22 +160,77 @@ export function StudentOverview({
 
   return (
     <div className="grid gap-5">
-      <section className="glass-hero flex flex-wrap items-center justify-between gap-5 p-6 sm:p-8">
-        <div className="grid gap-3">
+      <section className="glass-hero grid gap-5 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.72fr)] lg:items-center">
+        <div className="grid gap-4">
           <span className="glass-kicker w-fit px-3 py-1.5 text-xs">یادگیری، قدم به قدم</span>
           <h2 className="text-[24px] font-bold text-[#17305e]">سلام {me.name}، خوش آمدی</h2>
           <p className="max-w-2xl text-sm leading-loose text-slate-600">
-            مأموریت‌های همه معلم‌ها را یکجا ببین و پیشرفت تمرین در هر درس را جداگانه دنبال کن.
+            درس، تمرین یا مأموریتی را که می‌خواهی پیدا کن و یادگیری را از همان‌جا ادامه بده.
           </p>
+          <button
+            type="button"
+            onClick={() => setPage("student-search")}
+            className="glass-field flex min-h-12 w-full cursor-pointer items-center gap-3 px-4 text-right text-sm text-slate-500 transition hover:border-[#7fa6ee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2457b8]"
+            aria-label="جست‌وجو در درس‌ها و مأموریت‌ها"
+          >
+            <Search size={19} aria-hidden />
+            نام درس یا مأموریت را جست‌وجو کن…
+          </button>
         </div>
-        <Button variant="outline" onClick={() => setPage("courses")}>
-          مشاهده همه درس‌ها <ArrowLeft size={16} aria-hidden />
-        </Button>
+        <div className="glass-panel grid gap-3 p-5">
+          <div className="flex items-center gap-3">
+            <span className="grid size-11 place-items-center rounded-xl bg-[#e8efff] text-[#2457b8]">
+              <PlayCircle size={22} aria-hidden />
+            </span>
+            <div>
+              <p className="text-xs text-slate-500">پیشنهاد بعدی</p>
+              <h3 className="font-bold text-[#17305e]">
+                {nextAssignment?.title ?? "فعلاً تمرین آماده‌ای نداری"}
+              </h3>
+            </div>
+          </div>
+          {nextAssignment ? (
+            <>
+              <p className="text-xs leading-6 text-slate-600">
+                {nextCourse?.title ?? "مأموریت معلم"} · {nextAssignment.state === "in_progress" ? "در حال انجام" : "آماده شروع"}
+              </p>
+              <Button disabled={busy} onClick={() => void open(nextAssignment)}>
+                {nextAssignment.state === "in_progress" ? "ادامه یادگیری" : "شروع تمرین"}
+                <ArrowLeft size={16} aria-hidden />
+              </Button>
+            </>
+          ) : (
+            <Button variant="outline" onClick={() => setPage("courses")}>
+              مشاهده درس‌ها <ArrowLeft size={16} aria-hidden />
+            </Button>
+          )}
+        </div>
       </section>
       {!data ? (
         <section className="glass-panel p-6" role="status">در حال آماده‌سازی نمای درس‌ها و شواهد تمرین…</section>
       ) : (
         <>
+          <section aria-label="دسترسی سریع" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {[
+              { label: "تمرین و آزمون", detail: `${count(readyAssignments.length)} تمرین آماده`, icon: PlayCircle, page: "student-practice" },
+              { label: "مأموریت‌های معلم", detail: `${count(data.summary.assignments)} مأموریت`, icon: Target, page: "student-missions" },
+              { label: "مرور اشتباهات", detail: "تمرین دوباره و اصلاح", icon: RotateCcw, page: "student-mistakes" },
+              { label: "پیشرفت من", detail: `${count(data.summary.completed)} مأموریت تکمیل‌شده`, icon: BarChart3, page: "student-progress" },
+            ].map((item) => (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => setPage(item.page)}
+                className="glass-panel grid cursor-pointer gap-3 p-4 text-right transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2457b8] motion-reduce:transform-none"
+              >
+                <item.icon size={21} className="text-[#2457b8]" aria-hidden />
+                <span>
+                  <strong className="block text-sm">{item.label}</strong>
+                  <small className="mt-1 block text-xs leading-6 text-slate-500">{item.detail}</small>
+                </span>
+              </button>
+            ))}
+          </section>
           <section aria-label="خلاصه یادگیری" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[
               { label: "درس‌های فعال", value: data.summary.activeCourses, icon: BookOpenCheck },
@@ -178,7 +252,10 @@ export function StudentOverview({
           )}
           <section className="grid gap-4" aria-label="پیشرفت به تفکیک درس">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-xl font-bold">پیشرفت به تفکیک درس</h2>
+              <div>
+                <h2 className="text-xl font-bold">درس‌های من</h2>
+                <p className="mt-1 text-xs text-slate-600">درس‌ها، مأموریت‌ها و پیشرفت هر درس در یک نگاه.</p>
+              </div>
               {!!courseList.length && (
                 <label className="flex items-center gap-2 text-sm text-slate-700">
                   نمایش درس
