@@ -328,99 +328,180 @@ export default function HamyarApp() {
         ["student-progress", "پیشرفت من", BarChart3],
         ["student-search", "جست‌وجو", Search],
       ] as const);
+  const currentTitle =
+    nav.find((n) => n[0] === page)?.[1] ??
+    (page === "exam-import"
+      ? "ورود آزمون"
+      : page === "content-new"
+        ? "افزودن سؤال"
+        : page === "report"
+          ? "گزارش عملکرد"
+          : "محیط تمرین");
   return (
-    <div className="min-h-screen min-[651px]:grid min-[651px]:grid-cols-[max-content_minmax(0,1fr)]">
-      <aside className="glass-sidebar min-w-0 min-[651px]:w-max min-[651px]:min-w-max mx-3 my-3 flex flex-col gap-6 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
-        <Brand showTagline />
-        <small className="text-xs leading-loose text-slate-500">
-          {teacher ? "فضای کار معلم" : "فضای تمرین دانش‌آموز"}
-        </small>
-        <nav className="grid gap-2 min-[651px]:[&_button]:whitespace-nowrap">
-          {nav.map(([key, title, Icon]) => (
+    <div
+      className={clsx(
+        "min-h-screen",
+        !teacher && "hy-student-site",
+        teacher &&
+          "min-[651px]:grid min-[651px]:grid-cols-[max-content_minmax(0,1fr)]",
+      )}
+    >
+      {teacher ? (
+        <aside className="glass-sidebar min-w-0 min-[651px]:w-max min-[651px]:min-w-max mx-3 my-3 flex flex-col gap-6 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
+          <Brand showTagline />
+          <small className="text-xs leading-loose text-slate-500">
+            {teacher ? "فضای کار معلم" : "فضای تمرین دانش‌آموز"}
+          </small>
+          <nav className="grid gap-2 min-[651px]:[&_button]:whitespace-nowrap">
+            {nav.map(([key, title, Icon]) => (
+              <button
+                key={key}
+                onClick={() => navigatePage(key)}
+                data-active={page === key}
+                className={clsx(
+                  "hy-navigation-item flex w-full cursor-pointer items-center gap-3 rounded-[15px] p-2.5 text-right motion-reduce:transition-none max-[650px]:whitespace-nowrap",
+                  page === key && "font-bold",
+                )}
+              >
+                <span
+                  className="hy-icon-container !size-9 !rounded-xl"
+                  data-tone={
+                    key === "missions"
+                      ? "gold"
+                      : key === "students"
+                        ? "teal"
+                        : key === "learning"
+                          ? "purple"
+                          : "blue"
+                  }
+                >
+                  <Icon size={18} aria-hidden />
+                </span>
+                {title}
+              </button>
+            ))}
+          </nav>
+          <footer className="grid gap-[18px] mt-auto">
+            <div className="glass-note p-3.5 leading-[1.9]">
+              <Sparkles size={18} />
+              <small className="text-xs leading-loose text-slate-500">
+                معلم آموزش می‌دهد،
+                <br />
+                هدهد راهنمایی می‌کند.
+              </small>
+            </div>
+          </footer>
+          <Button
+            variant="outline"
+            onClick={() =>
+              run(async () => {
+                await logout();
+              })
+            }
+          >
+            <LogOut size={16} />
+            خروج
+          </Button>
+        </aside>
+      ) : (
+        <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-4 px-5 py-3 md:flex-nowrap lg:px-8">
             <button
-              key={key}
-              onClick={() => navigatePage(key)}
-              data-active={page === key}
-              className={clsx(
-                "hy-navigation-item flex w-full cursor-pointer items-center gap-3 rounded-[15px] p-2.5 text-right motion-reduce:transition-none max-[650px]:whitespace-nowrap",
-                page === key && "font-bold",
-              )}
+              type="button"
+              onClick={() => navigatePage("dashboard")}
+              className="shrink-0 cursor-pointer"
+              aria-label="رفتن به خانه هدهد"
             >
-              <span
-                className="hy-icon-container !size-9 !rounded-xl"
-                data-tone={
-                  key === "missions"
-                    ? "gold"
-                    : key === "students"
-                      ? "teal"
-                      : key === "learning"
-                        ? "purple"
-                        : "blue"
+              <Brand />
+            </button>
+            <nav className="order-3 flex w-full gap-1 overflow-x-auto border-t border-slate-100 pt-2 md:order-none md:w-auto md:flex-1 md:border-0 md:pt-0">
+              {nav.slice(0, 5).map(([key, title, Icon]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => navigatePage(key)}
+                  data-active={page === key}
+                  className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
+                >
+                  <Icon size={17} aria-hidden />
+                  {title}
+                </button>
+              ))}
+            </nav>
+            <div className="ms-auto flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                className="hidden cursor-pointer rounded-xl px-3 py-2 text-right sm:block"
+                onClick={() => navigatePage("student-progress")}
+              >
+                <span className="block text-sm font-bold">{me.name}</span>
+                <span className="block text-xs text-slate-500">دانش‌آموز</span>
+              </button>
+              <Button
+                variant="outline"
+                aria-label="خروج"
+                onClick={() =>
+                  run(async () => {
+                    await logout();
+                  })
                 }
               >
-                <Icon size={18} aria-hidden />
-              </span>
-              {title}
-            </button>
-          ))}
-        </nav>
-        <footer className="grid gap-[18px] mt-auto">
-          <div className="glass-note p-3.5 leading-[1.9]">
-            <Sparkles size={18} />
-            <small className="text-xs leading-loose text-slate-500">
-              معلم آموزش می‌دهد،
-              <br />
-              هدهد راهنمایی می‌کند.
-            </small>
-          </div>
-        </footer>
-        <Button
-          variant="outline"
-          onClick={() =>
-            run(async () => {
-              await logout();
-            })
-          }
-        >
-          <LogOut size={16} />
-          خروج
-        </Button>
-      </aside>
-      <main className="relative grid w-full min-w-0 content-start gap-[18px] px-8 py-7 max-[950px]:p-6 max-[650px]:p-[18px]">
-        <header className="glass-header mb-2 flex h-fit self-start items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-2.5 max-[650px]:mb-2 max-[650px]:[&_h1]:text-[22px]">
-          <div>
-            <small className="text-xs leading-loose text-slate-500">
-              هدهد / {teacher ? "پنل معلم" : "یادگیری"}
-            </small>
-            <h1 className="text-[28px] font-bold text-[#17305E]">
-              {nav.find((n) => n[0] === page)?.[1] ??
-                (page === "exam-import"
-                  ? "ورود آزمون"
-                  : page === "content-new"
-                    ? "افزودن سؤال"
-                    : page === "report"
-                      ? "گزارش عملکرد"
-                      : "محیط تمرین")}
-            </h1>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="hy-icon-container !size-[46px]" data-tone="purple">
-              <img
-                src="/app-icon.svg"
-                alt=""
-                width={44}
-                height={44}
-                className="h-11 w-11 object-contain"
-              />
-            </span>
-            <div>
-              <h3 className="text-base font-bold">{me.name}</h3>
-              <small className="text-xs leading-loose text-slate-500">
-                {teacher ? "معلم" : "دانش‌آموز"}
-              </small>
+                <LogOut size={16} aria-hidden />
+                <span className="hidden sm:inline">خروج</span>
+              </Button>
             </div>
           </div>
         </header>
+      )}
+      <main
+        className={clsx(
+          "relative grid w-full min-w-0 content-start gap-[18px]",
+          teacher
+            ? "px-8 py-7 max-[950px]:p-6 max-[650px]:p-[18px]"
+            : "mx-auto max-w-[1440px] px-5 py-6 lg:px-8 lg:py-9",
+        )}
+      >
+        {teacher ? (
+          <header className="glass-header mb-2 flex h-fit self-start items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-2.5 max-[650px]:mb-2 max-[650px]:[&_h1]:text-[22px]">
+            <div>
+              <small className="text-xs leading-loose text-slate-500">
+                هدهد / {teacher ? "پنل معلم" : "یادگیری"}
+              </small>
+              <h1 className="text-[28px] font-bold text-[#17305E]">
+                {currentTitle}
+              </h1>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <span
+                className="hy-icon-container !size-[46px]"
+                data-tone="purple"
+              >
+                <img
+                  src="/app-icon.svg"
+                  alt=""
+                  width={44}
+                  height={44}
+                  className="h-11 w-11 object-contain"
+                />
+              </span>
+              <div>
+                <h3 className="text-base font-bold">{me.name}</h3>
+                <small className="text-xs leading-loose text-slate-500">
+                  {teacher ? "معلم" : "دانش‌آموز"}
+                </small>
+              </div>
+            </div>
+          </header>
+        ) : page !== "dashboard" ? (
+          <header className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
+            <div>
+              <small className="text-xs text-slate-500">هدهد / یادگیری</small>
+              <h1 className="mt-1 text-2xl font-bold text-[#17305E]">
+                {currentTitle}
+              </h1>
+            </div>
+          </header>
+        ) : null}
         {feedback}
         {page === "courses" && (
           <CoursesScreen

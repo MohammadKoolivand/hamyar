@@ -272,7 +272,7 @@ export function StudentOverview({
   }
 
   return (
-    <div className="grid gap-5">
+    <div className="hy-student-home grid gap-7">
       <section className="glass-hero grid gap-5 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.72fr)] lg:items-center">
         <div className="grid gap-4">
           <span className="glass-kicker w-fit px-3 py-1.5 text-xs">
