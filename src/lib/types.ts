@@ -211,6 +211,13 @@ export interface Assignment {
   };
   attempts?: Attempt[];
   evaluations?: Evaluation[];
+  catalog?: {
+    questionCount: number;
+    difficultyScore: number | null;
+    sourceCategories: string[];
+    academicYears: string[];
+    successRate: number | null;
+  };
   hints?: {
     _id: string;
     questionVersionId: string;

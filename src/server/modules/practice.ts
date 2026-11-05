@@ -9,6 +9,10 @@ import { assertOpen, transition } from "../state";
 import { guide } from "../ai/tutor";
 import { recordLearning } from "../learning/service";
 import { recordQuestionDifficultyResponse } from "../learning/question-difficulty";
+import {
+  sourceCategory,
+  type QuestionSource,
+} from "../../lib/question-source";
 export function registerPractice(
   app: FastifyInstance,
   ctx: Context,
@@ -31,9 +35,99 @@ export function registerPractice(
         .project({ _id: 1, title: 1, state: 1, studentId: 1, teacherId: 1 })
         .toArray();
     }
-    return c("assignments")
+    const assignments = await c("assignments")
       .find(u.role === "teacher" ? { teacherId: u._id } : { studentId: u._id })
       .toArray();
+    if (u.role !== "student" || !assignments.length) return assignments;
+    const questionIds = [
+      ...new Set(assignments.flatMap((a) => a.questionVersionIds ?? [])),
+    ];
+    type CatalogQuestion = {
+      _id: string;
+      difficultyScore?: number | null;
+      source?: QuestionSource;
+    };
+    const questions: CatalogQuestion[] = questionIds.length
+      ? ((await c("questionVersions")
+          .find({ _id: { $in: questionIds } })
+          .project({ _id: 1, difficultyScore: 1, source: 1 })
+          .toArray()) as CatalogQuestion[])
+      : [];
+    const questionsById = new Map(questions.map((q) => [q._id, q]));
+    const assignmentIds = assignments.map((a) => a._id);
+    const attempts = await c("attempts")
+      .find({ assignmentId: { $in: assignmentIds } })
+      .project({ _id: 1, assignmentId: 1 })
+      .toArray();
+    const evaluations = attempts.length
+      ? await c("evaluations")
+          .find({ attemptId: { $in: attempts.map((a) => a._id) } })
+          .project({ attemptId: 1, result: 1 })
+          .toArray()
+      : [];
+    const attemptAssignment = new Map(
+      attempts.map((attempt) => [attempt._id, attempt.assignmentId]),
+    );
+    const resultsByAssignment = new Map<string, string[]>();
+    for (const evaluation of evaluations) {
+      const assignmentId = attemptAssignment.get(evaluation.attemptId);
+      if (!assignmentId) continue;
+      const results = resultsByAssignment.get(assignmentId) ?? [];
+      results.push(evaluation.result);
+      resultsByAssignment.set(assignmentId, results);
+    }
+    return assignments.map((assignment) => {
+      const assignedQuestions: CatalogQuestion[] = (
+        assignment.questionVersionIds ?? []
+      ).flatMap((questionId: string) => {
+          const question = questionsById.get(questionId);
+          return question ? [question] : [];
+        });
+      const difficultyScores: number[] = assignedQuestions.flatMap((question) =>
+        typeof question.difficultyScore === "number"
+          ? [question.difficultyScore]
+          : [],
+      );
+      const results = resultsByAssignment.get(assignment._id) ?? [];
+      const evaluated = feedbackVisible(assignment.policy, assignment.state)
+        ? results.filter((result) => result !== "pending_review")
+        : [];
+      return {
+        ...assignment,
+        catalog: {
+          questionCount: assignment.questionVersionIds?.length ?? 0,
+          difficultyScore: difficultyScores.length
+            ? Math.round(
+                difficultyScores.reduce((sum, score) => sum + score, 0) /
+                  difficultyScores.length,
+              )
+            : null,
+          sourceCategories: [
+            ...new Set(
+              assignedQuestions.flatMap((question) =>
+                question.source ? [sourceCategory(question.source)] : [],
+              ),
+            ),
+          ],
+          academicYears: [
+            ...new Set(
+              assignedQuestions.flatMap((question) =>
+                question.source?.academicYear
+                  ? [question.source.academicYear]
+                  : [],
+              ),
+            ),
+          ],
+          successRate: evaluated.length
+            ? Math.round(
+                (evaluated.filter((result) => result === "correct").length /
+                  evaluated.length) *
+                  100,
+              )
+            : null,
+        },
+      };
+    });
   });
   app.get("/api/assignments/:aid", async (r) => {
     const { u, a } = await assignment(r);

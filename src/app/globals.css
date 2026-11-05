@@ -17,7 +17,7 @@
   --hy-lavender-soft: #f3eeff;
   --hy-pink: #e86aa7;
   --hy-pink-soft: #fff0f7;
-  --hy-background: #f8fbff;
+  --hy-background: #ffffff;
   --hy-surface: rgba(255, 255, 255, 0.73);
   --hy-surface-strong: rgba(255, 255, 255, 0.89);
   --hy-glass: rgba(255, 255, 255, 0.73);
@@ -242,7 +242,7 @@
   }
   .hy-student-site {
     min-height: 100vh;
-    background: #f8fbff;
+    background: #fff;
   }
   .hy-student-site-header {
     box-shadow: 0 5px 24px rgba(35, 63, 125, 0.055);

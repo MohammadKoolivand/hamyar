@@ -5,9 +5,12 @@ import {
   ArrowLeft,
   BarChart3,
   BookOpenCheck,
+  Clock3,
   ClipboardCheck,
   Filter,
+  Gauge,
   RotateCcw,
+  Search,
   Target,
 } from "lucide-react";
 import clsx from "clsx";
@@ -35,6 +38,31 @@ type StudentNavigationActions = {
 const available = (assignment: Assignment) =>
   !["completed", "submitted", "cancelled"].includes(assignment.state);
 
+const practiceKinds = [
+  ["all", "همه"],
+  ["topic", "تمرین مبحثی"],
+  ["chapter", "آزمون فصل"],
+  ["school", "امتحان مدرسه"],
+  ["final", "امتحان نهایی"],
+  ["konkur", "کنکور"],
+  ["mistakes", "مرور اشتباهات"],
+  ["smart", "تمرین هوشمند"],
+] as const;
+type PracticeKind = (typeof practiceKinds)[number][0];
+
+function practiceKind(assignment: Assignment): Exclude<PracticeKind, "all"> {
+  const title = assignment.title.replaceAll("‌", " ");
+  if (/اشتباه|مرور/.test(title)) return "mistakes";
+  if (/هوشمند|پیشنهادی/.test(title)) return "smart";
+  const categories = assignment.catalog?.sourceCategories ?? [];
+  if (categories.includes("konkur")) return "konkur";
+  if (categories.includes("final")) return "final";
+  if (categories.some((item) => ["school", "coordinated"].includes(item)))
+    return "school";
+  if (/فصل/.test(title)) return "chapter";
+  return "topic";
+}
+
 export function StudentPracticeHub({
   assignments,
   courses,
@@ -46,6 +74,31 @@ export function StudentPracticeHub({
   const ready = assignments.filter(available);
   const completed = assignments.filter((item) =>
     ["completed", "submitted"].includes(item.state),
+  );
+  const [query, setQuery] = useState("");
+  const [kind, setKind] = useState<PracticeKind>("all");
+  const [status, setStatus] = useState("all");
+  const filtered = useMemo(
+    () =>
+      assignments.filter((assignment) => {
+        const course = courses.find(
+          (item) => item._id === assignment.courseId,
+        );
+        const matchesQuery = [assignment.title, course?.title, course?.subject]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase("fa")
+          .includes(query.trim().toLocaleLowerCase("fa"));
+        return (
+          matchesQuery &&
+          (kind === "all" || practiceKind(assignment) === kind) &&
+          (status === "all" ||
+            (status === "ready" && available(assignment)) ||
+            (status === "completed" &&
+              ["completed", "submitted"].includes(assignment.state)))
+        );
+      }),
+    [assignments, courses, kind, query, status],
   );
 
   return (
@@ -115,12 +168,12 @@ export function StudentPracticeHub({
         ))}
       </section>
 
-      <section className="glass-panel grid gap-4 p-5 sm:p-6">
+      <section className="glass-panel grid gap-5 p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold">ادامه بده</h2>
+            <h2 className="text-lg font-bold">کاتالوگ تمرین و آزمون</h2>
             <p className="mt-1 text-xs text-slate-600">
-              مأموریت‌های شروع‌نشده و نیمه‌تمام در اولویت‌اند.
+              تمرین مناسب را با نوع، وضعیت و عنوان پیدا کن.
             </p>
           </div>
           {!!completed.length && (
@@ -132,32 +185,148 @@ export function StudentPracticeHub({
             </Button>
           )}
         </div>
-        {!ready.length ? (
+
+        <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 lg:grid-cols-[minmax(0,1fr)_220px_220px]">
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+            جست‌وجو
+            <span className="relative">
+              <Search
+                size={17}
+                aria-hidden
+                className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                className="glass-field min-h-12 w-full pe-10 ps-3"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="عنوان تمرین یا نام درس"
+              />
+            </span>
+          </label>
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+            نوع فعالیت
+            <select
+              className="glass-field min-h-12 px-3"
+              value={kind}
+              onChange={(event) => setKind(event.target.value as PracticeKind)}
+            >
+              {practiceKinds.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+            وضعیت
+            <select
+              className="glass-field min-h-12 px-3"
+              value={status}
+              onChange={(event) => setStatus(event.target.value)}
+            >
+              <option value="all">همهٔ وضعیت‌ها</option>
+              <option value="ready">آماده / در حال انجام</option>
+              <option value="completed">تکمیل‌شده</option>
+            </select>
+          </label>
+        </div>
+
+        {!assignments.length ? (
           <p className="glass-note p-4 text-sm leading-loose">
             فعلاً تمرین آماده‌ای نداری. مأموریت‌های تکمیل‌شده و نتیجه‌ها در
             «پیشرفت من» محفوظ‌اند.
           </p>
+        ) : !filtered.length ? (
+          <div className="grid justify-items-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
+            <Filter size={24} className="text-slate-400" aria-hidden />
+            <p className="text-sm font-medium">نتیجه‌ای با این فیلتر پیدا نشد.</p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setQuery("");
+                setKind("all");
+                setStatus("all");
+              }}
+            >
+              پاک‌کردن فیلترها
+            </Button>
+          </div>
         ) : (
-          <PagedList items={ready} label="تمرین‌های آماده">
+          <PagedList items={filtered} label="تمرین‌ها و آزمون‌ها" pageSize={8}>
             {(assignment) => (
               <article
                 key={assignment._id}
-                className="glass-option grid gap-3 p-4"
+                className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="font-bold">{assignment.title}</h3>
-                  <span className="rounded-full bg-teal-50 px-3 py-1 text-xs text-teal-800">
-                    {stateLabel[assignment.state]}
+                  <div className="grid gap-1">
+                    <span className="text-xs font-medium text-[#2457b8]">
+                      {practiceKinds.find(
+                        ([value]) => value === practiceKind(assignment),
+                      )?.[1] ?? "تمرین مبحثی"}
+                    </span>
+                    <h3 className="font-bold">{assignment.title}</h3>
+                  </div>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">
+                    {stateLabel[assignment.state] ?? assignment.state}
                   </span>
                 </div>
                 <p className="text-xs text-slate-600">
                   {courses.find((course) => course._id === assignment.courseId)
                     ?.title ?? "تمرین زیر نظر معلم"}
                 </p>
+                <dl className="grid gap-2 text-xs text-slate-600 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="rounded-xl bg-slate-50 p-3">
+                    <dt>تعداد سؤال</dt>
+                    <dd className="mt-1 font-bold text-slate-900">
+                      {(assignment.catalog?.questionCount ??
+                        Object.keys(assignment.progress ?? {}).length
+                      ).toLocaleString("fa-IR")}
+                    </dd>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 p-3">
+                    <dt className="flex items-center gap-1">
+                      <Clock3 size={14} aria-hidden /> زمان تقریبی
+                    </dt>
+                    <dd className="mt-1 font-bold text-slate-900">
+                      حدود {Math.max(5, (assignment.catalog?.questionCount ?? 1) * 2).toLocaleString("fa-IR")} دقیقه
+                    </dd>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 p-3">
+                    <dt className="flex items-center gap-1">
+                      <Gauge size={14} aria-hidden /> سختی واقعی
+                    </dt>
+                    <dd className="mt-1 font-bold text-slate-900">
+                      {assignment.catalog?.difficultyScore === null ||
+                      assignment.catalog?.difficultyScore === undefined
+                        ? "تعیین نشده"
+                        : `${assignment.catalog.difficultyScore.toLocaleString("fa-IR")} از ۱۰۰`}
+                    </dd>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 p-3">
+                    <dt>موفقیت قبلی من</dt>
+                    <dd className="mt-1 font-bold text-slate-900">
+                      {assignment.catalog?.successRate === null ||
+                      assignment.catalog?.successRate === undefined
+                        ? "بدون سابقه"
+                        : `${assignment.catalog.successRate.toLocaleString("fa-IR")}٪`}
+                    </dd>
+                  </div>
+                </dl>
+                {!!assignment.catalog?.academicYears.length && (
+                  <p className="text-xs text-slate-500">
+                    سال آزمون: {assignment.catalog.academicYears.join("، ")}
+                  </p>
+                )}
                 <div className="flex flex-wrap gap-2">
-                  <Button disabled={busy} onClick={() => void open(assignment)}>
-                    <ClipboardCheck size={16} aria-hidden /> شروع / ادامه
-                  </Button>
+                  {available(assignment) && (
+                    <Button
+                      disabled={busy}
+                      onClick={() => void open(assignment)}
+                    >
+                      <ClipboardCheck size={16} aria-hidden /> شروع / ادامه
+                    </Button>
+                  )}
                   <Button
                     disabled={busy}
                     variant="outline"
