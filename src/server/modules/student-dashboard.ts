@@ -187,6 +187,106 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
       // Legacy unscoped work is not assigned to an unrelated current course.
       const legacy = summarize(assignments.filter((a) => !matched.has(a._id)));
       const summary = summarize(assignments);
+      const assignedQuestionIds = [
+        ...new Set(
+          assignments
+            .filter((a) => a.state !== "cancelled")
+            .flatMap((a) => a.questionVersionIds ?? []),
+        ),
+      ];
+      const versions = assignedQuestionIds.length
+        ? await ctx
+            .c("questionVersions")
+            .find(
+              { _id: { $in: assignedQuestionIds } },
+              {
+                session,
+                projection: {
+                  _id: 1,
+                  ownerId: 1,
+                  topicId: 1,
+                  type: 1,
+                  source: 1,
+                },
+              },
+            )
+            .toArray()
+        : [];
+      const topicIds = new Set(
+        versions.flatMap((version) =>
+          typeof version.topicId === "string" ? [version.topicId] : [],
+        ),
+      );
+      const owners = [...new Set(versions.map((version) => version.ownerId))];
+      const ownerNodes = owners.length
+        ? await ctx
+            .c("curriculum")
+            .find(
+              {
+                ownerId: { $in: owners },
+                archivedAt: { $exists: false },
+              },
+              {
+                session,
+                projection: {
+                  _id: 1,
+                  title: 1,
+                  kind: 1,
+                  parentId: 1,
+                  tracks: 1,
+                },
+              },
+            )
+            .toArray()
+        : [];
+      const byNodeId = new Map(ownerNodes.map((node) => [node._id, node]));
+      const visibleNodeIds = new Set<string>();
+      for (const topicId of topicIds) {
+        let node = byNodeId.get(topicId);
+        const seen = new Set<string>();
+        while (node && !seen.has(node._id)) {
+          seen.add(node._id);
+          visibleNodeIds.add(node._id);
+          node = node.parentId ? byNodeId.get(node.parentId) : undefined;
+        }
+      }
+      const contentItems = versions.flatMap((version) => {
+        if (
+          typeof version.topicId !== "string" ||
+          typeof version.type !== "string"
+        )
+          return [];
+        const source = version.source as
+          Record<string, string | number | undefined> | undefined;
+        const examKey = source
+          ? [
+              source.family,
+              source.sourceTitle,
+              source.academicYear,
+              source.examDate,
+              source.session,
+            ]
+              .filter(Boolean)
+              .join(":")
+          : "";
+        const resourceKey = source
+          ? String(
+              source.sourceUrl ??
+                source.sourcePageUrl ??
+                source.sourceTitle ??
+                "",
+            )
+          : "";
+        return [
+          {
+            questionId: version._id,
+            topicId: version.topicId,
+            type: version.type,
+            ...(examKey ? { examKey } : {}),
+            ...(resourceKey ? { resourceKey } : {}),
+          },
+        ];
+      });
       return {
         summary: {
           ...summary,
@@ -195,6 +295,10 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
         },
         courses,
         legacy,
+        content: {
+          nodes: ownerNodes.filter((node) => visibleNodeIds.has(node._id)),
+          items: contentItems,
+        },
       };
     });
   });

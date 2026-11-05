@@ -93,6 +93,17 @@ export interface StudentDashboardData {
   summary: DashboardMetrics & { activeCourses: number };
   courses: DashboardCourse[];
   legacy: DashboardMetrics & { missions: DashboardMission[] };
+  content: {
+    nodes: Node[];
+    items: StudentContentItem[];
+  };
+}
+export interface StudentContentItem {
+  questionId: string;
+  topicId: string;
+  type: string;
+  examKey?: string;
+  resourceKey?: string;
 }
 export interface User {
   _id: string;

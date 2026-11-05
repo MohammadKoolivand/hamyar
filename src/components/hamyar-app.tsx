@@ -676,6 +676,8 @@ export default function HamyarApp() {
           <StudentSearchScreen
             assignments={assignments}
             courses={courses}
+            nodes={studentDashboard?.content.nodes ?? []}
+            contentItems={studentDashboard?.content.items ?? []}
             busy={busy}
             open={open}
             showReport={showReport}

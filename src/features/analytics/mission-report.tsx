@@ -239,7 +239,7 @@ export function MissionReport({
             <article
               id={`report-question-${q._id}`}
               key={q._id}
-              className="scroll-mt-6 rounded-3xl border border-blue-200/70 bg-gradient-to-bl from-white/85 via-blue-50/65 to-cyan-50/45 p-4 text-[#233B8F] shadow-[0_8px_30px_rgba(35,59,143,0.05),inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-xl sm:p-6"
+              className="scroll-mt-6 rounded-3xl border border-blue-200/70 bg-blue-50 p-4 text-[#233B8F] shadow-[0_8px_30px_rgba(35,59,143,0.05),inset_0_1px_0_rgba(255,255,255,0.95)] sm:p-6"
             >
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-3">
