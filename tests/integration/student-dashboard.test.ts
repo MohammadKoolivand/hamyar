@@ -182,6 +182,13 @@ test("student dashboard groups lessons, counts real evaluations, and keeps legac
     assert.equal(mathView.correctIndependent, 1);
     assert.equal(mathView.correctAssisted, 0);
     assert.equal(mathView.answeredQuestions, 1);
+    assert.equal(mathView.learningProgress, 100);
+    assert.equal(mathView.incorrectQuestions, 0);
+    assert.ok(
+      physicsView.topics.some(
+        (item: { topicId: string }) => item.topicId === topic._id,
+      ),
+    );
     assert.equal(mathView.missions[0].dueAt, dueAt);
     assert.equal(physicsView.correctIndependent, 0);
     assert.equal(physicsView.correctAssisted, 1);
@@ -196,8 +203,10 @@ test("student dashboard groups lessons, counts real evaluations, and keeps legac
     assert.ok(Array.isArray(dashboard.content.items));
     assert.ok(
       dashboard.content.items.some(
-        (item: { questionId: string; topicId: string }) =>
-          item.questionId === q._id && item.topicId === topic._id,
+        (item: { questionId: string; topicId: string; courseIds: string[] }) =>
+          item.questionId === q._id &&
+          item.topicId === topic._id &&
+          item.courseIds.includes(physics._id),
       ),
     );
     assert.ok(!response.body.includes("دوباره ضرب را بررسی کن."));

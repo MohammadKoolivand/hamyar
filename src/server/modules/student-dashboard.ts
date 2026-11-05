@@ -277,15 +277,114 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
                 "",
             )
           : "";
+        const courseIds = [
+          ...new Set(
+            assignments
+              .filter(
+                (assignment) =>
+                  assignment.state !== "cancelled" &&
+                  assignment.questionVersionIds?.includes(version._id) &&
+                  valid.some(
+                    (course) =>
+                      course._id === assignment.courseId &&
+                      course.teacherId === assignment.teacherId,
+                  ),
+              )
+              .map((assignment) => assignment.courseId as string),
+          ),
+        ];
         return [
           {
             questionId: version._id,
             topicId: version.topicId,
             type: version.type,
+            courseIds,
             ...(examKey ? { examKey } : {}),
             ...(resourceKey ? { resourceKey } : {}),
+            ...(source?.sourceTitle
+              ? { examTitle: String(source.sourceTitle) }
+              : {}),
+            ...(source?.sourceTitle
+              ? { resourceTitle: String(source.sourceTitle) }
+              : {}),
           },
         ];
+      });
+      const versionById = new Map(
+        versions.map((version) => [version._id, version]),
+      );
+      const titleByNodeId = new Map(
+        ownerNodes.map((node) => [node._id, String(node.title)]),
+      );
+      const coursesWithEvidence = courses.map((course) => {
+        const assignmentIds = new Set(
+          assignments
+            .filter((assignment) => assignment.courseId === course.courseId)
+            .map((assignment) => assignment._id),
+        );
+        const byTopic = new Map<
+          string,
+          {
+            topicId: string;
+            title: string;
+            answered: number;
+            evaluated: number;
+            correctIndependent: number;
+            correctAssisted: number;
+            incorrect: number;
+          }
+        >();
+        for (const attempt of latest.values()) {
+          if (!assignmentIds.has(attempt.assignmentId)) continue;
+          const version = versionById.get(attempt.questionVersionId);
+          if (!version || typeof version.topicId !== "string") continue;
+          const current = byTopic.get(version.topicId) ?? {
+            topicId: version.topicId,
+            title: titleByNodeId.get(version.topicId) ?? "مبحث بدون عنوان",
+            answered: 0,
+            evaluated: 0,
+            correctIndependent: 0,
+            correctAssisted: 0,
+            incorrect: 0,
+          };
+          current.answered += 1;
+          const assignment = assignments.find(
+            (row) => row._id === attempt.assignmentId,
+          );
+          const evaluation = evaluationsByAttempt.get(attempt._id);
+          if (
+            assignment &&
+            evaluation &&
+            feedbackVisible(assignment.policy ?? {}, assignment.state) &&
+            ["correct", "incorrect", "partially_correct"].includes(
+              evaluation.result,
+            )
+          ) {
+            current.evaluated += 1;
+            if (evaluation.result === "correct") {
+              if (attempt.hintsUsed === 0) current.correctIndependent += 1;
+              else current.correctAssisted += 1;
+            } else current.incorrect += 1;
+          }
+          byTopic.set(version.topicId, current);
+        }
+        const topics = [...byTopic.values()].sort(
+          (a, b) =>
+            b.answered - a.answered || a.title.localeCompare(b.title, "fa"),
+        );
+        return {
+          ...course,
+          learningProgress: course.evaluatedQuestions
+            ? Math.round(
+                (course.correctIndependent / course.evaluatedQuestions) * 100,
+              )
+            : null,
+          incorrectQuestions: topics.reduce(
+            (sum, topic) => sum + topic.incorrect,
+            0,
+          ),
+          topics,
+        };
       });
       return {
         summary: {
@@ -293,7 +392,7 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
           activeCourses: courses.length,
           missions: undefined,
         },
-        courses,
+        courses: coursesWithEvidence,
         legacy,
         content: {
           nodes: ownerNodes.filter((node) => visibleNodeIds.has(node._id)),

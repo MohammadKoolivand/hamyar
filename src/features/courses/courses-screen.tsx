@@ -30,6 +30,7 @@ export function CoursesScreen({
   assignments,
   students,
   refresh,
+  openCourse,
 }: {
   teacher: boolean;
   courses: Course[];
@@ -37,6 +38,7 @@ export function CoursesScreen({
   assignments: Assignment[];
   students: User[];
   refresh: () => Promise<void>;
+  openCourse?: (courseId: string) => void;
 }) {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
@@ -358,6 +360,12 @@ export function CoursesScreen({
                       <p className="text-sm text-slate-600">
                         معلم: {own?.teacherName ?? "معلم"}
                       </p>
+                      <Button
+                        onClick={() => openCourse?.(course._id)}
+                        disabled={!openCourse}
+                      >
+                        صفحه جامع درس
+                      </Button>
                       <p className="text-xs text-slate-500">
                         {count} مأموریت این درس
                       </p>

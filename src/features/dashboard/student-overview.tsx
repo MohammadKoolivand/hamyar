@@ -69,7 +69,7 @@ export function StudentOverview({
   onJoined: () => Promise<void>;
   open: (assignment: Assignment) => Promise<void>;
   showReport: (assignment: Assignment) => Promise<void>;
-  setPage: (page: string) => void;
+  setPage: (page: string, contextId?: string) => void;
 }) {
   const [selected, setSelected] = useState("all");
   const [learning, setLearning] = useState<StudentLearningSnapshot | null>(
@@ -250,23 +250,9 @@ export function StudentOverview({
           {count(course.evaluatedQuestions)} پاسخ ارزیابی‌شده؛ این اعداد
           نشان‌دهنده شواهد تمرین‌اند، نه درصد تسلط قطعی.
         </p>
-        <div className="grid gap-2">
-          <h4 className="font-medium">مأموریت‌های این درس</h4>
-          {course.missions.length ? (
-            <>
-              {course.missions.slice(0, 3).map(missionRow)}
-              {course.missions.length > 3 && (
-                <Button variant="outline" onClick={() => setPage("missions")}>
-                  مشاهده همه مأموریت‌ها
-                </Button>
-              )}
-            </>
-          ) : (
-            <p className="text-sm text-slate-600">
-              هنوز مأموریتی برای این درس منتشر نشده است.
-            </p>
-          )}
-        </div>
+        <Button onClick={() => setPage("student-course", course.courseId)}>
+          صفحه جامع درس
+        </Button>
       </article>
     );
   }

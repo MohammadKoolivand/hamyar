@@ -88,6 +88,18 @@ export interface DashboardCourse extends DashboardMetrics {
   subject: string;
   teacherName: string;
   missions: DashboardMission[];
+  learningProgress: number | null;
+  incorrectQuestions: number;
+  topics: DashboardTopicEvidence[];
+}
+export interface DashboardTopicEvidence {
+  topicId: string;
+  title: string;
+  answered: number;
+  evaluated: number;
+  correctIndependent: number;
+  correctAssisted: number;
+  incorrect: number;
 }
 export interface StudentDashboardData {
   summary: DashboardMetrics & { activeCourses: number };
@@ -102,8 +114,11 @@ export interface StudentContentItem {
   questionId: string;
   topicId: string;
   type: string;
+  courseIds: string[];
   examKey?: string;
   resourceKey?: string;
+  examTitle?: string;
+  resourceTitle?: string;
 }
 export interface User {
   _id: string;

@@ -35,6 +35,7 @@ import { practiceAnswer } from "@/lib/practice-answer";
 import { api } from "@/lib/api";
 import {
   assignmentFromSearch,
+  courseFromSearch,
   pageFromPath,
   pathForPage,
 } from "@/lib/app-routes";
@@ -44,6 +45,7 @@ import { PracticeScreen } from "@/features/practice/practice-screen";
 import { MissionReport } from "@/features/analytics/mission-report";
 import { OverviewScreen } from "@/features/dashboard/dashboard-screen";
 import { StudentOverview } from "@/features/dashboard/student-overview";
+import { StudentCourseScreen } from "@/features/dashboard/student-course-screen";
 import { StudentsScreen } from "@/features/students/students-screen";
 import { AiSettingsScreen } from "@/features/settings/ai-settings-screen";
 import { ContentScreen } from "@/features/content/content-screen";
@@ -336,7 +338,9 @@ export default function HamyarApp() {
         ? "افزودن سؤال"
         : page === "report"
           ? "گزارش عملکرد"
-          : "محیط تمرین");
+          : page === "student-course"
+            ? "صفحه درس"
+            : "محیط تمرین");
   return (
     <div
       className={clsx(
@@ -511,6 +515,17 @@ export default function HamyarApp() {
             assignments={assignments}
             students={students}
             refresh={() => refresh()}
+            openCourse={(courseId) => navigatePage("student-course", courseId)}
+          />
+        )}
+        {page === "student-course" && !teacher && (
+          <StudentCourseScreen
+            courseId={courseFromSearch(window.location.search)}
+            data={studentDashboard}
+            assignments={assignments}
+            open={open}
+            showReport={showReport}
+            setPage={navigatePage}
           />
         )}
         {teacher && page === "classes" && (

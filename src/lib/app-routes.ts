@@ -15,6 +15,7 @@ export const tabPaths = {
   "student-mistakes": "/mistakes",
   "student-progress": "/progress",
   "student-search": "/search",
+  "student-course": "/course",
 } as const;
 
 export type TabPage = keyof typeof tabPaths;
@@ -34,16 +35,25 @@ export function pageFromPath(pathname: string): AppPage {
   return tabEntries.find(([, path]) => path === pathname)?.[0] ?? "dashboard";
 }
 
-export function pathForPage(page: string, assignmentId?: string): string {
+export function pathForPage(page: string, contextId?: string): string {
   if (page === "practice" || page === "report") {
-    return assignmentId
-      ? `/${page}?assignment=${encodeURIComponent(assignmentId)}`
+    return contextId
+      ? `/${page}?assignment=${encodeURIComponent(contextId)}`
       : "/homeworks";
   }
+  if (page === "student-course")
+    return contextId
+      ? `/course?course=${encodeURIComponent(contextId)}`
+      : "/courses";
   return tabPaths[page as TabPage] ?? "/dashboard";
 }
 
 export function assignmentFromSearch(search: string): string | null {
   const id = new URLSearchParams(search).get("assignment");
+  return id && /^[a-f0-9-]{36}$/i.test(id) ? id : null;
+}
+
+export function courseFromSearch(search: string): string | null {
+  const id = new URLSearchParams(search).get("course");
   return id && /^[a-f0-9-]{36}$/i.test(id) ? id : null;
 }
