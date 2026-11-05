@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { PagedList } from "@/components/ui/paged-list";
 import { curriculumTopicChoices } from "@/lib/curriculum";
 import { stateLabel } from "@/lib/presentation";
+import { parsePracticeFilters, practiceFiltersPath } from "@/lib/student-practice-route";
 import {
   emptyStudentContentFilters,
   parseStudentContentFilters,
@@ -85,25 +86,51 @@ export function StudentPracticeHub({
   const [topicId, setTopicId] = useState("all");
   const [year, setYear] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
+  const [minDifficulty, setMinDifficulty] = useState(0);
+  const [maxDifficulty, setMaxDifficulty] = useState(100);
+  const [filtersLoaded, setFiltersLoaded] = useState(false);
   const [sort, setSort] = useState("priority");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  useEffect(() => {
+    const value = parsePracticeFilters(window.location.search);
+    setQuery(value.query);
+    setKind(value.kind as PracticeKind);
+    setStatus(value.status);
+    setCourseId(value.course);
+    setChapterId(value.chapter);
+    setTopicId(value.topic);
+    setYear(value.year);
+    setDifficulty(value.difficulty);
+    setMinDifficulty(value.minDifficulty);
+    setMaxDifficulty(value.maxDifficulty);
+    setSort(value.sort);
+    setFiltersLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!filtersLoaded) return;
+    window.history.replaceState(window.history.state, "", practiceFiltersPath({
+      query, kind, status, course: courseId, chapter: chapterId, topic: topicId,
+      year, difficulty, minDifficulty, maxDifficulty, sort,
+    }));
+  }, [filtersLoaded, query, kind, status, courseId, chapterId, topicId, year, difficulty, minDifficulty, maxDifficulty, sort]);
+
   const topicChoices = useMemo(() => curriculumTopicChoices(nodes), [nodes]);
   const topicChoiceById = useMemo(
     () => new Map(topicChoices.map((choice) => [choice.topic._id, choice])),
     [topicChoices],
   );
   const catalogTopicChoices = useMemo(
-    () =>
-      topicChoices.filter((choice) =>
-        assignments.some((assignment) =>
-          assignment.catalog?.topicIds?.includes(choice.topic._id),
-        ),
+    () => topicChoices.filter((choice) =>
+      assignments.some((assignment) =>
+        (courseId === "all" || assignment.courseId === courseId) &&
+        assignment.catalog?.topicIds?.includes(choice.topic._id),
       ),
-    [assignments, topicChoices],
+    ),
+    [assignments, courseId, topicChoices],
   );
   const chapters = useMemo(
-    () =>
-      [...new Map(catalogTopicChoices.map((choice) => [choice.chapter.id, choice.chapter])).values()],
+    () => [...new Map(catalogTopicChoices.map((choice) => [choice.chapter.id, choice.chapter])).values()],
     [catalogTopicChoices],
   );
   const topics = catalogTopicChoices.filter(
@@ -143,6 +170,8 @@ export function StudentPracticeHub({
           (difficulty === "easy" && typeof score === "number" && score <= 33) ||
           (difficulty === "medium" && typeof score === "number" && score >= 34 && score <= 66) ||
           (difficulty === "hard" && typeof score === "number" && score >= 67);
+        const matchesRange = difficulty === "unset" ||
+          (typeof score === "number" && score >= minDifficulty && score <= maxDifficulty);
         const matchesQuery = [assignment.title, course?.title, course?.subject]
           .filter(Boolean)
           .join(" ")
@@ -155,6 +184,7 @@ export function StudentPracticeHub({
           (topicId === "all" || assignment.catalog?.topicIds?.includes(topicId)) &&
           (year === "all" || assignment.catalog?.academicYears.includes(year)) &&
           matchesDifficulty &&
+          (difficulty === "unset" || (minDifficulty === 0 && maxDifficulty === 100) || matchesRange) &&
           (kind === "all" || practiceKind(assignment) === kind) &&
           (status === "all" ||
             (status === "ready" && available(assignment)) ||
@@ -168,7 +198,7 @@ export function StudentPracticeHub({
         if (sort === "success") return (right.catalog?.successRate ?? -1) - (left.catalog?.successRate ?? -1);
         return Number(available(right)) - Number(available(left));
       }),
-    [assignments, chapterId, courseId, courses, difficulty, kind, query, sort, status, topicChoiceById, topicId, year],
+    [assignments, chapterId, courseId, courses, difficulty, minDifficulty, maxDifficulty, kind, query, sort, status, topicChoiceById, topicId, year],
   );
 
   function clearFilters() {
@@ -180,6 +210,8 @@ export function StudentPracticeHub({
     setTopicId("all");
     setYear("all");
     setDifficulty("all");
+    setMinDifficulty(0);
+    setMaxDifficulty(100);
     setSort("priority");
   }
 
@@ -317,7 +349,7 @@ export function StudentPracticeHub({
           </label>
           <label className="grid gap-1.5 text-xs font-medium text-slate-700">
             درس
-            <select className="glass-field min-h-12 px-3" value={courseId} onChange={(event) => setCourseId(event.target.value)}>
+            <select className="glass-field min-h-12 px-3" value={courseId} onChange={(event) => { setCourseId(event.target.value); setChapterId("all"); setTopicId("all"); }}>
               <option value="all">همهٔ درس‌ها</option>
               {courses.map((course) => <option key={course._id} value={course._id}>{course.title}</option>)}
             </select>
@@ -353,6 +385,20 @@ export function StudentPracticeHub({
               <option value="hard">۶۷ تا ۱۰۰</option>
             </select>
           </label>
+          <fieldset className="grid gap-2 text-xs font-medium text-slate-700 sm:col-span-2">
+            <legend>بازهٔ دلخواه سختی (۰ تا ۱۰۰)</legend>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="grid gap-1">از
+                <input aria-label="حداقل سختی" type="number" min={0} max={maxDifficulty} step={1} value={minDifficulty}
+                  className="glass-field min-h-12 w-full px-3" onChange={(event) => setMinDifficulty(Math.min(maxDifficulty, Math.max(0, Math.round(Number(event.target.value) || 0))))} />
+              </label>
+              <label className="grid gap-1">تا
+                <input aria-label="حداکثر سختی" type="number" min={minDifficulty} max={100} step={1} value={maxDifficulty}
+                  className="glass-field min-h-12 w-full px-3" onChange={(event) => setMaxDifficulty(Math.max(minDifficulty, Math.min(100, Math.round(Number(event.target.value) || 0))))} />
+              </label>
+            </div>
+            <p className="font-normal text-slate-500">سؤال‌های بدون درجهٔ سختی فقط با گزینهٔ «تعیین نشده» نمایش داده می‌شوند.</p>
+          </fieldset>
           <label className="grid gap-1.5 text-xs font-medium text-slate-700">
             مرتب‌سازی
             <select className="glass-field min-h-12 px-3" value={sort} onChange={(event) => setSort(event.target.value)}>

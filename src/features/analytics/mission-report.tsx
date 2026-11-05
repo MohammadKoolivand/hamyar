@@ -1,6 +1,7 @@
 "use client";
 import { PagedList } from "@/components/ui/paged-list";
 import { useState } from "react";
+import { AppLink as Link } from "@/components/app-link";
 import { CheckCircle2, XCircle, CircleHelp, MinusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -86,6 +87,7 @@ export function MissionReport({
     <div className="grid gap-5">
       <section className="glass-panel grid gap-5 p-6 sm:grid-cols-[1fr_auto] sm:p-8">
         <div>
+          {!teacher && <Link href="/progress" className="mb-3 inline-block text-xs font-semibold text-[#233B8F] underline-offset-4 hover:underline">← بازگشت به گزارش یادگیری</Link>}
           <p className="text-sm text-slate-500">
             گزارش عملکرد · {fa(report.answered)} از {fa(report.total)} پاسخ
             ثبت‌شده

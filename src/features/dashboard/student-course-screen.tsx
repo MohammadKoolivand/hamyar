@@ -65,13 +65,13 @@ export function StudentCourseScreen({
   const completed = courseAssignments.filter(
     (assignment) => assignment.state === "completed",
   );
-  const items = data.content.items.filter((item) =>
+  const items = (data.content?.items ?? []).filter((item) =>
     item.courseIds.includes(course.courseId),
   );
   const topicIds = new Set(items.map((item) => item.topicId));
-  const choices = curriculumTopicChoices(data.content.nodes).filter((choice) =>
-    topicIds.has(choice.topic._id),
-  );
+  const choices = curriculumTopicChoices(
+    data.content?.nodes ?? [],
+  ).filter((choice) => topicIds.has(choice.topic._id));
   const chapters = [
     ...new Map(
       choices.map((choice) => [choice.chapter.id, choice.chapter.title]),

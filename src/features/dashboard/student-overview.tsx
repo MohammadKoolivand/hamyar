@@ -259,60 +259,54 @@ export function StudentOverview({
 
   return (
     <div className="hy-student-home grid gap-7">
-      <section className="glass-hero grid gap-5 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.72fr)] lg:items-center">
-        <div className="grid gap-4">
-          <span className="glass-kicker w-fit px-3 py-1.5 text-xs">
-            یادگیری، قدم به قدم
-          </span>
-          <h2 className="text-[24px] font-bold text-[#17305e]">
-            سلام {me.name}، خوش آمدی
-          </h2>
-          <p className="max-w-2xl text-sm leading-loose text-slate-600">
-            درس، تمرین یا مأموریتی را که می‌خواهی پیدا کن و یادگیری را از
-            همان‌جا ادامه بده.
+      <section className="hy-home-spotlight" aria-label="قدم بعدی یادگیری">
+        <div className="hy-home-spotlight-main">
+          <span className="hy-home-eyebrow"><Sparkles size={15} aria-hidden /> مسیر یادگیری تو</span>
+          <p className="hy-home-welcome">سلام {me.name} <span aria-hidden>👋</span></p>
+          <h1 className="hy-home-title">
+            {nextAssignment
+              ? nextAssignment.state === "in_progress"
+                ? "از همان‌جایی ادامه بده که مانده بودی"
+                : "آماده‌ای یک قدم جلوتر بروی؟"
+              : "امروز چه چیزی یاد می‌گیریم؟"}
+          </h1>
+          <p className="hy-home-lead">
+            {nextAssignment
+              ? "لازم نیست بین صفحه‌ها بگردی؛ قدم بعدی یادگیری همین‌جاست."
+              : "برای شروع، یک درس یا تمرین انتخاب کن. هدهده قدم‌به‌قدم همراه توست."}
           </p>
-          <button
-            type="button"
-            onClick={() => setPage("student-search")}
-            className="glass-field flex min-h-12 w-full cursor-pointer items-center gap-3 px-4 text-right text-sm text-slate-500 transition hover:border-[#7fa6ee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2457b8]"
-            aria-label="جست‌وجو در درس‌ها و مأموریت‌ها"
-          >
-            <Search size={19} aria-hidden />
-            نام درس یا مأموریت را جست‌وجو کن…
-          </button>
-        </div>
-        <div className="glass-panel grid gap-3 p-5">
-          <div className="flex items-center gap-3">
-            <span className="grid size-11 place-items-center rounded-xl bg-[#e8efff] text-[#2457b8]">
-              <PlayCircle size={22} aria-hidden />
-            </span>
-            <div>
-              <p className="text-xs text-slate-500">پیشنهاد بعدی</p>
-              <h3 className="font-bold text-[#17305e]">
-                {nextAssignment?.title ?? "فعلاً تمرین آماده‌ای نداری"}
-              </h3>
+          <div className="hy-home-main-action">
+            <div className="min-w-0">
+              <span className="hy-home-action-label">{nextAssignment ? "پیشنهاد ویژهٔ تو" : "نقطهٔ شروع"}</span>
+              <h2 className="hy-home-action-title">{nextAssignment?.title ?? "پیدا کردن اولین تمرین"}</h2>
+              {nextAssignment && (
+                <p className="hy-home-action-context">
+                  {nextCourse?.title ?? "مأموریت معلم"} · {nextAssignment.state === "in_progress" ? "نیمه‌تمام" : "آمادهٔ شروع"}
+                </p>
+              )}
             </div>
-          </div>
-          {nextAssignment ? (
-            <>
-              <p className="text-xs leading-6 text-slate-600">
-                {nextCourse?.title ?? "مأموریت معلم"} ·{" "}
-                {nextAssignment.state === "in_progress"
-                  ? "در حال انجام"
-                  : "آماده شروع"}
-              </p>
-              <Button disabled={busy} onClick={() => void open(nextAssignment)}>
-                {nextAssignment.state === "in_progress"
-                  ? "ادامه یادگیری"
-                  : "شروع تمرین"}
-                <ArrowLeft size={16} aria-hidden />
-              </Button>
-            </>
-          ) : (
-            <Button variant="outline" onClick={() => setPage("courses")}>
-              مشاهده درس‌ها <ArrowLeft size={16} aria-hidden />
+            <Button
+              className="hy-home-primary-button"
+              disabled={busy}
+              onClick={() => nextAssignment ? void open(nextAssignment) : setPage("student-practice")}
+            >
+              {nextAssignment ? nextAssignment.state === "in_progress" ? "ادامهٔ تمرین" : "شروع تمرین" : "کاوش تمرین‌ها"}
+              <ArrowLeft size={18} aria-hidden />
             </Button>
-          )}
+          </div>
+        </div>
+        <div className="hy-home-spotlight-aside">
+          <div className="hy-home-aside-illustration" aria-hidden="true">
+            <div className="hy-home-orbit hy-home-orbit-one" />
+            <div className="hy-home-orbit hy-home-orbit-two" />
+            <span className="hy-home-orbit-icon"><BookOpenCheck size={43} strokeWidth={1.6} /></span>
+            <span className="hy-home-orbit-star hy-home-orbit-star-one">✦</span>
+            <span className="hy-home-orbit-star hy-home-orbit-star-two">✧</span>
+          </div>
+          <button type="button" onClick={() => setPage("student-search")} className="hy-home-search-link">
+            <Search size={17} aria-hidden /> دنبال درس یا مبحث خاصی هستی؟
+            <ArrowLeft size={16} aria-hidden />
+          </button>
         </div>
       </section>
       {!data ? (
@@ -323,7 +317,7 @@ export function StudentOverview({
         <>
           <section
             aria-label="دسترسی سریع"
-            className="grid grid-cols-2 gap-3 lg:grid-cols-4"
+            className="hy-home-quick-links grid grid-cols-2 gap-3 lg:grid-cols-4"
           >
             {[
               {
@@ -331,6 +325,7 @@ export function StudentOverview({
                 ariaLabel: "باز کردن تمرین‌های آماده",
                 detail: `${count(readyAssignments.length)} تمرین آماده`,
                 icon: PlayCircle,
+                tone: "blue",
                 page: "student-practice",
               },
               {
@@ -338,6 +333,7 @@ export function StudentOverview({
                 ariaLabel: "باز کردن تکلیف‌های من",
                 detail: `${count(data.summary.assignments)} مأموریت`,
                 icon: Target,
+                tone: "amber",
                 page: "student-missions",
               },
               {
@@ -345,6 +341,7 @@ export function StudentOverview({
                 ariaLabel: "باز کردن مرور اشتباهات",
                 detail: "تمرین دوباره و اصلاح",
                 icon: RotateCcw,
+                tone: "rose",
                 page: "student-mistakes",
               },
               {
@@ -352,17 +349,19 @@ export function StudentOverview({
                 ariaLabel: "باز کردن گزارش پیشرفت",
                 detail: `${count(data.summary.completed)} مأموریت تکمیل‌شده`,
                 icon: BarChart3,
+                tone: "mint",
                 page: "student-progress",
               },
             ].map((item) => (
               <button
                 key={item.label}
+                data-tone={item.tone}
                 type="button"
                 aria-label={item.ariaLabel}
                 onClick={() => setPage(item.page)}
-                className="glass-panel grid cursor-pointer gap-3 p-4 text-right transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2457b8] motion-reduce:transform-none"
+                className="hy-home-quick-link grid cursor-pointer gap-3 p-4 text-right focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2457b8]"
               >
-                <item.icon size={21} className="text-[#2457b8]" aria-hidden />
+                <span className="hy-home-quick-icon"><item.icon size={22} aria-hidden /></span>
                 <span>
                   <strong className="block text-sm">{item.label}</strong>
                   <small className="mt-1 block text-xs leading-6 text-slate-500">
@@ -374,9 +373,9 @@ export function StudentOverview({
           </section>
           <section
             aria-label="برنامه امروز"
-            className="grid gap-4 xl:grid-cols-2"
+            className="hy-home-daily grid gap-4 xl:grid-cols-2"
           >
-            <article className="glass-panel grid gap-4 p-5 sm:p-6">
+            <article className="hy-home-daily-card glass-panel grid gap-4 p-5 sm:p-6">
               <div className="flex items-center gap-3">
                 <span className="grid size-10 place-items-center rounded-xl bg-amber-50 text-amber-700">
                   <Clock3 size={20} aria-hidden />
@@ -416,7 +415,7 @@ export function StudentOverview({
               )}
             </article>
 
-            <article className="glass-panel grid gap-4 p-5 sm:p-6">
+            <article className="hy-home-daily-card glass-panel grid gap-4 p-5 sm:p-6">
               <div className="flex items-center gap-3">
                 <span className="grid size-10 place-items-center rounded-xl bg-violet-50 text-violet-700">
                   <Sparkles size={20} aria-hidden />
@@ -460,7 +459,7 @@ export function StudentOverview({
               )}
             </article>
 
-            <article className="glass-panel grid gap-4 p-5 sm:p-6">
+            <article className="hy-home-daily-card glass-panel grid gap-4 p-5 sm:p-6">
               <div className="flex items-center gap-3">
                 <span className="grid size-10 place-items-center rounded-xl bg-rose-50 text-rose-700">
                   <AlertCircle size={20} aria-hidden />
@@ -495,7 +494,7 @@ export function StudentOverview({
               )}
             </article>
 
-            <article className="glass-panel grid gap-4 p-5 sm:p-6">
+            <article className="hy-home-daily-card glass-panel grid gap-4 p-5 sm:p-6">
               <div className="flex items-center gap-3">
                 <span className="grid size-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700">
                   <TrendingUp size={20} aria-hidden />
@@ -539,7 +538,7 @@ export function StudentOverview({
           </section>
 
           <section
-            className="glass-panel grid gap-4 p-5 sm:p-6"
+            className="hy-home-fresh glass-panel grid gap-4 p-5 sm:p-6"
             aria-label="محتوای تازه برای درس‌های من"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -580,7 +579,7 @@ export function StudentOverview({
           </section>
           <section
             aria-label="خلاصه یادگیری"
-            className="grid grid-cols-2 gap-3 lg:grid-cols-4"
+            className="hy-home-stats grid grid-cols-2 gap-3 lg:grid-cols-4"
           >
             {[
               {
@@ -604,7 +603,7 @@ export function StudentOverview({
                 icon: ClipboardList,
               },
             ].map((item) => (
-              <div key={item.label} className="glass-stat grid gap-2 p-4">
+              <div key={item.label} className="hy-home-stat grid gap-2 p-4">
                 <item.icon size={20} color="#1F3F97" aria-hidden />
                 <p className="text-xs text-slate-600">{item.label}</p>
                 <strong className="text-2xl text-[#1F3F97]">

@@ -1,5 +1,6 @@
 "use client";
 import { PagedList } from "@/components/ui/paged-list";
+import { LearningReportOverview } from "./learning-report-overview";
 import { useEffect, useState } from "react";
 import { AppLink as Link } from "@/components/app-link";
 import { MathText } from "@/components/question-presentation";
@@ -34,6 +35,7 @@ interface Progress {
     incorrect: number;
     independent: number;
     assisted: number;
+    pending?: number;
   }[];
   answered: number;
   independent: number;
@@ -177,13 +179,15 @@ export function LearningDashboard({
       )}
       {error && (
         <p role="alert" className="rounded-xl bg-rose-50 p-3 text-rose-800">
-          {error}
+          {error} <button type="button" className="mr-3 font-semibold underline" onClick={() => setRevision((n) => n + 1)}>تلاش دوباره</button>
         </p>
       )}
       {!sid ? (
         <p className="p-6 text-slate-500">
           ابتدا دانش‌آموز را دعوت و یک مأموریت منتشر کنید.
         </p>
+      ) : !data && error ? (
+        <p className="rounded-xl border border-slate-200 p-5 text-sm text-slate-600">نمایش گزارش ممکن نشد. از دکمهٔ تلاش دوباره استفاده کنید.</p>
       ) : !data ? (
         <p role="status" className="p-6 text-slate-500">
           در حال خواندن شواهد ثبت‌شده…
@@ -305,35 +309,14 @@ export function LearningDashboard({
               )}
             </div>
           </section>
-          {me.role !== "parent" && !!data.recentMissions?.length && (
-            <section className="glass-panel grid gap-3 p-6">
-              <h2 className="text-lg font-bold">
-                تمرین‌های اخیر و نتیجه واقعی
-              </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <PagedList items={data.recentMissions} label="تمرین‌های اخیر">
-                  {(m) => (
-                    <Link
-                      key={m.assignmentId}
-                      href={`/report?assignment=${m.assignmentId}`}
-                      className={`rounded-xl border p-4 transition-colors hover:border-blue-400 ${m.incorrect ? "border-rose-200 bg-rose-50/50" : m.independent + m.assisted > 0 ? "border-emerald-200 bg-emerald-50/50" : "border-slate-200 bg-white/60"}`}
-                    >
-                      <h3 className="text-sm font-bold">{m.title}</h3>
-                      <p className="mt-2 text-xs leading-6">
-                        {number(m.answered)} از {number(m.total)} پاسخ ·{" "}
-                        {number(m.independent + m.assisted)} صحیح ·{" "}
-                        {number(m.incorrect)} نادرست ·{" "}
-                        {number(Math.max(0, m.total - m.answered))} نزده
-                      </p>
-                      <span className="mt-2 block text-xs font-medium text-[#233B8F]">
-                        بررسی سؤال‌ها و پاسخ‌ها ←
-                      </span>
-                    </Link>
-                  )}
-                </PagedList>
-              </div>
-            </section>
-          )}
+          <LearningReportOverview
+            missions={data.recentMissions ?? []}
+            independentSuccessRate={data.independentSuccessRate}
+            eligibleFirstAttempts={data.eligibleFirstAttempts}
+            hintUsageRate={data.hintUsageRate}
+            skills={data.skills}
+            canOpenReports={me.role !== "parent"}
+          />
           <section className="grid gap-3 glass-panel p-6">
             <h2 className="text-lg font-bold">مهارت‌ها و شواهد یادگیری</h2>
             <p className="text-sm text-slate-600">

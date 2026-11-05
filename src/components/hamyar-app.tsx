@@ -681,7 +681,7 @@ export default function HamyarApp() {
           <StudentPracticeHub
             assignments={assignments}
             courses={courses}
-            nodes={studentDashboard?.content.nodes ?? []}
+            nodes={studentDashboard?.content?.nodes ?? []}
             busy={busy}
             open={open}
             showReport={showReport}
@@ -692,8 +692,8 @@ export default function HamyarApp() {
           <StudentSearchScreen
             assignments={assignments}
             courses={courses}
-            nodes={studentDashboard?.content.nodes ?? []}
-            contentItems={studentDashboard?.content.items ?? []}
+            nodes={studentDashboard?.content?.nodes ?? []}
+            contentItems={studentDashboard?.content?.items ?? []}
             busy={busy}
             open={open}
             showReport={showReport}
