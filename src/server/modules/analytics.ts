@@ -182,17 +182,39 @@ export function registerAnalytics(
           note: z.string().min(2).max(2000),
         })
         .parse(r.body);
-    const found = await c("evaluations").findOne({ _id: eid });
-    if (
-      !found ||
-      !(await c("assignments").findOne({
-        _id: found.assignmentId,
-        teacherId: u._id,
-      }))
-    )
-      fail(404, "یافت نشد");
+    const found = await c("evaluations")
+      .aggregate([
+        { $match: { _id: eid } },
+        {
+          $lookup: {
+            from: "assignments",
+            let: { assignmentId: "$assignmentId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$_id", "$$assignmentId"] },
+                      { $eq: ["$teacherId", u._id] },
+                    ],
+                  },
+                },
+              },
+              { $project: { _id: 1 } },
+            ],
+            as: "authorizedAssignments",
+          },
+        },
+        { $match: { "authorizedAssignments.0": { $exists: true } } },
+        { $unset: "authorizedAssignments" },
+      ])
+      .next();
+    if (!found) fail(404, "یافت نشد");
     return ctx.atomic(r, u._id, `review:${eid}`, b, async (session) => {
-      const ev = (await c("evaluations").findOne({ _id: eid }, { session }))!;
+      const ev = (await c("evaluations").findOne(
+        { _id: eid, assignmentId: found!.assignmentId },
+        { session },
+      ))!;
       const a = (await c("assignments").findOne(
         { _id: ev.assignmentId, teacherId: u._id },
         { session },
@@ -210,7 +232,7 @@ export function registerAnalytics(
         createdAt: now(),
       };
       await c("evaluations").updateOne(
-        { _id: eid },
+        { _id: eid, assignmentId: a._id },
         {
           $set: {
             result: b.result,
@@ -258,7 +280,7 @@ export function registerAnalytics(
           { $set: { state: "completed" } },
           { session },
         );
-        await c("missions").updateOne(
+        if (a.missionId) await c("missions").updateOne(
           { _id: a.missionId },
           { $set: { state: "completed" } },
           { session },

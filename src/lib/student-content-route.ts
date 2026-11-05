@@ -7,6 +7,8 @@ export interface StudentContentFilters {
   chapter: string;
   topic: string;
   content: StudentContentKind;
+  query: string;
+  sort: "relevant" | "newest" | "hardest" | "easiest";
 }
 
 export const emptyStudentContentFilters: StudentContentFilters = {
@@ -16,6 +18,8 @@ export const emptyStudentContentFilters: StudentContentFilters = {
   chapter: "",
   topic: "",
   content: "questions",
+  query: "",
+  sort: "relevant",
 };
 
 export function parseStudentContentFilters(
@@ -25,6 +29,8 @@ export function parseStudentContentFilters(
   const content = params.get("content");
 
   return {
+    query: (params.get("q") ?? "").slice(0, 120),
+    sort: ["newest", "hardest", "easiest"].includes(params.get("sort") ?? "") ? params.get("sort") as StudentContentFilters["sort"] : "relevant",
     grade: params.get("grade") ?? "",
     track: params.get("track") ?? "",
     book: params.get("book") ?? "",
@@ -42,6 +48,8 @@ export function studentContentPath(filters: StudentContentFilters): string {
     if (filters[key]) params.set(key, filters[key]);
   }
   params.set("content", filters.content);
+  if (filters.query) params.set("q", filters.query);
+  if (filters.sort !== "relevant") params.set("sort", filters.sort);
 
   return `/search?${params.toString()}`;
 }

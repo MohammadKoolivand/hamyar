@@ -79,7 +79,8 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
 
   app.get("/api/course-requests", async (r) => {
     const actor = await user(r);
-    if (actor.role === "parent") fail(403, "دسترسی مجاز نیست");
+    if (!["teacher", "student"].includes(actor.role))
+      fail(403, "دسترسی مجاز نیست");
     const rows = await c("courseRequests")
       .find(actor.role === "teacher"
         ? { teacherId: actor._id }
@@ -171,7 +172,8 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
 
   app.post("/api/enrollments/:eid/leave", async (r) => {
     const actor = await user(r);
-    if (actor.role === "parent") fail(403, "دسترسی مجاز نیست");
+    if (!["teacher", "student"].includes(actor.role))
+      fail(403, "دسترسی مجاز نیست");
     const { eid } = z.object({ eid: uuid }).parse(r.params);
     return ctx.transaction(async (session) => {
       const enrollment = await c("enrollments").findOne({
@@ -217,7 +219,8 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
   // Student and teacher can inspect their own historical membership changes.
   app.get("/api/enrollment-history", async (r) => {
     const actor = await user(r);
-    if (actor.role === "parent") fail(403, "دسترسی مجاز نیست");
+    if (!["teacher", "student"].includes(actor.role))
+      fail(403, "دسترسی مجاز نیست");
     const rows = await c("enrollments").find(
       actor.role === "teacher" ? { teacherId: actor._id } : { studentId: actor._id },
     ).sort({ createdAt: -1 }).toArray();

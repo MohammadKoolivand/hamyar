@@ -1,5 +1,6 @@
 "use client";
 import { PagedList } from "@/components/ui/paged-list";
+import { nextLearningGuidance } from "@/features/dashboard/learning-guidance";
 import { LearningReportOverview } from "./learning-report-overview";
 import { useEffect, useState } from "react";
 import { AppLink as Link } from "@/components/app-link";
@@ -268,45 +269,18 @@ export function LearningDashboard({
             </div>
             <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4">
               <h3 className="font-bold text-amber-900">از کجا شروع کنم؟</h3>
-              {data.skills.length ? (
-                <ol className="mt-3 grid gap-2">
-                  {[...data.skills]
-                    .sort((a, b) => b.incorrect - a.incorrect)
-                    .slice(0, 3)
-                    .map((skill, i) => (
-                      <li key={skill.skillId} className="text-sm leading-7">
-                        <a
-                          href={`#skill-${skill.skillId}`}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            setSkillFilter("all");
-                            setSkillTarget((old) => old + 1);
-                            requestAnimationFrame(() =>
-                              document
-                                .getElementById(`skill-${skill.skillId}`)
-                                ?.scrollIntoView({ block: "start" }),
-                            );
-                          }}
-                          className="font-medium underline-offset-4 hover:underline"
-                        >
-                          {number(i + 1)}. {skill.title}
-                        </a>
-                        <p className="text-xs text-slate-600">
-                          {skill.incorrect
-                            ? `${number(skill.incorrect)} تلاش نادرست؛ مرور روش و سپس یک سؤال تازه بدون کمک`
-                            : skill.status === "proficient"
-                              ? "مرور فاصله‌دار برای بررسی پایداری یادگیری"
-                              : "یک سؤال تازه بدون کمک برای تکمیل شواهد"}
-                        </p>
-                      </li>
-                    ))}
-                </ol>
-              ) : (
-                <p className="mt-3 text-sm">
-                  برای پیشنهاد دقیق‌تر، ابتدا یک تمرین دارای مهارت مشخص انجام
-                  دهید.
-                </p>
-              )}
+              {(() => {
+                const guidance = nextLearningGuidance(data.skills, (data.recentMissions ?? []).some((m) => ["published", "in_progress"].includes(m.state)));
+                return <div className="mt-3 grid gap-3">
+                  <p className="text-sm font-semibold leading-7 text-amber-950">{guidance.title}</p>
+                  <p className="text-sm leading-7 text-amber-900">{guidance.description}</p>
+                  {me.role === "student" && <Link href={guidance.destination === "student-mistakes" ? "/mistakes" : "/student-practice"} className="w-fit rounded-lg bg-amber-900 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-950">{guidance.kind === "review" ? "مرور اشتباهات" : "کاوش تمرین‌ها"} ←</Link>}
+                  {guidance.skill?.skillId && <a href={`#skill-${guidance.skill.skillId}`} className="text-xs font-semibold text-amber-900 underline" onClick={(event) => {
+                    event.preventDefault(); setSkillFilter("all"); setSkillTarget((n) => n + 1);
+                    requestAnimationFrame(() => document.getElementById(`skill-${guidance.skill?.skillId}`)?.scrollIntoView({ block: "start" }));
+                  }}>مشاهدهٔ شواهد این مهارت</a>}
+                </div>;
+              })()}
             </div>
           </section>
           <LearningReportOverview

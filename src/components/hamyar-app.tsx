@@ -607,6 +607,7 @@ export default function HamyarApp() {
             setNotice={setNotice}
             nodes={nodes}
             questions={questions}
+            courses={courses}
             busy={busy}
             run={run}
             refresh={refresh}

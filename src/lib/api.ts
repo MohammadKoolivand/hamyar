@@ -9,6 +9,7 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
       ) ||
       path === "/curriculum/catalog/import" ||
       path === "/questions" ||
+      /^\/student\/library\/[^/]+\/start$/.test(path) ||
       /^\/questions\/[^/]+\/revise$/.test(path) ||
       path === "/question-drafts/generate" ||
       /\/question-drafts\/[^/]+\/(approve|reject)$/.test(path) ||

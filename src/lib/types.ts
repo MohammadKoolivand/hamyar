@@ -111,6 +111,7 @@ export interface StudentDashboardData {
   };
 }
 export interface StudentContentItem {
+  library?: boolean;
   questionId: string;
   topicId: string;
   type: string;
@@ -119,6 +120,9 @@ export interface StudentContentItem {
   resourceKey?: string;
   examTitle?: string;
   resourceTitle?: string;
+  academicYear?: string;
+  difficultyScore?: number | null;
+  sourceCategory?: string;
 }
 export interface User {
   _id: string;
@@ -191,6 +195,7 @@ export interface Attempt {
 }
 export interface Assignment {
   missionId: string;
+  questionVersionIds?: string[];
   groupTaskId?: string;
   groupId?: string;
   courseId?: string;

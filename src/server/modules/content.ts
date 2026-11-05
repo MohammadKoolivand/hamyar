@@ -44,7 +44,10 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
     if (u.role === "student" || u.role === "parent") {
       const versions = await c("questionVersions")
         .find(
-          { visuals: { $elemMatch: { kind: "image", assetId } } },
+          {
+            ownerId: imageAsset!.ownerId,
+            visuals: { $elemMatch: { kind: "image", assetId } },
+          },
           { projection: { _id: 1 } },
         )
         .toArray();
@@ -55,7 +58,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       if (
         !(await c("assignments").findOne({
           ...(u.role === "student"
-            ? { studentId: u._id }
+            ? { studentId: u._id, teacherId: imageAsset!.ownerId }
             : {
                 $or: links.length
                   ? links.map((l) => ({

@@ -69,15 +69,20 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
     const { aid } = r.params as { aid: string };
     if (u!.role === "parent") {
       if (studentOnly) fail(403, "دسترسی اولیا فقط برای مشاهده گزارش است");
-      const row = await c("assignments").findOne({ _id: aid });
-      if (
-        !row ||
-        !(await c("parentLinks").findOne({
-          parentId: u!._id,
-          studentId: row.studentId,
-          teacherId: row.teacherId,
-        }))
-      )
+      const links = await c("parentLinks")
+        .find({ parentId: u!._id })
+        .project({ studentId: 1, teacherId: 1 })
+        .toArray();
+      const row = links.length
+        ? await c("assignments").findOne({
+            _id: aid,
+            $or: links.map((link) => ({
+              studentId: link.studentId,
+              teacherId: link.teacherId,
+            })),
+          })
+        : null;
+      if (!row)
         fail(404, "مأموریت یافت نشد");
       return { u: u!, a: row! };
     }

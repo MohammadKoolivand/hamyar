@@ -504,3 +504,50 @@
   .hy-student-home .hy-home-primary-button { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { .hy-student-home .hy-home-quick-link { transition: none; } }
+
+/* Student learning destinations: clear primary action, quieter discovery surfaces. */
+.hy-learning-hero { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(190px,.55fr); border-radius:26px; overflow:hidden; background:#153b83; color:white; box-shadow:0 14px 34px rgba(21,59,131,.12); }
+.hy-learning-hero-content { padding:clamp(1.25rem,3vw,2.4rem); display:grid; align-content:center; gap:1rem; min-width:0; }
+.hy-learning-eyebrow { display:inline-flex; align-items:center; gap:.5rem; color:#b5efe1; font-size:.78rem; font-weight:800; }
+.hy-learning-hero-title { color:white; font-size:clamp(1.5rem,2.7vw,2.15rem); font-weight:900; line-height:1.55; }
+.hy-learning-hero-description { max-width:55ch; color:#dbe8ff; font-size:.88rem; line-height:2; }
+.hy-learning-featured { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; padding:1.1rem; border-radius:18px; background:#fff; color:#18335e; }
+.hy-learning-featured-label,.hy-learning-section-label { display:inline-block; font-size:.75rem; font-weight:800; color:#14806c; margin-bottom:.35rem; }
+.hy-learning-featured-title { font-weight:850; font-size:1.1rem; line-height:1.6; }
+.hy-learning-hero-aside { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.6rem; background:#1d4b94; padding:1.5rem; text-align:center; }
+.hy-learning-aside-icon { width:92px; height:92px; display:grid; place-items:center; border-radius:28px; background:#fff3d4; color:#153b83; transform:rotate(-6deg); margin-bottom:.65rem; }
+.hy-learning-hero-link { display:inline-flex; align-items:center; gap:.5rem; border:1px solid #779ace; padding:.65rem .95rem; border-radius:100px; font-size:.78rem; margin-top:.7rem; }
+.hy-learning-hero-link:hover { background:#ffffff18; }
+.hy-learning-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.8rem; }
+.hy-learning-shortcut { min-width:0; text-align:start; display:flex; align-items:center; gap:.8rem; border:1px solid #e5eaf1; border-radius:16px; padding:.9rem; background:white; transition:border-color .15s,transform .15s; }
+.hy-learning-shortcut:hover,.hy-learning-course-card:hover,.hy-learning-practice-card:hover { border-color:#9eb9df; transform:translateY(-2px); }
+.hy-learning-shortcut strong,.hy-learning-shortcut small { display:block; }
+.hy-learning-shortcut strong { color:#203c63; font-size:.87rem; }
+.hy-learning-shortcut small { color:#718096; font-size:.71rem; margin-top:.3rem; }
+.hy-learning-shortcut-icon { flex:none; display:grid; place-items:center; width:43px; height:43px; border-radius:13px; }
+.hy-learning-shortcut-rose { color:#b34a61; background:#fff0f3; }
+.hy-learning-shortcut-mint { color:#117b61; background:#e4f8f0; }
+.hy-learning-shortcut-gold { color:#986b15; background:#fff3d8; }
+.hy-learning-catalog-search { display:flex; align-items:center; gap:.8rem; padding:1rem 1.1rem; border:1px solid #cad9ed; border-radius:15px; background:#f8fbff; }
+.hy-learning-catalog-search:focus-within { border-color:#2457b8; outline:2px solid #c3d8ff; }
+.hy-learning-practice-card { min-width:0; border:1px solid #e1e8f1; border-radius:19px; padding:1.15rem; background:white; transition:border-color .15s, transform .15s; }
+.hy-learning-card-facts { display:flex; flex-wrap:wrap; gap:.6rem 1rem; border-block:1px solid #edf0f5; padding-block:.85rem; }
+.hy-learning-card-facts div { display:flex; align-items:center; gap:.4rem; }
+.hy-learning-card-facts dt { display:inline-flex; align-items:center; gap:.25rem; color:#718096; }
+.hy-learning-card-facts dd { font-weight:800; color:#203c63; }
+.hy-learning-empty { display:grid; justify-items:start; gap:.7rem; padding:2rem; border:1px dashed #c7d8ec; border-radius:20px; background:#f8fbff; }
+.hy-learning-courses-intro { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1.2rem; padding:1.5rem; border-radius:24px; background:#ecf4ff; }
+.hy-learning-courses-intro h2 { font-size:clamp(1.3rem,2.5vw,1.8rem); font-weight:900; color:#17305e; }
+.hy-learning-courses-intro p { font-size:.84rem; color:#586a82; line-height:2; margin-top:.4rem; }
+.hy-learning-courses-count { font-size:.8rem; font-weight:800; background:white; border-radius:100px; padding:.7rem 1rem; color:#2457b8; }
+.hy-learning-course-card { min-width:0; background:#fff; border:1px solid #e0e8f2; border-radius:20px; padding:1.35rem; transition:border-color .15s, transform .15s; }
+.hy-learning-course-card:nth-child(3n + 2) .hy-learning-course-icon { color:#9a6613; background:#fff3d9; }
+.hy-learning-course-card:nth-child(3n + 3) .hy-learning-course-icon { color:#2457b8; background:#eef3ff; }
+.hy-learning-course-meta { display:flex; flex-wrap:wrap; gap:.5rem 1rem; border-top:1px solid #edf0f5; padding-top:.8rem; }
+.hy-learning-join-details { border:1px solid #e5eaf1; background:#f8fafc; border-radius:20px; padding:1.25rem; }
+.hy-learning-join-details[open] { background:white; }
+.hy-learning-join-details > section { margin-top:1.1rem; }
+.hy-learning-detail-hero { background:#eaf2ff; border-radius:24px; border-inline-start:5px solid #2457b8; }
+.hy-learning-next-lesson { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; border:1px solid #c5e5d6; background:#f0faf5; border-radius:20px; padding:1.2rem 1.5rem; }
+@media (max-width:760px) { .hy-learning-hero { grid-template-columns:1fr; } .hy-learning-hero-aside { flex-direction:row; justify-content:space-between; gap:.7rem; padding:1rem 1.25rem; flex-wrap:wrap; } .hy-learning-aside-icon { display:none; } .hy-learning-hero-link { margin-top:0; } .hy-learning-shortcuts { grid-template-columns:1fr; } .hy-learning-featured > button { width:100%; } .hy-learning-join-details > summary { align-items:start; flex-direction:column; } }
+@media (prefers-reduced-motion:reduce) { .hy-learning-shortcut,.hy-learning-course-card,.hy-learning-practice-card { transition:none; } }

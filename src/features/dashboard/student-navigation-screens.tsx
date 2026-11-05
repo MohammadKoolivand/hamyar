@@ -15,6 +15,7 @@ import {
   Target,
 } from "lucide-react";
 import clsx from "clsx";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { PagedList } from "@/components/ui/paged-list";
 import { curriculumTopicChoices } from "@/lib/curriculum";
@@ -78,6 +79,7 @@ export function StudentPracticeHub({
   const completed = assignments.filter((item) =>
     ["completed", "submitted"].includes(item.state),
   );
+  const featured = ready.find((item) => item.state === "in_progress") ?? ready[0];
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<PracticeKind>("all");
   const [status, setStatus] = useState("all");
@@ -217,69 +219,57 @@ export function StudentPracticeHub({
 
   return (
     <div className="grid gap-5">
-      <section className="grid gap-5 border-b border-slate-200 bg-white py-5 sm:py-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-        <div className="grid gap-3">
-          <span className="w-fit rounded-full bg-[#eef4ff] px-3 py-1.5 text-xs font-medium text-[#2457b8]">
-            مرکز فعالیت‌های یادگیری
-          </span>
-          <h2 className="text-2xl font-bold text-[#17305e]">تمرین و آزمون</h2>
-          <p className="max-w-2xl text-sm leading-loose text-slate-600">
-            تمرین آماده را ادامه بده، مأموریت تازهٔ معلم را شروع کن یا سراغ
-            اشتباه‌هایی برو که نیاز به مرور دارند.
-          </p>
-        </div>
-        <Button onClick={() => setPage("student-missions")}>
-          همهٔ مأموریت‌های معلم <ArrowLeft size={16} aria-hidden />
-        </Button>
-      </section>
-
-      <section aria-label="راه‌های شروع تمرین" className="flex flex-wrap gap-2">
-        {[
-          {
-            title: "مأموریت‌های آماده",
-            value: ready.length,
-            description: "تمرین‌هایی که می‌توانی همین حالا شروع یا ادامه بدهی.",
-            icon: Target,
-            page: "student-missions",
-          },
-          {
-            title: "مرور اشتباهات",
-            value: null,
-            description: "پاسخ‌های نیازمند اصلاح و شواهد یادگیری را مرور کن.",
-            icon: RotateCcw,
-            page: "student-mistakes",
-          },
-          {
-            title: "درس‌های فعال",
-            value: courses.length,
-            description: "فعالیت‌ها و مأموریت‌ها را به تفکیک درس ببین.",
-            icon: BookOpenCheck,
-            page: "courses",
-          },
-        ].map((item) => (
-          <button
-            key={item.title}
-            type="button"
-            onClick={() => setPage(item.page)}
-            className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2 text-right hover:border-[#8eafe9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2457b8]"
-          >
-            <item.icon size={18} className="text-[#2457b8]" aria-hidden />
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-bold">{item.title}</h3>
-              {item.value !== null && (
-                <strong className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-[#1f3f97]">
-                  {item.value.toLocaleString("fa-IR")}
-                </strong>
-              )}
+      <section className="hy-learning-hero" aria-label="پیشنهاد شروع تمرین">
+        <div className="hy-learning-hero-content">
+          <span className="hy-learning-eyebrow"><Target size={16} aria-hidden /> قدم بعدی تو</span>
+          <h2 className="hy-learning-hero-title">{featured ? "با یک تمرین، جلوتر برو" : "از همین‌جا یادگیری را شروع کن"}</h2>
+          <p className="hy-learning-hero-description">{featured
+            ? "یک فعالیت آماده داری. لازم نیست بین همهٔ گزینه‌ها بگردی؛ از همین تمرین شروع کن."
+            : "هنوز تمرین آماده‌ای نداری؟ می‌توانی درس‌هایت را ببینی یا از معلم مأموریت تازه بگیری."}</p>
+          <div className="hy-learning-featured" data-testid="practice-featured-action">
+            <div className="min-w-0">
+              <span className="hy-learning-featured-label">{featured ? (featured.state === "in_progress" ? "ادامهٔ تمرین نیمه‌تمام" : "پیشنهاد امروز") : "مسیر پیشنهادی"}</span>
+              <h3 className="hy-learning-featured-title">{featured?.title ?? "دیدن درس‌های من"}</h3>
+              <p className="text-xs text-slate-500">{featured
+                ? `${courses.find((course) => course._id === featured.courseId)?.title ?? "تمرین آموزشی"} · ${featured.catalog?.questionCount?.toLocaleString("fa-IR") ?? "تعداد نامشخص"} سؤال`
+                : "از یک درس شروع کن و مسیر مناسب را انتخاب کن."}</p>
             </div>
-          </button>
-        ))}
+            <Button disabled={busy} onClick={() => featured ? void open(featured) : setPage("courses")}>
+              {featured ? "شروع / ادامه" : "دیدن درس‌ها"} <ArrowLeft size={16} aria-hidden />
+            </Button>
+          </div>
+        </div>
+        <div className="hy-learning-hero-aside">
+          <span className="hy-learning-aside-icon"><BookOpenCheck size={36} strokeWidth={1.5} aria-hidden /></span>
+          <strong className="text-3xl font-black">{ready.length.toLocaleString("fa-IR")}</strong>
+          <span className="text-sm text-blue-100">فعالیت آمادهٔ انجام</span>
+          <button className="hy-learning-hero-link" type="button" onClick={() => setPage("student-missions")}>همهٔ مأموریت‌ها <ArrowLeft size={15} aria-hidden /></button>
+        </div>
       </section>
 
-      <section className="grid gap-5 border-t border-slate-200 bg-white pt-5 sm:pt-6">
+      <section aria-label="مسیرهای دیگر تمرین" className="hy-learning-shortcuts">
+        <button type="button" className="hy-learning-shortcut" onClick={() => setPage("student-mistakes")}>
+          <span className="hy-learning-shortcut-icon hy-learning-shortcut-rose"><RotateCcw size={19} aria-hidden /></span>
+          <span><strong>مرور اشتباهات</strong><small>از پاسخ‌های قبلی یاد بگیر</small></span>
+          <ArrowLeft size={16} className="ms-auto text-slate-400" aria-hidden />
+        </button>
+        <button type="button" className="hy-learning-shortcut" onClick={() => setPage("courses")}>
+          <span className="hy-learning-shortcut-icon hy-learning-shortcut-mint"><BookOpenCheck size={19} aria-hidden /></span>
+          <span><strong>درس‌های من</strong><small>{courses.length.toLocaleString("fa-IR")} درس برای کاوش</small></span>
+          <ArrowLeft size={16} className="ms-auto text-slate-400" aria-hidden />
+        </button>
+        <button type="button" className="hy-learning-shortcut" onClick={() => setPage("student-progress")}>
+          <span className="hy-learning-shortcut-icon hy-learning-shortcut-gold"><BarChart3 size={19} aria-hidden /></span>
+          <span><strong>پیشرفت من</strong><small>{completed.length.toLocaleString("fa-IR")} فعالیت تکمیل‌شده</small></span>
+          <ArrowLeft size={16} className="ms-auto text-slate-400" aria-hidden />
+        </button>
+      </section>
+
+      <section className="hy-practice-catalog grid gap-5 border-t border-slate-200 bg-white pt-5 sm:pt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold">کاتالوگ تمرین و آزمون</h2>
+            <span className="hy-learning-section-label">یک تمرین مناسب پیدا کن</span>
+            <h2 className="text-xl font-extrabold text-[#19355f]">همهٔ تمرین‌ها و آزمون‌ها</h2>
             <p className="mt-1 text-xs text-slate-600">
               تمرین مناسب را با درس، مبحث، سال و سختی پیدا کن.
             </p>
@@ -294,6 +284,12 @@ export function StudentPracticeHub({
           )}
         </div>
 
+        <label className="hy-learning-catalog-search">
+          <Search size={18} className="text-[#2457b8]" aria-hidden />
+          <span className="sr-only">جست‌وجوی تمرین‌ها</span>
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="چه درسی یا چه تمرینی می‌خواهی؟" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400" />
+          <span className="hidden text-xs text-slate-500 sm:inline">{filtered.length.toLocaleString("fa-IR")} نتیجه</span>
+        </label>
         <button
           type="button"
           className="flex min-h-12 items-center justify-between rounded-xl border border-slate-200 px-4 text-sm font-bold lg:hidden"
@@ -305,7 +301,7 @@ export function StudentPracticeHub({
         </button>
 
         <div className={clsx("gap-3 rounded-2xl border border-slate-200 bg-white p-4 lg:grid lg:grid-cols-4", filtersOpen ? "grid" : "hidden")}>
-          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700 lg:hidden">
             جست‌وجو
             <span className="relative">
               <Search
@@ -420,10 +416,12 @@ export function StudentPracticeHub({
         </div>
 
         {!assignments.length ? (
-          <p className="glass-note p-4 text-sm leading-loose">
-            فعلاً تمرین آماده‌ای نداری. مأموریت‌های تکمیل‌شده و نتیجه‌ها در
-            «پیشرفت من» محفوظ‌اند.
-          </p>
+          <div className="hy-learning-empty">
+            <BookOpenCheck size={29} className="text-[#2457b8]" aria-hidden />
+            <h3 className="font-bold text-[#17305e]">هنوز تمرینی به تو اختصاص داده نشده</h3>
+            <p className="text-sm leading-loose text-slate-600">می‌توانی درس‌های خودت را مرور کنی یا مأموریت‌های معلم را ببینی.</p>
+            <div className="flex flex-wrap gap-2"><Button onClick={() => setPage("courses")}>دیدن درس‌ها</Button><Button variant="outline" onClick={() => setPage("student-missions")}>مأموریت‌ها</Button></div>
+          </div>
         ) : !filtered.length ? (
           <div className="grid justify-items-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
             <Filter size={24} className="text-slate-400" aria-hidden />
@@ -436,11 +434,11 @@ export function StudentPracticeHub({
             </Button>
           </div>
         ) : (
-          <PagedList items={filtered} label="تمرین‌ها و آزمون‌ها" pageSize={8}>
+          <PagedList items={filtered} label="تمرین‌ها و آزمون‌ها" pageSize={8} className="grid gap-3 md:grid-cols-2">
             {(assignment) => (
               <article
                 key={assignment._id}
-                className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                className="hy-learning-practice-card grid gap-3"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="grid gap-1">
@@ -459,44 +457,12 @@ export function StudentPracticeHub({
                   {courses.find((course) => course._id === assignment.courseId)
                     ?.title ?? "تمرین زیر نظر معلم"}
                 </p>
-                <dl className="grid gap-2 text-xs text-slate-600 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="rounded-xl bg-slate-50 p-3">
-                    <dt>تعداد سؤال</dt>
-                    <dd className="mt-1 font-bold text-slate-900">
-                      {(assignment.catalog?.questionCount ??
-                        Object.keys(assignment.progress ?? {}).length
-                      ).toLocaleString("fa-IR")}
-                    </dd>
-                  </div>
-                  <div className="rounded-xl bg-slate-50 p-3">
-                    <dt className="flex items-center gap-1">
-                      <Clock3 size={14} aria-hidden /> زمان تقریبی
-                    </dt>
-                    <dd className="mt-1 font-bold text-slate-900">
-                      حدود {Math.max(5, (assignment.catalog?.questionCount ?? 1) * 2).toLocaleString("fa-IR")} دقیقه
-                    </dd>
-                  </div>
-                  <div className="rounded-xl bg-slate-50 p-3">
-                    <dt className="flex items-center gap-1">
-                      <Gauge size={14} aria-hidden /> سختی واقعی
-                    </dt>
-                    <dd className="mt-1 font-bold text-slate-900">
-                      {assignment.catalog?.difficultyScore === null ||
-                      assignment.catalog?.difficultyScore === undefined
-                        ? "تعیین نشده"
-                        : `${assignment.catalog.difficultyScore.toLocaleString("fa-IR")} از ۱۰۰`}
-                    </dd>
-                  </div>
-                  <div className="rounded-xl bg-slate-50 p-3">
-                    <dt>موفقیت قبلی من</dt>
-                    <dd className="mt-1 font-bold text-slate-900">
-                      {assignment.catalog?.successRate === null ||
-                      assignment.catalog?.successRate === undefined
-                        ? "بدون سابقه"
-                        : `${assignment.catalog.successRate.toLocaleString("fa-IR")}٪`}
-                    </dd>
-                  </div>
+                <dl className="hy-learning-card-facts text-xs text-slate-600">
+                  <div><dt><ClipboardCheck size={14} aria-hidden /> سؤال</dt><dd>{(assignment.catalog?.questionCount ?? Object.keys(assignment.progress ?? {}).length).toLocaleString("fa-IR")}</dd></div>
+                  <div><dt><Clock3 size={14} aria-hidden /> زمان</dt><dd>حدود {Math.max(5, (assignment.catalog?.questionCount ?? 1) * 2).toLocaleString("fa-IR")} دقیقه</dd></div>
+                  <div><dt><Gauge size={14} aria-hidden /> سختی</dt><dd>{assignment.catalog?.difficultyScore == null ? "نامشخص" : `${assignment.catalog.difficultyScore.toLocaleString("fa-IR")} از ۱۰۰`}</dd></div>
                 </dl>
+                {assignment.catalog?.successRate != null && <p className="text-xs text-emerald-700">موفقیت قبلی: {assignment.catalog.successRate.toLocaleString("fa-IR")}٪</p>}
                 {!!assignment.catalog?.academicYears.length && (
                   <p className="text-xs text-slate-500">
                     سال آزمون: {assignment.catalog.academicYears.join("، ")}
@@ -531,11 +497,37 @@ export function StudentPracticeHub({
 export function StudentSearchScreen({
   nodes,
   contentItems,
+  assignments,
+  open,
+  busy,
   setPage,
 }: StudentNavigationActions & {
   nodes: Node[];
   contentItems: StudentContentItem[];
 }) {
+  const [library, setLibrary] = useState<{ items: StudentContentItem[]; nodes: Node[] }>({ items: [], nodes: [] });
+  const [libraryLoading, setLibraryLoading] = useState(true);
+  const [libraryError, setLibraryError] = useState("");
+  const [starting, setStarting] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    api<{ items: StudentContentItem[]; nodes: Node[] }>("/student/library")
+      .then(rows => { if (!cancelled) setLibrary(rows); })
+      .catch(error => { if (!cancelled) setLibraryError((error as Error).message); })
+      .finally(() => { if (!cancelled) setLibraryLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
+  async function startLibrary(questionId: string, courseId: string) {
+    setStarting(questionId);
+    setLibraryError("");
+    try {
+      const result = await api<{ assignmentId: string }>(`/student/library/${questionId}/start`, { courseId });
+      await open({ _id: result.assignmentId } as Assignment);
+    } catch (error) { setLibraryError((error as Error).message); }
+    finally { setStarting(""); }
+  }
+  const mergedNodes = useMemo(() => [...new Map([...nodes, ...library.nodes].map(node => [node._id, node])).values()], [nodes, library.nodes]);
+  const mergedItems = useMemo(() => [...new Map([...contentItems, ...library.items].map(item => [item.questionId, item])).values()], [contentItems, library.items]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<StudentContentFilters>(
     emptyStudentContentFilters,
@@ -554,7 +546,7 @@ export function StudentSearchScreen({
       return value;
     });
   }
-  const choices = useMemo(() => curriculumTopicChoices(nodes), [nodes]);
+  const choices = useMemo(() => curriculumTopicChoices(mergedNodes), [mergedNodes]);
   const byTopic = useMemo(
     () => new Map(choices.map((choice) => [choice.topic._id, choice])),
     [choices],
@@ -563,7 +555,7 @@ export function StudentSearchScreen({
     ...new Map(rows.map((row) => [row.id, row])).values(),
   ];
   const scopedItems = (scope: Partial<typeof filters>) =>
-    contentItems.filter((item) => {
+    mergedItems.filter((item) => {
       const choice = byTopic.get(item.topicId);
       return (
         !!choice &&
@@ -616,6 +608,31 @@ export function StudentSearchScreen({
   );
   const selectedItems = scopedItems(filters);
   const selectedCounts = counts(selectedItems);
+  const contentRows = useMemo(() => {
+    const rows = filters.content === "questions"
+      ? selectedItems.map((item) => ({ key: item.questionId, title: byTopic.get(item.topicId)?.topic.title ?? "سؤال آموزشی", items: [item] }))
+      : [...new Map(selectedItems.filter((item) => filters.content === "exams" ? !!item.examKey : !!item.resourceKey).map((item) => [filters.content === "exams" ? item.examKey! : item.resourceKey!, true])).keys()].map((key) => {
+          const rows = selectedItems.filter((item) => (filters.content === "exams" ? item.examKey : item.resourceKey) === key);
+          return { key, title: (filters.content === "exams" ? rows[0]?.examTitle : rows[0]?.resourceTitle) || "مجموعهٔ آموزشی", items: rows };
+        });
+    const needle = filters.query.trim().toLocaleLowerCase("fa");
+    return rows.filter((row) => !needle || [row.title, ...row.items.flatMap((item) => [
+      byTopic.get(item.topicId)?.book.title,
+      byTopic.get(item.topicId)?.chapter.title,
+      byTopic.get(item.topicId)?.topic.title,
+      item.academicYear,
+      item.examTitle,
+      item.resourceTitle,
+    ])].filter(Boolean).join(" ").toLocaleLowerCase("fa").includes(needle))
+      .sort((a, b) => {
+        const value = (row: typeof a) => row.items.map((item) => item.difficultyScore).filter((x): x is number => typeof x === "number");
+        const score = (row: typeof a) => { const scores = value(row); return scores.length ? scores.reduce((sum, x) => sum + x, 0) / scores.length : null; };
+        if (filters.sort === "hardest") return (score(b) ?? -1) - (score(a) ?? -1);
+        if (filters.sort === "easiest") return (score(a) ?? 101) - (score(b) ?? 101);
+        if (filters.sort === "newest") return (b.items[0]?.academicYear ?? "").localeCompare(a.items[0]?.academicYear ?? "", "fa");
+        return a.title.localeCompare(b.title, "fa");
+      });
+  }, [selectedItems, filters.content, filters.query, filters.sort, byTopic]);
   const trackLabels: Record<string, string> = {
     common: "مشترک متوسطه اول",
     mathematics: "ریاضی و فیزیک",
@@ -696,12 +713,29 @@ export function StudentSearchScreen({
 
   return (
     <div className="grid gap-6">
-      <section className="rounded-3xl bg-[#eef4ff] p-6 sm:p-8">
-        <div>
-          <h2 className="text-2xl font-bold text-[#17305e]">مرور محتوا</h2>
-          <p className="mt-2 text-sm leading-loose text-slate-600">
-            از پایه شروع کن و قدم‌به‌قدم به سؤال، آزمون یا منبع موردنظر برس.
-          </p>
+      <section className="hy-learning-hero" aria-label="کتابخانهٔ آموزشی">
+        <div className="hy-learning-hero-content">
+          <span className="hy-learning-eyebrow"><BookOpenCheck size={16} aria-hidden /> کتابخانهٔ من</span>
+          <h2 className="hy-learning-hero-title">برای یادگرفتن، از کنجکاوی شروع کن</h2>
+          <p className="hy-learning-hero-description">سؤال‌ها و مجموعه‌های آموزشیِ مجاز در کلاس‌هایت را بر اساس درس و مبحث پیدا کن. برای پاسخ‌دادن، مأموریت مرتبط را باز کن.</p>
+          <div className="flex flex-wrap gap-2 text-sm text-white/90">
+            <span className="rounded-full border border-white/25 px-3 py-1">{mergedItems.length.toLocaleString("fa-IR")} سؤال</span>
+            <span className="rounded-full border border-white/25 px-3 py-1">{new Set(mergedItems.flatMap((item) => item.examKey ? [item.examKey] : [])).size.toLocaleString("fa-IR")} مجموعهٔ آزمون</span>
+          </div>
+        </div>
+      </section>
+      <section className="grid gap-3 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6" aria-label="جست‌وجوی کتابخانه">
+        <label className="hy-learning-catalog-search"><Search size={18} aria-hidden className="text-[#2457b8]" />
+          <span className="sr-only">جست‌وجوی کتابخانه</span>
+          <input className="min-w-0 flex-1 bg-transparent text-sm outline-none" value={filters.query} onChange={(event) => update({ query: event.target.value.slice(0, 120) })} placeholder="نام درس، مبحث، سال یا مجموعه را جست‌وجو کن…" />
+        </label>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {([ ["questions", "سؤال"], ["exams", "آزمون"], ["resources", "منبع"] ] as const).map(([kind, label]) => (
+            <button type="button" key={kind} aria-pressed={filters.content === kind} className={clsx("rounded-xl border px-3 py-3 text-sm font-bold", filters.content === kind ? "border-[#2457b8] bg-[#eaf1ff] text-[#17305e]" : "border-slate-200 text-slate-600 hover:border-slate-400")} onClick={() => update({content: kind})}>{label}</button>
+          ))}
+          <label className="grid gap-1 text-xs text-slate-600"><span>مرتب‌سازی</span><select className="glass-field min-h-9 px-2" value={filters.sort} onChange={(event) => update({sort: event.target.value as StudentContentFilters["sort"]})}>
+            <option value="relevant">نام محتوا</option><option value="newest">جدیدترین سال</option><option value="hardest">سخت‌ترین</option><option value="easiest">آسان‌ترین</option>
+          </select></label>
         </div>
       </section>
       <section className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-6">
@@ -790,23 +824,43 @@ export function StudentSearchScreen({
           </fieldset>
         </div>
       </section>
-      {filters.topic ? (
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
-          <h2 className="font-bold">محتوای این مبحث</h2>
-          <p className="mt-2 text-sm text-slate-600">
-            {countLabel(selectedItems)} در دسترس است. برای حل سؤال‌ها، مأموریت
-            مرتبط را باز کن.
-          </p>
-          <Button className="mt-4" onClick={() => setPage("student-practice")}>
-            رفتن به تمرین‌ها <ArrowLeft size={16} aria-hidden />
-          </Button>
-        </section>
-      ) : (
-        <p className="rounded-2xl bg-[#f3f6fa] p-5 text-sm text-slate-600">
-          برای دیدن محتوا، مسیر را تا انتخاب مبحث ادامه بده. انتخاب‌ها در نشانی
-          صفحه ذخیره می‌شوند.
-        </p>
-      )}
+      {libraryLoading && <p role="status" className="text-sm text-slate-500">در حال دریافت سؤال‌های منتشرشدهٔ درس‌ها…</p>}
+      {libraryError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{libraryError}</p>}
+      <section className="grid gap-4" aria-label="نتایج کتابخانه">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div><h2 className="text-xl font-extrabold text-[#17305e]">محتوای پیدا شده</h2>
+          <p className="mt-1 text-xs text-slate-500">{contentRows.length.toLocaleString("fa-IR")} نتیجه · {countLabel(selectedItems)}</p></div>
+          {(filters.topic || filters.grade || filters.query) && <Button variant="outline" onClick={() => update({ ...emptyStudentContentFilters, content: filters.content })}><RotateCcw size={15} aria-hidden /> پاک‌کردن جست‌وجو و فیلترها</Button>}
+        </div>
+        {!contentRows.length ? <div className="hy-learning-empty">
+          <Search size={28} className="text-[#2457b8]" aria-hidden />
+          <h3 className="font-bold text-[#17305e]">محتوایی با این شرایط پیدا نشد</h3>
+          <p className="text-sm text-slate-600">کتابخانه شامل مأموریت‌های تو و سؤال‌های منتشرشده برای درس‌هایی است که عضو آن‌ها هستی. فیلترها را پاک کن یا درس دیگری انتخاب کن.</p>
+          <Button onClick={() => update(emptyStudentContentFilters)}>نمایش همهٔ محتوا</Button>
+        </div> : <PagedList items={contentRows} label="محتوای کتابخانه" pageSize={9} className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {(row) => {
+            const first = row.items[0];
+            const topic = byTopic.get(first.topicId);
+            const scores = row.items.map((item) => item.difficultyScore).filter((value): value is number => typeof value === "number");
+            const score = scores.length ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : null;
+            const related = assignments.find((assignment) => assignment.state !== "cancelled" && row.items.some((item) => assignment.questionVersionIds?.includes(item.questionId)));
+            return <article key={row.key} className="hy-learning-practice-card grid gap-3">
+              <span className="text-xs font-bold text-[#2457b8]">{filters.content === "questions" ? "سؤال آموزشی" : filters.content === "exams" ? "مجموعهٔ آزمون" : "منبع آموزشی"}</span>
+              <h3 className="text-base font-bold text-[#17305e]">{row.title}</h3>
+              <p className="text-xs leading-relaxed text-slate-600">{[topic?.book.title, topic?.chapter.title, topic?.topic.title].filter(Boolean).join(" ← ") || "موضوع در دسترس"}</p>
+              <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+                <span className="rounded-lg bg-slate-100 px-2 py-1">{row.items.length.toLocaleString("fa-IR")} سؤال</span>
+                {first.academicYear && <span className="rounded-lg bg-slate-100 px-2 py-1">سال {first.academicYear}</span>}
+                <span className="rounded-lg bg-slate-100 px-2 py-1">سختی: {score === null ? "نامشخص" : `${score.toLocaleString("fa-IR")} از ۱۰۰`}</span>
+              </div>
+              <div className="mt-auto flex flex-wrap gap-2">
+                {related ? <Button disabled={busy} onClick={() => void open(related)}>رفتن به تمرین مرتبط <ArrowLeft size={15} aria-hidden /></Button> : first.library && first.courseIds[0] ? <Button disabled={busy || !!starting} onClick={() => void startLibrary(first.questionId, first.courseIds[0])}>{starting === first.questionId ? "در حال آماده‌سازی…" : "شروع تمرین مستقل"}<ArrowLeft size={15} aria-hidden /></Button> : <Button variant="outline" onClick={() => setPage("student-missions")}>دیدن مأموریت‌ها</Button>}
+              </div>
+            </article>;
+          }}
+        </PagedList>}
+        <p className="text-xs leading-relaxed text-slate-500">سؤال‌های منتشرشده فقط برای دانش‌آموزان عضو درس قابل‌تمرین‌اند. بانک خصوصی معلم و پاسخ‌های مرجع در فهرست نمایش داده نمی‌شوند.</p>
+      </section>
     </div>
   );
 }

@@ -195,7 +195,10 @@ export function registerPractice(
   const itemSchema = z.object({ questionId: z.string().uuid() });
   async function questionFor(a: import("../db").Row, questionId: string) {
     if (!a.questionVersionIds.includes(questionId)) fail(404, "سؤال یافت نشد");
-    const q = await c("questionVersions").findOne({ _id: questionId });
+    const q = await c("questionVersions").findOne({
+      _id: questionId,
+      ownerId: a.teacherId,
+    });
     if (!q) fail(404, "نسخه سؤال یافت نشد");
     return q!;
   }
@@ -221,7 +224,11 @@ export function registerPractice(
         fail(409, "وضعیت پاسخ تغییر کرده است؛ مأموریت را به‌روز کنید");
       const key = `progress.${q._id}.attempts`;
       const reserved = await c("assignments").findOneAndUpdate(
-        { _id: a._id, [key]: { $lt: current!.policy.maxAttempts } },
+        {
+          _id: a._id,
+          studentId: u._id,
+          [key]: { $lt: current!.policy.maxAttempts },
+        },
         { $inc: { [key]: 1, revision: 1 }, $set: { state: "in_progress" } },
         { session, returnDocument: "after" },
       );
@@ -263,7 +270,7 @@ export function registerPractice(
         session,
       );
       await recordLearning(ctx, current!, q, attempt, evaluation, session);
-      await c("missions").updateOne(
+      if (a.missionId) await c("missions").updateOne(
         { _id: a.missionId },
         { $set: { state: "in_progress" } },
         { session },
@@ -333,7 +340,7 @@ export function registerPractice(
         fail(409, "سنجش مستقل بدون راهنمایی است");
       const counter = `progress.${q._id}.hints`;
       const updated = await c("assignments").updateOne(
-        { _id: a._id, [counter]: level },
+        { _id: a._id, studentId: u._id, [counter]: level },
         { $inc: { [counter]: 1, revision: 1 } },
         { session },
       );
@@ -401,7 +408,7 @@ export function registerPractice(
       .parse(r.body ?? {});
     return atomic(r, u._id, `complete:${a._id}`, body, async (session) => {
       const current = (await c("assignments").findOne(
-        { _id: a._id },
+        { _id: a._id, studentId: u._id },
         { session },
       ))!;
       if (["submitted", "completed"].includes(current.state))
@@ -409,7 +416,7 @@ export function registerPractice(
       assertOpen(current.state);
       // Every practice writer touches this document; this write serializes completion with it.
       await c("assignments").updateOne(
-        { _id: a._id },
+        { _id: a._id, studentId: u._id },
         { $inc: { revision: 1 } },
         { session },
       );
@@ -436,11 +443,11 @@ export function registerPractice(
       if (!(body.allowUnanswered && current.state === "published"))
         transition(current.state, next);
       await c("assignments").updateOne(
-        { _id: a._id },
+        { _id: a._id, studentId: u._id },
         { $set: { state: next } },
         { session },
       );
-      await c("missions").updateOne(
+      if (current.missionId) await c("missions").updateOne(
         { _id: current.missionId },
         { $set: { state: next } },
         { session },

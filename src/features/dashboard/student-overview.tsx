@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { StudentJoinTeacher } from "@/features/students/join-teacher";
 import { api } from "@/lib/api";
+import { nextLearningGuidance } from "./learning-guidance";
 import type {
   Assignment,
   DashboardCourse,
@@ -46,6 +47,8 @@ interface StudentLearningSnapshot {
     title: string;
     status: string;
     incorrect: number;
+    supportingAttempts?: number;
+    independentFirstAttempts?: number;
   }[];
   mistakes: { _id: string; status: string }[];
 }
@@ -119,6 +122,7 @@ export function StudentOverview({
     )
     .sort((a, b) => b.incorrect - a.incorrect)
     .slice(0, 3);
+  const guidance = learning ? nextLearningGuidance(learning.skills, readyAssignments.length > 0) : null;
   const latestResult = learning?.recentMissions.find(
     (mission) => mission.answered > 0,
   );
@@ -309,6 +313,21 @@ export function StudentOverview({
           </button>
         </div>
       </section>
+      {guidance && (
+        <section aria-label="پیشنهاد شخصی یادگیری" className="rounded-2xl border border-amber-200 bg-gradient-to-l from-amber-50 via-white to-white p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-5">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-amber-800">بر پایهٔ پاسخ‌های واقعی تو · قدم پیشنهادی بعدی</p>
+              <h2 className="mt-2 text-lg font-extrabold text-[#17305e]">{guidance.title}</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{guidance.description}</p>
+            </div>
+            <Button className="shrink-0" onClick={() => setPage(guidance.destination)}>
+              {guidance.kind === "review" ? "مرور اشتباهات" : "رفتن به تمرین‌ها"}
+              <ArrowLeft size={17} aria-hidden />
+            </Button>
+          </div>
+        </section>
+      )}
       {!data ? (
         <section className="glass-panel p-6" role="status">
           در حال آماده‌سازی نمای درس‌ها و شواهد تمرین…

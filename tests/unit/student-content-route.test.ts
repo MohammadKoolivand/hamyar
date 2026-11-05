@@ -13,6 +13,8 @@ test("student content filters survive a direct-link round trip", () => {
     chapter: "chapter-1",
     topic: "limits",
     content: "exams" as const,
+    query: "ریاضی",
+    sort: "newest" as const,
   };
 
   const path = studentContentPath(filters);
@@ -28,4 +30,10 @@ test("student content filters safely default an unknown content kind", () => {
     parseStudentContentFilters("?content=private").content,
     "questions",
   );
+});
+
+test("student content route rejects unknown sort and limits search length", () => {
+  const filters = parseStudentContentFilters(`?sort=untrusted&q=${"a".repeat(200)}`);
+  assert.equal(filters.sort, "relevant");
+  assert.equal(filters.query.length, 120);
 });

@@ -35,6 +35,7 @@ export function ContentScreen({
   view = "bank",
   nodes,
   questions,
+  courses,
   busy,
   run,
   refresh,
@@ -76,6 +77,7 @@ export function ContentScreen({
   setNotice: (v: string) => void;
   nodes: Node[];
   questions: Question[];
+  courses: import("@/lib/types").Course[];
   busy: boolean;
   run: (fn: () => Promise<void>) => Promise<void>;
   refresh: () => Promise<void>;
@@ -123,7 +125,7 @@ export function ContentScreen({
   return (
     <>
       {view === "bank" && (
-        <QuestionBank nodes={nodes} questions={questions} onSaved={refresh} />
+        <QuestionBank nodes={nodes} questions={questions} courses={courses} onSaved={refresh} />
       )}
       {view !== "bank" && (
         <div className="flex flex-wrap items-center justify-between gap-3">

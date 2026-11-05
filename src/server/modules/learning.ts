@@ -7,6 +7,8 @@ export function registerLearning(app: FastifyInstance, ctx: Context) {
   async function authorized(r: import("fastify").FastifyRequest) {
     const u = await ctx.user(r),
       { sid } = r.params as { sid: string };
+    if (!["teacher", "student", "parent"].includes(u.role))
+      ctx.fail(403, "دسترسی این نقش مجاز نیست");
     if (
       u.role === "parent"
         ? !(await ctx

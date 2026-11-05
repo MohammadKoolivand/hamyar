@@ -88,13 +88,18 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         : null,
       sourcePages: await c("examImportPages")
         .find(
-          { examId: e._id, kind: "question", expiresAt: { $gt: new Date() } },
+          {
+            examId: e._id,
+            ownerId: e.ownerId,
+            kind: "question",
+            expiresAt: { $gt: new Date() },
+          },
           { projection: { _id: 0, page: 1 } },
         )
         .sort({ page: 1 })
         .toArray(),
       items: await c("examImportItems")
-        .find({ examId: e._id })
+        .find({ examId: e._id, ownerId: e.ownerId })
         .sort({ createdAt: 1, _id: 1 })
         .toArray(),
     };

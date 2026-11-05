@@ -259,6 +259,7 @@ test("parent access is tied to verified child links and stays read-only", async 
       password: "StrongPass123!",
     });
     const parent = "session=" + login.cookies[0].value;
+    assert.equal((await f.request(f.path)).statusCode, 401);
     assert.equal(
       (await f.request("/api/children", undefined, parent)).statusCode,
       200,
@@ -268,7 +269,45 @@ test("parent access is tied to verified child links and stays read-only", async 
       200,
     );
     assert.equal(
+      (await f.request("/api/assignments", undefined, parent)).statusCode,
+      403,
+    );
+    assert.equal(
+      (await f.request(f.path, undefined, parent)).statusCode,
+      403,
+    );
+    const unrelatedAssignmentId = createContext(f.db).id();
+    await f.c("assignments").insertOne({
+      ...f.assignment,
+      _id: unrelatedAssignmentId,
+      studentId: createContext(f.db).id(),
+    });
+    assert.equal(
+      (
+        await f.request(
+          `/api/assignments/${unrelatedAssignmentId}`,
+          undefined,
+          parent,
+        )
+      ).statusCode,
+      403,
+    );
+    assert.equal(
+      (
+        await f.request(
+          `/api/assignments/${unrelatedAssignmentId}/report`,
+          undefined,
+          parent,
+        )
+      ).statusCode,
+      404,
+    );
+    assert.equal(
       (await f.request("/api/questions", undefined, parent)).statusCode,
+      403,
+    );
+    assert.equal(
+      (await f.request("/api/student/library", undefined, parent)).statusCode,
       403,
     );
     assert.equal(

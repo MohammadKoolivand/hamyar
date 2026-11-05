@@ -2,7 +2,7 @@
 import { PagedList } from "@/components/ui/paged-list";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { BookOpen, Plus, UserCheck, UserMinus } from "lucide-react";
+import { ArrowLeft, BookOpen, Plus, UserCheck, UserMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { api } from "@/lib/api";
@@ -186,48 +186,7 @@ export function CoursesScreen({
             </Button>
           </form>
         </section>
-      ) : (
-        <section className="glass-panel grid gap-3 p-6">
-          <h2 className="text-lg font-bold">درخواست عضویت در درس</h2>
-          <p className="text-sm leading-loose text-slate-600">
-            کد ۴۸ کاراکتری را از معلم بگیرید. ارسال درخواست به معنی عضویت فوری
-            نیست؛ تأیید معلم لازم است.
-          </p>
-          <form
-            className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
-            onSubmit={(e) => void requestCourse(e)}
-          >
-            <Field title="کد درخواست عضویت">
-              <input
-                dir="ltr"
-                className="glass-field min-h-11 w-full p-3"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-                minLength={48}
-                maxLength={48}
-                autoComplete="off"
-              />
-            </Field>
-            <Button disabled={busy} type="submit">
-              ارسال درخواست
-            </Button>
-          </form>
-          {!!requests.length && (
-            <div className="grid gap-2">
-              <h3 className="font-medium">وضعیت درخواست‌های من</h3>
-              <PagedList items={requests} label="درخواست‌ها">
-                {(request) => (
-                  <p key={request._id} className="glass-note p-3 text-sm">
-                    {request.courseTitle} ·{" "}
-                    {labels[request.status] ?? request.status}
-                  </p>
-                )}
-              </PagedList>
-            </div>
-          )}
-        </section>
-      )}
+      ) : null}
       {error && (
         <p
           role="alert"
@@ -276,10 +235,9 @@ export function CoursesScreen({
           </PagedList>
         </section>
       )}
-      <section className="grid gap-4">
-        <h2 className="text-lg font-bold">
-          {teacher ? "درس‌های تحت تدریس" : "درس‌های من"}
-        </h2>
+      <section className="grid gap-4" data-testid="courses-list">
+        {!teacher && <div className="hy-learning-courses-intro"><div><span className="hy-learning-section-label">کتابخانهٔ شخصی تو</span><h2>درس‌های من؛ از اینجا شروع کن</h2><p>یکی از درس‌ها را انتخاب کن تا مأموریت‌ها، مباحث و مسیر پیشرفتت را یک‌جا ببینی.</p></div><span className="hy-learning-courses-count">{courses.length.toLocaleString("fa-IR")} درس</span></div>}
+        {teacher && <h2 className="text-lg font-bold">درس‌های تحت تدریس</h2>}
         {!courses.length && (
           <div className="glass-panel p-6 text-sm leading-loose text-slate-600">
             {teacher
@@ -287,8 +245,8 @@ export function CoursesScreen({
               : "هنوز عضو هیچ درسی نیستید. از معلم کد درخواست مخصوص آن درس را بگیرید."}
           </div>
         )}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <PagedList items={courses} label="درس‌ها">
+        <div className="grid gap-4">
+          <PagedList items={courses} label="درس‌ها" className="grid gap-4 md:grid-cols-2">
             {(course) => {
               const enrolled = enrollments.filter(
                 (e) => e.courseId === course._id,
@@ -298,9 +256,9 @@ export function CoursesScreen({
               ).length;
               const own = enrolled[0];
               return (
-                <article className="glass-card grid gap-3 p-5" key={course._id}>
+                <article className={teacher ? "glass-card grid gap-3 p-5" : "hy-learning-course-card grid gap-4"} key={course._id}>
                   <div className="flex items-center gap-3">
-                    <span className="grid size-10 place-items-center rounded-xl bg-[#2EC8C315] text-[#08746f]">
+                    <span className="hy-learning-course-icon grid size-12 place-items-center rounded-xl bg-[#2EC8C315] text-[#08746f]">
                       <BookOpen size={20} />
                     </span>
                     <div>
@@ -360,14 +318,12 @@ export function CoursesScreen({
                       <p className="text-sm text-slate-600">
                         معلم: {own?.teacherName ?? "معلم"}
                       </p>
-                      <Button
-                        onClick={() => openCourse?.(course._id)}
-                        disabled={!openCourse}
-                      >
-                        صفحه جامع درس
+                      <Button className="w-fit" onClick={() => openCourse?.(course._id)} disabled={!openCourse}>
+                        ورود به درس <ArrowLeft size={16} aria-hidden />
                       </Button>
-                      <p className="text-xs text-slate-500">
-                        {count} مأموریت این درس
+                      <p className="hy-learning-course-meta text-xs text-slate-500">
+                        <span>{count.toLocaleString("fa-IR")} مأموریت در این درس</span>
+                        <span>{count > 0 ? "فعالیت‌ها آمادهٔ بررسی‌اند" : "منتظر اولین مأموریت"}</span>
                       </p>
                       {own && (
                         <Button
@@ -386,6 +342,54 @@ export function CoursesScreen({
           </PagedList>
         </div>
       </section>
+      {!teacher && (
+        <details className="hy-learning-join-details" data-testid="student-course-join">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 font-bold text-[#19355f]">
+            <span className="flex items-center gap-2"><Plus size={17} aria-hidden /> عضویت در درس جدید</span>
+            <span className="text-xs font-normal text-slate-500">کد معلم را داری؟ اینجا وارد کن</span>
+          </summary>
+        <section className="glass-panel grid gap-3 p-6">
+          <h2 className="text-lg font-bold">درخواست عضویت در درس</h2>
+          <p className="text-sm leading-loose text-slate-600">
+            کد ۴۸ کاراکتری را از معلم بگیرید. ارسال درخواست به معنی عضویت فوری
+            نیست؛ تأیید معلم لازم است.
+          </p>
+          <form
+            className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
+            onSubmit={(e) => void requestCourse(e)}
+          >
+            <Field title="کد درخواست عضویت">
+              <input
+                dir="ltr"
+                className="glass-field min-h-11 w-full p-3"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                required
+                minLength={48}
+                maxLength={48}
+                autoComplete="off"
+              />
+            </Field>
+            <Button disabled={busy} type="submit">
+              ارسال درخواست
+            </Button>
+          </form>
+          {!!requests.length && (
+            <div className="grid gap-2">
+              <h3 className="font-medium">وضعیت درخواست‌های من</h3>
+              <PagedList items={requests} label="درخواست‌ها">
+                {(request) => (
+                  <p key={request._id} className="glass-note p-3 text-sm">
+                    {request.courseTitle} ·{" "}
+                    {labels[request.status] ?? request.status}
+                  </p>
+                )}
+              </PagedList>
+            </div>
+          )}
+        </section>
+        </details>
+      )}
       {!!ended.length && (
         <section className="glass-panel grid gap-3 p-5">
           <h2 className="text-lg font-bold">تاریخچه عضویت‌های پایان‌یافته</h2>

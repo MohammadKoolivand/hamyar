@@ -130,7 +130,7 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
       );
       await ctx.boundary("after_assignment_insert");
       await c("missions").updateOne(
-        { _id: mid },
+        { _id: mid, teacherId: u._id },
         { $set: { state: "published" } },
         { session },
       );
@@ -157,17 +157,20 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
       );
       if (!m) fail(404, "یافت نشد");
       transition(m!.state, "cancelled");
-      const a = await c("assignments").findOne({ missionId: mid }, { session });
+      const a = await c("assignments").findOne(
+        { missionId: mid, teacherId: u._id },
+        { session },
+      );
       if (a) {
         transition(a.state, "cancelled");
         await c("assignments").updateOne(
-          { _id: a._id },
+          { _id: a._id, teacherId: u._id },
           { $set: { state: "cancelled" }, $inc: { revision: 1 } },
           { session },
         );
       }
       await c("missions").updateOne(
-        { _id: mid },
+        { _id: mid, teacherId: u._id },
         { $set: { state: "cancelled" } },
         { session },
       );

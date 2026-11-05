@@ -207,6 +207,7 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
                   topicId: 1,
                   type: 1,
                   source: 1,
+                  difficultyScore: 1,
                 },
               },
             )
@@ -299,6 +300,9 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
             topicId: version.topicId,
             type: version.type,
             courseIds,
+            ...(typeof source?.academicYear === "string" ? { academicYear: source.academicYear } : {}),
+            ...(typeof version.difficultyScore === "number" ? { difficultyScore: version.difficultyScore } : {}),
+            ...(typeof source?.family === "string" ? { sourceCategory: source.family } : {}),
             ...(examKey ? { examKey } : {}),
             ...(resourceKey ? { resourceKey } : {}),
             ...(source?.sourceTitle

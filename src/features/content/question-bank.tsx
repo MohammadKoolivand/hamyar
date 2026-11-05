@@ -10,7 +10,7 @@ import {
 import { QuestionEditor } from "./question-editor";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLink as Link } from "@/components/app-link";
 import {
   Plus,
@@ -23,7 +23,7 @@ import { Field } from "@/components/ui/field";
 import { QuestionPresentation } from "@/components/question-presentation";
 import { curriculumTopicChoices } from "@/lib/curriculum";
 import { fa } from "@/lib/presentation";
-import type { Node, Question } from "@/lib/types";
+import type { Node, Question, Course } from "@/lib/types";
 export const difficultyLabels: Record<string, string> = {
   easy: "آسان",
   medium: "متوسط",
@@ -41,12 +41,41 @@ const selectStyle =
 export function QuestionBank({
   nodes,
   questions,
+  courses,
   onSaved,
 }: {
   nodes: Node[];
   questions: Question[];
+  courses: Course[];
   onSaved: () => Promise<unknown> | void;
 }) {
+  const [libraryCourse, setLibraryCourse] = useState("");
+  const [published, setPublished] = useState(new Set<string>());
+  const [libraryBusy, setLibraryBusy] = useState("");
+  const [libraryError, setLibraryError] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    api<Array<{ questionVersionId: string; courseId: string }>>("/questions/library-publications")
+      .then(rows => { if (!cancelled) setPublished(new Set(rows.map(row => `${row.courseId}:${row.questionVersionId}`))); })
+      .catch(() => { if (!cancelled) setLibraryError("وضعیت انتشار کتابخانه دریافت نشد."); });
+    return () => { cancelled = true; };
+  }, []);
+  async function toggleLibrary(questionId: string) {
+    if (!libraryCourse) return;
+    const key = `${libraryCourse}:${questionId}`;
+    const next = !published.has(key);
+    setLibraryBusy(key);
+    setLibraryError("");
+    try {
+      await api(`/questions/${questionId}/library`, { courseId: libraryCourse, published: next });
+      setPublished(previous => {
+        const value = new Set(previous);
+        if (next) value.add(key); else value.delete(key);
+        return value;
+      });
+    } catch (error) { setLibraryError((error as Error).message); }
+    finally { setLibraryBusy(""); }
+  }
   const [bulkDifficulty, setBulkDifficulty] = useState("medium");
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkNotice, setBulkNotice] = useState("");
@@ -201,6 +230,17 @@ export function QuestionBank({
             افزودن سؤال
           </Link>
         </div>
+      </section>
+      <section className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 sm:p-5" aria-label="انتشار امن در کتابخانه">
+        <h3 className="font-bold text-[#17305e]">اشتراک سؤال‌ها در کتابخانهٔ درس</h3>
+        <p className="mt-1 text-sm text-slate-600">انتشار برای هر درس اختیاری است؛ تنها دانش‌آموزان عضو همان درس می‌توانند سؤال را پیدا و تمرین کنند. پاسخ مرجع در فهرست نمایش داده نمی‌شود.</p>
+        <label className="mt-3 grid max-w-lg gap-1 text-sm font-medium">انتخاب درس
+          <select className={selectStyle} value={libraryCourse} onChange={event => setLibraryCourse(event.target.value)}>
+            <option value="">ابتدا یک درس انتخاب کنید</option>
+            {courses.filter(course => course.status === "active").map(course => <option key={course._id} value={course._id}>{course.title}</option>)}
+          </select>
+        </label>
+        {libraryError && <p role="alert" className="mt-2 text-sm text-red-700">{libraryError}</p>}
       </section>
       <section
         aria-label="دسته‌بندی آزمون‌ها"
@@ -603,6 +643,13 @@ export function QuestionBank({
                     </span>
                   )}
                 </div>
+                {libraryCourse && q.topicId && <button type="button"
+                  disabled={!!libraryBusy}
+                  aria-pressed={published.has(`${libraryCourse}:${q._id}`)}
+                  onClick={() => void toggleLibrary(q._id)}
+                  className="w-fit rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800 disabled:opacity-50">
+                  {libraryBusy === `${libraryCourse}:${q._id}` ? "در حال ثبت…" : published.has(`${libraryCourse}:${q._id}`) ? "حذف از کتابخانهٔ این درس" : "انتشار در کتابخانهٔ این درس"}
+                </button>}
                 <div className="absolute left-4 top-4">
                   <Button
                     type="button"

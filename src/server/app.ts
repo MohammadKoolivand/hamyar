@@ -28,6 +28,7 @@ import { registerClassGroups } from "./modules/class-groups";
 import { registerCourseMembership } from "./modules/course-membership";
 import { registerStudentDashboard } from "./modules/student-dashboard";
 import { registerPractice } from "./modules/practice";
+import { registerLibrary } from "./modules/library";
 import { registerAnalytics } from "./modules/analytics";
 import { registerLearning } from "./modules/learning";
 import { registerAuthoring } from "./modules/authoring";
@@ -163,6 +164,7 @@ export async function buildApp(
   registerClassGroups(app, ctx);
   registerCourseMembership(app, ctx);
   registerStudentDashboard(app, ctx);
+  registerLibrary(app, ctx);
   registerContent(app, ctx);
   registerExamImports(app, ctx);
   registerAiSettings(app, ctx, avalai);
