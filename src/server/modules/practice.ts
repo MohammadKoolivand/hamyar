@@ -46,11 +46,12 @@ export function registerPractice(
       _id: string;
       difficultyScore?: number | null;
       source?: QuestionSource;
+      topicId?: string;
     };
     const questions: CatalogQuestion[] = questionIds.length
       ? ((await c("questionVersions")
           .find({ _id: { $in: questionIds } })
-          .project({ _id: 1, difficultyScore: 1, source: 1 })
+          .project({ _id: 1, difficultyScore: 1, source: 1, topicId: 1 })
           .toArray()) as CatalogQuestion[])
       : [];
     const questionsById = new Map(questions.map((q) => [q._id, q]));
@@ -115,6 +116,13 @@ export function registerPractice(
                 question.source?.academicYear
                   ? [question.source.academicYear]
                   : [],
+              ),
+            ),
+          ],
+          topicIds: [
+            ...new Set(
+              assignedQuestions.flatMap((question) =>
+                question.topicId ? [question.topicId] : [],
               ),
             ),
           ],

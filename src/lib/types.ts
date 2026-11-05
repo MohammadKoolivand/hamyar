@@ -216,6 +216,7 @@ export interface Assignment {
     difficultyScore: number | null;
     sourceCategories: string[];
     academicYears: string[];
+    topicIds: string[];
     successRate: number | null;
   };
   hints?: {

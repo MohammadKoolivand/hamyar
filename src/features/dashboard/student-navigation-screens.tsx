@@ -7,6 +7,7 @@ import {
   BookOpenCheck,
   Clock3,
   ClipboardCheck,
+  ChevronDown,
   Filter,
   Gauge,
   RotateCcw,
@@ -66,11 +67,12 @@ function practiceKind(assignment: Assignment): Exclude<PracticeKind, "all"> {
 export function StudentPracticeHub({
   assignments,
   courses,
+  nodes,
   busy,
   open,
   showReport,
   setPage,
-}: StudentNavigationActions) {
+}: StudentNavigationActions & { nodes: Node[] }) {
   const ready = assignments.filter(available);
   const completed = assignments.filter((item) =>
     ["completed", "submitted"].includes(item.state),
@@ -78,12 +80,69 @@ export function StudentPracticeHub({
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<PracticeKind>("all");
   const [status, setStatus] = useState("all");
+  const [courseId, setCourseId] = useState("all");
+  const [chapterId, setChapterId] = useState("all");
+  const [topicId, setTopicId] = useState("all");
+  const [year, setYear] = useState("all");
+  const [difficulty, setDifficulty] = useState("all");
+  const [sort, setSort] = useState("priority");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const topicChoices = useMemo(() => curriculumTopicChoices(nodes), [nodes]);
+  const topicChoiceById = useMemo(
+    () => new Map(topicChoices.map((choice) => [choice.topic._id, choice])),
+    [topicChoices],
+  );
+  const catalogTopicChoices = useMemo(
+    () =>
+      topicChoices.filter((choice) =>
+        assignments.some((assignment) =>
+          assignment.catalog?.topicIds?.includes(choice.topic._id),
+        ),
+      ),
+    [assignments, topicChoices],
+  );
+  const chapters = useMemo(
+    () =>
+      [...new Map(catalogTopicChoices.map((choice) => [choice.chapter.id, choice.chapter])).values()],
+    [catalogTopicChoices],
+  );
+  const topics = catalogTopicChoices.filter(
+    (choice) => chapterId === "all" || choice.chapter.id === chapterId,
+  );
+  const years = [
+    ...new Set(assignments.flatMap((assignment) => assignment.catalog?.academicYears ?? [])),
+  ].sort((left, right) => right.localeCompare(left, "fa"));
+  const kindCounts = useMemo(
+    () =>
+      Object.fromEntries(
+        practiceKinds.map(([value]) => [
+          value,
+          value === "all"
+            ? assignments.length
+            : assignments.filter((assignment) => practiceKind(assignment) === value).length,
+        ]),
+      ) as Record<PracticeKind, number>,
+    [assignments],
+  );
   const filtered = useMemo(
     () =>
       assignments.filter((assignment) => {
         const course = courses.find(
           (item) => item._id === assignment.courseId,
         );
+        const assignedChoices = (assignment.catalog?.topicIds ?? []).flatMap(
+          (id) => {
+            const choice = topicChoiceById.get(id);
+            return choice ? [choice] : [];
+          },
+        );
+        const score = assignment.catalog?.difficultyScore;
+        const matchesDifficulty =
+          difficulty === "all" ||
+          (difficulty === "unset" && (score === null || score === undefined)) ||
+          (difficulty === "easy" && typeof score === "number" && score <= 33) ||
+          (difficulty === "medium" && typeof score === "number" && score >= 34 && score <= 66) ||
+          (difficulty === "hard" && typeof score === "number" && score >= 67);
         const matchesQuery = [assignment.title, course?.title, course?.subject]
           .filter(Boolean)
           .join(" ")
@@ -91,21 +150,44 @@ export function StudentPracticeHub({
           .includes(query.trim().toLocaleLowerCase("fa"));
         return (
           matchesQuery &&
+          (courseId === "all" || assignment.courseId === courseId) &&
+          (chapterId === "all" || assignedChoices.some((choice) => choice.chapter.id === chapterId)) &&
+          (topicId === "all" || assignment.catalog?.topicIds?.includes(topicId)) &&
+          (year === "all" || assignment.catalog?.academicYears.includes(year)) &&
+          matchesDifficulty &&
           (kind === "all" || practiceKind(assignment) === kind) &&
           (status === "all" ||
             (status === "ready" && available(assignment)) ||
             (status === "completed" &&
               ["completed", "submitted"].includes(assignment.state)))
         );
+      }).sort((left, right) => {
+        if (sort === "questions") return (right.catalog?.questionCount ?? 0) - (left.catalog?.questionCount ?? 0);
+        if (sort === "hardest") return (right.catalog?.difficultyScore ?? -1) - (left.catalog?.difficultyScore ?? -1);
+        if (sort === "easiest") return (left.catalog?.difficultyScore ?? 101) - (right.catalog?.difficultyScore ?? 101);
+        if (sort === "success") return (right.catalog?.successRate ?? -1) - (left.catalog?.successRate ?? -1);
+        return Number(available(right)) - Number(available(left));
       }),
-    [assignments, courses, kind, query, status],
+    [assignments, chapterId, courseId, courses, difficulty, kind, query, sort, status, topicChoiceById, topicId, year],
   );
+
+  function clearFilters() {
+    setQuery("");
+    setKind("all");
+    setStatus("all");
+    setCourseId("all");
+    setChapterId("all");
+    setTopicId("all");
+    setYear("all");
+    setDifficulty("all");
+    setSort("priority");
+  }
 
   return (
     <div className="grid gap-5">
-      <section className="glass-hero grid gap-5 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <section className="grid gap-5 border-b border-slate-200 bg-white py-5 sm:py-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div className="grid gap-3">
-          <span className="glass-kicker w-fit px-3 py-1.5 text-xs">
+          <span className="w-fit rounded-full bg-[#eef4ff] px-3 py-1.5 text-xs font-medium text-[#2457b8]">
             مرکز فعالیت‌های یادگیری
           </span>
           <h2 className="text-2xl font-bold text-[#17305e]">تمرین و آزمون</h2>
@@ -119,10 +201,7 @@ export function StudentPracticeHub({
         </Button>
       </section>
 
-      <section
-        aria-label="راه‌های شروع تمرین"
-        className="grid gap-3 sm:grid-cols-3"
-      >
+      <section aria-label="راه‌های شروع تمرین" className="flex flex-wrap gap-2">
         {[
           {
             title: "مأموریت‌های آماده",
@@ -150,30 +229,27 @@ export function StudentPracticeHub({
             key={item.title}
             type="button"
             onClick={() => setPage(item.page)}
-            className="glass-panel grid cursor-pointer gap-3 p-5 text-right transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2457b8] motion-reduce:transform-none"
+            className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2 text-right hover:border-[#8eafe9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2457b8]"
           >
-            <item.icon size={22} className="text-[#2457b8]" aria-hidden />
-            <div>
-              <h3 className="font-bold">{item.title}</h3>
+            <item.icon size={18} className="text-[#2457b8]" aria-hidden />
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold">{item.title}</h3>
               {item.value !== null && (
-                <strong className="mt-1 block text-2xl text-[#1f3f97]">
+                <strong className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-[#1f3f97]">
                   {item.value.toLocaleString("fa-IR")}
                 </strong>
               )}
             </div>
-            <p className="text-xs leading-6 text-slate-600">
-              {item.description}
-            </p>
           </button>
         ))}
       </section>
 
-      <section className="glass-panel grid gap-5 p-5 sm:p-6">
+      <section className="grid gap-5 border-t border-slate-200 bg-white pt-5 sm:pt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-bold">کاتالوگ تمرین و آزمون</h2>
             <p className="mt-1 text-xs text-slate-600">
-              تمرین مناسب را با نوع، وضعیت و عنوان پیدا کن.
+              تمرین مناسب را با درس، مبحث، سال و سختی پیدا کن.
             </p>
           </div>
           {!!completed.length && (
@@ -186,7 +262,17 @@ export function StudentPracticeHub({
           )}
         </div>
 
-        <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 lg:grid-cols-[minmax(0,1fr)_220px_220px]">
+        <button
+          type="button"
+          className="flex min-h-12 items-center justify-between rounded-xl border border-slate-200 px-4 text-sm font-bold lg:hidden"
+          onClick={() => setFiltersOpen((current) => !current)}
+          aria-expanded={filtersOpen}
+        >
+          <span className="flex items-center gap-2"><Filter size={17} aria-hidden /> فیلتر و مرتب‌سازی</span>
+          <ChevronDown size={17} className={clsx("transition-transform", filtersOpen && "rotate-180")} aria-hidden />
+        </button>
+
+        <div className={clsx("gap-3 rounded-2xl border border-slate-200 bg-white p-4 lg:grid lg:grid-cols-4", filtersOpen ? "grid" : "hidden")}>
           <label className="grid gap-1.5 text-xs font-medium text-slate-700">
             جست‌وجو
             <span className="relative">
@@ -212,7 +298,7 @@ export function StudentPracticeHub({
             >
               {practiceKinds.map(([value, label]) => (
                 <option key={value} value={value}>
-                  {label}
+                  {label} ({kindCounts[value].toLocaleString("fa-IR")})
                 </option>
               ))}
             </select>
@@ -229,6 +315,62 @@ export function StudentPracticeHub({
               <option value="completed">تکمیل‌شده</option>
             </select>
           </label>
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+            درس
+            <select className="glass-field min-h-12 px-3" value={courseId} onChange={(event) => setCourseId(event.target.value)}>
+              <option value="all">همهٔ درس‌ها</option>
+              {courses.map((course) => <option key={course._id} value={course._id}>{course.title}</option>)}
+            </select>
+          </label>
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+            فصل
+            <select className="glass-field min-h-12 px-3" value={chapterId} onChange={(event) => { setChapterId(event.target.value); setTopicId("all"); }}>
+              <option value="all">همهٔ فصل‌ها</option>
+              {chapters.map((chapter) => <option key={chapter.id} value={chapter.id}>{chapter.title}</option>)}
+            </select>
+          </label>
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+            مبحث
+            <select className="glass-field min-h-12 px-3" value={topicId} onChange={(event) => setTopicId(event.target.value)}>
+              <option value="all">همهٔ مباحث</option>
+              {topics.map((choice) => <option key={choice.topic._id} value={choice.topic._id}>{choice.topic.title}</option>)}
+            </select>
+          </label>
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+            سال آزمون
+            <select className="glass-field min-h-12 px-3" value={year} onChange={(event) => setYear(event.target.value)}>
+              <option value="all">همهٔ سال‌ها</option>
+              {years.map((value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+          </label>
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+            سختی واقعی
+            <select className="glass-field min-h-12 px-3" value={difficulty} onChange={(event) => setDifficulty(event.target.value)}>
+              <option value="all">همهٔ درجه‌ها</option>
+              <option value="unset">تعیین نشده</option>
+              <option value="easy">۰ تا ۳۳</option>
+              <option value="medium">۳۴ تا ۶۶</option>
+              <option value="hard">۶۷ تا ۱۰۰</option>
+            </select>
+          </label>
+          <label className="grid gap-1.5 text-xs font-medium text-slate-700">
+            مرتب‌سازی
+            <select className="glass-field min-h-12 px-3" value={sort} onChange={(event) => setSort(event.target.value)}>
+              <option value="priority">آماده‌ها در ابتدا</option>
+              <option value="questions">بیشترین سؤال</option>
+              <option value="hardest">سخت‌ترین</option>
+              <option value="easiest">آسان‌ترین</option>
+              <option value="success">بیشترین موفقیت</option>
+            </select>
+          </label>
+          <div className="flex items-end">
+            <Button variant="outline" className="min-h-12 w-full" onClick={clearFilters}><RotateCcw size={15} aria-hidden /> پاک‌کردن فیلترها</Button>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+          <span>{filtered.length.toLocaleString("fa-IR")} فعالیت پیدا شد</span>
+          {busy && <span role="status">در حال به‌روزرسانی…</span>}
         </div>
 
         {!assignments.length ? (
@@ -242,11 +384,7 @@ export function StudentPracticeHub({
             <p className="text-sm font-medium">نتیجه‌ای با این فیلتر پیدا نشد.</p>
             <Button
               variant="outline"
-              onClick={() => {
-                setQuery("");
-                setKind("all");
-                setStatus("all");
-              }}
+              onClick={clearFilters}
             >
               پاک‌کردن فیلترها
             </Button>

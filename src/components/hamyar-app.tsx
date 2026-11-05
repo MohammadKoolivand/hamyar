@@ -681,6 +681,7 @@ export default function HamyarApp() {
           <StudentPracticeHub
             assignments={assignments}
             courses={courses}
+            nodes={studentDashboard?.content.nodes ?? []}
             busy={busy}
             open={open}
             showReport={showReport}
