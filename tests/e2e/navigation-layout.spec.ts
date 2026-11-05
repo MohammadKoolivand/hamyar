@@ -48,6 +48,17 @@ test("student navigation exposes the phase-one learning architecture with workin
   await expect(
     page.getByRole("heading", { name: "درس‌های من", exact: true }),
   ).toBeVisible();
+  for (const section of [
+    "مأموریت‌های نزدیک به موعد",
+    "تمرین پیشنهادی هدهده",
+    "مباحث نیازمند مرور",
+    "آخرین نتیجه و روند پیشرفت",
+    "محتوای تازه برای درس‌های تو",
+  ]) {
+    await expect(
+      page.getByRole("heading", { name: section, exact: true }),
+    ).toBeVisible();
+  }
   for (const action of [
     "باز کردن تمرین‌های آماده",
     "باز کردن تکلیف‌های من",

@@ -27,6 +27,7 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
             createdAt: 1,
             questionVersionIds: 1,
             policy: 1,
+            dueAt: 1,
           })
           .toArray(),
       ]);
@@ -144,6 +145,7 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
             state: a.state,
             courseId: a.courseId ?? null,
             createdAt: a.createdAt,
+            dueAt: a.dueAt ?? null,
           }))
           .sort((a, b) =>
             String(b.createdAt).localeCompare(String(a.createdAt)),

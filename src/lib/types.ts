@@ -67,6 +67,7 @@ export interface DashboardMission {
   state: string;
   courseId: string | null;
   createdAt: string;
+  dueAt?: string | null;
 }
 export interface DashboardMetrics {
   assignments: number;

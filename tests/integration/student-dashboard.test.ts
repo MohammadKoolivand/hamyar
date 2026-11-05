@@ -57,6 +57,11 @@ test("student dashboard groups lessons, counts real evaluations, and keeps legac
     const physicsAssignment = await f.c("assignments").findOne({ missionId: physicsMission._id });
     assert.ok(mathAssignment);
     assert.ok(physicsAssignment);
+    const dueAt = new Date(Date.now() + 2 * 86_400_000).toISOString();
+    await f.c("assignments").updateOne(
+      { _id: mathAssignment!._id },
+      { $set: { dueAt } },
+    );
     await f.post("/api/assignments/" + mathAssignment!._id + "/attempts", {
       questionId: f.question._id, answer: "2",
     }, f.student);
@@ -83,6 +88,7 @@ test("student dashboard groups lessons, counts real evaluations, and keeps legac
     assert.equal(mathView.correctIndependent, 1);
     assert.equal(mathView.correctAssisted, 0);
     assert.equal(mathView.answeredQuestions, 1);
+    assert.equal(mathView.missions[0].dueAt, dueAt);
     assert.equal(physicsView.correctIndependent, 0);
     assert.equal(physicsView.correctAssisted, 1);
     assert.equal(physicsView.teacherName, "Physics Teacher");
