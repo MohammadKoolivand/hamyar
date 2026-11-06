@@ -1,3 +1,4 @@
+import { sessionCookieOptions, SESSION_MAX_AGE_SECONDS } from "../security/session";
 import {
   createHmac,
   randomBytes,
@@ -36,6 +37,8 @@ export function developmentOtpBypass(activeDatabase?: string) {
 export function validOtpCode(code: string, bypass: boolean) {
   return bypass ? /^\d{1,12}$/.test(code) : /^\d{6}$/.test(code);
 }
+// Separate this challenge from any other verification workflow.
+const OTP_PURPOSE = "phone-login:v1" as const;
 const developmentSecret = randomBytes(32);
 function secret() {
   if (developmentOtpBypass()) return developmentSecret;
@@ -45,7 +48,7 @@ function secret() {
 }
 function digest(challenge: string, phone: string, code: string) {
   return createHmac("sha256", secret())
-    .update(JSON.stringify([challenge, phone, code]))
+    .update(JSON.stringify([OTP_PURPOSE, challenge, phone, code]))
     .digest("hex");
 }
 export function registerPhoneAuth(
@@ -124,6 +127,7 @@ export function registerPhoneAuth(
         {
           _id: key,
           challengeId,
+          purpose: OTP_PURPOSE,
           codeHash: digest(challengeId, phone, code),
           state: "sending",
           developmentBypass: bypass,
@@ -195,11 +199,35 @@ export function registerPhoneAuth(
       if (process.env.AUTH_OTP_DEV_BYPASS === "true" && !bypass)
         ctx.fail(503, "حالت آزمایشی فقط روی محیط توسعه محلی و دیتابیس آزمایشی مجاز است.");
       if (!validOtpCode(b.code, bypass)) ctx.fail(400, "کد تأیید نامعتبر است.");
+      // A durable, per-account budget across all OTP challenges and app replicas.
+      // Keep the limiter independent of the verification transaction so failures
+      // still count, including incorrect, expired and replayed challenges.
+      const limitKey = ctx.hash("otp-verify:" + b.phone);
+      const now = new Date();
+      await ctx.c("otpVerifyThrottle").updateOne(
+        { _id: limitKey },
+        { $setOnInsert: { count: 0, windowEndsAt: new Date(0) } },
+        { upsert: true },
+      );
+      await ctx.c("otpVerifyThrottle").updateOne(
+        { _id: limitKey, windowEndsAt: { $lte: now } },
+        { $set: { count: 0, windowEndsAt: new Date(now.getTime() + 600000) } },
+      );
+      const admitted = await ctx.c("otpVerifyThrottle").updateOne(
+        { _id: limitKey, windowEndsAt: { $gt: now }, count: { $lt: 15 } },
+        {
+          $inc: { count: 1 },
+          $set: { expiresAt: new Date(now.getTime() + 86400000) },
+        },
+      );
+      if (!admitted.modifiedCount)
+        ctx.fail(429, "تعداد تلاش‌ها زیاد است؛ کمی بعد دوباره امتحان کنید.");
       const sessionToken = ctx.randomBytes(32).toString("hex");
       const result = await ctx.transaction(async (session) => {
         const query = {
           _id: ctx.hash("otp:" + b.phone),
           challengeId: b.challengeId,
+          purpose: OTP_PURPOSE,
           state: "active",
           expiresAt: { $gt: new Date() },
           attempts: { $lt: 5 },
@@ -289,7 +317,8 @@ export function registerPhoneAuth(
             _id: ctx.id(),
             userId: user._id,
             tokenHash: ctx.hash(sessionToken),
-            expiresAt: new Date(Date.now() + 7 * 86400000),
+            expiresAt: new Date(Date.now() + SESSION_MAX_AGE_SECONDS * 1000),
+            securityRevision: user.securityRevision ?? 0,
           },
           { session },
         );
@@ -310,16 +339,7 @@ export function registerPhoneAuth(
       });
       if (!result)
         ctx.fail(400, "کد نامعتبر، منقضی یا بیش از حد امتحان شده است.");
-      reply.setCookie("session", sessionToken, {
-        httpOnly: true,
-        sameSite: "strict",
-        secure:
-          process.env.COOKIE_SECURE === "true" ||
-          (process.env.NODE_ENV === "production" &&
-            (process.env.APP_ORIGIN ?? "").startsWith("https://")),
-        path: "/",
-        maxAge: 604800,
-      });
+      reply.setCookie("session", sessionToken, sessionCookieOptions());
       return result;
     },
   );

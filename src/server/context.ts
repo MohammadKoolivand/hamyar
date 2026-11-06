@@ -1,3 +1,5 @@
+import { assertLibraryAssignmentAccess } from "./library-access";
+import { assertActiveAssignmentCourse } from "./course-access";
 import { loginIdentifierSchema } from "../lib/phone";
 import { roleSchema } from "../lib/access";
 import type { FastifyRequest } from "fastify";
@@ -37,6 +39,8 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
     if (!session) fail(401, "نشست منقضی شده است");
     const u = await c("users").findOne({ _id: session!.userId });
     if (!u || u.disabledAt) fail(401, "حساب فعال یافت نشد");
+    if ((session.securityRevision ?? 0) !== (u.securityRevision ?? 0))
+      fail(401, "نشست باطل شده است");
     if (!roleSchema.safeParse(u!.role).success)
       fail(403, "نقش حساب معتبر نیست");
     if (role && u!.role !== role) fail(403, "دسترسی مجاز نیست");
@@ -97,6 +101,10 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
           : { teacherId: u._id }),
     });
     if (!a) fail(404, "مأموریت یافت نشد");
+    if (u.role === "student") {
+      await assertActiveAssignmentCourse({ c, fail }, a!, u._id);
+      await assertLibraryAssignmentAccess({ c, fail }, a!, u._id);
+    }
     return { u, a: a! };
   }
   return {

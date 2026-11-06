@@ -1,3 +1,5 @@
+import { mongoDeploymentErrors } from "../../scripts/mongo-security-policy.mjs";
+import { mongoTransportErrors } from "../../scripts/transport-policy.mjs";
 import { MongoClient, type Db, type Document } from "mongodb";
 export type Row = Document & { _id: string; reviews?: Document[] };
 export const collection = (db: Db, name: string) => db.collection<Row>(name);
@@ -5,6 +7,8 @@ export async function connect(
   url = process.env.MONGO_URL ?? "mongodb://127.0.0.1:27017",
   name = process.env.MONGO_DB ?? "hamyar",
 ) {
+  if (process.env.NODE_ENV === "production" && (mongoTransportErrors(url).length || mongoDeploymentErrors(url, name).length))
+    throw new Error("MongoDB TLS configuration is required and must verify certificates");
   const client = new MongoClient(url, { serverSelectionTimeoutMS: 5000 });
   await client.connect();
   const db = client.db(name);
@@ -26,6 +30,12 @@ export async function connect(
   await db
     .collection("users")
     .createIndex({ phone: 1 }, { unique: true, sparse: true });
+  await db.collection("guardianConsents").createIndex({ studentId: 1, status: 1, policyVersion: 1 });
+  await db.collection("guardianConsentEvents").createIndex({ consentId: 1, sequence: 1 }, { unique: true });
+  await db.collection("guardianConsentEvents").createIndex({ studentId: 1, guardianId: 1, recordedAt: -1 });
+  await db.collection("parentLinks").createIndex({ studentId: 1, status: 1, parentId: 1 });
+  await db.collection("dataDeletionRequests").createIndex({ requesterId: 1, requestedAt: -1 });
+  await db.collection("dataDeletionRequests").createIndex({ subjectId: 1, status: 1 });
   for (const [name, keys] of [
     ["sessions", { tokenHash: 1 }],
     ["invitations", { tokenHash: 1 }],
@@ -106,7 +116,7 @@ export async function connect(
   await db
     .collection("mailOutbox")
     .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-  for (const name of ["otpChallenges", "otpThrottle"])
+  for (const name of ["otpChallenges", "otpThrottle", "otpVerifyThrottle"])
     await db
       .collection(name)
       .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });

@@ -1,3 +1,5 @@
+import { mongoDeploymentErrors } from "./mongo-security-policy.mjs";
+import { mongoTransportErrors, providerTransportErrors } from "./transport-policy.mjs";
 /** Read-only startup configuration guard. Never prints environment values. */
 import process from "node:process";
 import console from "node:console";
@@ -17,6 +19,10 @@ export function deploymentChecks(env, role = "web") {
     errors.push("SERVICE_ROLE_INVALID");
   if (!/^mongodb(?:\+srv)?:\/\/[^\s]+$/.test(env.MONGO_URL ?? ""))
     errors.push("MONGO_URL_REQUIRED_OR_INVALID");
+  errors.push(...mongoTransportErrors(env.MONGO_URL));
+  errors.push(...mongoDeploymentErrors(env.MONGO_URL, env.MONGO_DB));
+  if (role === "web" && (env.AI_PROVIDER === "ollama" || env.AI_AUTHOR_PROVIDER === "ollama"))
+    errors.push(...providerTransportErrors(env.OLLAMA_BASE_URL ?? "http://127.0.0.1:11434"));
   if (
     !/^[-\w]+$/.test(env.MONGO_DB ?? "") ||
     Buffer.byteLength(env.MONGO_DB ?? "") > 63
@@ -40,6 +46,8 @@ export function deploymentChecks(env, role = "web") {
   }
   if (env.COOKIE_SECURE !== "true") errors.push("SECURE_COOKIES_REQUIRED");
   if (role === "web") {
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{2,63}$/.test(env.STUDENT_CONSENT_POLICY_VERSION ?? ""))
+      errors.push("STUDENT_CONSENT_POLICY_REVIEW_REQUIRED");
     if (!["mock", "ollama"].includes(env.AI_PROVIDER ?? "mock"))
       errors.push("AI_PROVIDER_INVALID");
     let sharedSms = false;

@@ -223,6 +223,16 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
           task!.studentIds,
           session,
         );
+        // Make concurrent leave and group publication conflict on each
+        // enrollment instead of relying solely on a snapshot read.
+        for (const enrollmentId of enrollmentIds.values()) {
+          const locked = await c("enrollments").updateOne(
+            { _id: enrollmentId, status: "active" },
+            { $inc: { accessRevision: 1 } },
+            { session },
+          );
+          if (!locked.modifiedCount) fail(409, "عضویت درس تغییر کرده است");
+        }
         const questions = await c("questionVersions").countDocuments(
           {
             _id: { $in: task!.questionVersionIds },

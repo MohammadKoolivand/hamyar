@@ -1,3 +1,4 @@
+import { clearSessionCookieOptions } from "../security/session";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { Context } from "../context";
@@ -207,7 +208,7 @@ export function registerPasswordReset(
           { session },
         );
       });
-      reply.clearCookie("session", { path: "/" });
+      reply.clearCookie("session", clearSessionCookieOptions());
       return { message: "رمز عبور تغییر کرد. با رمز جدید وارد شوید." };
     },
   );

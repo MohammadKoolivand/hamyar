@@ -9,7 +9,7 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
   app.get("/api/student/dashboard", async (request) => {
     const student = await ctx.user(request, "student");
     return ctx.transaction(async (session) => {
-      const [enrollments, assignments] = await Promise.all([
+      const [enrollments, allAssignments] = await Promise.all([
         ctx
           .c("enrollments")
           .find({ studentId: student._id, status: "active" }, { session })
@@ -24,6 +24,7 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
             courseId: 1,
             title: 1,
             state: 1,
+            accessRevokedAt: 1,
             createdAt: 1,
             questionVersionIds: 1,
             policy: 1,
@@ -51,6 +52,15 @@ export function registerStudentDashboard(app: FastifyInstance, ctx: Context) {
         enrollments.some(
           (e) => e.courseId === course._id && e.teacherId === course.teacherId,
         ),
+      );
+      // Historical evidence remains in MongoDB, but revoked private course
+      // assignments must not reappear through dashboard summaries or content.
+      const assignments = allAssignments.filter(
+        (a) => !a.accessRevokedAt && (!a.courseId || (
+          a.state !== "cancelled" && valid.some((course) =>
+            course._id === a.courseId && course.teacherId === a.teacherId
+          )
+        )),
       );
       const teachers = await ctx
         .c("users")

@@ -124,11 +124,11 @@ test("revocation freezes unfinished assignments but retains history and permits 
     assert.equal((await f.c("assignments").findOne({ _id: assignment!._id }))?.state, "cancelled");
     assert.equal((await f.c("missions").findOne({ _id: mission._id }))?.state, "cancelled");
     assert.equal(await f.c("attempts").countDocuments({ assignmentId: assignment!._id }), recorded);
-    assert.equal((await f.request("/api/assignments/" + assignment!._id, undefined, f.student)).statusCode, 200);
-    assert.equal((await f.request("/api/assignments/" + assignment!._id + "/report", undefined, f.student)).statusCode, 200);
+    assert.equal((await f.request("/api/assignments/" + assignment!._id, undefined, f.student)).statusCode, 404);
+    assert.equal((await f.request("/api/assignments/" + assignment!._id + "/report", undefined, f.student)).statusCode, 404);
     assert.equal((await f.request("/api/assignments/" + assignment!._id + "/attempts", {
       questionId: f.question._id, answer: "2",
-    }, f.student)).statusCode, 409);
+    }, f.student)).statusCode, 404);
     assert.equal((await f.request("/api/enrollments/" + membership!._id + "/leave", {}, f.student)).statusCode, 404);
 
     const notAllowed = await f.request("/api/missions", {

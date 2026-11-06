@@ -197,23 +197,40 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
       if (result.modifiedCount !== 1) fail(409, "عضویت قبلاً تغییر کرده است");
       // Freeze unfinished course assignments; retain attempts, reviews,
       // completed work and evidence for historical access.
-      const unfinished = await c("assignments").find({
-        enrollmentId: eid,
+      // Include old course assignments and library practices which predate
+      // enrollmentId tracking; never cancel unrelated teachers' work.
+      const scope = {
+        studentId: enrollment!.studentId,
+        teacherId: enrollment!.teacherId,
+        courseId: enrollment!.courseId,
         state: { $in: ["published", "in_progress"] },
-      }, { session }).project({ missionId: 1 }).toArray();
+      };
+      const unfinished = await c("assignments").find(scope, { session })
+        .project({ missionId: 1 }).toArray();
       if (unfinished.length) {
         await c("assignments").updateMany(
-          { enrollmentId: eid, state: { $in: ["published", "in_progress"] } },
+          scope,
           { $set: { state: "cancelled" }, $inc: { revision: 1 } },
           { session },
         );
         await c("missions").updateMany(
-          { _id: { $in: unfinished.map((a) => a.missionId) },
+          { _id: { $in: unfinished.map((a) => a.missionId).filter(Boolean) },
             state: { $in: ["published", "in_progress"] } },
           { $set: { state: "cancelled" } },
           { session },
         );
       }
+      // Completed/submitted work stays in its historical state but its
+      // private content must not revive when the learner later rejoins.
+      await c("assignments").updateMany(
+        {
+          studentId: enrollment!.studentId,
+          teacherId: enrollment!.teacherId,
+          courseId: enrollment!.courseId,
+        },
+        { $set: { accessRevokedAt: timestamp }, $inc: { revision: 1 } },
+        { session },
+      );
       await c("auditLogs").insertOne({
         _id: id(), actorId: actor._id, action: "revoke_course_enrollment",
         resourceId: eid, createdAt: timestamp,

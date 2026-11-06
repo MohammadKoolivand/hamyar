@@ -1,3 +1,4 @@
+import { sessionCookieOptions, clearSessionCookieOptions, SESSION_MAX_AGE_SECONDS } from "../security/session";
 import {
   accountContact,
   invitationContactSchema,
@@ -178,21 +179,13 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
             _id: id(),
             tokenHash: hash(token),
             userId: u!._id,
-            expiresAt: new Date(Date.now() + 7 * 86400000),
+            expiresAt: new Date(Date.now() + SESSION_MAX_AGE_SECONDS * 1000),
+            securityRevision: u!.securityRevision ?? 0,
           },
           { session },
         );
       });
-      reply.setCookie("session", token, {
-        httpOnly: true,
-        sameSite: "strict",
-        secure:
-          process.env.COOKIE_SECURE === "true" ||
-          (process.env.NODE_ENV === "production" &&
-            (process.env.APP_ORIGIN ?? "").startsWith("https://")),
-        path: "/",
-        maxAge: 604800,
-      });
+      reply.setCookie("session", token, sessionCookieOptions());
       return safe(u!);
     },
   );
@@ -200,7 +193,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
   app.post("/api/auth/logout", async (r, reply) => {
     if (r.cookies.session)
       await c("sessions").deleteOne({ tokenHash: hash(r.cookies.session) });
-    reply.clearCookie("session", { path: "/" });
+    reply.clearCookie("session", clearSessionCookieOptions());
     return { ok: true };
   });
   app.post("/api/invitations", async (r) => {

@@ -16,7 +16,7 @@ type LibraryAccess = {
  * from different relationships.
  */
 export async function activeLibraryAccess(
-  ctx: Context,
+  ctx: Pick<Context, "c" | "fail">,
   studentId: string,
   courseId: string,
   questionVersionId: string,
@@ -64,7 +64,7 @@ export async function activeLibraryAccess(
 }
 
 export async function assertLibraryAssignmentAccess(
-  ctx: Context,
+  ctx: Pick<Context, "c" | "fail">,
   assignment: Row,
   studentId: string,
   session?: ClientSession,

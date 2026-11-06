@@ -274,7 +274,7 @@ test("OTP invitation binds the verified phone to parent scope; disabled accounts
 test("OTP challenge and throttle collections have TTL cleanup indexes", async () => {
   const f = await fixture();
   try {
-    for (const name of ["otpChallenges", "otpThrottle"]) {
+    for (const name of ["otpChallenges", "otpThrottle", "otpVerifyThrottle"]) {
       const indexes = await f.db
         .collection(name)
         .listIndexes()
@@ -294,4 +294,78 @@ test("OTP challenge and throttle collections have TTL cleanup indexes", async ()
   } finally {
     await f.close();
   }
+});
+
+test("OTP is bound to phone and login purpose, and concurrent replay creates one session", async () => {
+  let code = "";
+  const f = await fixture({
+    sms: {
+      name: "controlled_sms",
+      configured: () => true,
+      sendOtp: async (_phone, value) => { code = value; },
+    },
+  });
+  try {
+    const requested = await f.post("/api/auth/otp/request", { phone: "09123456789" });
+    const stored = await f.c("otpChallenges").findOne({ challengeId: requested.challengeId });
+    assert.equal(stored?.purpose, "phone-login:v1");
+    assert.equal(stored?.attempts, 0);
+    const stolen = await f.request("/api/auth/otp/verify", {
+      phone: "09123456788", challengeId: requested.challengeId, code,
+      name: "User Test", role: "student",
+    });
+    assert.equal(stolen.statusCode, 400);
+    // No authentication under another workflow, even with a valid OTP code.
+    await f.c("otpChallenges").updateOne(
+      { challengeId: requested.challengeId },
+      { $set: { purpose: "password-reset:v1" } },
+    );
+    const verify = {
+      phone: "09123456789", challengeId: requested.challengeId, code,
+      name: "User Test", role: "student",
+    };
+    assert.equal((await f.request("/api/auth/otp/verify", verify)).statusCode, 400);
+    await f.c("otpChallenges").updateOne(
+      { challengeId: requested.challengeId },
+      { $set: { purpose: "phone-login:v1" } },
+    );
+    const simultaneous = await Promise.all(
+      Array.from({ length: 4 }, () => f.request("/api/auth/otp/verify", verify)),
+    );
+    assert.equal(simultaneous.filter((r) => r.statusCode === 200).length, 1);
+    assert.equal(await f.c("users").countDocuments({ phone: verify.phone }), 1);
+    assert.equal((await f.request("/api/auth/otp/verify", verify)).statusCode, 400);
+  } finally { await f.close(); }
+});
+
+test("OTP verification has a persistent per-phone limit across challenge identifiers", async () => {
+  let code = "";
+  const f = await fixture({
+    sms: {
+      name: "controlled_sms",
+      configured: () => true,
+      sendOtp: async (_phone, value) => { code = value; },
+    },
+  });
+  try {
+    const first = await f.post("/api/auth/otp/request", { phone: "09123456789" });
+    // Unknown challenge identifiers must still spend the per-phone verification budget.
+    const responses = await Promise.all(Array.from({ length: 18 }, (_, n) =>
+      f.request("/api/auth/otp/verify", {
+        phone: "09123456789", challengeId: n % 2
+          ? first.challengeId : "00000000-0000-4000-8000-000000000000",
+        code: "000000",
+      }),
+    ));
+    assert.equal(responses.filter((r) => r.statusCode === 429).length, 3);
+    assert.equal(responses.filter((r) => r.statusCode === 400).length, 15);
+    const blocked = await f.request("/api/auth/otp/verify", {
+      phone: "09123456789", challengeId: first.challengeId,
+      code, name: "User Test", role: "student",
+    });
+    assert.equal(blocked.statusCode, 429);
+    assert.equal(await f.c("users").countDocuments({ phone: "09123456789" }), 0);
+    const limiter = await f.c("otpVerifyThrottle").findOne({});
+    assert.equal(limiter?.count, 15);
+  } finally { await f.close(); }
 });

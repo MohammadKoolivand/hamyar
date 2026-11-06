@@ -5,11 +5,12 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { deploymentChecks } from "../../scripts/check-deployment.mjs";
 const base = {
-  MONGO_URL: "mongodb://127.0.0.1:27019/?replicaSet=test",
+  MONGO_URL: "mongodb://fixture:nonsecret@127.0.0.1:27019/hodhodeh_staging_test?replicaSet=test&tls=true&authSource=hodhodeh_staging_test",
   MONGO_DB: "hodhodeh_staging_test",
   HODHOD_EXPECTED_DB: "hodhodeh_staging_test",
   APP_ORIGIN: "https://staging.example.test",
   COOKIE_SECURE: "true",
+  STUDENT_CONSENT_POLICY_VERSION: "reviewed-policy-v1",
 };
 test("deployment guard rejects wrong database, insecure origin and unsafe mail configuration", () => {
   assert.deepEqual(deploymentChecks(base, "exams").errors, []);
@@ -118,4 +119,18 @@ test("token SMS preflight validates vendor endpoint and OTP key without leaking 
   });
   assert.ok(invalid.errors.includes("SMS_SHARED_ENDPOINT_INVALID"));
   assert.ok(!JSON.stringify(invalid).includes("private-token"));
+});
+
+test("staging pushes are verified before automatic activation", async () => {
+  const { readFileSync } = await import("node:fs");
+  const verify = readFileSync(".github/workflows/verify.yml", "utf8");
+  const deploy = readFileSync(".github/workflows/staging.yml", "utf8");
+  assert.match(verify, /branches: \[main, staging\]/);
+  assert.match(verify, /hodhodeh-source-\$\{\{ github\.sha \}\}/);
+  assert.match(deploy, /workflow_run:/);
+  assert.match(deploy, /branches: \[staging\]/);
+  assert.match(deploy, /workflow_run\.conclusion == 'success'/);
+  assert.match(deploy, /workflow_run\.head_branch == 'staging'/);
+  assert.match(deploy, /ACTIVATE:.*workflow_run.*'true'/);
+  assert.match(deploy, /StrictHostKeyChecking=yes/);
 });

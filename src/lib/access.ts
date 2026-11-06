@@ -37,6 +37,10 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/staff/workspaces",
     "/api/staff/workspaces/:tid/roster",
     "/api/staff/workspaces/:tid/courses",
+    "/api/privacy/consent/status",
+    "/api/privacy/children/:studentId/consent/history",
+    "/api/privacy/deletion-requests/:requestId",
+    "/api/privacy/deletion-requests/:requestId/inventory",
     "/api/children",
     "/api/students",
     "/api/students/:sid/parents",
@@ -74,6 +78,11 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/auth/email-verification/request",
     "/api/auth/email-verification/confirm",
     "/api/auth/email/change",
+    "/api/privacy/guardian-links/:linkId/review",
+    "/api/privacy/children/:studentId/consent",
+    "/api/privacy/deletion-requests",
+    "/api/privacy/deletion-requests/:requestId/execute",
+    "/api/privacy/deletion-requests/:requestId/finalize",
     "/api/auth/register",
     "/api/auth/login",
     "/api/auth/logout",
@@ -173,6 +182,11 @@ export function routeRoles(method: string, route: string): Role[] | null {
     ].includes(route)
   )
     return [...roleSchema.options];
+  if (route === "/api/privacy/guardian-links/:linkId/review" || route === "/api/privacy/deletion-requests/:requestId/execute" || route === "/api/privacy/deletion-requests/:requestId/inventory" || route === "/api/privacy/deletion-requests/:requestId/finalize") return ["super_admin"];
+  if (route === "/api/privacy/children/:studentId/consent") return ["parent"];
+  if (route === "/api/privacy/consent/status") return ["student"];
+  if (route === "/api/privacy/children/:studentId/consent/history") return ["student", "parent", "super_admin"];
+  if (route.startsWith("/api/privacy/deletion-requests")) return [...roleSchema.options];
   if (route.startsWith("/api/admin/")) return ["super_admin"];
   if (route.startsWith("/api/staff/")) return ["secretary"];
   if (route === "/api/children") return ["parent"];

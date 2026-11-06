@@ -1,3 +1,4 @@
+import { clearSessionCookieOptions } from "../security/session";
 import { z } from "zod";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
@@ -193,7 +194,7 @@ export function registerEmailVerification(app: FastifyInstance, ctx: Context) {
           { session },
         );
       });
-      reply.clearCookie("session", { path: "/" });
+      reply.clearCookie("session", clearSessionCookieOptions());
       return { message: "ایمیل تأیید شد. دوباره وارد حساب شوید." };
     },
   );

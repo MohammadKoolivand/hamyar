@@ -1,3 +1,5 @@
+import { assertActiveAssignmentCourse } from "../course-access";
+import { assertLibraryAssignmentAccess } from "../library-access";
 import { MAX_MISSION_QUESTIONS } from "../../lib/mission-limits";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
@@ -8,9 +10,20 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id, now, fail } = ctx;
   app.get("/api/missions", async (r) => {
     const u = await user(r);
-    return u.role === "teacher"
-      ? c("missions").find({ teacherId: u._id }).toArray()
-      : c("assignments").find({ studentId: u._id }).toArray();
+    if (u.role === "teacher")
+      return c("missions").find({ teacherId: u._id }).toArray();
+    const rows = await c("assignments").find({ studentId: u._id }).toArray();
+    const visible = [];
+    for (const row of rows) {
+      try {
+        await assertActiveAssignmentCourse(ctx, row, u._id);
+        await assertLibraryAssignmentAccess(ctx, row, u._id);
+        visible.push(row);
+      } catch (error) {
+        if ((error as { statusCode?: number }).statusCode !== 404) throw error;
+      }
+    }
+    return visible;
   });
   app.post("/api/missions", async (r) => {
     const u = await user(r, "teacher"),
@@ -101,6 +114,13 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
           { session },
         );
         if (!course || !enrollment) fail(409, "عضویت این درس دیگر معتبر نیست");
+        // Conflict with concurrent membership revocation before inserting work.
+        const locked = await c("enrollments").updateOne(
+          { _id: enrollment!._id, status: "active" },
+          { $inc: { accessRevision: 1 } },
+          { session },
+        );
+        if (!locked.modifiedCount) fail(409, "عضویت این درس دیگر معتبر نیست");
       }
       transition(m!.state, "published");
       const progress = Object.fromEntries(

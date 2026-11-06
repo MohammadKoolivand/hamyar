@@ -22,8 +22,7 @@ test("student APIs keep answer keys, full solutions and final results private un
       {
         topicId: f.question.topicId,
         statement: "سؤال دارای نتیجه زمان‌بندی‌شده",
-        type: "choice",
-        options: ["پاسخ عمومی", secrets.reference],
+        type: "short",
         reference: secrets.reference,
         hints: ["راهنمای عمومی"],
       },
@@ -70,10 +69,18 @@ test("student APIs keep answer keys, full solutions and final results private un
     excludesSecrets(detailBefore.body);
     assert.deepEqual(detailBefore.json().evaluations, []);
     assert.equal(detailBefore.json().hints.length, 0);
+    const progressBefore = await f.request(
+      `/api/students/${student._id}/progress`, undefined, f.student,
+    );
+    assert.equal(progressBefore.statusCode, 200, progressBefore.body);
+    assert.equal(progressBefore.json().recentMissions.some(
+      (item: { assignmentId: string }) => item.assignmentId === assignment._id,
+    ), false);
+
 
     const submitted = await f.request(
       path + "/attempts",
-      { questionId: question._id, answer: secrets.reference },
+      { questionId: question._id, answer: "wrong answer" },
       f.student,
     );
     assert.equal(submitted.statusCode, 200, submitted.body);
@@ -85,6 +92,27 @@ test("student APIs keep answer keys, full solutions and final results private un
       409,
     );
     await f.post(path + "/complete", {}, f.student);
+    for (const endpoint of [
+      `/api/students/${student._id}/progress`,
+      `/api/students/${student._id}/mistakes`,
+      "/api/student/dashboard",
+      "/api/assignments",
+      "/api/missions",
+    ]) {
+      const response = await f.request(endpoint, undefined, f.student);
+      assert.equal(response.statusCode, 200, response.body);
+      excludesSecrets(response.body);
+      if (endpoint.endsWith("/progress")) {
+        assert.equal(response.json().recentMissions.some(
+          (item: { assignmentId: string }) => item.assignmentId === assignment._id,
+        ), false, response.body);
+      }
+      if (endpoint.endsWith("/mistakes"))
+        assert.equal(response.json().some(
+          (item: { assignmentId: string }) => item.assignmentId === assignment._id,
+        ), false, response.body);
+    }
+
 
     const completedButScheduled = await f.request(path, undefined, f.student);
     excludesSecrets(completedButScheduled.body);
@@ -105,7 +133,13 @@ test("student APIs keep answer keys, full solutions and final results private un
     const released = await f.request(path + "/report", undefined, f.student);
     assert.equal(released.statusCode, 200, released.body);
     assert.equal(released.json().questions[0].reference, secrets.reference);
-    assert.equal(released.json().questions[0].result, "correct");
+    assert.equal(released.json().questions[0].result, "incorrect");
+    const progressAfter = await f.request(
+      `/api/students/${student._id}/progress`, undefined, f.student,
+    );
+    assert.equal(progressAfter.json().recentMissions.some(
+      (item: { assignmentId: string }) => item.assignmentId === assignment._id,
+    ), true);
   } finally {
     await f.close();
   }

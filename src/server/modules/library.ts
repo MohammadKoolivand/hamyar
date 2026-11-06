@@ -67,8 +67,28 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
         { upsert: true },
       );
     } else {
-      await c("libraryPublications").updateMany(selector, {
-        $set: { published: false, updatedAt: now() },
+      // Unpublishing also freezes in-flight library practices. The shared
+      // assignment write conflicts with concurrent attempt/hint transactions,
+      // preventing a request from committing after revocation.
+      await ctx.transaction(async (session) => {
+        await c("libraryPublications").updateMany(selector, {
+          $set: { published: false, updatedAt: now() },
+        }, { session });
+        const scope = {
+          teacherId: teacher._id,
+          courseId: input.courseId,
+          libraryQuestionId: qid,
+        };
+        await c("assignments").updateMany(
+          { ...scope, state: { $in: ["published", "in_progress"] } },
+          { $set: { state: "cancelled" }, $inc: { revision: 1 } },
+          { session },
+        );
+        // Keep finished evidence, but invalidate old content URLs permanently.
+        await c("assignments").updateMany(scope,
+          { $set: { accessRevokedAt: now() }, $inc: { revision: 1 } },
+          { session },
+        );
       });
     }
     await c("auditLogs").insertOne({
@@ -250,6 +270,21 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
             session,
           );
           if (!access) fail(404, "این سؤال در کتابخانهٔ درس شما موجود نیست");
+          // Serialize start with unpublish/revoke on authoritative records.
+          // A snapshot read alone cannot prevent a concurrently committed
+          // revocation from being missed by an insert into a new assignment.
+          const enrolled = await c("enrollments").updateOne(
+            { _id: access!.enrollment._id, status: "active" },
+            { $inc: { accessRevision: 1 } },
+            { session },
+          );
+          const published = await c("libraryPublications").updateOne(
+            { _id: access!.publication._id, published: true },
+            { $inc: { accessRevision: 1 } },
+            { session },
+          );
+          if (!enrolled.modifiedCount || !published.modifiedCount)
+            fail(404, "این سؤال در کتابخانهٔ درس شما موجود نیست");
           const publication = access!.publication;
           const existing = await c("assignments").findOne(
             {
@@ -257,6 +292,7 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
               libraryQuestionId: qid,
               courseId: input.courseId,
               state: { $in: ["published", "in_progress"] },
+              accessRevokedAt: { $exists: false },
             },
             { session },
           );
@@ -272,6 +308,7 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
               teacherId: publication.teacherId,
               studentId: student._id,
               courseId: input.courseId,
+              enrollmentId: access!.enrollment._id,
               libraryQuestionId: qid,
               title: "تمرین انتخابی از کتابخانه",
               questionVersionIds: [qid],

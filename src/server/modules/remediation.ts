@@ -10,7 +10,7 @@ export function registerRemediation(app: FastifyInstance, ctx: Context) {
   const { c, id, now, user, fail } = ctx;
   const uuid = z.string().uuid();
   const params = z.object({ sid: uuid });
-  const scope = z.object({ courseId: uuid.optional() });
+  const scope = z.object({ courseId: uuid.optional() }).strict();
 
   async function candidates(
     teacherId: string, studentId: string, courseId: string | undefined,

@@ -1,3 +1,4 @@
+import { providerTransportErrors } from "../../../scripts/transport-policy.mjs";
 import {
   questionVisualsSchema,
   type visualKind,
@@ -37,6 +38,8 @@ export class OllamaQuestionGenerator implements QuestionGenerator {
     private transport: typeof fetch = fetch,
   ) {}
   async generate(input: AuthoringInput) {
+    if (process.env.NODE_ENV === "production" && providerTransportErrors(this.config.url).length)
+      throw new Error("AI generator requires TLS for remote connections");
     const url = new URL(this.config.url);
     if (
       !["http:", "https:"].includes(url.protocol) ||

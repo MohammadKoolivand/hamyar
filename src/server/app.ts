@@ -1,3 +1,4 @@
+import { registerPrivacy, ensureStudentConsent } from "./modules/privacy";
 import { registerPhoneAuth } from "./modules/phone-auth";
 import { MelipayamakProvider, type SmsProvider } from "./auth/sms";
 import { registerEmailVerification } from "./modules/email-verification";
@@ -34,6 +35,7 @@ import { registerLearning } from "./modules/learning";
 import { registerAuthoring } from "./modules/authoring";
 import type { QuestionGenerator } from "./ai/question-generator";
 import { isAllowedRequestOrigin } from "./security/request-origin";
+import { assertAllowedQuery, assertSafeApiInput } from "./security/input-validation";
 export async function buildApp(
   db: Db,
   provider: HintProvider = new MockProvider(),
@@ -61,6 +63,11 @@ export async function buildApp(
               "body",
               "password",
               "token",
+              "code",
+              "codeHash",
+              "challengeId",
+              "req.body",
+              "res.body",
             ],
           }
         : false,
@@ -134,6 +141,21 @@ export async function buildApp(
         fail(403, "مبدأ درخواست مجاز نیست");
     }
   });
+  // Reject MongoDB operator objects, prototype-pollution keys, and malformed
+  // structures before any handler can construct a database filter.
+  app.addHook("preValidation", async (r) => {
+    const allowedQuery = r.routeOptions.url === "/api/students/:sid/remediation-candidates"
+      ? ["courseId"]
+      : [];
+    assertAllowedQuery(r.query ?? {}, allowedQuery);
+    assertSafeApiInput(r.params ?? {});
+    if (r.body !== undefined) {
+      // Binary import endpoints are separately restricted by the proxy's
+      // upload limit and their content-type-specific validation.
+      if (Buffer.isBuffer(r.body)) return;
+      assertSafeApiInput(r.body);
+    }
+  });
   app.get("/api/health", async () => {
     await db.command({ ping: 1 });
     return {
@@ -154,8 +176,20 @@ export async function buildApp(
     const actor = await ctx.user(r);
     if (!roles.includes(actor.role))
       ctx.fail(403, "دسترسی این نقش به این عملیات مجاز نیست");
+    if (actor.role === "student" && !route.startsWith("/api/privacy/") && route !== "/api/auth/me" && route !== "/api/access/me" && route !== "/api/auth/logout")
+      await ensureStudentConsent(ctx, actor._id);
+    // Scoped teacher endpoints that directly handle an identifiable student's
+    // educational records must apply the same processing restriction.
+    if (actor.role === "teacher" && !route.startsWith("/api/privacy/")) {
+      const params = r.params as Record<string, unknown> | undefined;
+      const body = r.body as Record<string, unknown> | undefined;
+      const subjectId = typeof params?.sid === "string" ? params.sid :
+        (body && typeof body.studentId === "string" ? body.studentId : null);
+      if (subjectId) await ensureStudentConsent(ctx, subjectId);
+    }
   });
   registerAccessManagement(app, ctx);
+  registerPrivacy(app, ctx);
   const { linkInvitation } = registerIdentity(app, ctx);
   registerPhoneAuth(app, ctx, sms, linkInvitation, db.databaseName);
   registerPasswordReset(app, ctx, resetMailer);

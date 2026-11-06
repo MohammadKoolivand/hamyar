@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "test": "node --import tsx --test --test-concurrency=4 --test-timeout=120000 tests/unit/*.test.ts tests/unit/*.test.mjs tests/integration/*.test.ts",
     "test:e2e": "node scripts/run-e2e.mjs",
+    "security:scan-secrets": "node scripts/scan-secrets.mjs .",
     "check": "npm run typecheck && npm run lint && npm run build && npm test",
     "format": "prettier --write src tests scripts docs *.json *.ts *.mjs",
     "audit:integrity": "node --env-file-if-exists=.env --import tsx scripts/audit-integrity.ts",
@@ -27,7 +28,10 @@
     "predev": "node scripts/prepare-font.mjs",
     "prebuild": "node scripts/prepare-font.mjs",
     "worker:mail": "node --env-file-if-exists=.env --import tsx scripts/mail-worker.ts",
-    "ops:preflight": "node --env-file-if-exists=.env scripts/check-deployment.mjs"
+    "ops:preflight": "node --env-file-if-exists=.env scripts/check-deployment.mjs",
+    "privacy:retention:plan": "node scripts/retention-job.mjs --dry-run",
+    "privacy:retention:verify": "node --test tests/unit/retention-policy.test.mjs",
+    "security:mongo:readonly": "node --env-file-if-exists=.env scripts/check-mongo-readonly.mjs"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

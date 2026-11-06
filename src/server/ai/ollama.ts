@@ -1,3 +1,4 @@
+import { providerTransportErrors } from "../../../scripts/transport-policy.mjs";
 import { z } from "zod";
 import type { HintInput, HintOutput, HintProvider } from "./types";
 const selection = z
@@ -13,6 +14,8 @@ export class OllamaProvider implements HintProvider {
     private config: { baseUrl: string; model: string; timeoutMs: number },
     private transport: typeof fetch = fetch,
   ) {
+    if (process.env.NODE_ENV === "production" && providerTransportErrors(config.baseUrl).length)
+      throw new Error("Ollama requires TLS for remote connections");
     const url = new URL(config.baseUrl);
     if (
       !["http:", "https:"].includes(url.protocol) ||

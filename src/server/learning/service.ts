@@ -1,4 +1,5 @@
 import type { ClientSession } from "mongodb";
+import { feedbackVisible } from "../../lib/practice-answer";
 import type { Context } from "../context";
 import type { Row } from "../db";
 import { mastery, mistake, summarize, type Evidence } from "./model";
@@ -154,19 +155,26 @@ export async function progress(ctx: Context, studentId: string, viewer: Row) {
         : viewer.role === "parent"
           ? { teacherId: { $in: parentLinks.map((l) => l.teacherId) } }
           : {};
+    // Decide publication in the server, not in the browser. Checking only
+    // feedbackMode/state would expose graded progress before resultReleaseAt.
+    // Filter assignment IDs *before* loading evidence, mistakes and mastery.
+    const visibleAssignments = await ctx
+      .c("assignments")
+      .find({ studentId, ...teacherScope }, { session })
+      .project({ _id: 1, policy: 1, state: 1 })
+      .toArray();
+    const permittedIds = visibleAssignments
+      .filter((a) =>
+        viewer.role === "teacher" ||
+        feedbackVisible(a.policy ?? {}, a.state),
+      )
+      .map((a) => a._id);
     const filter = {
-        studentId,
-        ...teacherScope,
-        ...(viewer.role !== "teacher"
-          ? {
-              $or: [
-                { "policy.feedbackMode": { $ne: "end" } },
-                { state: { $in: ["submitted", "completed"] } },
-              ],
-            }
-          : {}),
-      },
-      snapshot = await canonical(ctx, filter, session),
+      studentId,
+      ...teacherScope,
+      _id: { $in: permittedIds },
+    };
+    const snapshot = await canonical(ctx, filter, session),
       { events, assignments, versions } = snapshot;
     const skillIds = [...new Set(events.flatMap((e) => e.skillIds))],
       nodes = await ctx

@@ -1,3 +1,4 @@
+import { assertActiveAssignmentCourse } from "../course-access";
 import { assessHint, HINT_SAFETY_VERSION } from "../ai/hint-safety";
 import { feedbackVisible } from "../../lib/practice-answer";
 import type { AvalaiClient } from "../ai/avalai";
@@ -37,6 +38,20 @@ export function registerPractice(
       .find(u.role === "teacher" ? { teacherId: u._id } : { studentId: u._id })
       .toArray();
     if (u.role !== "student" || !assignments.length) return assignments;
+    // Never expose private course assignments by replaying an old list URL.
+    const permitted = [];
+    for (const a of assignments) {
+      try {
+        await assertActiveAssignmentCourse(ctx, a, u._id);
+        await assertLibraryAssignmentAccess(ctx, a, u._id);
+        permitted.push(a);
+      } catch (error) {
+        if ((error as { statusCode?: number }).statusCode !== 404) throw error;
+      }
+    }
+    assignments.splice(0, assignments.length, ...permitted);
+    if (!assignments.length) return [];
+
     const questionIds = [
       ...new Set(assignments.flatMap((a) => a.questionVersionIds ?? [])),
     ];
@@ -141,7 +156,8 @@ export function registerPractice(
     if (u.role === "parent")
       fail(403, "اولیا گزارش را از پنل فرزند مشاهده می‌کنند");
     if (u.role === "student")
-      await assertLibraryAssignmentAccess(ctx, a, u._id);
+      await assertActiveAssignmentCourse(ctx, a, u._id);
+    await assertLibraryAssignmentAccess(ctx, a, u._id);
     const questions = await c("questionVersions")
       .find({ _id: { $in: a.questionVersionIds } })
       .toArray();
@@ -214,6 +230,7 @@ export function registerPractice(
         })
         .parse(r.body),
       q = await questionFor(a, b.questionId);
+    await assertActiveAssignmentCourse(ctx, a, u._id);
     await assertLibraryAssignmentAccess(ctx, a, u._id);
     return atomic(r, u._id, `attempt:${a._id}`, b, async (session) => {
       const current = await c("assignments").findOne(
@@ -221,6 +238,7 @@ export function registerPractice(
         { session },
       );
       if (!current) fail(404, "مأموریت یافت نشد");
+      await assertActiveAssignmentCourse(ctx, current!, u._id, session);
       await assertLibraryAssignmentAccess(ctx, current!, u._id, session);
       assertOpen(current!.state);
       if (
@@ -300,6 +318,7 @@ export function registerPractice(
         })
         .parse(r.body),
       q = await questionFor(a, b.questionId);
+    await assertActiveAssignmentCourse(ctx, a, u._id);
     await assertLibraryAssignmentAccess(ctx, a, u._id);
     // Provider executes before the transaction: failure never reserves quota. Replay is checked first.
     const key = r.headers["idempotency-key"];
@@ -342,6 +361,7 @@ export function registerPractice(
         { session },
       );
       if (!current) fail(404, "مأموریت یافت نشد");
+      await assertActiveAssignmentCourse(ctx, current!, u._id, session);
       await assertLibraryAssignmentAccess(ctx, current!, u._id, session);
       assertOpen(current!.state);
       if (requestedLevel > (current!.policy.maxHintLevel ?? 3))
@@ -389,6 +409,7 @@ export function registerPractice(
     const b = z
       .object({ reason: z.string().trim().min(3).max(1000) })
       .parse(r.body);
+    await assertActiveAssignmentCourse(ctx, a, u._id);
     await assertLibraryAssignmentAccess(ctx, a, u._id);
     if (!(await c("hintEvents").findOne({ _id: hid, assignmentId: a._id })))
       fail(404, "راهنما یافت نشد");
@@ -418,6 +439,7 @@ export function registerPractice(
       .object({ allowUnanswered: z.boolean().optional() })
       .parse(r.body ?? {});
     // Keep idempotent replays subject to the current publication/membership.
+    await assertActiveAssignmentCourse(ctx, a, u._id);
     await assertLibraryAssignmentAccess(ctx, a, u._id);
     return atomic(r, u._id, `complete:${a._id}`, body, async (session) => {
       const current = (await c("assignments").findOne(
@@ -425,6 +447,7 @@ export function registerPractice(
         { session },
       ))!;
       if (!current) fail(404, "مأموریت یافت نشد");
+      await assertActiveAssignmentCourse(ctx, current, u._id, session);
       await assertLibraryAssignmentAccess(ctx, current, u._id, session);
       if (["submitted", "completed"].includes(current.state))
         return { ok: true };
