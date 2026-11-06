@@ -15,17 +15,17 @@ release=/opt/hodhod/releases/$sha
 # Never overwrite an existing release, and never import local env/private files.
 [[ ! -e "$release" ]]
 install -d -o hodhod -g hodhod "$release"
-tar -xzf "$incoming/source.tar.gz" -C "$release" --no-same-owner
+tar -tzf "$incoming/release.tar.gz" | grep -qx './.next/BUILD_ID'
+tar -tzf "$incoming/release.tar.gz" | grep -qx './node_modules/next/package.json'
+! tar -tzf "$incoming/release.tar.gz" | grep -Eq '^\./(\.env|\.private)(/|$)'
+tar -xzf "$incoming/release.tar.gz" -C "$release" --no-same-owner
 [[ ! -e "$release/.env" && ! -e "$release/.private" ]]
 ln -s /etc/hodhod/staging.env "$release/.env"
 ln -s /var/lib/hodhod/private "$release/.private"
 chown -R hodhod:hodhod "$release"
 cd "$release"
-runuser -u hodhod -- npm ci
-runuser -u hodhod -- npm run ocr:setup
-runuser -u hodhod -- npm run typecheck
-runuser -u hodhod -- npm run lint
-runuser -u hodhod -- npm run build
+# The runtime bundle was built and verified in CI. Never install or build on
+# the server: deployment only activates the exact checked artifact.
 runuser -u hodhod -- npm run ops:preflight -- web
 runuser -u hodhod -- npm run ops:preflight -- exams
 if [[ "$activate" == false ]]; then

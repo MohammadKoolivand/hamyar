@@ -1,0 +1,61 @@
+name: Deep HodHodeh verification
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 2 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  integration-and-e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      TEST_MONGO_URL: mongodb://127.0.0.1:27017/?replicaSet=hamyar-rs
+      MONGO_DB: hamyar_deep_ci
+      AI_PROVIDER: mock
+      APP_ORIGIN: http://127.0.0.1:5174
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Start isolated MongoDB replica set
+        env:
+          HODHOD_MONGO_GLIBC_TUNABLES: glibc.pthread.rseq=1
+        run: |
+          set -euo pipefail
+          docker compose up -d mongo
+          for i in $(seq 1 45); do
+            if [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q mongo)")" = "healthy" ]; then exit 0; fi
+            sleep 2
+          done
+          docker compose logs mongo
+          exit 1
+      - name: Install OCR and shell validation tools
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils tesseract-ocr shellcheck
+      - run: bash -n ops/deploy-staging.sh && shellcheck ops/deploy-staging.sh
+      - run: npm run ocr:setup
+      - run: cp .env.example .env
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run worker:exams > /tmp/hodhod-worker.log 2>&1 &
+      - name: Run browser journeys
+        run: npm run test:e2e
+        env:
+          CI: "true"
+          AUTH_RATE_LIMIT_MAX: "60"
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hodhodeh-deep-ui-evidence
+          path: |
+            test-results/
+            playwright-report/
+            /tmp/hodhod-worker.log
+          if-no-files-found: ignore

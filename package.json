@@ -12,6 +12,7 @@
     "start": "next start --hostname 127.0.0.1 --port 5174",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "test:fast": "node --import tsx --test --test-concurrency=4 --test-timeout=30000 tests/unit/*.test.ts tests/unit/*.test.mjs",
     "test": "node --import tsx --test --test-concurrency=4 --test-timeout=120000 tests/unit/*.test.ts tests/unit/*.test.mjs tests/integration/*.test.ts",
     "test:e2e": "node scripts/run-e2e.mjs",
     "security:scan-secrets": "node scripts/scan-secrets.mjs .",

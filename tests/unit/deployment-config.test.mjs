@@ -121,16 +121,21 @@ test("token SMS preflight validates vendor endpoint and OTP key without leaking 
   assert.ok(!JSON.stringify(invalid).includes("private-token"));
 });
 
-test("staging pushes are verified before automatic activation", async () => {
+test("only verified staging runtime bundles can activate staging", async () => {
   const { readFileSync } = await import("node:fs");
   const verify = readFileSync(".github/workflows/verify.yml", "utf8");
   const deploy = readFileSync(".github/workflows/staging.yml", "utf8");
-  assert.match(verify, /branches: \[main, staging\]/);
-  assert.match(verify, /hodhodeh-source-\$\{\{ github\.sha \}\}/);
+  assert.match(verify, /branches: \[staging\]/);
+  assert.doesNotMatch(verify, /branches: \[main, staging\]/);
+  assert.match(verify, /npm run build/);
+  assert.match(verify, /hodhodeh-runtime-\$\{\{ github\.sha \}\}/);
+  assert.match(verify, /release\.tar\.gz/);
   assert.match(deploy, /workflow_run:/);
   assert.match(deploy, /branches: \[staging\]/);
   assert.match(deploy, /workflow_run\.conclusion == 'success'/);
   assert.match(deploy, /workflow_run\.head_branch == 'staging'/);
   assert.match(deploy, /ACTIVATE:.*workflow_run.*'true'/);
   assert.match(deploy, /StrictHostKeyChecking=yes/);
+  assert.doesNotMatch(deploy, /npm ci/);
+  assert.doesNotMatch(deploy, /npm run build/);
 });

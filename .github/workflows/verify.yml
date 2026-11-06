@@ -2,7 +2,7 @@ name: Verify HodHodeh MVP
 
 on:
   push:
-    branches: [main, staging]
+    branches: [staging]
   pull_request:
   workflow_dispatch:
 
@@ -16,12 +16,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    env:
-      TEST_MONGO_URL: mongodb://127.0.0.1:27017/?replicaSet=hamyar-rs
-      MONGO_DB: hamyar_ci_e2e
-      AI_PROVIDER: mock
-      APP_ORIGIN: http://127.0.0.1:5174
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,67 +24,33 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      - name: Start MongoDB replica set
-        env:
-          # Work around the MongoDB 8 per-CPU rseq guard on newer GitHub runner kernels.
-          HODHOD_MONGO_GLIBC_TUNABLES: glibc.pthread.rseq=1
-        run: |
-          docker compose up -d mongo
-          # GitHub ubuntu-24.04 runners may use a newer Linux kernel: verify actual health.
-          for i in $(seq 1 45); do
-            if [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q mongo)")" = "healthy" ]; then
-              echo "Replica set healthy"; exit 0
-            fi
-            sleep 2
-          done
-          docker compose logs mongo
-          exit 1
-      - name: Install local document tools
-        run: sudo apt-get update && sudo apt-get install -y poppler-utils tesseract-ocr shellcheck
-      - name: Validate deployment shell
-        run: bash -n ops/deploy-staging.sh && shellcheck ops/deploy-staging.sh
-      - run: npm run ocr:setup
-      - run: cp .env.example .env
       - run: npm run typecheck
       - run: npm run lint
+      - run: npm run security:scan-secrets
+      - run: npm run test:fast
       - run: npm run build
-      - name: Verify password recovery (independent of OCR)
-        run: timeout 45s node --import tsx tests/integration/password-reset.test.ts
-      - name: Verify login and logout sessions
-        run: timeout 45s node --import tsx tests/integration/auth-session.test.ts
-      - run: npm test
-      - run: npx playwright install --with-deps chromium
-      - name: Start durable exam worker
-        run: npm run worker:exams > /tmp/hodhod-worker.log 2>&1 &
-      - name: Validate UI and capture light glass screenshots
-        run: npm run test:e2e
-        env:
-          CI: "true"
-          # Synthetic accounts share one loopback IP; production default remains 10.
-          # Dedicated auth tests above still verify the default threshold.
-          AUTH_RATE_LIMIT_MAX: "60"
-      - name: Upload Playwright screenshots and traces
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: hamyar-ui-evidence
-          path: |
-            test-results/
-            playwright-report/
-          if-no-files-found: ignore
-      - name: Package verified source for staging
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') && github.event_name != 'pull_request'
+      - name: Package verified runtime for staging
+        if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
         run: |
+          set -euo pipefail
           mkdir -p /tmp/hodhod-release
-          git archive --format=tar HEAD | gzip -n > /tmp/hodhod-release/source.tar.gz
+          tar \
+            --exclude=.git \
+            --exclude=.env \
+            --exclude=.env.* \
+            --exclude=.private \
+            --exclude=test-results \
+            --exclude=playwright-report \
+            --exclude=coverage \
+            -czf /tmp/hodhod-release/release.tar.gz .
           cd /tmp/hodhod-release
-          sha256sum source.tar.gz > SHA256SUMS
+          sha256sum release.tar.gz > SHA256SUMS
           printf '%s\n' "$GITHUB_SHA" > COMMIT
-      - name: Publish verified staging source
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') && github.event_name != 'pull_request'
+      - name: Publish verified staging runtime
+        if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
-          name: hodhodeh-source-${{ github.sha }}
+          name: hodhodeh-runtime-${{ github.sha }}
           path: /tmp/hodhod-release/
           retention-days: 14
           if-no-files-found: error
