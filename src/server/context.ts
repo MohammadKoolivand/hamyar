@@ -37,14 +37,16 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
       expiresAt: { $gt: new Date() },
     });
     if (!session) fail(401, "نشست منقضی شده است");
-    const u = await c("users").findOne({ _id: session!.userId });
+    const activeSession = session!;
+    const u = await c("users").findOne({ _id: activeSession.userId });
     if (!u || u.disabledAt) fail(401, "حساب فعال یافت نشد");
-    if ((session.securityRevision ?? 0) !== (u.securityRevision ?? 0))
+    const activeUser = u!;
+    if ((activeSession.securityRevision ?? 0) !== (activeUser.securityRevision ?? 0))
       fail(401, "نشست باطل شده است");
-    if (!roleSchema.safeParse(u!.role).success)
+    if (!roleSchema.safeParse(activeUser.role).success)
       fail(403, "نقش حساب معتبر نیست");
-    if (role && u!.role !== role) fail(403, "دسترسی مجاز نیست");
-    return u!;
+    if (role && activeUser.role !== role) fail(403, "دسترسی مجاز نیست");
+    return activeUser;
   }
   const safe = (u: Row) => ({
     _id: u._id,

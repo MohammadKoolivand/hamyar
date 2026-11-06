@@ -10,17 +10,16 @@ test("cookie security cannot be disabled in production", () => {
   const priorNode = process.env.NODE_ENV;
   const priorSecure = process.env.COOKIE_SECURE;
   try {
-    process.env.NODE_ENV = "production";
-    process.env.COOKIE_SECURE = "false";
+    Object.assign(process.env, { NODE_ENV: "production", COOKIE_SECURE: "false" });
     assert.deepEqual(sessionCookieOptions(), {
       httpOnly: true, sameSite: "strict", secure: true,
       path: "/", maxAge: 604800,
     });
   } finally {
-    if (priorNode === undefined) delete process.env.NODE_ENV;
-    else process.env.NODE_ENV = priorNode;
-    if (priorSecure === undefined) delete process.env.COOKIE_SECURE;
-    else process.env.COOKIE_SECURE = priorSecure;
+    if (priorNode === undefined) Reflect.deleteProperty(process.env, "NODE_ENV");
+    else Object.assign(process.env, { NODE_ENV: priorNode });
+    if (priorSecure === undefined) Reflect.deleteProperty(process.env, "COOKIE_SECURE");
+    else Object.assign(process.env, { COOKIE_SECURE: priorSecure });
   }
 });
 

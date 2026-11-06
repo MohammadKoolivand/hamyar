@@ -11,21 +11,26 @@ export function consentPolicyVersion(env: NodeJS.ProcessEnv = process.env) {
   return value;
 }
 export const CONSENT_SCOPE = "educational-processing:v1";
+
+function valueOf(value: object | null | undefined, key: string): unknown {
+  return value ? (value as Record<string, unknown>)[key] : undefined;
+}
+
 export function isValidGuardianConsent(
-  link: { status?: unknown; verification?: unknown; verifiedAt?: unknown },
-  consent: { status?: unknown; policyVersion?: unknown; scope?: unknown; guardianId?: unknown; studentId?: unknown } | null,
+  link: object | null,
+  consent: object | null,
   guardianId: string,
   studentId: string,
   version: string,
 ) {
-  return link.status === "verified" && typeof link.verifiedAt === "string" &&
-    consent?.status === "granted" && consent.guardianId === guardianId &&
-    consent.studentId === studentId && consent.scope === CONSENT_SCOPE &&
-    consent.policyVersion === version;
+  return valueOf(link, "status") === "verified" && typeof valueOf(link, "verifiedAt") === "string" &&
+    valueOf(consent, "status") === "granted" && valueOf(consent, "guardianId") === guardianId &&
+    valueOf(consent, "studentId") === studentId && valueOf(consent, "scope") === CONSENT_SCOPE &&
+    valueOf(consent, "policyVersion") === version;
 }
 
 /** A student-wide withdrawal overrides otherwise valid guardian grants until
  * a new, verified grant explicitly resumes processing. */
-export function consentProcessingSuspended(student: { consentProcessingSuspended?: unknown } | null) {
-  return !student || student.consentProcessingSuspended === true;
+export function consentProcessingSuspended(student: object | null) {
+  return !student || valueOf(student, "consentProcessingSuspended") === true;
 }

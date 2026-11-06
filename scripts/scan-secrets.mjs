@@ -1,6 +1,6 @@
 /** Offline secret scanner. Only locations and rule names are printed, never values. */
 import { readdir, readFile, stat } from 'node:fs/promises';
-import { resolve, relative, basename, extname } from 'node:path';
+import { resolve, relative, extname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const ignoredDirs = new Set(['node_modules', '.git', 'coverage', 'test-results', 'playwright-report']);

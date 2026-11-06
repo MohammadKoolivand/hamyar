@@ -1,5 +1,5 @@
 /** Intentional report-only job. Requires policy review before any destructive implementation is enabled. */
-import { policyMetadata, retentionCategories, retentionPlan, canExecuteRetention } from './retention-policy.mjs';
+import { policyMetadata, retentionPlan, canExecuteRetention } from './retention-policy.mjs';
 const requestedExecute=process.argv.includes('--execute');
 const approvalErrors=canExecuteRetention(policyMetadata,process.env);
 const report={version:policyMetadata.version, policyStatus:policyMetadata.status, mode:'DRY_RUN', executionRequested:requestedExecute, deletionPerformed:false, categories:retentionPlan(), blockers:approvalErrors, externalSystemsRequireIndependentReview:true};

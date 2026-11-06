@@ -1,8 +1,8 @@
 import type { FastifyInstance } from "fastify";
-import type { ClientSession } from "mongodb";
+import type { ClientSession, Filter } from "mongodb";
 import type { Context } from "../context";
 import { z } from "zod";
-import { randomBytes } from "node:crypto";
+import type { Row } from "../db";
 import { consentAuditKey, consentTextFingerprint, makeConsentEvent, validateConsentHistory, requiresFreshConsent } from "../../../scripts/consent-version-policy.mjs";
 import { CONSENT_SCOPE, consentPolicyVersion, isValidGuardianConsent, studentConsentRequired, consentProcessingSuspended } from "../security/privacy-policy";
 
@@ -174,8 +174,9 @@ export function registerPrivacy(app: FastifyInstance, ctx: Context) {
     const { requestId } = z.object({ requestId: uuid }).parse(r.params);
     const item = await c("dataDeletionRequests").findOne({ _id: requestId, ...(actor.role === "super_admin" ? {} : { requesterId: actor._id }) });
     if (!item) fail(404, "درخواست یافت نشد");
-    return { requestId: item._id, status: item.status, requestedAt: item.requestedAt, completedAt: item.completedAt ?? null,
-      retentionCategories: item.retentionCategories ?? [], externalTasks: item.externalTasks ?? [] };
+    const request = item!;
+    return { requestId: request._id, status: request.status, requestedAt: request.requestedAt, completedAt: request.completedAt ?? null,
+      retentionCategories: request.retentionCategories ?? [], externalTasks: request.externalTasks ?? [] };
   });
 
   // Read-only subject data inventory for the privacy reviewer. Deliberately
@@ -185,12 +186,13 @@ export function registerPrivacy(app: FastifyInstance, ctx: Context) {
     const { requestId } = z.object({ requestId: uuid }).parse(r.params);
     const item = await c("dataDeletionRequests").findOne({ _id: requestId });
     if (!item) fail(404, "درخواست یافت نشد");
-    const subjectId = item.subjectId as string;
+    const request = item!;
+    const subjectId = request.subjectId as string;
     const assignments = await c("assignments").find({ studentId: subjectId }).project({ _id: 1 }).toArray();
     const assignmentIds = assignments.map(a => a._id);
     const attempts = assignmentIds.length ? await c("attempts").find({ assignmentId: { $in: assignmentIds } }).project({ _id: 1 }).toArray() : [];
     const counts: Record<string, number> = {};
-    for (const [name, filter] of [
+    const inventoryFilters: Array<[string, Filter<Row>]> = [
       ["users", { _id: subjectId }], ["sessions", { userId: subjectId }],
       ["enrollments", { studentId: subjectId }], ["relations", { studentId: subjectId }],
       ["parentLinks", { $or: [{ studentId: subjectId }, { parentId: subjectId }] }],
@@ -204,7 +206,8 @@ export function registerPrivacy(app: FastifyInstance, ctx: Context) {
       ["courseRequests", { studentId: subjectId }],
       ["guardianConsents", { studentId: subjectId }],
       ["dataDeletionRequests", { subjectId }],
-    ] as const) counts[name] = await c(name).countDocuments(filter);
+    ];
+    for (const [name, filter] of inventoryFilters) counts[name] = await c(name).countDocuments(filter);
     return { requestId, counts, externalSystemsRequireManualVerification: ["sms", "smtp", "ai", "backups", "object_storage"],
       note: "وجود داده در سامانه‌های بیرونی از طریق این درخواست تأیید نمی‌شود" };
   });
@@ -219,18 +222,20 @@ export function registerPrivacy(app: FastifyInstance, ctx: Context) {
     return ctx.transaction(async (session) => {
       const req = await c("dataDeletionRequests").findOne({ _id: requestId, status: "pending_review" }, { session });
       if (!req) fail(409, "درخواست در انتظار بررسی یافت نشد");
-      if (req.subjectId === admin._id) fail(403, "تأیید حذف حساب خود مجاز نیست");
-      const subject = await c("users").findOne({ _id: req.subjectId }, { session });
+      const request = req!;
+      if (request.subjectId === admin._id) fail(403, "تأیید حذف حساب خود مجاز نیست");
+      const subject = await c("users").findOne({ _id: request.subjectId }, { session });
       if (!subject) fail(404, "حساب یافت نشد");
       const locked = await c("dataDeletionRequests").updateOne({ _id: requestId, status: "pending_review" },
         { $set: { status: "processing", reviewedBy: admin._id, legalReviewReference: b.legalReviewReference, retentionDecisionReference: b.retentionDecisionReference } }, { session });
       if (!locked.modifiedCount) fail(409, "درخواست هم‌زمان پردازش شده است");
       // Real account erasure: invalidate sessions and tokens before any later request.
-      for (const [name, filter] of [
-        ["sessions", { userId: req.subjectId }], ["passwordResetTokens", { userId: req.subjectId }],
-        ["emailVerificationTokens", { userId: req.subjectId }], ["parentLinks", { $or: [{ parentId: req.subjectId }, { studentId: req.subjectId }] }],
-      ] as const) await c(name).deleteMany(filter, { session });
-      await c("users").updateOne({ _id: req.subjectId }, { $unset: {
+      const deletionFilters: Array<[string, Filter<Row>]> = [
+        ["sessions", { userId: request.subjectId }], ["passwordResetTokens", { userId: request.subjectId }],
+        ["emailVerificationTokens", { userId: request.subjectId }], ["parentLinks", { $or: [{ parentId: request.subjectId }, { studentId: request.subjectId }] }],
+      ];
+      for (const [name, filter] of deletionFilters) await c(name).deleteMany(filter, { session });
+      await c("users").updateOne({ _id: request.subjectId }, { $unset: {
         name: "", email: "", phone: "", passwordHash: "", emailVerified: "", phoneVerified: "",
       }, $set: { disabledAt: now(), erasedAt: now(), displayName: "حساب حذف‌شده" }, $inc: { securityRevision: 1 } }, { session });
       const retentionCategories = ["educational_records", "assessment_responses", "audit_trail", "legal_obligations"];

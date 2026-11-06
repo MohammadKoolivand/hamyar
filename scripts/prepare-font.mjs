@@ -1,4 +1,3 @@
-/* global console */
 import { copyFile, access } from "node:fs/promises";
 const licensed = ".private/fonts/IRANSansXFaNum-Regular.ttf";
 let source = "src/assets/fonts/Poppins-Regular.ttf";
