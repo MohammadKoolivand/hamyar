@@ -16,7 +16,7 @@
     "test": "node --import tsx --test --test-concurrency=4 --test-timeout=120000 tests/unit/*.test.ts tests/unit/*.test.mjs tests/integration/*.test.ts",
     "test:e2e": "node scripts/run-e2e.mjs",
     "security:scan-secrets": "node scripts/scan-secrets.mjs .",
-    "check": "npm run typecheck && npm run lint && npm run build && npm test",
+    "check": "npm run typecheck && npm run lint && npm run test:fast",
     "format": "prettier --write src tests scripts docs *.json *.ts *.mjs",
     "audit:integrity": "node --env-file-if-exists=.env --import tsx scripts/audit-integrity.ts",
     "migrate:replica": "node --env-file-if-exists=.env --import tsx scripts/copy-to-replica.ts",
@@ -32,7 +32,8 @@
     "ops:preflight": "node --env-file-if-exists=.env scripts/check-deployment.mjs",
     "privacy:retention:plan": "node scripts/retention-job.mjs --dry-run",
     "privacy:retention:verify": "node --test tests/unit/retention-policy.test.mjs",
-    "security:mongo:readonly": "node --env-file-if-exists=.env scripts/check-mongo-readonly.mjs"
+    "security:mongo:readonly": "node --env-file-if-exists=.env scripts/check-mongo-readonly.mjs",
+    "check:full": "npm run typecheck && npm run lint && npm run build && npm test"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

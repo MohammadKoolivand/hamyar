@@ -1,3 +1,5 @@
+> برای توسعه سریع و به‌روزرسانی سادهٔ Staging، راهنمای [MVP_SIMPLE_WORKFLOW.md](MVP_SIMPLE_WORKFLOW.md) را ببینید.
+
 # هدهده — HodHodeh
 
 Next.js تمام‌استک، TypeScript، Tailwind CSS و MongoDB. رابط فارسی RTL؛ Poppins محلی و IRANSans دارای لایسنس دستگاه با next/font/local و fallback فارسی. یک برنامه Node.js، یک پایگاه داده، بدون monorepo یا سرور API جدا.
