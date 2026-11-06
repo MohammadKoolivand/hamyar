@@ -36,3 +36,6 @@ Workflow **Deep HodHodeh verification** دیگر هفتگی خودکار اجر�
 - اجرای Workflowها و اتصال واقعی سرور در این بسته تست نشده است.
 - Verify روی Pull Request هم اجرا می‌شود، اما فقط Push موفق به `staging` می‌تواند Deploy را شروع کند.
 - اگر Commit جدیدتری وارد `staging` شده باشد، Deploy قدیمی کنار گذاشته می‌شود.
+
+
+> **Current staging override (MVP without users):** see `MVP_BUILD_ONLY.md`. Automatic Verify now runs only `npm ci`, `npm run build` and release packaging.
