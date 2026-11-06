@@ -124,6 +124,7 @@ export class MockProvider implements HintProvider {
 }
 export const policySchema = z.object({
   feedbackMode: z.enum(["immediate", "end"]).default("immediate"),
+  resultReleaseAt: z.string().datetime({ offset: true }).optional(),
   maxAttempts: z.number().int().min(1).max(10),
   maxHints: z.number().int().min(0).max(3),
   independent: z.boolean(),

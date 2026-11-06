@@ -62,11 +62,10 @@ test("report includes ordered questions, actual answers and keys after submissio
       { questionId: wrong._id, answer: "یک" },
       f.student,
     );
-    const before = (
-      await f.request(path + "/report", undefined, f.student)
-    ).json();
-    assert.equal(before.questions[0].reference, undefined);
-    assert.equal(before.questions[2].result, "unanswered");
+    assert.equal(
+      (await f.request(path + "/report", undefined, f.student)).statusCode,
+      409,
+    );
     assert.equal(
       (await f.request(path + "/complete", {}, f.student)).statusCode,
       409,

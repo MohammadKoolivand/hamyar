@@ -21,7 +21,7 @@ const credentials = z
     password: z.string().min(10).max(128),
   })
   .strict();
-const fail = (status: number, message: string) => {
+const fail = (status: number, message: string): never => {
   throw Object.assign(new Error(message), { statusCode: status });
 };
 

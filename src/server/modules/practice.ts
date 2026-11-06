@@ -9,10 +9,8 @@ import { assertOpen, transition } from "../state";
 import { guide } from "../ai/tutor";
 import { recordLearning } from "../learning/service";
 import { recordQuestionDifficultyResponse } from "../learning/question-difficulty";
-import {
-  sourceCategory,
-  type QuestionSource,
-} from "../../lib/question-source";
+import { sourceCategory, type QuestionSource } from "../../lib/question-source";
+import { assertLibraryAssignmentAccess } from "../library-access";
 export function registerPractice(
   app: FastifyInstance,
   ctx: Context,
@@ -81,13 +79,14 @@ export function registerPractice(
       const assignedQuestions: CatalogQuestion[] = (
         assignment.questionVersionIds ?? []
       ).flatMap((questionId: string) => {
-          const question = questionsById.get(questionId);
-          return question ? [question] : [];
-        });
-      const difficultyScores: number[] = assignedQuestions.flatMap((question) =>
-        typeof question.difficultyScore === "number"
-          ? [question.difficultyScore]
-          : [],
+        const question = questionsById.get(questionId);
+        return question ? [question] : [];
+      });
+      const difficultyScores: number[] = assignedQuestions.flatMap(
+        (question) =>
+          typeof question.difficultyScore === "number"
+            ? [question.difficultyScore]
+            : [],
       );
       const results = resultsByAssignment.get(assignment._id) ?? [];
       const evaluated = feedbackVisible(assignment.policy, assignment.state)
@@ -141,6 +140,8 @@ export function registerPractice(
     const { u, a } = await assignment(r);
     if (u.role === "parent")
       fail(403, "اولیا گزارش را از پنل فرزند مشاهده می‌کنند");
+    if (u.role === "student")
+      await assertLibraryAssignmentAccess(ctx, a, u._id);
     const questions = await c("questionVersions")
       .find({ _id: { $in: a.questionVersionIds } })
       .toArray();
@@ -177,7 +178,9 @@ export function registerPractice(
         if (u.role === "teacher") return true;
         if (h.provider === "teacher-solution")
           return Boolean(
-            a.policy.allowFullSolution && a.policy.maxHintLevel >= 4,
+            feedbackVisible(a.policy, a.state) &&
+              a.policy.allowFullSolution &&
+              a.policy.maxHintLevel >= 4,
           );
         const q = questions.find((q) => q._id === h.questionVersionId);
         return (
@@ -211,11 +214,14 @@ export function registerPractice(
         })
         .parse(r.body),
       q = await questionFor(a, b.questionId);
+    await assertLibraryAssignmentAccess(ctx, a, u._id);
     return atomic(r, u._id, `attempt:${a._id}`, b, async (session) => {
       const current = await c("assignments").findOne(
         { _id: a._id, studentId: u._id },
         { session },
       );
+      if (!current) fail(404, "مأموریت یافت نشد");
+      await assertLibraryAssignmentAccess(ctx, current!, u._id, session);
       assertOpen(current!.state);
       if (
         b.expectedAttempt !== undefined &&
@@ -270,11 +276,12 @@ export function registerPractice(
         session,
       );
       await recordLearning(ctx, current!, q, attempt, evaluation, session);
-      if (a.missionId) await c("missions").updateOne(
-        { _id: a.missionId },
-        { $set: { state: "in_progress" } },
-        { session },
-      );
+      if (a.missionId)
+        await c("missions").updateOne(
+          { _id: a.missionId },
+          { $set: { state: "in_progress" } },
+          { session },
+        );
       await boundary("after_evaluation_insert");
       return {
         attempt,
@@ -293,6 +300,7 @@ export function registerPractice(
         })
         .parse(r.body),
       q = await questionFor(a, b.questionId);
+    await assertLibraryAssignmentAccess(ctx, a, u._id);
     // Provider executes before the transaction: failure never reserves quota. Replay is checked first.
     const key = r.headers["idempotency-key"];
     if (key) {
@@ -333,6 +341,8 @@ export function registerPractice(
         { _id: a._id, studentId: u._id },
         { session },
       );
+      if (!current) fail(404, "مأموریت یافت نشد");
+      await assertLibraryAssignmentAccess(ctx, current!, u._id, session);
       assertOpen(current!.state);
       if (requestedLevel > (current!.policy.maxHintLevel ?? 3))
         fail(409, "سطح راهنمایی مجاز نیست");
@@ -379,6 +389,7 @@ export function registerPractice(
     const b = z
       .object({ reason: z.string().trim().min(3).max(1000) })
       .parse(r.body);
+    await assertLibraryAssignmentAccess(ctx, a, u._id);
     if (!(await c("hintEvents").findOne({ _id: hid, assignmentId: a._id })))
       fail(404, "راهنما یافت نشد");
     return atomic(r, u._id, `hint-report:${hid}`, b, async (session) => {
@@ -406,11 +417,15 @@ export function registerPractice(
     const body = z
       .object({ allowUnanswered: z.boolean().optional() })
       .parse(r.body ?? {});
+    // Keep idempotent replays subject to the current publication/membership.
+    await assertLibraryAssignmentAccess(ctx, a, u._id);
     return atomic(r, u._id, `complete:${a._id}`, body, async (session) => {
       const current = (await c("assignments").findOne(
         { _id: a._id, studentId: u._id },
         { session },
       ))!;
+      if (!current) fail(404, "مأموریت یافت نشد");
+      await assertLibraryAssignmentAccess(ctx, current, u._id, session);
       if (["submitted", "completed"].includes(current.state))
         return { ok: true };
       assertOpen(current.state);
@@ -447,11 +462,12 @@ export function registerPractice(
         { $set: { state: next } },
         { session },
       );
-      if (current.missionId) await c("missions").updateOne(
-        { _id: current.missionId },
-        { $set: { state: next } },
-        { session },
-      );
+      if (current.missionId)
+        await c("missions").updateOne(
+          { _id: current.missionId },
+          { $set: { state: next } },
+          { session },
+        );
       return { ok: true };
     });
   });

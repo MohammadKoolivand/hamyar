@@ -208,6 +208,7 @@ export interface Assignment {
   progress: Record<string, { attempts: number; hints: number }>;
   policy: {
     feedbackMode?: "immediate" | "end";
+    resultReleaseAt?: string;
     maxHints: number;
     maxAttempts: number;
     independent: boolean;

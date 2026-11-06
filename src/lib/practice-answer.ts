@@ -16,10 +16,32 @@ export function practiceAnswer(
   );
 }
 export function feedbackVisible(
-  policy: { feedbackMode?: string },
+  policy: { feedbackMode?: string; resultReleaseAt?: string },
   state: string,
+  at = new Date(),
 ) {
+  if (!releaseTimeReached(policy, at)) return false;
   return (
     policy.feedbackMode !== "end" || ["submitted", "completed"].includes(state)
   );
+}
+
+export function finalResultVisible(
+  policy: { resultReleaseAt?: string },
+  state: string,
+  at = new Date(),
+) {
+  return (
+    ["submitted", "completed"].includes(state) &&
+    releaseTimeReached(policy, at)
+  );
+}
+
+function releaseTimeReached(
+  policy: { resultReleaseAt?: string },
+  at: Date,
+) {
+  if (!policy.resultReleaseAt) return true;
+  const release = new Date(policy.resultReleaseAt).getTime();
+  return Number.isFinite(release) && release <= at.getTime();
 }

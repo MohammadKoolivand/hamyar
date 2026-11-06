@@ -71,6 +71,15 @@ export async function connect(
     .createIndex({ teacherId: 1, studentId: 1, status: 1 });
   await db.collection("enrollments").createIndex({ studentId: 1, status: 1 });
   await db
+    .collection("libraryPublications")
+    .createIndex(
+      { teacherId: 1, courseId: 1, questionVersionId: 1 },
+      { unique: true },
+    );
+  await db
+    .collection("libraryPublications")
+    .createIndex({ courseId: 1, published: 1 });
+  await db
     .collection("sessions")
     .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
   await db

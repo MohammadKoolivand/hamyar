@@ -1,4 +1,4 @@
-import { feedbackVisible } from "../../lib/practice-answer";
+import { finalResultVisible } from "../../lib/practice-answer";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
 import { z } from "zod";
@@ -13,8 +13,8 @@ export function registerAnalytics(
   const { c, user, assignment, now, fail } = ctx;
   app.get("/api/assignments/:aid/report", async (r) => {
     const { u, a } = await assignment(r);
-    if (u.role !== "teacher" && !feedbackVisible(a.policy, a.state))
-      fail(409, "نتیجه پس از پایان تمرین نمایش داده می‌شود");
+    if (u.role !== "teacher" && !finalResultVisible(a.policy, a.state))
+      fail(409, "نتیجه هنوز منتشر نشده است");
     return ctx.transaction(async (session) => {
       const attempts = await c("attempts")
           .find({ assignmentId: a._id }, { session })
