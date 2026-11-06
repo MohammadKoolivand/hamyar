@@ -1,5 +1,9 @@
 name: Deploy verified staging release
 on:
+  workflow_run:
+    workflows: ["Verify HodHodeh MVP"]
+    branches: [staging]
+    types: [completed]
   workflow_dispatch:
     inputs:
       run_id:
@@ -19,7 +23,12 @@ concurrency:
   cancel-in-progress: false
 jobs:
   staging:
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'staging') ||
+      github.event_name == 'workflow_dispatch'
     environment: staging
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -28,19 +37,20 @@ jobs:
         id: source
         env:
           GH_TOKEN: ${{ github.token }}
-          RUN_ID: ${{ inputs.run_id }}
+          RUN_ID: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.id || inputs.run_id }}
+          EXPECTED_BRANCH: ${{ github.event_name == 'workflow_run' && 'staging' || 'main' }}
         run: |
           set -euo pipefail
           [[ "$RUN_ID" =~ ^[0-9]+$ ]]
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" > run.json
-          jq -e '.conclusion == "success" and .head_branch == "main" and (.event == "push" or .event == "workflow_dispatch") and .path == ".github/workflows/verify.yml"' run.json > /dev/null
+          jq -e --arg branch "$EXPECTED_BRANCH" '.conclusion == "success" and .head_branch == $branch and (.event == "push" or .event == "workflow_dispatch") and .path == ".github/workflows/verify.yml"' run.json > /dev/null
           SHA=$(jq -r .head_sha run.json)
           [[ "$SHA" =~ ^[a-f0-9]{40}$ ]]
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@v4
         with:
           name: hodhodeh-source-${{ steps.source.outputs.sha }}
-          run-id: ${{ inputs.run_id }}
+          run-id: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.id || inputs.run_id }}
           github-token: ${{ github.token }}
           path: release
       - name: Verify bundle and configure pinned SSH
@@ -60,7 +70,7 @@ jobs:
       - name: Upload and prepare or activate
         env:
           SHA: ${{ steps.source.outputs.sha }}
-          ACTIVATE: ${{ inputs.activate }}
+          ACTIVATE: ${{ github.event_name == 'workflow_run' && 'true' || inputs.activate }}
           HOST: ${{ vars.STAGING_HOST }}
           USER: ${{ vars.STAGING_USER }}
           PORT: ${{ vars.STAGING_PORT }}
