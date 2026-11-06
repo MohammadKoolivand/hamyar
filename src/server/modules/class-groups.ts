@@ -53,6 +53,7 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
         title: z.string().trim().min(2).max(100),
         studentIds: ids,
       })
+      .strict()
       .parse(r.body);
     const course = await c("courses").findOne({
       _id: body.courseId,
@@ -77,7 +78,10 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
   app.post("/api/class-groups/:gid/members", async (r) => {
     const teacher = await user(r, "teacher");
     const { gid } = z.object({ gid: uuid }).parse(r.params);
-    const { studentIds } = z.object({ studentIds: ids }).parse(r.body);
+    const { studentIds } = z
+      .object({ studentIds: ids })
+      .strict()
+      .parse(r.body);
     return ctx.transaction(async (session) => {
       const group = await c("classGroups").findOne(
         {
@@ -146,6 +150,7 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
           .refine((v) => new Set(v).size === v.length),
         policy: policySchema,
       })
+      .strict()
       .parse(r.body);
     const group = await c("classGroups").findOne({
       _id: body.groupId,

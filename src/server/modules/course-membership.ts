@@ -36,7 +36,10 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
     config: { rateLimit: { max: 10, timeWindow: "1 minute" } },
   }, async (r) => {
     const student = await user(r, "student");
-    const { code } = z.object({ code: z.string().regex(/^[a-f0-9]{48}$/) }).parse(r.body);
+    const { code } = z
+      .object({ code: z.string().regex(/^[a-f0-9]{48}$/) })
+      .strict()
+      .parse(r.body);
     return ctx.transaction(async (session) => {
       const record = await c("courseJoinCodes").findOne({
         tokenHash: hash(code), expiresAt: { $gt: new Date() },
@@ -117,7 +120,10 @@ export function registerCourseMembership(app: FastifyInstance, ctx: Context) {
   app.post("/api/course-requests/:rid/decision", async (r) => {
     const teacher = await user(r, "teacher");
     const { rid } = z.object({ rid: uuid }).parse(r.params);
-    const { decision } = z.object({ decision: z.enum(["approve", "decline"]) }).parse(r.body);
+    const { decision } = z
+      .object({ decision: z.enum(["approve", "decline"]) })
+      .strict()
+      .parse(r.body);
     return ctx.transaction(async (session) => {
       const request = await c("courseRequests").findOne({
         _id: rid, teacherId: teacher._id, status: "pending",

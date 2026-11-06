@@ -15,10 +15,12 @@ import { writes, type WriteHooks } from "./transactions";
 const id = () => randomUUID(),
   now = () => new Date().toISOString(),
   hash = (s: string) => createHash("sha256").update(s).digest("hex");
-const credentials = z.object({
-  email: loginIdentifierSchema,
-  password: z.string().min(10).max(128),
-});
+const credentials = z
+  .object({
+    email: loginIdentifierSchema,
+    password: z.string().min(10).max(128),
+  })
+  .strict();
 const fail = (status: number, message: string) => {
   throw Object.assign(new Error(message), { statusCode: status });
 };

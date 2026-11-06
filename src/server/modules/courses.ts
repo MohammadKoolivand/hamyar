@@ -23,10 +23,13 @@ export function registerCourses(app: FastifyInstance, ctx: Context) {
 
   app.post("/api/courses", async (r) => {
     const teacher = await user(r, "teacher");
-    const body = z.object({
-      title: z.string().trim().min(2).max(120),
-      subject: z.string().trim().min(2).max(100),
-    }).parse(r.body);
+    const body = z
+      .object({
+        title: z.string().trim().min(2).max(120),
+        subject: z.string().trim().min(2).max(100),
+      })
+      .strict()
+      .parse(r.body);
     const row = {
       _id: id(),
       teacherId: teacher._id,

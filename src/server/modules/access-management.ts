@@ -70,7 +70,7 @@ export function registerAccessManagement(app: FastifyInstance, ctx: Context) {
       ctx.credentials.extend({
         name: z.string().trim().min(2).max(100),
         role: roleSchema,
-      }),
+      }).strict(),
     ]).parse(r.body);
     const contact = "phone" in b
       ? { phone: b.phone, phoneVerified: false }
@@ -119,6 +119,7 @@ export function registerAccessManagement(app: FastifyInstance, ctx: Context) {
     const uid = z.uuid().parse((r.params as { uid: string }).uid);
     const b = z
       .object({ role: roleSchema, disabled: z.boolean() })
+      .strict()
       .parse(r.body);
     if (uid === actor._id)
       fail(409, "تغییر نقش یا مسدودکردن حساب خودتان از این مسیر مجاز نیست");
@@ -187,6 +188,7 @@ export function registerAccessManagement(app: FastifyInstance, ctx: Context) {
         teacherId: z.uuid(),
         permissions: z.array(staffPermissionSchema).min(1).max(3),
       })
+      .strict()
       .parse(r.body);
     return ctx.transaction(async (session) => {
       await assertAdmin(actor._id, session);
@@ -331,6 +333,7 @@ export function registerAccessManagement(app: FastifyInstance, ctx: Context) {
         role: z.enum(["student", "parent"]),
         studentId: z.uuid().optional(),
       })
+      .strict()
       .parse(r.body);
     if (
       b.role === "parent" &&

@@ -114,6 +114,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
           // Roles cannot be escalated through public registration.
           role: z.enum(["teacher", "student"]).default("teacher"),
         })
+        .strict()
         .parse(r.body);
       const salt = randomBytes(16).toString("hex");
       const uid = id();
@@ -210,6 +211,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
           studentId: z.string().uuid().optional(),
           courseId: z.string().uuid().optional(),
         })
+        .strict()
         .parse(r.body);
     if (
       b.role === "parent" &&
@@ -262,6 +264,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
           name: z.string().min(2).max(100),
           token: z.string().min(20).max(100),
         })
+        .strict()
         .parse(r.body);
       const contact = b.phone ? { phone: b.phone } : { email: b.email! };
       const existing = await c("users").findOne(contact);
@@ -339,6 +342,7 @@ export function registerIdentity(app: FastifyInstance, ctx: Context) {
         token: z.string().min(20).max(100),
         phone: phoneSchema.optional(),
       })
+      .strict()
       .parse(r.body);
     if (phone && student.phone && phone !== student.phone)
       fail(400, "شماره موبایل با حساب شما مطابقت ندارد");
