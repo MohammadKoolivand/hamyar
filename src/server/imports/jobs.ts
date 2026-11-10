@@ -174,7 +174,7 @@ async function runLeasedExamJob(ctx: Context) {
             await ctx.c("examImportJobs").updateOne(
               { _id: job._id, leaseToken: token },
               {
-                $set: { stage: `${kind}:${p.stage}`, processedPage: p.page },
+                $set: { stage: `${kind}:${p.stage}`, processedPage: p.page, totalPages: p.totalPages, progressUpdatedAt: new Date().toISOString() },
               },
             );
           })
@@ -205,6 +205,16 @@ async function runLeasedExamJob(ctx: Context) {
             },
           },
         );
+      } catch (error) {
+        const diagnostic = error as { stderr?: string; message?: string };
+        if (!/FormatError|InvalidPDFException|UnknownErrorException/.test(`${diagnostic.stderr ?? ""} ${diagnostic.message ?? ""}`)) throw error;
+        stage = `${kind}:ocr_fallback`;
+        await ctx.c("examImportJobs").updateOne({ _id: job._id, leaseToken: token }, { $set: { stage } });
+        await exec(process.execPath, ["--max-old-space-size=768", "--import", "tsx", resolve("scripts/extract-document.ts"), path, dir, "--raster"], {
+          timeout: 20 * 60 * 1000,
+          maxBuffer: 256 * 1024,
+          env: { NODE_ENV: process.env.NODE_ENV ?? "production", PATH: process.env.PATH, OCR_DATA_DIR: process.env.OCR_DATA_DIR, OCR_LANG: exam.ocrLanguage ?? "fas", TESSERACT_BIN: process.env.TESSERACT_BIN, PDFTOPPM_BIN: process.env.PDFTOPPM_BIN, OMP_THREAD_LIMIT: "1" },
+        });
       } finally {
         clearInterval(progress);
       }
@@ -432,6 +442,8 @@ async function runLeasedExamJob(ctx: Context) {
       );
     });
   } catch (error) {
+    const failure = error as { stderr?: string; message?: string };
+    const unreadable = `${failure.stderr ?? ""} ${failure.message ?? ""}`.match(/PDF_PAGE_UNREADABLE:(\d+):(\d+)/);
     await ctx.c("examImportJobs").updateOne(
       { _id: job._id, leaseToken: token },
       {
@@ -440,7 +452,9 @@ async function runLeasedExamJob(ctx: Context) {
           stage: "failed",
           errorCode: "DOCUMENT_PROCESSING_FAILED",
           errorMessage:
-            "پردازش محلی انجام نشد؛ فایل، نصب ابزار OCR و مدل‌های زبان را بررسی کنید.",
+            unreadable
+              ? `صفحهٔ ${unreadable[1]} از ${unreadable[2]} صفحهٔ PDF قابل خواندن نیست. نسخهٔ سالم فایل را دوباره بارگذاری کنید؛ صفحات خراب خودکار حذف نمی‌شوند.`
+              : "پردازش محلی انجام نشد؛ فایل، نصب ابزار OCR و مدل‌های زبان را بررسی کنید.",
           completedAt: ctx.now(),
         },
         $unset: { leaseToken: "", leaseUntil: "" },

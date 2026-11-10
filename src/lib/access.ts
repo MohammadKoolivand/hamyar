@@ -143,6 +143,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/exam-imports/:eid/items/:iid/review",
   ],
   DELETE: [
+    "/api/exam-imports/:eid",
     "/api/exam-imports/:eid/files/:kind",
     "/api/exam-imports/:eid/files",
   ],

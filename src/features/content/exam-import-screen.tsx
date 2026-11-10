@@ -383,12 +383,13 @@ export function ExamImportScreen({
             )}
             <PagedList items={list} label="آزمون‌های واردشده">
               {(e) => (
+                <div key={e._id} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2">
                 <button
                   disabled={busy}
                   type="button"
                   key={e._id}
                   onClick={() => void run(() => load(e._id))}
-                  className="flex flex-wrap justify-between gap-2 rounded-xl border border-slate-200 bg-white p-4 text-right"
+                  className="flex flex-1 flex-wrap justify-between gap-2 p-2 text-right"
                 >
                   <span>{e.title}</span>
                   <span className="text-xs text-slate-500">
@@ -397,6 +398,15 @@ export function ExamImportScreen({
                       : "در انتظار فایل / پردازش"}
                   </span>
                 </button>
+                <Button type="button" variant="outline" disabled={busy || e.state === "processing"} onClick={() => {
+                  if (!window.confirm(`آزمون «${e.title}» از فهرست حذف شود؟ سؤال‌های تأییدشدهٔ بانک حفظ می‌شوند.`)) return;
+                  void run(async () => {
+                    const response = await fetch(`/api/exam-imports/${e._id}`, { method: "DELETE" });
+                    if (!response.ok) throw new Error((await response.json()).message ?? "حذف آزمون انجام نشد");
+                    await loadList();
+                  });
+                }}>حذف آزمون</Button>
+                </div>
               )}
             </PagedList>
           </section>
@@ -513,13 +523,20 @@ export function ExamImportScreen({
                 role="status"
                 className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 text-sm leading-7"
               >
-                پردازش در صف پایدار سرور · مرحله: {exam.job?.stage ?? "queued"}
+                {exam.job?.stage === "queued" || !exam.job?.stage
+                  ? "در انتظار worker؛ پردازش هنوز شروع نشده است."
+                  : `مرحلهٔ پردازش: ${exam.job.stage}`}
                 {exam.job?.processedPage
-                  ? ` · صفحه ${fa(exam.job.processedPage)}`
+                  ? ` · ${fa(exam.job.processedPage)} صفحه پردازش شده${exam.job.totalPages ? ` از ${fa(exam.job.totalPages)}` : ""}`
                   : ""}
+                {Boolean(exam.job?.totalPages) && (
+                  <div className="mt-3">
+                    <progress className="w-full" max={exam.job!.totalPages} value={exam.job?.processedPage ?? 0} aria-label="پیشرفت پردازش صفحات فایل جاری" />
+                    <p>پیشرفت فایل جاری: {fa(Math.round(100 * (exam.job?.processedPage ?? 0) / exam.job!.totalPages!))}٪</p>
+                  </div>
+                )}
                 <p>
-                  می‌توانید صفحه را ببندید؛ پردازش در worker مستقل ادامه می‌یابد
-                  و نتیجه اینجا باقی می‌ماند.
+                  پیشرفت ذخیره می‌شود و بعد از تازه‌سازی باقی می‌ماند. اگر وضعیت در صف باقی ماند، worker را با دستور npm run worker:exams در ترمینال جدا اجرا کنید.
                 </p>
               </div>
             )}

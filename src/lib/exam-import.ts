@@ -59,6 +59,8 @@ export interface ExamImport extends ExamMetadata {
     stage: string;
     attempts: number;
     processedPage?: number;
+    totalPages?: number;
+    progressUpdatedAt?: string;
     errorMessage?: string;
   };
   statistics?: {

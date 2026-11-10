@@ -24,7 +24,9 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
   const getExam = async (r: Parameters<typeof user>[0]) => {
     const u = await user(r, "teacher");
     const { eid } = params.parse(r.params);
-    return { u, e: await owned("examImports", eid, u._id) };
+    const e = await owned("examImports", eid, u._id);
+    if (e.archivedAt) fail(404, "آزمون یافت نشد");
+    return { u, e };
   };
   // A source transcription import used SHA256 item identities. Keep those
   // existing drafts editable without accepting arbitrary non-UUID identifiers.
@@ -52,7 +54,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     const u = await user(r, "teacher");
     return c("examImports")
       .find(
-        { ownerId: u._id },
+        { ownerId: u._id, archivedAt: { $exists: false } },
         { projection: { questionText: 0, answerText: 0 } },
       )
       .sort({ createdAt: -1 })
@@ -75,6 +77,15 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
       await c("examImports").insertOne(row, { session });
       return row;
     });
+  });
+  app.delete("/api/exam-imports/:eid", async (r) => {
+    const { u, e } = await getExam(r);
+    const result = await c("examImports").updateOne(
+      { _id: e._id, ownerId: u._id, state: { $ne: "processing" }, archivedAt: { $exists: false } },
+      { $set: { archivedAt: now() } },
+    );
+    if (!result.modifiedCount) fail(409, "ابتدا منتظر پایان پردازش آزمون بمانید");
+    return { deleted: true };
   });
   app.get("/api/exam-imports/:eid", async (r) => {
     const { e } = await getExam(r);

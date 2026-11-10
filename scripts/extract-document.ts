@@ -1,6 +1,6 @@
-import { writeDocumentResult } from "../src/server/imports/document-engine";
+import { writeDocumentResult, rasterDocument } from "../src/server/imports/document-engine";
 try {
-  await writeDocumentResult(process.argv[2], process.argv[3]);
+  await (process.argv.includes("--raster") ? rasterDocument : writeDocumentResult)(process.argv[2], process.argv[3]);
 } catch (error) {
   console.error(
     error instanceof Error
