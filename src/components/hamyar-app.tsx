@@ -225,12 +225,7 @@ export default function HamyarApp() {
       void restoreLocation();
     };
     window.addEventListener("popstate", handleHistory);
-    // Local npm run dev only: request a real, cookie-backed demo session.
-    // The server rejects this endpoint on staging/production or remote databases.
-    const sessionCheck = api<User>("/auth/me").catch(async (error) => {
-      if (process.env.NODE_ENV !== "development") throw error;
-      return api<User>("/auth/dev-login", {});
-    });
+    const sessionCheck = api<User>("/auth/me");
     sessionCheck
       .then(async (u) => {
         setMe(u);

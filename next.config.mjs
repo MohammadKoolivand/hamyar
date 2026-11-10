@@ -1,10 +1,5 @@
 export default {
   poweredByHeader: false,
-  // TEMPORARY: allow the staging MVP build without TypeScript checks.
-  // Disabled by default for local/production builds.
-  typescript: {
-    ignoreBuildErrors: process.env.HODHOD_MVP_SKIP_TYPECHECK === "1",
-  },
   async headers() {
     return [
       {

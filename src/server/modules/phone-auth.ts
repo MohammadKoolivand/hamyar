@@ -67,7 +67,7 @@ export function registerPhoneAuth(
     {
       config: {
         rateLimit: {
-          max: 5,
+          max: developmentOtpBypass(activeDatabase) ? 1000000 : 5,
           timeWindow: "10 minutes",
           keyGenerator: (r) => "otp:" + r.ip,
         },
@@ -91,6 +91,7 @@ export function registerPhoneAuth(
       const key = ctx.hash("otp:" + phone);
       const at = new Date();
       // Durable per-phone cooldown and hourly send cap, shared by all web instances.
+      if (!bypass) {
       await ctx.c("otpThrottle").updateOne(
         { _id: key },
         {
@@ -118,8 +119,9 @@ export function registerPhoneAuth(
           $inc: { count: 1 },
         },
       );
-      // if (!allowed.modifiedCount)
-      //   ctx.fail(429, "کمی بعد دوباره درخواست کد بدهید.");
+      if (!allowed.modifiedCount)
+        ctx.fail(429, "کمی بعد دوباره درخواست کد بدهید.");
+      }
       const challengeId = ctx.id();
       const code = String(randomInt(100000, 1000000));
       await ctx.c("otpChallenges").replaceOne(
@@ -156,7 +158,7 @@ export function registerPhoneAuth(
       return {
         challengeId,
         expiresIn: 300,
-        resendAfter: 60,
+        resendAfter: bypass ? 0 : 60,
         developmentBypass: bypass,
         message: bypass
           ? "حالت توسعه: پیامک ارسال نمی‌شود؛ هر کد عددی دلخواه پذیرفته می‌شود."
@@ -169,7 +171,7 @@ export function registerPhoneAuth(
     {
       config: {
         rateLimit: {
-          max: 15,
+          max: developmentOtpBypass(activeDatabase) ? 1000000 : 15,
           timeWindow: "10 minutes",
           keyGenerator: (r) => "otp-verify:" + r.ip,
         },

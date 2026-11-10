@@ -30,7 +30,6 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
   GET: [
     "/api/health",
     "/api/auth/me",
-    "/api/auth/dev-login",
     "/api/access/me",
     "/api/admin/users",
     "/api/admin/audit",
@@ -165,7 +164,6 @@ export function routeRoles(method: string, route: string): Role[] | null {
       "/api/auth/email-verification/request",
       "/api/auth/email-verification/confirm",
       "/api/auth/login",
-      "/api/auth/dev-login",
       "/api/auth/otp/request",
       "/api/auth/otp/verify",
       "/api/auth/register",

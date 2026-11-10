@@ -47,6 +47,16 @@ export function PhoneAuthScreen() {
     setCode("");
     setRemaining(result.resendAfter);
     setNotice(result.message);
+    if (result.developmentBypass === true) {
+      setCode("123456");
+      await api("/auth/otp/verify", {
+        phone: normalizePhone(phone),
+        challengeId: result.challengeId,
+        code: "123456",
+        ...(register ? { name, ...(invite ? { invitationToken: invite } : { role }) } : {}),
+      });
+      window.location.replace("/dashboard");
+    }
   }
   return (
     <main className="mx-auto my-[5vh] max-w-lg p-5 sm:pt-12" dir="rtl">

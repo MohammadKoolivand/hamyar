@@ -1,6 +1,5 @@
 import { registerPrivacy, ensureStudentConsent } from "./modules/privacy";
 import { registerPhoneAuth } from "./modules/phone-auth";
-import { registerDevLogin } from "./modules/dev-login";
 import { MelipayamakProvider, type SmsProvider } from "./auth/sms";
 import { registerEmailVerification } from "./modules/email-verification";
 import Fastify from "fastify";
@@ -148,8 +147,6 @@ export async function buildApp(
     const allowedQuery = r.routeOptions.url === "/api/students/:sid/remediation-candidates"
       ? ["courseId"]
       : [];
-    // Fastify's query/route parsers use their own object prototypes. Copy
-    // their own enumerable fields before checking the untrusted values.
     assertAllowedQuery({ ...(r.query as Record<string, unknown> ?? {}) }, allowedQuery);
     assertSafeApiInput({ ...(r.params as Record<string, unknown> ?? {}) });
     if (r.body !== undefined) {
@@ -191,7 +188,6 @@ export async function buildApp(
       if (subjectId) await ensureStudentConsent(ctx, subjectId);
     }
   });
-  registerDevLogin(app, ctx);
   registerAccessManagement(app, ctx);
   registerPrivacy(app, ctx);
   const { linkInvitation } = registerIdentity(app, ctx);
