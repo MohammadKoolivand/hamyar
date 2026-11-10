@@ -18,7 +18,7 @@ const persian = localFont({
 const questionText = localFont({
   src: "../assets/fonts/BNazanin-Bold.ttf",
   variable: "--font-question-text",
-  preload: false,
+  preload: true,
   weight: "700",
   display: "swap",
   adjustFontFallback: false,
@@ -49,7 +49,7 @@ export default function RootLayout({
       dir="rtl"
       className={`${poppins.variable} ${persian.variable} ${questionText.variable} ${questionMath.variable}`}
     >
-      <body className="hamyar-ambient min-h-screen text-[#17305E] [font-family:var(--font-persian),var(--font-latin),Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
+      <body className="hamyar-ambient min-h-screen text-[#17305E] [font-family:var(--font-question-text),var(--font-persian),Tahoma,serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
         {children}
       </body>
     </html>
