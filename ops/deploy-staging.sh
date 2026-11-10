@@ -15,9 +15,9 @@ release=/opt/hodhod/releases/$sha
 # Never overwrite an existing release, and never import local env/private files.
 [[ ! -e "$release" ]]
 install -d -o hodhod -g hodhod "$release"
-tar -tzf "$incoming/release.tar.gz" | grep -qx './.next/BUILD_ID'
-tar -tzf "$incoming/release.tar.gz" | grep -qx './node_modules/next/package.json'
-! tar -tzf "$incoming/release.tar.gz" | grep -Eq '^\./(\.env|\.private)(/|$)'
+tar -tzf "$incoming/release.tar.gz" | grep -x './.next/BUILD_ID' > /dev/null
+tar -tzf "$incoming/release.tar.gz" | grep -x './node_modules/next/package.json' > /dev/null
+! tar -tzf "$incoming/release.tar.gz" | grep -E '^\./(\.env|\.private)(/|$)' > /dev/null
 tar -xzf "$incoming/release.tar.gz" -C "$release" --no-same-owner
 [[ ! -e "$release/.env" && ! -e "$release/.private" ]]
 ln -s /etc/hodhod/staging.env "$release/.env"
