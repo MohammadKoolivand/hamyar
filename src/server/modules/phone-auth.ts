@@ -118,8 +118,8 @@ export function registerPhoneAuth(
           $inc: { count: 1 },
         },
       );
-      if (!allowed.modifiedCount)
-        ctx.fail(429, "کمی بعد دوباره درخواست کد بدهید.");
+      // if (!allowed.modifiedCount)
+      //   ctx.fail(429, "کمی بعد دوباره درخواست کد بدهید.");
       const challengeId = ctx.id();
       const code = String(randomInt(100000, 1000000));
       await ctx.c("otpChallenges").replaceOne(

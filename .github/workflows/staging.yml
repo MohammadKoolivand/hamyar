@@ -2,7 +2,7 @@ name: Deploy verified staging release
 on:
   workflow_run:
     workflows: ["Verify HodHodeh MVP"]
-    branches: [staging]
+    branches: [stage, staging]
     types: [completed]
   workflow_dispatch:
     inputs:
@@ -27,7 +27,7 @@ jobs:
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_branch == 'staging') ||
+       (github.event.workflow_run.head_branch == 'stage' || github.event.workflow_run.head_branch == 'staging')) ||
       github.event_name == 'workflow_dispatch'
     environment: staging
     runs-on: ubuntu-24.04
@@ -38,7 +38,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.id || inputs.run_id }}
-          EXPECTED_BRANCH: staging
+          EXPECTED_BRANCH: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || 'stage' }}
         run: |
           set -euo pipefail
           [[ "$RUN_ID" =~ ^[0-9]+$ ]]
