@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { ImageCropEditor } from "./image-crop-editor";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,32 @@ export function VisualEditor({
   disabled?: boolean;
   cropOpen?: boolean;
 }) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  async function upload(file: File, index?: number) {
+    if (disabled || uploading) return;
+    setUploading(true);
+    setUploadError("");
+    try {
+      if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) throw new Error("تصویر حداکثر ۵ مگابایت انتخاب کنید");
+      const response = await fetch("/api/question-assets", { method: "POST", headers: { "Content-Type": file.type }, body: file });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message ?? "بارگذاری تصویر انجام نشد");
+      if (index === undefined) onChange([...value, result]);
+      else onChange(value.map((old, i) => i === index ? { ...result, caption: old.caption } : old));
+    } catch (error) { setUploadError((error as Error).message); }
+    finally { setUploading(false); }
+  }
+  function imageInput(index?: number) {
+    return <div tabIndex={0} className="rounded-xl border border-dashed border-blue-300 p-3 text-sm" onPaste={(event) => {
+      const file = Array.from(event.clipboardData.files).find(file => file.type.startsWith("image/"));
+      if (file) { event.preventDefault(); void upload(file, index); }
+    }}>
+      <p>{index === undefined ? "افزودن اسکرین‌شات یا تصویر" : "جایگزینی تصویر"} — اینجا کلیک کنید و Paste بزنید.</p>
+      <p className="text-xs text-slate-500">مک: ⌘⇧⌃4 · ویندوز: Win+Shift+S؛ سپس ⌘V یا Ctrl+V. بعد از بارگذاری، سؤال را ذخیره کنید.</p>
+      <input aria-label={index === undefined ? "افزودن تصویر سؤال" : `جایگزینی تصویر ${index + 1}`} type="file" accept="image/png,image/jpeg,image/webp" disabled={disabled || uploading} onChange={event => { const file = event.target.files?.[0]; if (file) void upload(file, index); event.target.value = ""; }} />
+    </div>;
+  }
   const change = (i: number, v: QuestionVisual) =>
     onChange(value.map((old, j) => (i === j ? v : old)));
   const num = (
@@ -66,6 +93,9 @@ export function VisualEditor({
           </Button>
         ))}
       </div>
+      {value.length < 3 && imageInput()}
+      {uploading && <p role="status">در حال بارگذاری تصویر…</p>}
+      {uploadError && <p role="alert" className="text-rose-700">{uploadError}</p>}
       {value.map((v, i) => (
         <details
           open
@@ -87,11 +117,14 @@ export function VisualEditor({
               />
             </Field>
             {v.kind === "image" && (
+              <>
+              {imageInput(i)}
               <ImageCropEditor
                 value={v}
                 autoOpen={cropOpen}
                 onChange={(next) => change(i, next)}
               />
+              </>
             )}
             {v.kind === "formula" && (
               <>

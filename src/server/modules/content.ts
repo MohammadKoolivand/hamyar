@@ -1,4 +1,5 @@
 import { randomInt } from "node:crypto";
+import sharp from "sharp";
 import { difficultySchema } from "../../lib/difficulty";
 import {
   empiricalDifficultyScore,
@@ -19,6 +20,17 @@ import {
 import { questionSchema } from "../domain";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
+  app.post("/api/question-assets", { bodyLimit: 5 * 1024 * 1024 }, async (r) => {
+    const u = await user(r, "teacher");
+    if (!Buffer.isBuffer(r.body) || !r.body.length || r.body.length > 5 * 1024 * 1024) ctx.fail(400, "تصویر معتبر انتخاب کنید؛ حداکثر ۵ مگابایت");
+    let image;
+    try {
+      image = await sharp(r.body as Buffer, { limitInputPixels: 12_000_000 }).rotate().resize({ width: 4096, height: 4096, fit: "inside", withoutEnlargement: true }).png().toBuffer({ resolveWithObject: true });
+    } catch { return ctx.fail(400, "فایل تصویر قابل خواندن نیست"); }
+    const assetId = id();
+    await c("questionAssets").insertOne({ _id: assetId, ownerId: u._id, data: new Binary(image.data), width: image.info.width, height: image.info.height, createdAt: ctx.now() });
+    return { kind: "image", assetId, width: image.info.width, height: image.info.height, caption: "تصویر سؤال" };
+  });
   app.get("/api/question-assets/:assetId", async (r, reply) => {
     const u = await user(r),
       assetId = z

@@ -29,10 +29,10 @@ async function handle(request: Request) {
     const app = await backend();
     const large =
       request.method === "POST" &&
-      /^\/api\/exam-imports\/[a-f0-9-]{36}\/files\/(question|answer)$/.test(
+      (/^\/api\/exam-imports\/[a-f0-9-]{36}\/files\/(question|answer)$/.test(
         url.pathname,
-      );
-    if (large) {
+      ) || url.pathname === "/api/question-assets");
+    if (large && url.pathname !== "/api/question-assets") {
       const eid = url.pathname.split("/")[3];
       const authorized = await app.inject({
         method: "GET",
