@@ -9,15 +9,28 @@ export function registerCourses(app: FastifyInstance, ctx: Context) {
 
   app.get("/api/courses", async (r) => {
     const u = await user(r);
-    if (u.role === "teacher")
-      return c("courses").find({ teacherId: u._id }).sort({ createdAt: -1 }).toArray();
+    if (["teacher", "super_admin"].includes(u.role))
+      return c("courses")
+        .find({ teacherId: u._id })
+        .sort({ createdAt: -1 })
+        .toArray();
     if (u.role !== "student") fail(403, "دسترسی مجاز نیست");
     const memberships = await c("enrollments")
       .find({ studentId: u._id, status: "active" })
       .toArray();
     return c("courses")
-      .find({ _id: { $in: memberships.map((e) => e.courseId) }, status: "active" })
-      .project({ _id: 1, teacherId: 1, title: 1, subject: 1, createdAt: 1, status: 1 })
+      .find({
+        _id: { $in: memberships.map((e) => e.courseId) },
+        status: "active",
+      })
+      .project({
+        _id: 1,
+        teacherId: 1,
+        title: 1,
+        subject: 1,
+        createdAt: 1,
+        status: 1,
+      })
       .toArray();
   });
 
@@ -46,36 +59,51 @@ export function registerCourses(app: FastifyInstance, ctx: Context) {
   app.get("/api/enrollments", async (r) => {
     const u = await user(r);
     if (u.role === "parent") fail(403, "دسترسی مجاز نیست");
-    const query = u.role === "teacher"
+    const query = ["teacher", "super_admin"].includes(u.role)
       ? { teacherId: u._id, status: "active" }
       : { studentId: u._id, status: "active" };
-    const rows = await c("enrollments").find(query).sort({ createdAt: -1 }).toArray();
+    const rows = await c("enrollments")
+      .find(query)
+      .sort({ createdAt: -1 })
+      .toArray();
     if (!rows.length) return [];
-    const courses = await c("courses").find({
-      _id: { $in: rows.map((e) => e.courseId) },
-      status: "active",
-    }).project({ _id: 1, teacherId: 1, title: 1, subject: 1 }).toArray();
+    const courses = await c("courses")
+      .find({
+        _id: { $in: rows.map((e) => e.courseId) },
+        status: "active",
+      })
+      .project({ _id: 1, teacherId: 1, title: 1, subject: 1 })
+      .toArray();
     const allowed = new Map(courses.map((row) => [row._id, row]));
-    const teacherIds = [...new Set(courses.map((row) => row.teacherId as string))];
-    const teachers = u.role === "student"
-      ? await c("users").find({ _id: { $in: teacherIds }, role: "teacher" })
-        .project({ _id: 1, name: 1 }).toArray()
-      : [];
+    const teacherIds = [
+      ...new Set(courses.map((row) => row.teacherId as string)),
+    ];
+    const teachers =
+      u.role === "student"
+        ? await c("users")
+            .find({ _id: { $in: teacherIds }, role: "teacher" })
+            .project({ _id: 1, name: 1 })
+            .toArray()
+        : [];
     const names = new Map(teachers.map((t) => [t._id, t.name as string]));
     return rows.flatMap((row) => {
       const course = allowed.get(row.courseId);
       if (!course || course.teacherId !== row.teacherId) return [];
-      return [{
-        _id: row._id,
-        teacherId: row.teacherId,
-        studentId: row.studentId,
-        courseId: row.courseId,
-        status: row.status,
-        createdAt: row.createdAt,
-        courseTitle: course.title,
-        subject: course.subject,
-        ...(u.role === "student" ? { teacherName: names.get(row.teacherId) ?? "معلم" } : {}),
-      }];
+      return [
+        {
+          _id: row._id,
+          teacherId: row.teacherId,
+          studentId: row.studentId,
+          courseId: row.courseId,
+          status: row.status,
+          createdAt: row.createdAt,
+          courseTitle: course.title,
+          subject: course.subject,
+          ...(u.role === "student"
+            ? { teacherName: names.get(row.teacherId) ?? "معلم" }
+            : {}),
+        },
+      ];
     });
   });
 }

@@ -117,6 +117,7 @@ export function ContentScreen({
   const [visuals, setVisuals] = useState<QuestionVisual[]>([]);
   const [nodeSearch, setNodeSearch] = useState("");
   const [entryMode, setEntryMode] = useState("topic");
+  const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [source, setSource] = useState<QuestionSource>();
   const [difficulty, setDifficulty] = useState("");
   const [year, setYear] = useState("");
@@ -125,7 +126,12 @@ export function ContentScreen({
   return (
     <>
       {view === "bank" && (
-        <QuestionBank nodes={nodes} questions={questions} courses={courses} onSaved={refresh} />
+        <QuestionBank
+          nodes={nodes}
+          questions={questions}
+          courses={courses}
+          onSaved={refresh}
+        />
       )}
       {view !== "bank" && (
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -353,6 +359,7 @@ export function ContentScreen({
                 e.preventDefault();
                 run(async () => {
                   await api("/questions", {
+                    visibility,
                     ...(entryMode === "free"
                       ? { classification: "free" }
                       : { topicId: topic }),
@@ -414,6 +421,19 @@ export function ContentScreen({
               }}
               className="grid gap-[18px]"
             >
+              <label className="block text-sm">
+                دسترسی سؤال
+                <select
+                  className="w-full rounded-xl border p-3"
+                  value={visibility}
+                  onChange={(e) =>
+                    setVisibility(e.target.value as "private" | "public")
+                  }
+                >
+                  <option value="private">خصوصی</option>
+                  <option value="public">عمومی برای همهٔ دانش‌آموزان</option>
+                </select>
+              </label>
               {entryMode === "free" ? (
                 <p className="rounded-xl bg-slate-50 p-4 text-sm leading-7 text-slate-600">
                   سؤال آزاد بدون اتصال به کتاب یا مبحث ذخیره می‌شود. درجه سختی و

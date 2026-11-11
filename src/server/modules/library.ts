@@ -71,9 +71,13 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
       // assignment write conflicts with concurrent attempt/hint transactions,
       // preventing a request from committing after revocation.
       await ctx.transaction(async (session) => {
-        await c("libraryPublications").updateMany(selector, {
-          $set: { published: false, updatedAt: now() },
-        }, { session });
+        await c("libraryPublications").updateMany(
+          selector,
+          {
+            $set: { published: false, updatedAt: now() },
+          },
+          { session },
+        );
         const scope = {
           teacherId: teacher._id,
           courseId: input.courseId,
@@ -85,7 +89,8 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
           { session },
         );
         // Keep finished evidence, but invalidate old content URLs permanently.
-        await c("assignments").updateMany(scope,
+        await c("assignments").updateMany(
+          scope,
           { $set: { accessRevokedAt: now() }, $inc: { revision: 1 } },
           { session },
         );
@@ -138,6 +143,22 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
   app.get("/api/student/library", async (request) => {
     const student = await user(request, "student");
     const publications = await authorized(student._id);
+    const publicVersions = await c("questionVersions")
+      .find({
+        visibility: "public",
+        verifiedAt: { $exists: true },
+      })
+      .project({ _id: 1, ownerId: 1 })
+      .limit(2000)
+      .toArray();
+    publications.push(
+      ...publicVersions.map((v) => ({
+        _id: v._id,
+        teacherId: v.ownerId,
+        questionVersionId: v._id,
+        courseId: v._id,
+      })),
+    );
     if (!publications.length) return { items: [], nodes: [] };
     const versions = await c("questionVersions")
       .find({ _id: { $in: publications.map((p) => p.questionVersionId) } })
@@ -192,14 +213,22 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
       }
     }
     return {
-      nodes: allNodes.filter((node) => visibleNodeIds.has(node._id)),
+      nodes: [
+        ...allNodes.filter((node) => visibleNodeIds.has(node._id)),
+        ...visible
+          .filter((v) => !v.topicId)
+          .map((v) => ({
+            _id: v._id,
+            kind: "topic",
+            title: "سؤال عمومی بدون مبحث",
+          })),
+      ],
       items: visible.flatMap((v) => {
-        if (typeof v.topicId !== "string") return [];
         const source = v.source as Record<string, unknown> | undefined;
         return [
           {
             questionId: v._id,
-            topicId: v.topicId,
+            topicId: v.topicId ?? v._id,
             type: v.type,
             courseIds: [
               ...new Set(
@@ -273,13 +302,20 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
           // Serialize start with unpublish/revoke on authoritative records.
           // A snapshot read alone cannot prevent a concurrently committed
           // revocation from being missed by an insert into a new assignment.
-          const enrolled = await c("enrollments").updateOne(
-            { _id: access!.enrollment._id, status: "active" },
-            { $inc: { accessRevision: 1 } },
-            { session },
-          );
-          const published = await c("libraryPublications").updateOne(
-            { _id: access!.publication._id, published: true },
+          const publicLibrary = access!.publication.publicLibrary === true;
+          const enrolled = publicLibrary
+            ? { modifiedCount: 1 }
+            : await c("enrollments").updateOne(
+                { _id: access!.enrollment._id, status: "active" },
+                { $inc: { accessRevision: 1 } },
+                { session },
+              );
+          const published = await c(
+            publicLibrary ? "questions" : "libraryPublications",
+          ).updateOne(
+            publicLibrary
+              ? { _id: access!.question.questionId, currentVersionId: qid }
+              : { _id: access!.publication._id, published: true },
             { $inc: { accessRevision: 1 } },
             { session },
           );

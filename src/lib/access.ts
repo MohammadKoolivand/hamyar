@@ -157,7 +157,25 @@ export const registeredAccessRoutes = new Set(
 );
 
 // Route-level roles are only the first gate; ownership/relationship checks remain mandatory.
+export function isAuthoringRoute(route: string): boolean {
+  return /^\/api\/(curriculum|questions|question-drafts|exam-imports|question-assets)(\/|$)/.test(
+    route,
+  );
+}
+
 export function routeRoles(method: string, route: string): Role[] | null {
+  const roles = baseRouteRoles(method, route);
+  if (!roles || !roles.includes("teacher")) return roles;
+  return [
+    ...new Set([
+      ...roles,
+      "super_admin" as const,
+      ...(isAuthoringRoute(route) ? ["secretary" as const] : []),
+    ]),
+  ];
+}
+
+function baseRouteRoles(method: string, route: string): Role[] | null {
   method = method.toUpperCase();
   if (!registeredAccessRoutes.has(`${method} ${route}`)) return [];
   if (
@@ -184,11 +202,19 @@ export function routeRoles(method: string, route: string): Role[] | null {
     ].includes(route)
   )
     return [...roleSchema.options];
-  if (route === "/api/privacy/guardian-links/:linkId/review" || route === "/api/privacy/deletion-requests/:requestId/execute" || route === "/api/privacy/deletion-requests/:requestId/inventory" || route === "/api/privacy/deletion-requests/:requestId/finalize") return ["super_admin"];
+  if (
+    route === "/api/privacy/guardian-links/:linkId/review" ||
+    route === "/api/privacy/deletion-requests/:requestId/execute" ||
+    route === "/api/privacy/deletion-requests/:requestId/inventory" ||
+    route === "/api/privacy/deletion-requests/:requestId/finalize"
+  )
+    return ["super_admin"];
   if (route === "/api/privacy/children/:studentId/consent") return ["parent"];
   if (route === "/api/privacy/consent/status") return ["student"];
-  if (route === "/api/privacy/children/:studentId/consent/history") return ["student", "parent", "super_admin"];
-  if (route.startsWith("/api/privacy/deletion-requests")) return [...roleSchema.options];
+  if (route === "/api/privacy/children/:studentId/consent/history")
+    return ["student", "parent", "super_admin"];
+  if (route.startsWith("/api/privacy/deletion-requests"))
+    return [...roleSchema.options];
   if (route.startsWith("/api/admin/")) return ["super_admin"];
   if (route.startsWith("/api/staff/")) return ["secretary"];
   if (route === "/api/children") return ["parent"];
@@ -217,6 +243,7 @@ export function routeRoles(method: string, route: string): Role[] | null {
     route.startsWith("/api/student/")
   )
     return ["student"];
+  if (route === "/api/question-assets") return ["teacher"];
   if (route.startsWith("/api/question-assets/"))
     return ["teacher", "student", "parent"];
   const teacherPrefixes = [

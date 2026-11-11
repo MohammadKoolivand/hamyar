@@ -140,6 +140,7 @@ export interface Node {
   tracks?: string[];
 }
 export interface Question {
+  visibility?: "private" | "public";
   importEvidence?: {
     answerBasis: "published_key" | "independent_review";
     note: string;

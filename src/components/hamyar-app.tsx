@@ -109,7 +109,16 @@ export default function HamyarApp() {
   const [qi, setQi] = useState(0),
     [answer, setAnswer] = useState("");
   async function refresh(u = me) {
-    if (!u || ["parent", "super_admin", "secretary"].includes(u.role)) return;
+    if (!u || u.role === "parent") return;
+    if (u.role === "secretary") {
+      const [n, q] = await Promise.all([
+        api<Node[]>("/curriculum"),
+        api<Question[]>("/questions"),
+      ]);
+      setNodes(n);
+      setQuestions(q);
+      return;
+    }
     const [nextAssignments, nextCourses, nextEnrollments] = await Promise.all([
       api<Assignment[]>("/assignments"),
       api<Course[]>("/courses"),
@@ -125,7 +134,7 @@ export default function HamyarApp() {
     } else {
       setStudentDashboard(null);
     }
-    if (u.role === "teacher") {
+    if (u.role === "teacher" || u.role === "super_admin") {
       const [s, n, q, d] = await Promise.all([
         api<User[]>("/students"),
         api<Node[]>("/curriculum"),
@@ -303,33 +312,57 @@ export default function HamyarApp() {
     </>
   );
   if (!me) return <AuthScreen />;
-  if (me.role === "super_admin" || me.role === "secretary")
-    return <AccessConsole me={me} onLogout={logout} />;
+  if (
+    (me.role === "super_admin" || me.role === "secretary") &&
+    page === "access"
+  )
+    return (
+      <>
+        <button
+          className="m-4 rounded border p-3"
+          onClick={() => setPage("content")}
+        >
+          بازگشت به بانک سؤال
+        </button>
+        <AccessConsole me={me} onLogout={logout} />
+      </>
+    );
   if (me.role === "parent")
     return <ParentDashboard me={me} onLogout={logout} />;
-  const teacher = me.role === "teacher";
-  const nav = teacher
-    ? ([
-        ["dashboard", "نمای کلی", LayoutDashboard],
-        ["students", "دانش‌آموزان", Users],
-        ["courses", "درس‌های من", BookOpenCheck],
-        ["classes", "کلاس‌های گروهی", UsersRound],
-        ["content", "بانک سؤال و محتوا", Library],
-        ["exam-import", "ورود آزمون", FileUp],
-        ["resources", "منابع آموزشی", BookOpenCheck],
-        ["missions", "مأموریت‌ها", Target],
-        ["learning", "یادگیری و مرور", BarChart3],
-        ["settings", "تنظیمات", Settings],
-      ] as const)
-    : ([
-        ["dashboard", "خانه", LayoutDashboard],
-        ["courses", "درس‌های من", BookOpenCheck],
-        ["student-practice", "تمرین و آزمون", ClipboardCheck],
-        ["student-missions", "مأموریت‌های معلم", Target],
-        ["student-mistakes", "مرور اشتباهات", RotateCcw],
-        ["student-progress", "پیشرفت من", BarChart3],
-        ["student-search", "جست‌وجو", Search],
-      ] as const);
+  const teacher = ["teacher", "super_admin", "secretary"].includes(me.role);
+  const nav =
+    me.role === "secretary"
+      ? ([
+          ["content", "بانک سؤال و محتوا", Library],
+          ["exam-import", "ورود آزمون", FileUp],
+          ["resources", "منابع آموزشی", BookOpenCheck],
+          ["access", "دسترسی‌های تفویض‌شده", Settings],
+        ] as const)
+      : teacher
+        ? ([
+            ["dashboard", "نمای کلی", LayoutDashboard],
+            ["students", "دانش‌آموزان", Users],
+            ["courses", "درس‌های من", BookOpenCheck],
+            ["classes", "کلاس‌های گروهی", UsersRound],
+            ["content", "بانک سؤال و محتوا", Library],
+            ["exam-import", "ورود آزمون", FileUp],
+            ["resources", "منابع آموزشی", BookOpenCheck],
+            ["missions", "مأموریت‌ها", Target],
+            ["learning", "یادگیری و مرور", BarChart3],
+            ["settings", "تنظیمات", Settings],
+            ...(me.role === "super_admin"
+              ? [["access", "مدیریت دسترسی‌ها", Settings] as const]
+              : []),
+          ] as const)
+        : ([
+            ["dashboard", "خانه", LayoutDashboard],
+            ["courses", "درس‌های من", BookOpenCheck],
+            ["student-practice", "تمرین و آزمون", ClipboardCheck],
+            ["student-missions", "مأموریت‌های معلم", Target],
+            ["student-mistakes", "مرور اشتباهات", RotateCcw],
+            ["student-progress", "پیشرفت من", BarChart3],
+            ["student-search", "جست‌وجو", Search],
+          ] as const);
   const currentTitle =
     nav.find((n) => n[0] === page)?.[1] ??
     (page === "exam-import"

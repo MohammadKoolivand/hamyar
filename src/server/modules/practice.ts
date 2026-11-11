@@ -35,7 +35,11 @@ export function registerPractice(
         .toArray();
     }
     const assignments = await c("assignments")
-      .find(u.role === "teacher" ? { teacherId: u._id } : { studentId: u._id })
+      .find(
+        ["teacher", "super_admin"].includes(u.role)
+          ? { teacherId: u._id }
+          : { studentId: u._id },
+      )
       .toArray();
     if (u.role !== "student" || !assignments.length) return assignments;
     // Never expose private course assignments by replaying an old list URL.
@@ -155,9 +159,9 @@ export function registerPractice(
     const { u, a } = await assignment(r);
     if (u.role === "parent")
       fail(403, "اولیا گزارش را از پنل فرزند مشاهده می‌کنند");
+    if (u.role === "student") await assertActiveAssignmentCourse(ctx, a, u._id);
     if (u.role === "student")
-      await assertActiveAssignmentCourse(ctx, a, u._id);
-    await assertLibraryAssignmentAccess(ctx, a, u._id);
+      await assertLibraryAssignmentAccess(ctx, a, u._id);
     const questions = await c("questionVersions")
       .find({ _id: { $in: a.questionVersionIds } })
       .toArray();
@@ -195,8 +199,8 @@ export function registerPractice(
         if (h.provider === "teacher-solution")
           return Boolean(
             feedbackVisible(a.policy, a.state) &&
-              a.policy.allowFullSolution &&
-              a.policy.maxHintLevel >= 4,
+            a.policy.allowFullSolution &&
+            a.policy.maxHintLevel >= 4,
           );
         const q = questions.find((q) => q._id === h.questionVersionId);
         return (

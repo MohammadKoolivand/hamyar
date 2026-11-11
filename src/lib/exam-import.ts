@@ -80,6 +80,7 @@ export interface ExamImportItem {
   examId: string;
   state: "pending" | "approved" | "rejected";
   question: {
+    visibility?: "private" | "public";
     statement: string;
     reference: string;
     type: string;

@@ -1,7 +1,7 @@
 import { assertLibraryAssignmentAccess } from "./library-access";
 import { assertActiveAssignmentCourse } from "./course-access";
 import { loginIdentifierSchema } from "../lib/phone";
-import { roleSchema } from "../lib/access";
+import { roleSchema, isAuthoringRoute } from "../lib/access";
 import type { FastifyRequest } from "fastify";
 import type { Db } from "mongodb";
 import {
@@ -41,11 +41,20 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
     const u = await c("users").findOne({ _id: activeSession.userId });
     if (!u || u.disabledAt) fail(401, "حساب فعال یافت نشد");
     const activeUser = u!;
-    if ((activeSession.securityRevision ?? 0) !== (activeUser.securityRevision ?? 0))
+    if (
+      (activeSession.securityRevision ?? 0) !==
+      (activeUser.securityRevision ?? 0)
+    )
       fail(401, "نشست باطل شده است");
     if (!roleSchema.safeParse(activeUser.role).success)
       fail(403, "نقش حساب معتبر نیست");
-    if (role && activeUser.role !== role) fail(403, "دسترسی مجاز نیست");
+    const creatorAccess =
+      role === "teacher" &&
+      (activeUser.role === "super_admin" ||
+        (activeUser.role === "secretary" &&
+          isAuthoringRoute(r.routeOptions.url ?? "")));
+    if (role && activeUser.role !== role && !creatorAccess)
+      fail(403, "دسترسی مجاز نیست");
     return activeUser;
   }
   const safe = (u: Row) => ({
@@ -90,8 +99,7 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
             })),
           })
         : null;
-      if (!row)
-        fail(404, "مأموریت یافت نشد");
+      if (!row) fail(404, "مأموریت یافت نشد");
       return { u: u!, a: row! };
     }
     const a = await c("assignments").findOne({

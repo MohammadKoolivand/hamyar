@@ -10,7 +10,7 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id, now, fail } = ctx;
   app.get("/api/missions", async (r) => {
     const u = await user(r);
-    if (u.role === "teacher")
+    if (["teacher", "super_admin"].includes(u.role))
       return c("missions").find({ teacherId: u._id }).toArray();
     const rows = await c("assignments").find({ studentId: u._id }).toArray();
     const visible = [];

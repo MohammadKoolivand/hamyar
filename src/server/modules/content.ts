@@ -18,33 +18,74 @@ import {
   trackLabels,
 } from "../curriculum-catalog";
 import { questionSchema } from "../domain";
+import { assertActiveAssignmentCourse } from "../course-access";
+import { assertLibraryAssignmentAccess } from "../library-access";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
-  app.post("/api/question-assets", { bodyLimit: 5 * 1024 * 1024 }, async (r) => {
-    const u = await user(r, "teacher");
-    if (!Buffer.isBuffer(r.body) || !r.body.length || r.body.length > 5 * 1024 * 1024) ctx.fail(400, "تصویر معتبر انتخاب کنید؛ حداکثر ۵ مگابایت");
-    let image;
-    try {
-      image = await sharp(r.body as Buffer, { limitInputPixels: 12_000_000 }).rotate().resize({ width: 4096, height: 4096, fit: "inside", withoutEnlargement: true }).png().toBuffer({ resolveWithObject: true });
-    } catch { return ctx.fail(400, "فایل تصویر قابل خواندن نیست"); }
-    const assetId = id();
-    await c("questionAssets").insertOne({ _id: assetId, ownerId: u._id, data: new Binary(image.data), width: image.info.width, height: image.info.height, createdAt: ctx.now() });
-    return { kind: "image", assetId, width: image.info.width, height: image.info.height, caption: "تصویر سؤال" };
-  });
+  app.post(
+    "/api/question-assets",
+    { bodyLimit: 5 * 1024 * 1024 },
+    async (r) => {
+      const u = await user(r, "teacher");
+      if (
+        !Buffer.isBuffer(r.body) ||
+        !r.body.length ||
+        r.body.length > 5 * 1024 * 1024
+      )
+        ctx.fail(400, "تصویر معتبر انتخاب کنید؛ حداکثر ۵ مگابایت");
+      let image;
+      try {
+        image = await sharp(r.body as Buffer, { limitInputPixels: 12_000_000 })
+          .rotate()
+          .resize({
+            width: 4096,
+            height: 4096,
+            fit: "inside",
+            withoutEnlargement: true,
+          })
+          .png()
+          .toBuffer({ resolveWithObject: true });
+      } catch {
+        return ctx.fail(400, "فایل تصویر قابل خواندن نیست");
+      }
+      const assetId = id();
+      await c("questionAssets").insertOne({
+        _id: assetId,
+        ownerId: u._id,
+        data: new Binary(image.data),
+        width: image.info.width,
+        height: image.info.height,
+        createdAt: ctx.now(),
+      });
+      return {
+        kind: "image",
+        assetId,
+        width: image.info.width,
+        height: image.info.height,
+        caption: "تصویر سؤال",
+      };
+    },
+  );
   app.get("/api/question-assets/:assetId", async (r, reply) => {
     const u = await user(r),
       assetId = z
         .string()
         .uuid()
         .parse((r.params as { assetId: string }).assetId);
-    if (!["teacher", "student", "parent"].includes(u.role))
+    if (
+      !["teacher", "super_admin", "secretary", "student", "parent"].includes(
+        u.role,
+      )
+    )
       ctx.fail(403, "دسترسی مجاز نیست");
     const asset = await c("questionAssets").findOne({
       _id: assetId,
-      ...(u.role === "teacher" ? { ownerId: u._id } : {}),
+      ...(["teacher", "super_admin", "secretary"].includes(u.role)
+        ? { ownerId: u._id }
+        : {}),
     });
     const preview =
-      !asset && u.role === "teacher"
+      !asset && ["teacher", "super_admin", "secretary"].includes(u.role)
         ? await c("examImportPreviewAssets").findOne({
             _id: assetId,
             ownerId: u._id,
@@ -67,8 +108,8 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         u.role === "parent"
           ? await c("parentLinks").find({ parentId: u._id }).toArray()
           : [];
-      if (
-        !(await c("assignments").findOne({
+      const candidates = await c("assignments")
+        .find({
           ...(u.role === "student"
             ? { studentId: u._id, teacherId: imageAsset!.ownerId }
             : {
@@ -81,9 +122,29 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
               }),
           questionVersionIds: { $in: versions.map((v) => v._id) },
           state: { $ne: "cancelled" },
-        }))
-      )
-        ctx.fail(404, "تصویر یافت نشد");
+        })
+        .toArray();
+      let permitted = false;
+      for (const candidate of candidates) {
+        try {
+          await assertActiveAssignmentCourse(
+            ctx,
+            candidate,
+            candidate.studentId,
+          );
+          await assertLibraryAssignmentAccess(
+            ctx,
+            candidate,
+            candidate.studentId,
+          );
+          permitted = true;
+          break;
+        } catch (error) {
+          if ((error as { statusCode?: number }).statusCode !== 404)
+            throw error;
+        }
+      }
+      if (!permitted) ctx.fail(404, "تصویر یافت نشد");
     }
     reply
       .header("Content-Type", "image/png")
@@ -539,7 +600,10 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         const examImported =
           previous!.origin === "exam_import_reviewed" ||
           previous!.originalOrigin === "exam_import_reviewed";
-        const questionFields = { ...b };
+        const questionFields = {
+          ...b,
+          visibility: b.visibility ?? previous!.visibility ?? "private",
+        };
         if (examImported) delete questionFields.difficulty;
         const row = {
           ...questionFields,

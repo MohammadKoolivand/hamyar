@@ -145,6 +145,21 @@ export function QuestionEditor({
             }}
           >
             <fieldset disabled={busy} className="grid min-w-0 gap-5">
+              <Field title="دسترسی سؤال">
+                <select
+                  className={style}
+                  value={value.visibility ?? "private"}
+                  onChange={(event) =>
+                    change({
+                      ...value,
+                      visibility: event.target.value as "private" | "public",
+                    })
+                  }
+                >
+                  <option value="private">خصوصی</option>
+                  <option value="public">عمومی — برای همهٔ دانش‌آموزان</option>
+                </select>
+              </Field>
               <Field title="متن سؤال">
                 <QuestionTextInput
                   required

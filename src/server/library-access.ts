@@ -22,6 +22,44 @@ export async function activeLibraryAccess(
   questionVersionId: string,
   session?: ClientSession,
 ): Promise<LibraryAccess | null> {
+  if (courseId === questionVersionId) {
+    const question = await ctx.c("questionVersions").findOne(
+      {
+        _id: questionVersionId,
+        visibility: "public",
+        verifiedAt: { $exists: true },
+      },
+      { session },
+    );
+    if (!question) return null;
+    const current = await ctx.c("questions").findOne(
+      {
+        _id: question.questionId,
+        ownerId: question.ownerId,
+        currentVersionId: questionVersionId,
+      },
+      { session },
+    );
+    if (!current) return null;
+    // Serialize submissions with a visibility revision on the same current pointer.
+    if (session) {
+      const locked = await ctx.c("questions").updateOne(
+        {
+          _id: current._id,
+          currentVersionId: questionVersionId,
+        },
+        { $inc: { accessRevision: 1 } },
+        { session },
+      );
+      if (!locked.matchedCount) return null;
+    }
+    const scope = {
+      _id: courseId,
+      teacherId: question.ownerId,
+      publicLibrary: true,
+    };
+    return { question, course: scope, enrollment: scope, publication: scope };
+  }
   const enrollment = await ctx
     .c("enrollments")
     .findOne({ studentId, courseId, status: "active" }, { session });

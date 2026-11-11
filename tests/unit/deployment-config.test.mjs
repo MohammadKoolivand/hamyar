@@ -5,7 +5,8 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { deploymentChecks } from "../../scripts/check-deployment.mjs";
 const base = {
-  MONGO_URL: "mongodb://fixture:nonsecret@127.0.0.1:27019/hodhodeh_staging_test?replicaSet=test&tls=true&authSource=hodhodeh_staging_test",
+  MONGO_URL:
+    "mongodb://fixture:nonsecret@127.0.0.1:27019/hodhodeh_staging_test?replicaSet=test&tls=true&authSource=hodhodeh_staging_test",
   MONGO_DB: "hodhodeh_staging_test",
   HODHOD_EXPECTED_DB: "hodhodeh_staging_test",
   APP_ORIGIN: "https://staging.example.test",
@@ -125,13 +126,13 @@ test("only verified staging runtime bundles can activate staging", async () => {
   const { readFileSync } = await import("node:fs");
   const verify = readFileSync(".github/workflows/verify.yml", "utf8");
   const deploy = readFileSync(".github/workflows/staging.yml", "utf8");
-  assert.match(verify, /branches: \[staging\]/);
+  assert.match(verify, /branches: \[stage, staging\]/);
   assert.doesNotMatch(verify, /branches: \[main, staging\]/);
   assert.match(verify, /npm run build/);
   assert.match(verify, /hodhodeh-runtime-\$\{\{ github\.sha \}\}/);
   assert.match(verify, /release\.tar\.gz/);
   assert.match(deploy, /workflow_run:/);
-  assert.match(deploy, /branches: \[staging\]/);
+  assert.match(deploy, /branches: \[stage, staging\]/);
   assert.match(deploy, /workflow_run\.conclusion == 'success'/);
   assert.match(deploy, /workflow_run\.head_branch == 'staging'/);
   assert.match(deploy, /ACTIVATE:.*workflow_run.*'true'/);

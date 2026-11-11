@@ -10,6 +10,7 @@ export const questionSchema = z
   .object({
     topicId: z.string().uuid().optional(),
     classification: z.enum(["topic", "free"]).optional(),
+    visibility: z.enum(["private", "public"]).optional(),
     source: questionSourceSchema.optional(),
     difficulty: z.enum(["easy", "medium", "hard"]).optional(),
     year: z.number().int().min(1300).max(1500).optional(),

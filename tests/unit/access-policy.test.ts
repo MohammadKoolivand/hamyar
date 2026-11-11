@@ -22,19 +22,26 @@ test("role matrix separates student, teacher, parent, admin and secretary routes
   assert.deepEqual(routeRoles("GET", "/api/admin/users"), ["super_admin"]);
   assert.deepEqual(routeRoles("GET", "/api/staff/workspaces"), ["secretary"]);
   assert.deepEqual(routeRoles("GET", "/api/student/dashboard"), ["student"]);
-  assert.deepEqual(routeRoles("POST", "/api/questions"), ["teacher"]);
+  assert.deepEqual(routeRoles("POST", "/api/questions"), [
+    "teacher",
+    "super_admin",
+    "secretary",
+  ]);
   assert.deepEqual(routeRoles("GET", "/api/assignments"), [
     "teacher",
     "student",
+    "super_admin",
   ]);
   assert.deepEqual(routeRoles("GET", "/api/assignments/:aid"), [
     "teacher",
     "student",
+    "super_admin",
   ]);
   assert.deepEqual(routeRoles("GET", "/api/assignments/:aid/report"), [
     "teacher",
     "student",
     "parent",
+    "super_admin",
   ]);
   assert.deepEqual(routeRoles("POST", "/api/assignments/:aid/attempts"), [
     "student",
@@ -43,16 +50,25 @@ test("role matrix separates student, teacher, parent, admin and secretary routes
     "teacher",
     "student",
     "parent",
+    "super_admin",
   ]);
   assert.deepEqual(
     routeRoles("POST", "/api/students/:sid/mastery/:skillId/override"),
-    ["teacher"],
+    ["teacher", "super_admin"],
   );
 });
 
 test("method changes never widen a protected resource", () => {
-  assert.deepEqual(routeRoles("GET", "/api/questions"), ["teacher"]);
-  assert.deepEqual(routeRoles("POST", "/api/questions"), ["teacher"]);
+  assert.deepEqual(routeRoles("GET", "/api/questions"), [
+    "teacher",
+    "super_admin",
+    "secretary",
+  ]);
+  assert.deepEqual(routeRoles("POST", "/api/questions"), [
+    "teacher",
+    "super_admin",
+    "secretary",
+  ]);
   assert.deepEqual(routeRoles("DELETE", "/api/questions"), []);
   assert.deepEqual(routeRoles("POST", "/api/assignments/:aid/complete"), [
     "student",
@@ -70,8 +86,7 @@ test("every registered Fastify route has an explicit access policy", () => {
       join(serverDir, "modules", name),
     ),
   ].filter((name) => name.endsWith(".ts"));
-  const routePattern =
-    /app\.(get|post|put|patch|delete)\(\s*["`]([^"`]+)["`]/g;
+  const routePattern = /app\.(get|post|put|patch|delete)\(\s*["`]([^"`]+)["`]/g;
   const discovered = new Set<string>();
   for (const file of files) {
     const source = readFileSync(file, "utf8");

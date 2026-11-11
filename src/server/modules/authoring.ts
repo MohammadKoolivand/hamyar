@@ -45,7 +45,7 @@ export async function persistQuestion(
     vid = ctx.id();
   const examImported =
     (provenance as { origin?: string }).origin === "exam_import_reviewed";
-  const questionFields = { ...b };
+  const questionFields = { ...b, visibility: b.visibility ?? "private" };
   if (examImported) delete questionFields.difficulty;
   await ctx
     .c("questions")

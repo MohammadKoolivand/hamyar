@@ -1,0 +1,157 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { fixture } from "../helpers/fixture";
+import sharp from "sharp";
+
+test("public library allows unenrolled students without exposing keys and private revision revokes practice", async () => {
+  const f = await fixture();
+  try {
+    const image = await sharp({
+      create: { width: 2, height: 2, channels: 3, background: "white" },
+    })
+      .png()
+      .toBuffer();
+    const upload = await f.app.inject({
+      method: "POST",
+      url: "/api/question-assets",
+      headers: { cookie: f.teacher, "content-type": "image/png" },
+      payload: image,
+    });
+    assert.equal(upload.statusCode, 200, upload.body);
+    const visual = upload.json();
+    const body = {
+      topicId: f.question.topicId,
+      statement: "سؤال عمومی آزمایشی",
+      type: "choice",
+      options: ["الف", "ب"],
+      reference: "الف",
+      visibility: "public",
+      visuals: [visual],
+    };
+    const q = await f.post("/api/questions", body, f.teacher);
+    const catalog = await f.request(
+      "/api/student/library",
+      undefined,
+      f.student,
+    );
+    assert.equal(catalog.statusCode, 200);
+    assert.ok(
+      catalog
+        .json()
+        .items.some((i: { questionId: string }) => i.questionId === q._id),
+    );
+    assert.equal(catalog.body.includes('"reference"'), false);
+    const started = await f.post(
+      `/api/student/library/${q._id}/start`,
+      { courseId: q._id },
+      f.student,
+    );
+    const practice = await f.request(
+      `/api/assignments/${started.assignmentId}`,
+      undefined,
+      f.student,
+    );
+    assert.equal(practice.statusCode, 200, practice.body);
+    assert.equal(practice.body.includes('"reference"'), false);
+    assert.equal(
+      (
+        await f.request(
+          `/api/question-assets/${visual.assetId}`,
+          undefined,
+          f.student,
+        )
+      ).statusCode,
+      200,
+    );
+    await f.post(
+      `/api/questions/${q._id}/revise`,
+      { ...body, visibility: "private" },
+      f.teacher,
+    );
+    assert.equal(
+      (
+        await f.request(
+          `/api/student/library/${q._id}/start`,
+          { courseId: q._id },
+          f.student,
+        )
+      ).statusCode,
+      404,
+    );
+    assert.equal(
+      (
+        await f.request(
+          `/api/assignments/${started.assignmentId}`,
+          undefined,
+          f.student,
+        )
+      ).statusCode,
+      404,
+    );
+    assert.equal(
+      (
+        await f.request(
+          `/api/question-assets/${visual.assetId}`,
+          undefined,
+          f.student,
+        )
+      ).statusCode,
+      404,
+    );
+    assert.equal(
+      (
+        await f.request(
+          `/api/student/library/${f.question._id}/start`,
+          { courseId: f.question._id },
+          f.student,
+        )
+      ).statusCode,
+      404,
+    );
+  } finally {
+    await f.close();
+  }
+});
+
+for (const role of ["super_admin", "secretary"]) {
+  test(`${role} can author own questions; students cannot; secretary cannot manage users`, async () => {
+    const f = await fixture();
+    try {
+      await f.c("users").updateOne({ email: "t@test.dev" }, { $set: { role } });
+      const q = await f.post(
+        "/api/questions",
+        {
+          classification: "free",
+          statement: "سؤال نقش آزمایشی",
+          type: "numeric",
+          reference: "2",
+        },
+        f.teacher,
+      );
+      assert.equal(q.visibility, "private");
+      assert.equal(
+        (
+          await f.request(
+            "/api/questions",
+            {
+              classification: "free",
+              statement: "سؤال غیرمجاز",
+              type: "numeric",
+              reference: "2",
+            },
+            f.student,
+          )
+        ).statusCode,
+        403,
+      );
+      if (role === "secretary")
+        assert.equal(
+          (await f.request("/api/admin/users", undefined, f.teacher))
+            .statusCode,
+          403,
+        );
+    } finally {
+      await f.close();
+    }
+  });
+}

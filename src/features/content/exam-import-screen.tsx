@@ -383,29 +383,51 @@ export function ExamImportScreen({
             )}
             <PagedList items={list} label="آزمون‌های واردشده">
               {(e) => (
-                <div key={e._id} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2">
-                <button
-                  disabled={busy}
-                  type="button"
+                <div
                   key={e._id}
-                  onClick={() => void run(() => load(e._id))}
-                  className="flex flex-1 flex-wrap justify-between gap-2 p-2 text-right"
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2"
                 >
-                  <span>{e.title}</span>
-                  <span className="text-xs text-slate-500">
-                    {e.state === "review"
-                      ? "آماده بازبینی"
-                      : "در انتظار فایل / پردازش"}
-                  </span>
-                </button>
-                <Button type="button" variant="outline" disabled={busy || e.state === "processing"} onClick={() => {
-                  if (!window.confirm(`آزمون «${e.title}» از فهرست حذف شود؟ سؤال‌های تأییدشدهٔ بانک حفظ می‌شوند.`)) return;
-                  void run(async () => {
-                    const response = await fetch(`/api/exam-imports/${e._id}`, { method: "DELETE" });
-                    if (!response.ok) throw new Error((await response.json()).message ?? "حذف آزمون انجام نشد");
-                    await loadList();
-                  });
-                }}>حذف آزمون</Button>
+                  <button
+                    disabled={busy}
+                    type="button"
+                    key={e._id}
+                    onClick={() => void run(() => load(e._id))}
+                    className="flex flex-1 flex-wrap justify-between gap-2 p-2 text-right"
+                  >
+                    <span>{e.title}</span>
+                    <span className="text-xs text-slate-500">
+                      {e.state === "review"
+                        ? "آماده بازبینی"
+                        : "در انتظار فایل / پردازش"}
+                    </span>
+                  </button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={busy || e.state === "processing"}
+                    onClick={() => {
+                      if (
+                        !window.confirm(
+                          `آزمون «${e.title}» از فهرست حذف شود؟ سؤال‌های تأییدشدهٔ بانک حفظ می‌شوند.`,
+                        )
+                      )
+                        return;
+                      void run(async () => {
+                        const response = await fetch(
+                          `/api/exam-imports/${e._id}`,
+                          { method: "DELETE" },
+                        );
+                        if (!response.ok)
+                          throw new Error(
+                            (await response.json()).message ??
+                              "حذف آزمون انجام نشد",
+                          );
+                        await loadList();
+                      });
+                    }}
+                  >
+                    حذف آزمون
+                  </Button>
                 </div>
               )}
             </PagedList>
@@ -531,12 +553,28 @@ export function ExamImportScreen({
                   : ""}
                 {Boolean(exam.job?.totalPages) && (
                   <div className="mt-3">
-                    <progress className="w-full" max={exam.job!.totalPages} value={exam.job?.processedPage ?? 0} aria-label="پیشرفت پردازش صفحات فایل جاری" />
-                    <p>پیشرفت فایل جاری: {fa(Math.round(100 * (exam.job?.processedPage ?? 0) / exam.job!.totalPages!))}٪</p>
+                    <progress
+                      className="w-full"
+                      max={exam.job!.totalPages}
+                      value={exam.job?.processedPage ?? 0}
+                      aria-label="پیشرفت پردازش صفحات فایل جاری"
+                    />
+                    <p>
+                      پیشرفت فایل جاری:{" "}
+                      {fa(
+                        Math.round(
+                          (100 * (exam.job?.processedPage ?? 0)) /
+                            exam.job!.totalPages!,
+                        ),
+                      )}
+                      ٪
+                    </p>
                   </div>
                 )}
                 <p>
-                  پیشرفت ذخیره می‌شود و بعد از تازه‌سازی باقی می‌ماند. اگر وضعیت در صف باقی ماند، worker را با دستور npm run worker:exams در ترمینال جدا اجرا کنید.
+                  پیشرفت ذخیره می‌شود و بعد از تازه‌سازی باقی می‌ماند. اگر وضعیت
+                  در صف باقی ماند، worker را با دستور npm run worker:exams در
+                  ترمینال جدا اجرا کنید.
                 </p>
               </div>
             )}
@@ -969,6 +1007,22 @@ function ReviewItem({
             });
           }}
         >
+          <Field title="دسترسی سؤال">
+            <select
+              className={style}
+              value={q.visibility ?? "private"}
+              onChange={(e) => {
+                setQ({
+                  ...q,
+                  visibility: e.target.value as "private" | "public",
+                });
+                setConfirmed(false);
+              }}
+            >
+              <option value="private">خصوصی</option>
+              <option value="public">عمومی برای همهٔ دانش‌آموزان</option>
+            </select>
+          </Field>
           <Field
             title={`صورت سؤال ${index + 1} · فرمول‌ها با LaTeX داخل $...$`}
           >
