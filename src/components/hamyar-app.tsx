@@ -1,5 +1,6 @@
 "use client";
 import { AccessConsole } from "@/features/access/access-console";
+import { PublicQuestionBank } from "@/features/content/public-question-bank";
 import { clsx } from "clsx";
 
 import React, { useState, useEffect } from "react";
@@ -328,12 +329,18 @@ export default function HamyarApp() {
       </>
     );
   if (me.role === "parent")
-    return <ParentDashboard me={me} onLogout={logout} />;
+    return (
+      <>
+        <ParentDashboard me={me} onLogout={logout} />
+        <PublicQuestionBank />
+      </>
+    );
   const teacher = ["teacher", "super_admin", "secretary"].includes(me.role);
   const nav =
     me.role === "secretary"
       ? ([
           ["content", "بانک سؤال و محتوا", Library],
+          ["public-bank", "بانک سؤال عمومی", Library],
           ["exam-import", "ورود آزمون", FileUp],
           ["resources", "منابع آموزشی", BookOpenCheck],
           ["access", "دسترسی‌های تفویض‌شده", Settings],
@@ -345,6 +352,7 @@ export default function HamyarApp() {
             ["courses", "درس‌های من", BookOpenCheck],
             ["classes", "کلاس‌های گروهی", UsersRound],
             ["content", "بانک سؤال و محتوا", Library],
+            ["public-bank", "بانک سؤال عمومی", Library],
             ["exam-import", "ورود آزمون", FileUp],
             ["resources", "منابع آموزشی", BookOpenCheck],
             ["missions", "مأموریت‌ها", Target],
@@ -362,6 +370,7 @@ export default function HamyarApp() {
             ["student-mistakes", "مرور اشتباهات", RotateCcw],
             ["student-progress", "پیشرفت من", BarChart3],
             ["student-search", "جست‌وجو", Search],
+            ["public-bank", "بانک سؤال عمومی", Library],
           ] as const);
   const currentTitle =
     nav.find((n) => n[0] === page)?.[1] ??
@@ -623,6 +632,7 @@ export default function HamyarApp() {
             setInviteToken={setInviteToken}
           />
         )}
+        {page === "public-bank" && <PublicQuestionBank />}
         {page === "settings" && teacher && <AiSettingsScreen />}
         {page === "exam-import" && teacher && (
           <ExamImportScreen nodes={nodes} onApproved={refresh} />

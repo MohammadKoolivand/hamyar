@@ -3,6 +3,62 @@ import { test } from "node:test";
 import { fixture } from "../helpers/fixture";
 import sharp from "sharp";
 
+test("every authenticated role can browse public questions without keys or private questions", async () => {
+  const f = await fixture();
+  try {
+    const q = await f.post(
+      "/api/questions",
+      {
+        classification: "free",
+        visibility: "public",
+        statement: "سؤال عمومی مشترک",
+        type: "short",
+        reference: "PRIVATE_KEY_42",
+      },
+      f.teacher,
+    );
+    assert.equal((await f.request("/api/questions/public")).statusCode, 401);
+    for (const role of [
+      "student",
+      "teacher",
+      "parent",
+      "secretary",
+      "super_admin",
+    ]) {
+      await f.c("users").updateOne({ email: "s@test.dev" }, { $set: { role } });
+      const response = await f.request(
+        "/api/questions/public",
+        undefined,
+        f.student,
+      );
+      assert.equal(response.statusCode, 200, `${role}: ${response.body}`);
+      assert.deepEqual(
+        response.json().map((row: { _id: string }) => row._id),
+        [q._id],
+      );
+      assert.equal(response.body.includes("PRIVATE_KEY_42"), false);
+      assert.equal(response.body.includes('"reference"'), false);
+    }
+    await f.post(
+      `/api/questions/${q._id}/revise`,
+      {
+        classification: "free",
+        visibility: "private",
+        statement: "سؤال عمومی مشترک",
+        type: "short",
+        reference: "PRIVATE_KEY_42",
+      },
+      f.teacher,
+    );
+    assert.deepEqual(
+      (await f.request("/api/questions/public", undefined, f.student)).json(),
+      [],
+    );
+  } finally {
+    await f.close();
+  }
+});
+
 test("public library allows unenrolled students without exposing keys and private revision revokes practice", async () => {
   const f = await fixture();
   try {

@@ -28,6 +28,7 @@ export const staffPermissionLabels: Record<StaffPermission, string> = {
 
 const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
   GET: [
+    "/api/questions/public",
     "/api/health",
     "/api/auth/me",
     "/api/access/me",
@@ -176,6 +177,8 @@ export function routeRoles(method: string, route: string): Role[] | null {
 }
 
 function baseRouteRoles(method: string, route: string): Role[] | null {
+  if (method.toUpperCase() === "GET" && route === "/api/questions/public")
+    return [...roleSchema.options];
   method = method.toUpperCase();
   if (!registeredAccessRoutes.has(`${method} ${route}`)) return [];
   if (

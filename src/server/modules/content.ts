@@ -22,6 +22,44 @@ import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
+  app.get("/api/questions/public", async (r) => {
+    await user(r);
+    return c("questions")
+      .aggregate([
+        {
+          $lookup: {
+            from: "questionVersions",
+            localField: "currentVersionId",
+            foreignField: "_id",
+            as: "version",
+          },
+        },
+        { $unwind: "$version" },
+        {
+          $match: {
+            "version.visibility": "public",
+            "version.verifiedAt": { $exists: true },
+            $expr: { $eq: ["$ownerId", "$version.ownerId"] },
+          },
+        },
+        { $replaceRoot: { newRoot: "$version" } },
+        {
+          $project: {
+            _id: 1,
+            statement: 1,
+            type: 1,
+            options: 1,
+            visuals: 1,
+            visualLayout: 1,
+            source: 1,
+            year: 1,
+            difficultyScore: 1,
+          },
+        },
+        { $sort: { _id: 1 } },
+      ])
+      .toArray();
+  });
   app.post(
     "/api/question-assets",
     { bodyLimit: 5 * 1024 * 1024 },
@@ -78,11 +116,36 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       )
     )
       ctx.fail(403, "دسترسی مجاز نیست");
+    const publicQuestion = await c("questions")
+      .aggregate([
+        {
+          $lookup: {
+            from: "questionVersions",
+            localField: "currentVersionId",
+            foreignField: "_id",
+            as: "version",
+          },
+        },
+        { $unwind: "$version" },
+        {
+          $match: {
+            "version.visibility": "public",
+            "version.verifiedAt": { $exists: true },
+            "version.visuals": { $elemMatch: { kind: "image", assetId } },
+            $expr: { $eq: ["$ownerId", "$version.ownerId"] },
+          },
+        },
+        { $project: { ownerId: 1 } },
+        { $limit: 1 },
+      ])
+      .next();
     const asset = await c("questionAssets").findOne({
       _id: assetId,
-      ...(["teacher", "super_admin", "secretary"].includes(u.role)
-        ? { ownerId: u._id }
-        : {}),
+      ...(publicQuestion
+        ? { ownerId: publicQuestion.ownerId }
+        : ["teacher", "super_admin", "secretary"].includes(u.role)
+          ? { ownerId: u._id }
+          : {}),
     });
     const preview =
       !asset && ["teacher", "super_admin", "secretary"].includes(u.role)
@@ -94,7 +157,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         : null;
     const imageAsset = asset ?? preview;
     if (!imageAsset) ctx.fail(404, "تصویر یافت نشد");
-    if (u.role === "student" || u.role === "parent") {
+    if (!publicQuestion && (u.role === "student" || u.role === "parent")) {
       const versions = await c("questionVersions")
         .find(
           {
