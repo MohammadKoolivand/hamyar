@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { fixture } from "../helpers/fixture";
 import sharp from "sharp";
 
-test("every authenticated role can browse public questions without keys or private questions", async () => {
+test("guests and every role can browse public questions without keys or private questions", async () => {
   const f = await fixture();
   try {
     const q = await f.post(
@@ -17,7 +17,13 @@ test("every authenticated role can browse public questions without keys or priva
       },
       f.teacher,
     );
-    assert.equal((await f.request("/api/questions/public")).statusCode, 401);
+    const guest = await f.request("/api/questions/public");
+    assert.equal(guest.statusCode, 200);
+    assert.deepEqual(
+      guest.json().map((row: { _id: string }) => row._id),
+      [q._id],
+    );
+    assert.equal(guest.body.includes("PRIVATE_KEY_42"), false);
     for (const role of [
       "student",
       "teacher",
@@ -85,6 +91,10 @@ test("public library allows unenrolled students without exposing keys and privat
       visuals: [visual],
     };
     const q = await f.post("/api/questions", body, f.teacher);
+    assert.equal(
+      (await f.request(`/api/question-assets/${visual.assetId}`)).statusCode,
+      200,
+    );
     const catalog = await f.request(
       "/api/student/library",
       undefined,
@@ -123,6 +133,10 @@ test("public library allows unenrolled students without exposing keys and privat
       `/api/questions/${q._id}/revise`,
       { ...body, visibility: "private" },
       f.teacher,
+    );
+    assert.equal(
+      (await f.request(`/api/question-assets/${visual.assetId}`)).statusCode,
+      401,
     );
     assert.equal(
       (

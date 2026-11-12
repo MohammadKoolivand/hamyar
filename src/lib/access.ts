@@ -177,8 +177,11 @@ export function routeRoles(method: string, route: string): Role[] | null {
 }
 
 function baseRouteRoles(method: string, route: string): Role[] | null {
-  if (method.toUpperCase() === "GET" && route === "/api/questions/public")
-    return [...roleSchema.options];
+  if (
+    method.toUpperCase() === "GET" &&
+    ["/api/questions/public", "/api/question-assets/:assetId"].includes(route)
+  )
+    return null; // Asset handler independently checks current public publication or session ownership.
   method = method.toUpperCase();
   if (!registeredAccessRoutes.has(`${method} ${route}`)) return [];
   if (

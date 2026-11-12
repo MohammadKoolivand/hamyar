@@ -16,9 +16,6 @@ import {
   FileUp,
   UsersRound,
   Settings,
-  Search,
-  ClipboardCheck,
-  RotateCcw,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Brand } from "./ui/brand";
@@ -56,10 +53,6 @@ import { ParentDashboard } from "@/features/analytics/parent-dashboard";
 import { LearningDashboard } from "@/features/analytics/learning-dashboard";
 import { CoursesScreen } from "@/features/courses/courses-screen";
 import { ClassGroupsScreen } from "@/features/classes/class-groups-screen";
-import {
-  StudentPracticeHub,
-  StudentSearchScreen,
-} from "@/features/dashboard/student-navigation-screens";
 export default function HamyarApp() {
   const [me, setMe] = useState<User | null>(null),
     [loading, setLoading] = useState(true),
@@ -179,6 +172,16 @@ export default function HamyarApp() {
   async function restoreLocation(currentUser = me) {
     let next = pageFromPath(window.location.pathname);
     if (currentUser?.role === "student") {
+      if (
+        ["student-practice", "student-search", "public-bank"].includes(next)
+      ) {
+        next = "dashboard";
+        window.history.replaceState(
+          window.history.state,
+          "",
+          `/dashboard${window.location.search}`,
+        );
+      }
       if (next === "missions") next = "student-missions";
       if (next === "learning") next = "student-progress";
     }
@@ -312,7 +315,57 @@ export default function HamyarApp() {
       )}
     </>
   );
-  if (!me) return <AuthScreen />;
+  if (!me) {
+    const publicPage = [
+      "dashboard",
+      "student-practice",
+      "student-search",
+      "public-bank",
+    ].includes(page);
+    return (
+      <div className="min-h-screen bg-white" dir="rtl">
+        <header className="border-b bg-white">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4">
+            <button
+              aria-label="خانهٔ هدهده"
+              onClick={() => navigatePage("dashboard")}
+            >
+              <Brand />
+            </button>
+            <nav
+              aria-label="بخش‌های اصلی"
+              className="flex flex-wrap gap-4 text-sm"
+            >
+              <button onClick={() => navigatePage("dashboard")}>
+                تمرین و نمونه‌سؤال
+              </button>
+              <button onClick={() => navigatePage("courses")}>
+                معلم و درس‌های من
+              </button>
+            </nav>
+            <Button onClick={() => navigatePage("login")}>
+              ورود / ثبت‌نام
+            </Button>
+          </div>
+        </header>
+        <main className="mx-auto max-w-7xl px-5 py-8">
+          {publicPage ? (
+            <PublicQuestionBank home onLogin={() => navigatePage("login")} />
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => navigatePage("dashboard")}
+              >
+                ادامهٔ مرور بدون ورود
+              </Button>
+              <AuthScreen />
+            </>
+          )}
+        </main>
+      </div>
+    );
+  }
   if (
     (me.role === "super_admin" || me.role === "secretary") &&
     page === "access"
@@ -363,14 +416,8 @@ export default function HamyarApp() {
               : []),
           ] as const)
         : ([
-            ["dashboard", "خانه", LayoutDashboard],
-            ["courses", "درس‌های من", BookOpenCheck],
-            ["student-practice", "تمرین و آزمون", ClipboardCheck],
-            ["student-missions", "مأموریت‌های معلم", Target],
-            ["student-mistakes", "مرور اشتباهات", RotateCcw],
-            ["student-progress", "پیشرفت من", BarChart3],
-            ["student-search", "جست‌وجو", Search],
-            ["public-bank", "بانک سؤال عمومی", Library],
+            ["dashboard", "تمرین و نمونه‌سؤال", Library],
+            ["courses", "معلم و درس‌های من", BookOpenCheck],
           ] as const);
   const currentTitle =
     nav.find((n) => n[0] === page)?.[1] ??
@@ -587,7 +634,8 @@ export default function HamyarApp() {
         {page === "student-mistakes" && !teacher && (
           <LearningDashboard me={me} students={students} focus="mistakes" />
         )}
-        {page === "dashboard" &&
+        {((page === "dashboard" && teacher) ||
+          (page === "courses" && !teacher)) &&
           (teacher ? (
             <OverviewScreen
               me={me}
@@ -632,7 +680,7 @@ export default function HamyarApp() {
             setInviteToken={setInviteToken}
           />
         )}
-        {page === "public-bank" && <PublicQuestionBank />}
+        {teacher && page === "public-bank" && <PublicQuestionBank />}
         {page === "settings" && teacher && <AiSettingsScreen />}
         {page === "exam-import" && teacher && (
           <ExamImportScreen nodes={nodes} onApproved={refresh} />
@@ -721,29 +769,13 @@ export default function HamyarApp() {
             open={open}
           />
         )}
-        {page === "student-practice" && !teacher && (
-          <StudentPracticeHub
-            assignments={assignments}
-            courses={courses}
-            nodes={studentDashboard?.content?.nodes ?? []}
-            busy={busy}
-            open={open}
-            showReport={showReport}
-            setPage={navigatePage}
-          />
-        )}
-        {page === "student-search" && !teacher && (
-          <StudentSearchScreen
-            assignments={assignments}
-            courses={courses}
-            nodes={studentDashboard?.content?.nodes ?? []}
-            contentItems={studentDashboard?.content?.items ?? []}
-            busy={busy}
-            open={open}
-            showReport={showReport}
-            setPage={navigatePage}
-          />
-        )}
+        {!teacher &&
+          [
+            "dashboard",
+            "student-practice",
+            "student-search",
+            "public-bank",
+          ].includes(page) && <PublicQuestionBank home signedIn />}
         {page === "practice" && active?.questions && (
           <PracticeScreen
             active={active}

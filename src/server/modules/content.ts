@@ -23,8 +23,8 @@ import { assertLibraryAssignmentAccess } from "../library-access";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
   app.get("/api/questions/public", async (r) => {
-    await user(r);
-    return c("questions")
+    void r; // Public catalog never includes answers, hints or private versions.
+    const rows = await c("questions")
       .aggregate([
         {
           $lookup: {
@@ -54,11 +54,50 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
             source: 1,
             year: 1,
             difficultyScore: 1,
+            difficulty: 1,
+            topicId: 1,
+            ownerId: 1,
           },
         },
         { $sort: { _id: 1 } },
       ])
       .toArray();
+    const nodes = rows.length
+      ? await c("curriculum")
+          .find({
+            ownerId: { $in: [...new Set(rows.map((row) => row.ownerId))] },
+            archivedAt: { $exists: false },
+          })
+          .project({ _id: 1, ownerId: 1, parentId: 1, kind: 1, title: 1 })
+          .toArray()
+      : [];
+    const byId = new Map(nodes.map((node) => [node._id, node]));
+    return rows.map((row) => {
+      const taxonomy: Record<string, string> = {
+        level: "",
+        grade: "",
+        book: "",
+        chapter: "",
+        topic: "",
+      };
+      const seen = new Set<string>();
+      let node = byId.get(row.topicId);
+      while (node && node.ownerId === row.ownerId && !seen.has(node._id)) {
+        seen.add(node._id);
+        const key =
+          node.kind === "course" || node.kind === "subject"
+            ? "book"
+            : node.kind;
+        if (key in taxonomy && !taxonomy[key]) taxonomy[key] = node.title;
+        node = node.parentId ? byId.get(node.parentId) : undefined;
+      }
+      taxonomy.grade ||= row.source?.grade ?? "";
+      taxonomy.book ||= row.source?.subject ?? "";
+      const { ownerId: _owner, topicId: _topic, ...publicRow } = row;
+      void _owner;
+      void _topic;
+      return { ...publicRow, taxonomy };
+    });
   });
   app.post(
     "/api/question-assets",
@@ -105,17 +144,10 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
     },
   );
   app.get("/api/question-assets/:assetId", async (r, reply) => {
-    const u = await user(r),
-      assetId = z
-        .string()
-        .uuid()
-        .parse((r.params as { assetId: string }).assetId);
-    if (
-      !["teacher", "super_admin", "secretary", "student", "parent"].includes(
-        u.role,
-      )
-    )
-      ctx.fail(403, "دسترسی مجاز نیست");
+    const assetId = z
+      .string()
+      .uuid()
+      .parse((r.params as { assetId: string }).assetId);
     const publicQuestion = await c("questions")
       .aggregate([
         {
@@ -139,6 +171,14 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         { $limit: 1 },
       ])
       .next();
+    const u = publicQuestion ? { role: "public", _id: "" } : await user(r);
+    if (
+      !publicQuestion &&
+      !["teacher", "super_admin", "secretary", "student", "parent"].includes(
+        u.role,
+      )
+    )
+      ctx.fail(403, "دسترسی مجاز نیست");
     const asset = await c("questionAssets").findOne({
       _id: assetId,
       ...(publicQuestion

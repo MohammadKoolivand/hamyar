@@ -1,0 +1,11 @@
+# Public practice discovery
+
+The default guest and student home is now the same practice and sample-question catalog. Browsing, hierarchical filtering, exam grouping and PDF printing require no account. An explicit login page is available at `/login`; starting an online practice still requires a real student session. Student primary navigation has two sections: practice/sample questions and teacher/courses. Older practice, search and public-bank links remain available.
+
+Filter order: level, grade, subject/book, chapter, topic, exam/source category, difficulty. The existing source schema supplies category-specific filters (for example exam group/location for Konkur and session for final exams). Filters are stored in the URL. Child taxonomy selections are cleared when their parent changes. Taxonomy comes from the published question's actual curriculum ancestry; missing metadata is never invented. Unset difficulty stays unset.
+
+The public catalog projects only question content and source/taxonomy metadata. References, hints, solutions, owners and private versions are excluded. A guest image request succeeds only when the image belongs to a current verified public question. Private images continue to require session and ownership/membership checks. Changing a question back to private removes guest access.
+
+PDF export uses the browser print destination **Save as PDF**. It prints the selected questions, or the current filtered results if none are selected, across pagination. The print document loads the same fonts and math styles, waits for images/fonts, and reports failed assets instead of silently printing missing images. The output includes no answer keys. Exam groups show the number of available questions, without claiming the complete original booklet is present.
+
+Validation: `tests/unit/public-bank.test.ts`, `tests/integration/public-library.test.ts`, and `tests/e2e/practice-discovery.spec.ts`. The browser test uses the real Fastify/MongoDB fixture via the existing transport adapter, checks guest/optional login, hierarchical and conditional filters, refresh, selected print contents, KaTeX stylesheet loading, and mobile overflow. A real PDF is generated for visual review during the acceptance test.
