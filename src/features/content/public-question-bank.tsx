@@ -1,7 +1,11 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/lib/api";
-import { QuestionPresentation } from "@/components/question-presentation";
+import {
+  QuestionPresentation,
+  MathText,
+  QuestionVisualView,
+} from "@/components/question-presentation";
 import { PagedList } from "@/components/ui/paged-list";
 import { Button } from "@/components/ui/button";
 import { sourceFields, sourceSummary } from "@/lib/question-source";
@@ -470,9 +474,51 @@ export function PublicQuestionBank({
         <div ref={printable} dir="rtl">
           <h1>تمرین و نمونه‌سؤال هدهده</h1>
           {output.map((q, i) => (
-            <article key={q._id}>
-              <p>{(i + 1).toLocaleString("fa-IR")}.</p>
-              {questionView(q)}
+            <article key={q._id} className="pdf-question">
+              <div className="pdf-question-head">
+                <span className="pdf-number">
+                  {(i + 1).toLocaleString("fa-IR")}ـ
+                </span>
+                <div className="pdf-statement">
+                  <MathText text={q.statement} />
+                </div>
+                <span className="pdf-source">
+                  {[
+                    q.source?.family === "konkur"
+                      ? `سراسری ${q.source.group === "mathematics" ? "ریاضی" : q.source.group === "experimental" ? "تجربی" : ""}`
+                      : q.source?.family === "practice"
+                        ? "تألیفی"
+                        : q.source?.administration === "final"
+                          ? "نهایی"
+                          : sourceSummary(q.source).split(" · ")[0],
+                    q.year
+                      ? q.year.toLocaleString("fa-IR", { useGrouping: false })
+                      : q.source?.academicYear,
+                    q.source?.organizer,
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                </span>
+              </div>
+              {!!q.options?.length && (
+                <ol
+                  className={`pdf-options${q.options.some((option) => option.length > 65) ? " pdf-options-long" : ""}`}
+                >
+                  {q.options.map((option, index) => (
+                    <li key={index} className="pdf-option">
+                      <span>{(index + 1).toLocaleString("fa-IR")})</span>
+                      <MathText text={option} />
+                    </li>
+                  ))}
+                </ol>
+              )}
+              {!!q.visuals?.length && (
+                <div className="pdf-visuals">
+                  {q.visuals.map((visual, index) => (
+                    <QuestionVisualView key={index} visual={visual} />
+                  ))}
+                </div>
+              )}
             </article>
           ))}
         </div>

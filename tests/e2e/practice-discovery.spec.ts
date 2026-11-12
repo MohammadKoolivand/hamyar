@@ -173,6 +173,23 @@ test("unified discovery preserves dependent filters and exports only selected pu
     await expect(printElement).toHaveCount(1);
     const frame = await (await printElement.elementHandle())!.contentFrame();
     await expect(frame!.locator("article")).toHaveCount(1);
+    await expect(frame!.locator(".pdf-source")).toHaveText("سراسری ریاضی ۱۴۰۵");
+    await expect(frame!.locator(".pdf-option")).toHaveCount(2);
+    expect(
+      await frame!
+        .locator(".pdf-question")
+        .evaluate((el) => getComputedStyle(el).borderTopWidth),
+    ).toBe("0px");
+    expect(
+      await frame!
+        .locator("body")
+        .evaluate((el) => getComputedStyle(el).fontFamily),
+    ).toContain("questionText");
+    expect(
+      await frame!.evaluate(() =>
+        document.fonts.check("700 16px questionText"),
+      ),
+    ).toBe(true);
     await expect(frame!.locator(".katex").first()).toBeVisible();
     expect(
       await frame!
