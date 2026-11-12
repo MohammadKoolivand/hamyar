@@ -1,4 +1,5 @@
 import { splitColumnRows } from "./text-columns";
+import { schoolRows } from "./school-rows";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { readFile, writeFile, stat } from "node:fs/promises";
@@ -118,6 +119,7 @@ export async function processDocument(
         const line: TextLine = {
           page,
           text: item.str,
+          fontId: item.fontName,
           x: item.transform[4] * scale,
           y: Math.max(
             0,
@@ -137,11 +139,20 @@ export async function processDocument(
           ) ?? line.y;
         grouped.set(k, [...(grouped.get(k) ?? []), line]);
       }
-      let lines = splitColumnRows([...grouped.values()], width).map((ls) => {
+      const rawRows = schoolRows([...grouped.values()], width);
+      const structured = rawRows.some((row) =>
+        row.some((l) => l.questionNumber !== undefined),
+      );
+      let lines: TextLine[] = (
+        structured ? rawRows : splitColumnRows(rawRows, width)
+      ).map((ls, readingOrder) => {
         const rtl = ls.some((l) => /[\u0600-\u06ff]/.test(l.text));
         ls.sort((a, b) => (rtl ? b.x - a.x : a.x - b.x));
         return {
           ...ls[0],
+          ...(structured ? { readingOrder } : {}),
+          questionNumber: ls.find((l) => l.questionNumber !== undefined)
+            ?.questionNumber,
           text: (() => {
             const chunks: string[] = [];
             for (let i = 0; i < ls.length; i++) {
@@ -420,11 +431,20 @@ export async function processDocument(
 }
 export async function rasterDocument(file: string, directory: string) {
   const bytes = await readFile(file);
-  if (bytes.length > 20 * 1024 * 1024 || bytes.subarray(0, 5).toString() !== "%PDF-") throw new Error("Invalid PDF");
-  const { stdout: info } = await exec("pdfinfo", [file], { timeout: 15000, maxBuffer: 256 * 1024 });
-  if (/Encrypted:\s+yes/i.test(info)) throw new Error("Encrypted PDF requires manual review");
+  if (
+    bytes.length > 20 * 1024 * 1024 ||
+    bytes.subarray(0, 5).toString() !== "%PDF-"
+  )
+    throw new Error("Invalid PDF");
+  const { stdout: info } = await exec("pdfinfo", [file], {
+    timeout: 15000,
+    maxBuffer: 256 * 1024,
+  });
+  if (/Encrypted:\s+yes/i.test(info))
+    throw new Error("Encrypted PDF requires manual review");
   const total = Number(info.match(/^Pages:\s+(\d+)/m)?.[1]);
-  if (!Number.isInteger(total) || total < 1 || total > 100) throw new Error("Invalid PDF page count");
+  if (!Number.isInteger(total) || total < 1 || total > 100)
+    throw new Error("Invalid PDF page count");
   const data = await verifyOcrModels();
   const pages: DocumentPage[] = [];
   let size = 0;
@@ -432,29 +452,89 @@ export async function rasterDocument(file: string, directory: string) {
     const started = Date.now();
     const imageFile = `page-${page}.png`;
     try {
-      await exec(process.env.PDFTOPPM_BIN ?? "pdftoppm", ["-f", String(page), "-l", String(page), "-scale-to", "1600", "-png", "-singlefile", file, join(directory, `page-${page}`)], { timeout: 45000, maxBuffer: 512 * 1024 });
+      await exec(
+        process.env.PDFTOPPM_BIN ?? "pdftoppm",
+        [
+          "-f",
+          String(page),
+          "-l",
+          String(page),
+          "-scale-to",
+          "1600",
+          "-png",
+          "-singlefile",
+          file,
+          join(directory, `page-${page}`),
+        ],
+        { timeout: 45000, maxBuffer: 512 * 1024 },
+      );
     } catch {
       throw new Error(`PDF_PAGE_UNREADABLE:${page}:${total}`);
     }
     size += (await stat(join(directory, imageFile))).size;
-    if (size > 100 * 1024 * 1024) throw new Error("Rendered output exceeds 100 MiB");
-    const metadata = await sharp(join(directory, imageFile), { limitInputPixels: 12_000_000 }).metadata();
-    const { stdout } = await exec(process.env.TESSERACT_BIN ?? "tesseract", [join(directory, imageFile), "stdout", "--tessdata-dir", data, "-l", process.env.OCR_LANG ?? "fas", "--psm", "3", "tsv"], { timeout: 60000, maxBuffer: 3 * 1024 * 1024, env: { ...process.env, OMP_THREAD_LIMIT: "1" } });
-    pages.push({ page, width: metadata.width!, height: metadata.height!, imageFile, lines: parseTsv(stdout, page), method: "ocr", warnings: ["PDF text extraction failed; raster OCR requires human review"], milliseconds: Date.now() - started, engine: { pdfjs: "raster-fallback", ocrModelsSha256: createHash("sha256").update(await readFile(resolve("config/ocr-models.lock.json"))).digest("hex") } });
-    await writeFile(join(directory, "progress.json"), JSON.stringify({ stage: "ocr_fallback", page, totalPages: total }));
+    if (size > 100 * 1024 * 1024)
+      throw new Error("Rendered output exceeds 100 MiB");
+    const metadata = await sharp(join(directory, imageFile), {
+      limitInputPixels: 12_000_000,
+    }).metadata();
+    const { stdout } = await exec(
+      process.env.TESSERACT_BIN ?? "tesseract",
+      [
+        join(directory, imageFile),
+        "stdout",
+        "--tessdata-dir",
+        data,
+        "-l",
+        process.env.OCR_LANG ?? "fas",
+        "--psm",
+        "3",
+        "tsv",
+      ],
+      {
+        timeout: 60000,
+        maxBuffer: 3 * 1024 * 1024,
+        env: { ...process.env, OMP_THREAD_LIMIT: "1" },
+      },
+    );
+    pages.push({
+      page,
+      width: metadata.width!,
+      height: metadata.height!,
+      imageFile,
+      lines: parseTsv(stdout, page),
+      method: "ocr",
+      warnings: [
+        "PDF text extraction failed; raster OCR requires human review",
+      ],
+      milliseconds: Date.now() - started,
+      engine: {
+        pdfjs: "raster-fallback",
+        ocrModelsSha256: createHash("sha256")
+          .update(await readFile(resolve("config/ocr-models.lock.json")))
+          .digest("hex"),
+      },
+    });
+    await writeFile(
+      join(directory, "progress.json"),
+      JSON.stringify({ stage: "ocr_fallback", page, totalPages: total }),
+    );
   }
   await writeFile(join(directory, "result.json"), JSON.stringify(pages));
 }
 export async function writeDocumentResult(file: string, directory: string) {
-  const pages = await processDocument(file, directory, async (page, totalPages) => {
-    await writeFile(
-      join(directory, "progress.json"),
-      JSON.stringify({
-        stage: page.method === "ocr" ? "ocr" : "reading",
-        page: page.page,
-        totalPages,
-      }),
-    );
-  });
+  const pages = await processDocument(
+    file,
+    directory,
+    async (page, totalPages) => {
+      await writeFile(
+        join(directory, "progress.json"),
+        JSON.stringify({
+          stage: page.method === "ocr" ? "ocr" : "reading",
+          page: page.page,
+          totalPages,
+        }),
+      );
+    },
+  );
   await writeFile(join(directory, "result.json"), JSON.stringify(pages));
 }

@@ -7,6 +7,10 @@ export interface TextLine {
   height: number;
   confidence: number | null;
   method: "text" | "ocr";
+  fontId?: string;
+  questionNumber?: number;
+  readingOrder?: number;
+  columnBounds?: { x: number; width: number };
 }
 export interface Region {
   page: number;
@@ -68,7 +72,14 @@ export function parseQuestions(
             .filter((l) => l.x + l.width / 2 < width / 2 === side)
             .sort((a, b) => a.y - b.y || b.x - a.x),
         );
-    } else groups.push(pageLines.sort((a, b) => a.y - b.y || b.x - a.x));
+    } else
+      groups.push(
+        pageLines.sort((a, b) =>
+          a.readingOrder !== undefined && b.readingOrder !== undefined
+            ? a.readingOrder - b.readingOrder
+            : a.y - b.y || b.x - a.x,
+        ),
+      );
   }
   const result: ParsedQuestion[] = [];
   let current: ParsedQuestion | undefined;
@@ -85,9 +96,9 @@ export function parseQuestions(
       );
       current.regions.push({
         page,
-        x: 0,
+        x: ls[0].columnBounds?.x ?? 0,
         y,
-        width: size.width,
+        width: ls[0].columnBounds?.width ?? size.width,
         height: Math.max(1, bottom - y),
       });
     }
@@ -120,11 +131,25 @@ export function parseQuestions(
         .replace(/[\u200e\u200f\u202a-\u202e]/g, "")
         .replace(/((?:سؤ?ال|سوال)\s*)[.)]\s*(\d+)/, "$1$2.")
         .trim();
-      const a = anchor(text);
+      const structuredPage = group.some(
+        (l) => l.page === line.page && l.questionNumber !== undefined,
+      );
+      const a =
+        line.questionNumber !== undefined
+          ? [
+              text,
+              "سؤال",
+              String(line.questionNumber),
+              "(",
+              text.replace(/^\d+\s*[()]/, "").trim(),
+            ]
+          : structuredPage
+            ? null
+            : anchor(text);
       const inline = [
         ...text.matchAll(/(?:^|\s)\(?([1-4]|الف|ب|ج|د)\s*[()\]:،]\s*/g),
       ];
-      if (current && inline.length > 1 && !a?.[1]) {
+      if (!structuredPage && current && inline.length > 1 && !a?.[1]) {
         const parts = inline
           .map((marker, i) => ({
             n: /\d/.test(marker[1])
@@ -154,7 +179,7 @@ export function parseQuestions(
       const opt = text.match(
         /^\s*\(?((?:[1-4]|الف|ب|ج|د))\s*(?:[()\]:،]\s*|\s+)(.+)/,
       );
-      if (opt && current && !a?.[1]) {
+      if (!structuredPage && opt && current && !a?.[1]) {
         const n = /\d/.test(opt[1])
           ? Number(opt[1])
           : ["الف", "ب", "ج", "د"].indexOf(opt[1]) + 1;
