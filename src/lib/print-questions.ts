@@ -46,7 +46,7 @@ export async function printQuestions(content: HTMLElement, title: string) {
     .pdf-question-head{display:flex;align-items:baseline;gap:2mm;flex-wrap:wrap}
     .pdf-number{flex-shrink:0}
     .pdf-statement{flex:1;min-width:0;font-weight:700}
-    .pdf-source{font-size:9pt;font-weight:700;border:1px solid #aaa;border-radius:3px;padding:0 1.5mm;white-space:nowrap}
+    .pdf-source{font-size:9pt;font-weight:700;border:0;border-radius:5px;padding:0.5mm 2mm;white-space:nowrap;background:#eff6ff;color:#1e3a5f;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .pdf-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1mm 4mm;margin:1.5mm 6mm 0 0;padding:0;list-style:none}
     .pdf-options.pdf-options-long{grid-template-columns:1fr}
     .pdf-option{display:flex;align-items:baseline;gap:1.5mm;min-width:0}
