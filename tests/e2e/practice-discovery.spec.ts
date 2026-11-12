@@ -70,6 +70,13 @@ test("unified discovery preserves dependent filters and exports only selected pu
     );
     await routeBackend(page, f.app);
     await page.goto("/");
+    await expect(page.locator(".hy-student-site-header")).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "بخش‌های اصلی" })
+        .getByRole("button"),
+    ).toHaveCount(2);
+    await expect(page.locator(".hy-student-nav-link svg")).toHaveCount(2);
     await expect(
       page.getByRole("heading", { name: "تمرین و نمونه‌سؤال", exact: true }),
     ).toBeVisible();

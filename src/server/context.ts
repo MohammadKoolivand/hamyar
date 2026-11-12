@@ -118,6 +118,7 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
     return { u, a: a! };
   }
   return {
+    db,
     ...writes(db, hooks),
     c,
     user,

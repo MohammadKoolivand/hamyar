@@ -20,6 +20,7 @@ import {
 import { questionSchema } from "../domain";
 import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
+import { addDiscoveryPath } from "../discovery-settings";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
   app.get("/api/questions/public", async (r) => {
@@ -735,6 +736,8 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
             : {}),
         };
         await c("questionVersions").insertOne(row, { session });
+        if (row.visibility === "public" && b.topicId)
+          await addDiscoveryPath(ctx.db, u._id, b.topicId, session);
         await ctx.boundary("after_question_version_insert");
         await c("auditLogs").insertOne(
           {

@@ -2,6 +2,7 @@ import { assessHint, hintTexts, HINT_SAFETY_VERSION } from "../ai/hint-safety";
 import { difficultySchema, difficultyLabels } from "../../lib/difficulty";
 import { difficultyMetadata } from "../../lib/difficulty";
 import { visualKind } from "../../lib/question-visuals";
+import { addDiscoveryPath } from "../discovery-settings";
 import type { AvalaiClient } from "../ai/avalai";
 import type { FastifyInstance } from "fastify";
 import type { ClientSession } from "mongodb";
@@ -69,6 +70,8 @@ export async function persistQuestion(
     ...provenance,
   };
   await ctx.c("questionVersions").insertOne(row, { session });
+  if (row.visibility === "public" && b.topicId)
+    await addDiscoveryPath(ctx.db, ownerId, b.topicId, session);
   await ctx.boundary("after_question_version_insert");
   return row;
 }

@@ -293,9 +293,19 @@ export default function HamyarApp() {
     return (
       <div
         role="status"
-        className="mx-auto my-[7vh] max-w-[1020px] glass-note p-3.5 leading-[1.9]"
+        className="flex min-h-[70vh] flex-col items-center justify-center gap-6 bg-white"
+        aria-live="polite"
       >
-        در حال اتصال به هدهد…
+        <Brand />
+        <span
+          className="relative flex size-12 items-center justify-center"
+          aria-hidden="true"
+        >
+          <span className="absolute inset-0 rounded-full border-[3px] border-slate-100" />
+          <span className="absolute inset-0 animate-spin rounded-full border-[3px] border-transparent border-t-teal-500 border-r-amber-400 motion-reduce:animate-none" />
+          <span className="size-2 rounded-full bg-teal-500" />
+        </span>
+        <span className="sr-only">در حال بارگذاری هدهده</span>
       </div>
     );
   const feedback = (
@@ -324,26 +334,41 @@ export default function HamyarApp() {
     ].includes(page);
     return (
       <div className="min-h-screen bg-white" dir="rtl">
-        <header className="border-b bg-white">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4">
+        <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-4 px-5 py-3 md:flex-nowrap lg:px-8">
             <button
               aria-label="خانهٔ هدهده"
+              className="shrink-0 cursor-pointer"
               onClick={() => navigatePage("dashboard")}
             >
               <Brand />
             </button>
             <nav
               aria-label="بخش‌های اصلی"
-              className="flex flex-wrap gap-4 text-sm"
+              className="order-3 flex w-full gap-1 overflow-x-auto border-t border-slate-100 pt-2 md:order-none md:w-auto md:flex-1 md:border-0 md:pt-0"
             >
-              <button onClick={() => navigatePage("dashboard")}>
+              <button
+                data-active={publicPage}
+                className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
+                onClick={() => navigatePage("dashboard")}
+              >
+                <Library size={17} aria-hidden />
                 تمرین و نمونه‌سؤال
               </button>
-              <button onClick={() => navigatePage("courses")}>
+              <button
+                data-active={page === "courses"}
+                className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
+                onClick={() => navigatePage("courses")}
+              >
+                <BookOpenCheck size={17} aria-hidden />
                 معلم و درس‌های من
               </button>
             </nav>
-            <Button onClick={() => navigatePage("login")}>
+            <Button
+              className="ms-auto shrink-0"
+              variant="outline"
+              onClick={() => navigatePage("login")}
+            >
               ورود / ثبت‌نام
             </Button>
           </div>

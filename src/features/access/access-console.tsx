@@ -12,6 +12,7 @@ import {
   type StaffPermission,
 } from "@/lib/access";
 import type { User } from "@/lib/types";
+import { DiscoveryFiltersEditor } from "@/features/content/discovery-filters-editor";
 type Account = User & { disabledAt?: string };
 type Grant = {
   _id: string;
@@ -141,6 +142,7 @@ export function AccessConsole({
           {error}
         </p>
       )}
+      {admin && <DiscoveryFiltersEditor />}
       {notice && (
         <p role="status" className="glass-note p-4">
           {notice}

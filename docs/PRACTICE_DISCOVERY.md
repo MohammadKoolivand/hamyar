@@ -1,5 +1,7 @@
 # Public practice discovery
 
+Discovery uses a white surface with Gama-inspired gold, teal and blue accents and Lucide icons. Main filter labels, option labels, ordering and activation are persisted in `siteSettings` (`public-bank-filters`). Super administrators can edit them at `/management`; updates require an optimistic revision and are audited. Archiving an option preserves its canonical value and existing question links. Initialization is additive and preserves edits and archived options. Publishing a question registers its curriculum ancestry in the filter catalog.
+
 The default guest and student home is now the same practice and sample-question catalog. Browsing, hierarchical filtering, exam grouping and PDF printing require no account. An explicit login page is available at `/login`; starting an online practice still requires a real student session. Student primary navigation has two sections: practice/sample questions and teacher/courses. Older practice, search and public-bank links remain available.
 
 Filter order: level, grade, subject/book, chapter, topic, exam/source category, difficulty. The existing source schema supplies category-specific filters (for example exam group/location for Konkur and session for final exams). Filters are stored in the URL. Child taxonomy selections are cleared when their parent changes. Taxonomy comes from the published question's actual curriculum ancestry; missing metadata is never invented. Unset difficulty stays unset.

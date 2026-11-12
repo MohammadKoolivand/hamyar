@@ -22,6 +22,7 @@ import {
 } from "./auth/reset-mail";
 import { registerExamImports } from "./modules/exam-imports";
 import { registerContent } from "./modules/content";
+import { registerDiscoverySettings } from "./modules/discovery-settings";
 import { registerMissions } from "./modules/missions";
 import { registerRemediation } from "./modules/remediation";
 import { registerCourses } from "./modules/courses";
@@ -35,7 +36,10 @@ import { registerLearning } from "./modules/learning";
 import { registerAuthoring } from "./modules/authoring";
 import type { QuestionGenerator } from "./ai/question-generator";
 import { isAllowedRequestOrigin } from "./security/request-origin";
-import { assertAllowedQuery, assertSafeApiInput } from "./security/input-validation";
+import {
+  assertAllowedQuery,
+  assertSafeApiInput,
+} from "./security/input-validation";
 export async function buildApp(
   db: Db,
   provider: HintProvider = new MockProvider(),
@@ -144,11 +148,15 @@ export async function buildApp(
   // Reject MongoDB operator objects, prototype-pollution keys, and malformed
   // structures before any handler can construct a database filter.
   app.addHook("preValidation", async (r) => {
-    const allowedQuery = r.routeOptions.url === "/api/students/:sid/remediation-candidates"
-      ? ["courseId"]
-      : [];
-    assertAllowedQuery({ ...(r.query as Record<string, unknown> ?? {}) }, allowedQuery);
-    assertSafeApiInput({ ...(r.params as Record<string, unknown> ?? {}) });
+    const allowedQuery =
+      r.routeOptions.url === "/api/students/:sid/remediation-candidates"
+        ? ["courseId"]
+        : [];
+    assertAllowedQuery(
+      { ...((r.query as Record<string, unknown>) ?? {}) },
+      allowedQuery,
+    );
+    assertSafeApiInput({ ...((r.params as Record<string, unknown>) ?? {}) });
     if (r.body !== undefined) {
       // Binary import endpoints are separately restricted by the proxy's
       // upload limit and their content-type-specific validation.
@@ -176,15 +184,25 @@ export async function buildApp(
     const actor = await ctx.user(r);
     if (!roles.includes(actor.role))
       ctx.fail(403, "دسترسی این نقش به این عملیات مجاز نیست");
-    if (actor.role === "student" && !route.startsWith("/api/privacy/") && route !== "/api/auth/me" && route !== "/api/access/me" && route !== "/api/auth/logout")
+    if (
+      actor.role === "student" &&
+      !route.startsWith("/api/privacy/") &&
+      route !== "/api/auth/me" &&
+      route !== "/api/access/me" &&
+      route !== "/api/auth/logout"
+    )
       await ensureStudentConsent(ctx, actor._id);
     // Scoped teacher endpoints that directly handle an identifiable student's
     // educational records must apply the same processing restriction.
     if (actor.role === "teacher" && !route.startsWith("/api/privacy/")) {
       const params = r.params as Record<string, unknown> | undefined;
       const body = r.body as Record<string, unknown> | undefined;
-      const subjectId = typeof params?.sid === "string" ? params.sid :
-        (body && typeof body.studentId === "string" ? body.studentId : null);
+      const subjectId =
+        typeof params?.sid === "string"
+          ? params.sid
+          : body && typeof body.studentId === "string"
+            ? body.studentId
+            : null;
       if (subjectId) await ensureStudentConsent(ctx, subjectId);
     }
   });
@@ -200,6 +218,7 @@ export async function buildApp(
   registerStudentDashboard(app, ctx);
   registerLibrary(app, ctx);
   registerContent(app, ctx);
+  registerDiscoverySettings(app, ctx);
   registerExamImports(app, ctx);
   registerAiSettings(app, ctx, avalai);
   registerAuthoring(app, ctx, questionGenerator, avalai);

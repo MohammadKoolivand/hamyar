@@ -4,11 +4,12 @@ import { api } from "@/lib/api";
 import { QuestionPresentation } from "@/components/question-presentation";
 import { PagedList } from "@/components/ui/paged-list";
 import { Button } from "@/components/ui/button";
+import { sourceFields, sourceSummary } from "@/lib/question-source";
 import {
-  sourceCategories,
-  sourceFields,
-  sourceSummary,
-} from "@/lib/question-source";
+  discoveryChoices,
+  type DiscoveryKey,
+  type DiscoverySettings,
+} from "@/lib/discovery-settings";
 import {
   bankExamKey,
   bankFilterSearch,
@@ -21,14 +22,8 @@ import {
   type PublicBankQuestion,
 } from "@/lib/public-bank";
 import { printQuestions } from "@/lib/print-questions";
+import { BookOpen, SlidersHorizontal, FileDown } from "lucide-react";
 
-const labels = {
-  level: "مقطع",
-  grade: "پایه",
-  book: "درس",
-  chapter: "فصل",
-  topic: "مبحث",
-};
 const inputStyle =
   "mt-2 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm";
 export function PublicQuestionBank({
@@ -41,6 +36,9 @@ export function PublicQuestionBank({
   onLogin?: () => void;
 }) {
   const [questions, setQuestions] = useState<PublicBankQuestion[]>([]);
+  const [settings, setSettings] = useState<DiscoverySettings | null>(null);
+  const labelFor = (key: DiscoveryKey) =>
+    settings?.fields.find((field) => field.key === key)?.label ?? "";
   const [loading, setLoading] = useState(true),
     [error, setError] = useState("");
   const [filters, setFilters] = useState<BankFilters>(emptyBankFilters);
@@ -49,6 +47,7 @@ export function PublicQuestionBank({
   const [selected, setSelected] = useState<string[]>([]),
     [filtersOpen, setFiltersOpen] = useState(false);
   const printable = useRef<HTMLDivElement>(null);
+  const [retry, setRetry] = useState(0);
   const [starting, setStarting] = useState("");
   async function startPractice(questionId: string) {
     if (!signedIn) {
@@ -91,9 +90,17 @@ export function PublicQuestionBank({
   }, [filters, ready]);
   useEffect(() => {
     let active = true;
-    api<PublicBankQuestion[]>("/questions/public")
-      .then((rows) => {
-        if (active) setQuestions(rows);
+    setLoading(true);
+    setError("");
+    Promise.all([
+      api<PublicBankQuestion[]>("/questions/public"),
+      api<DiscoverySettings>("/discovery-filters"),
+    ])
+      .then(([rows, config]) => {
+        if (active) {
+          setQuestions(rows);
+          setSettings(config);
+        }
       })
       .catch((error) => {
         if (active) setError((error as Error).message);
@@ -104,7 +111,7 @@ export function PublicQuestionBank({
     return () => {
       active = false;
     };
-  }, []);
+  }, [retry]);
   const visible = useMemo(
     () => questions.filter((q) => matchesBankQuestion(q, filters)),
     [questions, filters],
@@ -134,17 +141,14 @@ export function PublicQuestionBank({
     change(next);
   }
   function taxonomyOptions(key: (typeof taxonomyKeys)[number]) {
-    const prior = taxonomyKeys.slice(0, taxonomyKeys.indexOf(key));
     return [
-      ...new Set(
-        questions
-          .filter((q) =>
-            prior.every((k) => !filters[k] || q.taxonomy?.[k] === filters[k]),
-          )
-          .map((q) => q.taxonomy?.[key])
-          .filter(Boolean),
-      ),
-    ].sort((a, b) => a.localeCompare(b, "fa"));
+      ...new Map(
+        discoveryChoices(settings, key, filters).map((option) => [
+          option.value,
+          option,
+        ]),
+      ).values(),
+    ];
   }
   function extraOptions(key: string) {
     const scope = { ...filters, extra: { ...filters.extra, [key]: "" } };
@@ -183,47 +187,54 @@ export function PublicQuestionBank({
     ? results.filter((q) => selected.includes(q._id))
     : results;
   return (
-    <section className="grid gap-5 bg-white" dir="rtl">
-      <header className="border-b pb-5">
-        <h1 className="text-2xl font-bold">
-          {home ? "تمرین و نمونه‌سؤال" : "بانک سؤال عمومی"}
-        </h1>
-        <p className="mt-2 text-sm text-slate-500">
-          درس و مبحث را انتخاب کن؛ سؤال یا نمونه‌امتحان پیدا کن و خروجی PDF
-          بگیر.
-        </p>
+    <section className="hy-discovery grid gap-5 bg-white" dir="rtl">
+      <header className="discovery-hero flex items-center justify-between gap-5">
+        <div>
+          <span className="discovery-eyebrow">یادگیری، یک سؤال در هر قدم</span>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+            {home ? "تمرین و نمونه‌سؤال" : "بانک سؤال عمومی"}
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            درس و مبحث را انتخاب کن؛ سؤال یا نمونه‌امتحان پیدا کن و خروجی PDF
+            بگیر.
+          </p>
+        </div>
+        <span aria-hidden="true" className="discovery-hero-icon">
+          <BookOpen size={30} strokeWidth={1.6} />
+        </span>
       </header>
       <button
         type="button"
-        className="rounded-xl border p-3 text-right md:hidden"
+        className="discovery-filter-toggle flex items-center gap-2 rounded-xl border p-3 text-right md:hidden"
         aria-expanded={filtersOpen}
         onClick={() => setFiltersOpen(!filtersOpen)}
       >
+        <SlidersHorizontal size={17} aria-hidden />
         فیلتر سؤال‌ها
       </button>
       <div
-        className={`${filtersOpen ? "grid" : "hidden"} gap-4 rounded-2xl border p-4 md:grid`}
+        className={`discovery-filters ${filtersOpen ? "grid" : "hidden"} gap-4 rounded-2xl border p-4 md:grid md:p-5`}
       >
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {taxonomyKeys.map((key) => (
             <label key={key}>
-              {labels[key]}
+              {labelFor(key)}
               <select
                 className={inputStyle}
                 value={filters[key]}
                 onChange={(e) => selectTaxonomy(key, e.target.value)}
               >
                 <option value="">همه</option>
-                {taxonomyOptions(key).map((value) => (
-                  <option key={value} value={value}>
-                    {value}
+                {taxonomyOptions(key).map((option) => (
+                  <option key={option.id} value={option.value}>
+                    {option.label}
                   </option>
                 ))}
               </select>
             </label>
           ))}
           <label>
-            نوع سؤال / آزمون
+            {labelFor("category")}
             <select
               className={inputStyle}
               value={filters.category}
@@ -232,15 +243,15 @@ export function PublicQuestionBank({
               }
             >
               <option value="">همهٔ انواع</option>
-              {sourceCategories.map((c) => (
-                <option key={c.id} value={c.id}>
+              {discoveryChoices(settings, "category", {}).map((c) => (
+                <option key={c.id} value={c.value}>
                   {c.label}
                 </option>
               ))}
             </select>
           </label>
           <label>
-            درجهٔ سختی
+            {labelFor("difficulty")}
             <select
               className={inputStyle}
               value={filters.difficulty}
@@ -249,10 +260,11 @@ export function PublicQuestionBank({
               }
             >
               <option value="">همهٔ درجه‌ها</option>
-              <option value="easy">ساده</option>
-              <option value="medium">متوسط</option>
-              <option value="hard">سخت</option>
-              <option value="unset">تعیین نشده</option>
+              {discoveryChoices(settings, "difficulty", {}).map((option) => (
+                <option key={option.id} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </label>
         </div>
@@ -280,6 +292,12 @@ export function PublicQuestionBank({
             </label>
             {sourceFields
               .filter((field) => field.categories.includes(filters.category))
+              .filter(
+                (field) =>
+                  field.options ||
+                  extraOptions(field.key).length ||
+                  filters.extra[field.key],
+              )
               .map((field) => (
                 <label key={field.key}>
                   {field.label}
@@ -314,15 +332,15 @@ export function PublicQuestionBank({
           پاک‌کردن فیلترها
         </Button>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-2">
+      <div className="discovery-toolbar flex flex-wrap items-center justify-between gap-3">
+        <div className="discovery-tabs flex gap-1">
           {[
             ["questions", "سؤال‌ها"],
             ["exams", "نمونه‌امتحان‌ها"],
           ].map(([value, label]) => (
             <Button
               key={value}
-              variant={filters.content === value ? "default" : "outline"}
+              variant="outline"
               onClick={() => change({ ...filters, content: value })}
               aria-pressed={filters.content === value}
             >
@@ -330,7 +348,7 @@ export function PublicQuestionBank({
             </Button>
           ))}
         </div>
-        <span className="text-sm text-slate-500">
+        <span className="discovery-count text-sm text-slate-500">
           {(filters.content === "exams"
             ? groups.length
             : visible.length
@@ -338,24 +356,35 @@ export function PublicQuestionBank({
           نتیجه
         </span>
         <Button
+          className="discovery-export"
           disabled={printing || !results.length}
           onClick={() => void exportPdf()}
         >
+          <FileDown size={17} aria-hidden />
           خروجی PDF / چاپ{" "}
           {selected.length
             ? `(${selected.length.toLocaleString("fa-IR")} سؤال)`
             : "نتایج"}
         </Button>
       </div>
-      <p className="text-xs text-slate-500">
+      <p className="text-xs leading-6 text-slate-400">
         در پنجرهٔ چاپ، مقصد «ذخیره به‌صورت PDF / Save as PDF» را انتخاب کن. بدون
         انتخاب سؤال، تمام نتایج فیلترشده چاپ می‌شوند.
       </p>
       {loading && <p role="status">در حال دریافت سؤال‌ها…</p>}
       {error && (
-        <p role="alert" className="text-rose-700">
-          {error}
-        </p>
+        <div
+          role="alert"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm text-rose-800"
+        >
+          <span>{error}</span>
+          <Button
+            variant="outline"
+            onClick={() => setRetry((value) => value + 1)}
+          >
+            تلاش دوباره
+          </Button>
+        </div>
       )}
       {!loading &&
         !error &&
@@ -365,8 +394,11 @@ export function PublicQuestionBank({
       {filters.content === "questions" ? (
         <PagedList items={visible} label="سؤال‌ها">
           {(q) => (
-            <article key={q._id} className="rounded-xl border p-4">
-              <label className="mb-4 flex gap-2 text-sm">
+            <article
+              key={q._id}
+              className="discovery-question rounded-2xl border p-5 sm:p-6"
+            >
+              <label className="discovery-question-meta mb-5 flex flex-wrap items-center gap-2 text-xs">
                 <input
                   type="checkbox"
                   checked={selected.includes(q._id)}
@@ -387,7 +419,7 @@ export function PublicQuestionBank({
               {questionView(q)}
               {home && (
                 <Button
-                  className="mt-4"
+                  className="discovery-practice mt-5"
                   disabled={!!starting}
                   onClick={() => void startPractice(q._id)}
                 >
@@ -404,7 +436,10 @@ export function PublicQuestionBank({
       ) : (
         <PagedList items={groups} label="نمونه‌امتحان‌ها">
           {(group) => (
-            <article key={group._id} className="rounded-xl border p-4">
+            <article
+              key={group._id}
+              className="discovery-question rounded-2xl border p-5 sm:p-6"
+            >
               <h2 className="font-bold">
                 {group.items[0].source?.sourceTitle ||
                   sourceSummary(group.items[0].source)}

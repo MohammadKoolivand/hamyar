@@ -28,6 +28,8 @@ export const staffPermissionLabels: Record<StaffPermission, string> = {
 
 const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
   GET: [
+    "/api/discovery-filters",
+    "/api/admin/discovery-filters",
     "/api/questions/public",
     "/api/health",
     "/api/auth/me",
@@ -76,6 +78,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/exam-imports/:eid/pages/:kind/:page",
   ],
   POST: [
+    "/api/admin/discovery-filters",
     "/api/auth/email-verification/request",
     "/api/auth/email-verification/confirm",
     "/api/auth/email/change",
@@ -177,6 +180,8 @@ export function routeRoles(method: string, route: string): Role[] | null {
 }
 
 function baseRouteRoles(method: string, route: string): Role[] | null {
+  if (method.toUpperCase() === "GET" && route === "/api/discovery-filters")
+    return null;
   if (
     method.toUpperCase() === "GET" &&
     ["/api/questions/public", "/api/question-assets/:assetId"].includes(route)

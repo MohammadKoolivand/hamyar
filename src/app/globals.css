@@ -551,3 +551,41 @@
 .hy-learning-next-lesson { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; border:1px solid #c5e5d6; background:#f0faf5; border-radius:20px; padding:1.2rem 1.5rem; }
 @media (max-width:760px) { .hy-learning-hero { grid-template-columns:1fr; } .hy-learning-hero-aside { flex-direction:row; justify-content:space-between; gap:.7rem; padding:1rem 1.25rem; flex-wrap:wrap; } .hy-learning-aside-icon { display:none; } .hy-learning-hero-link { margin-top:0; } .hy-learning-shortcuts { grid-template-columns:1fr; } .hy-learning-featured > button { width:100%; } .hy-learning-join-details > summary { align-items:start; flex-direction:column; } }
 @media (prefers-reduced-motion:reduce) { .hy-learning-shortcut,.hy-learning-course-card,.hy-learning-practice-card { transition:none; } }
+
+/* Quiet, flat colors for public discovery; question typography stays unchanged. */
+.hy-discovery { color:#263b55; }
+.hy-discovery { --discovery-gama-gold:#ffb600; --discovery-gama-teal:#48a9a6; --discovery-gama-blue:#1f5592; }
+.hy-discovery .discovery-hero { padding:1.8rem 2rem; border:1px solid #f3e8c9; border-radius:24px; background:#fffcf3; }
+.hy-discovery .discovery-eyebrow { font-size:.72rem; font-weight:600; color:#94710d; }
+.hy-discovery .discovery-hero h1 { color:var(--discovery-gama-blue); }
+.hy-discovery .discovery-hero p { max-width:42rem; line-height:1.9; color:#64758b; }
+.hy-discovery .discovery-hero-icon { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:72px; height:72px; border-radius:22px; color:#37857e; background:#e5f2ee; }
+.hy-discovery .discovery-filters { background:#f9fafb; border-color:#e5eaf1; }
+.hy-discovery .discovery-filters .border-t { border-color:#e5eaf1; }
+.hy-discovery .discovery-filters label { font-size:.76rem; font-weight:600; color:#5c7088; }
+.hy-discovery .discovery-filters label, .hy-discovery .discovery-filters select { min-width:0; max-width:100%; }
+.hy-discovery .discovery-filters select { min-height:46px; border-color:#dfe6ef; border-radius:12px; background:#fff; color:#314760; font-weight:500; padding:.65rem .8rem; box-shadow:0 1px 2px #22355203; }
+.hy-discovery select:focus-visible { outline:2px solid #95b7e5; outline-offset:2px; }
+.hy-discovery .discovery-filters > button { justify-self:start; border:none; background:transparent; color:#6f8197; min-height:36px; padding:.3rem 0; font-size:.73rem; box-shadow:none; }
+.hy-discovery .discovery-tabs { padding:4px; border-radius:14px; background:#f0f3f8; }
+.hy-discovery .discovery-tabs button { background:transparent; border:none; border-radius:10px; min-height:38px; padding:.5rem 1.1rem; color:#7a8799; box-shadow:none; font-size:.8rem; }
+.hy-discovery .discovery-tabs button[aria-pressed=true] { background:#fff3d4; color:#825f00; box-shadow:0 1px 4px #263b5510; }
+.hy-discovery .discovery-export { background:#018786; border:1px solid #018786; border-radius:12px; box-shadow:none; font-size:.78rem; }
+.hy-discovery .discovery-export:hover { background:#226c65; }
+.hy-discovery .discovery-count { margin-inline-end:auto; font-size:.75rem; color:#8591a1; }
+.hy-discovery .discovery-question { background:#fff; border-color:#e5eaf1; box-shadow:0 3px 16px #213e6304; }
+.hy-discovery .discovery-question-meta { color:#75869b; border-bottom:1px solid #f0f3f7; padding-bottom:1rem; }
+.hy-discovery input[type=checkbox] { width:15px; height:15px; accent-color:#4176b6; }
+.hy-discovery .discovery-question:has(input:checked) { border-color:#a7c4e8; }
+.hy-discovery .discovery-practice { background:#f1f6fd; color:#3769a5; border:1px solid #dfE9f7; border-radius:11px; min-height:38px; font-size:.75rem; padding:.5rem 1rem; box-shadow:none; }
+.hy-discovery .discovery-practice:hover { background:#e6effb; }
+.hy-discovery .discovery-filter-toggle { border-color:#dfe7f2; color:#4d709c; background:#f7faff; }
+@media (max-width:640px) {
+  .hy-discovery .discovery-hero { padding:1.3rem; border-radius:20px; }
+  .hy-discovery .discovery-hero-icon { width:48px; height:48px; border-radius:15px; }
+  .hy-discovery .discovery-hero-icon svg { width:24px; }
+  .hy-discovery .discovery-hero h1 { font-size:1.4rem; }
+  .hy-discovery .discovery-hero p { font-size:.75rem; }
+  .hy-discovery .discovery-toolbar { align-items:center; }
+  .hy-discovery .discovery-count { margin-inline-end:0; }
+}
