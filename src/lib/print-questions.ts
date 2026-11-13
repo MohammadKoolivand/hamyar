@@ -46,11 +46,11 @@ export async function printQuestions(content: HTMLElement, title: string) {
     .pdf-question-head{display:flex;align-items:baseline;gap:2mm;flex-wrap:wrap;direction:rtl}
     .pdf-number{flex-shrink:0}
     .pdf-statement{flex:1;min-width:0;font-weight:700;text-align:justify;white-space:pre-wrap;overflow-wrap:anywhere}
-    .pdf-source{font-family:var(--font-persian),"B Nazanin",serif;font-size:8pt;font-weight:400;border:0;border-radius:5px;padding:0.5mm 2mm;white-space:nowrap;background:#eff6ff;color:#1e3a5f;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .pdf-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1mm 4mm;margin:1.5mm 6mm 0 0;padding:0;list-style:none;direction:rtl;font-family:"B Nazanin",var(--font-persian),serif;font-weight:400}
+    .pdf-source{font-family:var(--font-question-regular),"B Nazanin",serif;font-size:8pt;font-weight:400;border:0;border-radius:5px;padding:0.5mm 2mm;white-space:nowrap;background:#eff6ff;color:#1e3a5f;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .pdf-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1mm 4mm;margin:1.5mm 6mm 0 0;padding:0;list-style:none;direction:rtl;font-family:var(--font-question-regular),"B Nazanin",serif;font-weight:400}
     .pdf-options[data-layout="stack"]{grid-template-columns:minmax(0,1fr)}
-    .pdf-option{display:flex;align-items:baseline;gap:1.5mm;min-width:0;font-family:"B Nazanin",var(--font-persian),serif;font-weight:400;text-align:justify;overflow-wrap:anywhere}
-    .pdf-option .hy-question-text,.pdf-option .hy-question-text math mn,.pdf-option .hy-question-text .katex .hy-math-number{font-family:"B Nazanin",var(--font-persian),serif!important;font-weight:400!important}
+    .pdf-option{display:flex;align-items:baseline;gap:1.5mm;min-width:0;font-family:var(--font-question-regular),"B Nazanin",serif;font-weight:400;text-align:justify;overflow-wrap:anywhere}
+    .pdf-option .hy-question-text,.pdf-option .hy-question-text math mn,.pdf-option .hy-question-text .katex .hy-math-number{font-family:var(--font-question-regular),"B Nazanin",serif!important;font-weight:400!important}
     .pdf-option-text{min-width:0;flex:1;white-space:pre-wrap;text-align:justify}
     .pdf-visuals{direction:ltr;text-align:left}
     .pdf-visuals figure{display:table;border:0;padding:0;margin:2mm 0 2mm 0;max-width:75mm;max-width:min(75mm,100%);margin-right:auto;margin-left:0;direction:rtl;text-align:center}
