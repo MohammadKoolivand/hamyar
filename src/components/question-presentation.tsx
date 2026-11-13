@@ -284,7 +284,7 @@ export function QuestionPresentation({
   onCrop?: () => void;
 }) {
   const statementView = (
-    <div className="whitespace-pre-wrap break-words text-sm leading-8">
+    <div className="hy-question-statement whitespace-pre-wrap break-words text-sm font-bold leading-8">
       <MathText text={statement} />
     </div>
   );
@@ -410,13 +410,13 @@ export function QuestionOptionsLayout({
         >
           {options.map((option, i) =>
             renderOption ? (
-              <div key={i} className="min-w-0" data-option-measure>
+              <div key={i} className="hy-question-option min-w-0 font-normal" data-option-measure>
                 {renderOption(option, i)}
               </div>
             ) : (
               <div
                 key={i}
-                className="flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-white/60 px-3 py-2 text-sm leading-7"
+                className="hy-question-option flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-white/60 px-3 py-2 text-sm font-normal leading-7"
               >
                 <span className="shrink-0 text-slate-500">
                   {(i + 1).toLocaleString("fa-IR")}.
