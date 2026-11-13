@@ -31,6 +31,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y poppler-utils
       - run: npm run test:fast
       - run: bash -n ops/cleanup-staging-artifacts.sh
+      - run: bash -n ops/backup-before-release.sh
       - run: npm run build
       - name: Package verified runtime for staging
         if: (github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/staging') && github.event_name == 'push'
