@@ -2,6 +2,7 @@ export const tabPaths = {
   dashboard: "/dashboard",
   login: "/login",
   access: "/management",
+  "admin-overview": "/system-overview",
   students: "/students",
   courses: "/courses",
   classes: "/classes",
