@@ -152,7 +152,9 @@ export async function buildApp(
     const allowedQuery =
       r.routeOptions.url === "/api/students/:sid/remediation-candidates"
         ? ["courseId"]
-        : [];
+        : r.routeOptions.url === "/api/admin/system-overview/users"
+          ? ["role", "q", "page"]
+          : [];
     assertAllowedQuery(
       { ...((r.query as Record<string, unknown>) ?? {}) },
       allowedQuery,
