@@ -49,4 +49,16 @@ jobs:
             key=${pair%%:*}; pattern=${pair#*:}
             if grep -Fiq -- "$pattern" <<< "$logs"; then echo "WEB_ERROR_${key}=yes"; fi
           done
+          echo "TARGET_RELEASE_CHECK_START"
+          target=/opt/hodhod/releases/42e65f2808d3113cceae11d60f9307eb33848e8b
+          if [[ -d "$target" && ! -L "$target" ]]; then
+            echo "TARGET_RELEASE_EXISTS=yes"
+            for p in .next/BUILD_ID .next/cache .next/server .next/server/route-cache node_modules/next/package.json .private; do
+              if [[ -d "$target/$p" ]]; then echo "TARGET_PATH_${p//\//_}=dir"
+              elif [[ -f "$target/$p" ]]; then echo "TARGET_PATH_${p//\//_}=file"
+              elif [[ -L "$target/$p" ]]; then echo "TARGET_PATH_${p//\//_}=symlink"
+              else echo "TARGET_PATH_${p//\//_}=missing"; fi
+            done
+          else echo "TARGET_RELEASE_EXISTS=no"; fi
+          echo "TARGET_RELEASE_CHECK_END"
           REMOTE
