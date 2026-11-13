@@ -35,6 +35,8 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/auth/me",
     "/api/access/me",
     "/api/admin/users",
+    "/api/admin/system-overview",
+    "/api/admin/system-overview/users",
     "/api/admin/audit",
     "/api/admin/staff-assignments",
     "/api/staff/workspaces",
