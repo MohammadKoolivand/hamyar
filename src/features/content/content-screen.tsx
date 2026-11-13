@@ -431,7 +431,7 @@ export function ContentScreen({
                   }
                 >
                   <option value="private">خصوصی</option>
-                  <option value="public">عمومی برای همهٔ دانش‌آموزان</option>
+                  <option value="public">عمومی برای همه‌ی دانش‌آموزان</option>
                 </select>
               </label>
               {entryMode === "free" ? (

@@ -188,7 +188,7 @@ export function LearningDashboard({
           ابتدا دانش‌آموز را دعوت و یک مأموریت منتشر کنید.
         </p>
       ) : !data && error ? (
-        <p className="rounded-xl border border-slate-200 p-5 text-sm text-slate-600">نمایش گزارش ممکن نشد. از دکمهٔ تلاش دوباره استفاده کنید.</p>
+        <p className="rounded-xl border border-slate-200 p-5 text-sm text-slate-600">نمایش گزارش ممکن نشد. از دکمه‌ی تلاش دوباره استفاده کنید.</p>
       ) : !data ? (
         <p role="status" className="p-6 text-slate-500">
           در حال خواندن شواهد ثبت‌شده…
@@ -263,8 +263,8 @@ export function LearningDashboard({
                 مهارت با شواهد کافی از حل مستقل.
               </p>
               <p className="mt-2 text-xs leading-6 text-slate-500">
-                صحیح با راهنما نشانهٔ موفقیت با کمک است؛ با حل مستقل یکی نیست.
-                دادهٔ کم به معنی ضعف قطعی نیست.
+                صحیح با راهنما نشانه‌ی موفقیت با کمک است؛ با حل مستقل یکی نیست.
+                داده‌ی کم به معنی ضعف قطعی نیست.
               </p>
             </div>
             <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4">
@@ -278,7 +278,7 @@ export function LearningDashboard({
                   {guidance.skill?.skillId && <a href={`#skill-${guidance.skill.skillId}`} className="text-xs font-semibold text-amber-900 underline" onClick={(event) => {
                     event.preventDefault(); setSkillFilter("all"); setSkillTarget((n) => n + 1);
                     requestAnimationFrame(() => document.getElementById(`skill-${guidance.skill?.skillId}`)?.scrollIntoView({ block: "start" }));
-                  }}>مشاهدهٔ شواهد این مهارت</a>}
+                  }}>مشاهده‌ی شواهد این مهارت</a>}
                 </div>;
               })()}
             </div>

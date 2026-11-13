@@ -277,15 +277,15 @@ export function StudentOverview({
           <p className="hy-home-lead">
             {nextAssignment
               ? "لازم نیست بین صفحه‌ها بگردی؛ قدم بعدی یادگیری همین‌جاست."
-              : "برای شروع، یک درس یا تمرین انتخاب کن. هدهده قدم‌به‌قدم همراه توست."}
+              : "برای شروع، یک درس یا تمرین انتخاب کن. هدهد قدم‌به‌قدم همراه توست."}
           </p>
           <div className="hy-home-main-action">
             <div className="min-w-0">
-              <span className="hy-home-action-label">{nextAssignment ? "پیشنهاد ویژهٔ تو" : "نقطهٔ شروع"}</span>
+              <span className="hy-home-action-label">{nextAssignment ? "پیشنهاد ویژه‌ی تو" : "نقطه‌ی شروع"}</span>
               <h2 className="hy-home-action-title">{nextAssignment?.title ?? "پیدا کردن اولین تمرین"}</h2>
               {nextAssignment && (
                 <p className="hy-home-action-context">
-                  {nextCourse?.title ?? "مأموریت معلم"} · {nextAssignment.state === "in_progress" ? "نیمه‌تمام" : "آمادهٔ شروع"}
+                  {nextCourse?.title ?? "مأموریت معلم"} · {nextAssignment.state === "in_progress" ? "نیمه‌تمام" : "آماده‌ی شروع"}
                 </p>
               )}
             </div>
@@ -294,7 +294,7 @@ export function StudentOverview({
               disabled={busy}
               onClick={() => nextAssignment ? void open(nextAssignment) : setPage("student-practice")}
             >
-              {nextAssignment ? nextAssignment.state === "in_progress" ? "ادامهٔ تمرین" : "شروع تمرین" : "کاوش تمرین‌ها"}
+              {nextAssignment ? nextAssignment.state === "in_progress" ? "ادامه‌ی تمرین" : "شروع تمرین" : "کاوش تمرین‌ها"}
               <ArrowLeft size={18} aria-hidden />
             </Button>
           </div>
@@ -317,7 +317,7 @@ export function StudentOverview({
         <section aria-label="پیشنهاد شخصی یادگیری" className="rounded-2xl border border-amber-200 bg-gradient-to-l from-amber-50 via-white to-white p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-5">
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-amber-800">بر پایهٔ پاسخ‌های واقعی تو · قدم پیشنهادی بعدی</p>
+              <p className="text-xs font-bold text-amber-800">بر پایه‌ی پاسخ‌های واقعی تو · قدم پیشنهادی بعدی</p>
               <h2 className="mt-2 text-lg font-extrabold text-[#17305e]">{guidance.title}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{guidance.description}</p>
             </div>
@@ -440,7 +440,7 @@ export function StudentOverview({
                   <Sparkles size={20} aria-hidden />
                 </span>
                 <div>
-                  <h2 className="font-bold">تمرین پیشنهادی هدهده</h2>
+                  <h2 className="font-bold">تمرین پیشنهادی هدهد</h2>
                   <p className="text-xs text-slate-600">
                     پیشنهاد بر پایه پاسخ‌ها و فعالیت واقعی تو.
                   </p>

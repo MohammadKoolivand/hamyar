@@ -224,11 +224,11 @@ export function StudentPracticeHub({
           <span className="hy-learning-eyebrow"><Target size={16} aria-hidden /> قدم بعدی تو</span>
           <h2 className="hy-learning-hero-title">{featured ? "با یک تمرین، جلوتر برو" : "از همین‌جا یادگیری را شروع کن"}</h2>
           <p className="hy-learning-hero-description">{featured
-            ? "یک فعالیت آماده داری. لازم نیست بین همهٔ گزینه‌ها بگردی؛ از همین تمرین شروع کن."
+            ? "یک فعالیت آماده داری. لازم نیست بین همه‌ی گزینه‌ها بگردی؛ از همین تمرین شروع کن."
             : "هنوز تمرین آماده‌ای نداری؟ می‌توانی درس‌هایت را ببینی یا از معلم مأموریت تازه بگیری."}</p>
           <div className="hy-learning-featured" data-testid="practice-featured-action">
             <div className="min-w-0">
-              <span className="hy-learning-featured-label">{featured ? (featured.state === "in_progress" ? "ادامهٔ تمرین نیمه‌تمام" : "پیشنهاد امروز") : "مسیر پیشنهادی"}</span>
+              <span className="hy-learning-featured-label">{featured ? (featured.state === "in_progress" ? "ادامه‌ی تمرین نیمه‌تمام" : "پیشنهاد امروز") : "مسیر پیشنهادی"}</span>
               <h3 className="hy-learning-featured-title">{featured?.title ?? "دیدن درس‌های من"}</h3>
               <p className="text-xs text-slate-500">{featured
                 ? `${courses.find((course) => course._id === featured.courseId)?.title ?? "تمرین آموزشی"} · ${featured.catalog?.questionCount?.toLocaleString("fa-IR") ?? "تعداد نامشخص"} سؤال`
@@ -242,8 +242,8 @@ export function StudentPracticeHub({
         <div className="hy-learning-hero-aside">
           <span className="hy-learning-aside-icon"><BookOpenCheck size={36} strokeWidth={1.5} aria-hidden /></span>
           <strong className="text-3xl font-black">{ready.length.toLocaleString("fa-IR")}</strong>
-          <span className="text-sm text-blue-100">فعالیت آمادهٔ انجام</span>
-          <button className="hy-learning-hero-link" type="button" onClick={() => setPage("student-missions")}>همهٔ مأموریت‌ها <ArrowLeft size={15} aria-hidden /></button>
+          <span className="text-sm text-blue-100">فعالیت آماده‌ی انجام</span>
+          <button className="hy-learning-hero-link" type="button" onClick={() => setPage("student-missions")}>همه‌ی مأموریت‌ها <ArrowLeft size={15} aria-hidden /></button>
         </div>
       </section>
 
@@ -269,7 +269,7 @@ export function StudentPracticeHub({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <span className="hy-learning-section-label">یک تمرین مناسب پیدا کن</span>
-            <h2 className="text-xl font-extrabold text-[#19355f]">همهٔ تمرین‌ها و آزمون‌ها</h2>
+            <h2 className="text-xl font-extrabold text-[#19355f]">همه‌ی تمرین‌ها و آزمون‌ها</h2>
             <p className="mt-1 text-xs text-slate-600">
               تمرین مناسب را با درس، مبحث، سال و سختی پیدا کن.
             </p>
@@ -338,7 +338,7 @@ export function StudentPracticeHub({
               value={status}
               onChange={(event) => setStatus(event.target.value)}
             >
-              <option value="all">همهٔ وضعیت‌ها</option>
+              <option value="all">همه‌ی وضعیت‌ها</option>
               <option value="ready">آماده / در حال انجام</option>
               <option value="completed">تکمیل‌شده</option>
             </select>
@@ -346,35 +346,35 @@ export function StudentPracticeHub({
           <label className="grid gap-1.5 text-xs font-medium text-slate-700">
             درس
             <select className="glass-field min-h-12 px-3" value={courseId} onChange={(event) => { setCourseId(event.target.value); setChapterId("all"); setTopicId("all"); }}>
-              <option value="all">همهٔ درس‌ها</option>
+              <option value="all">همه‌ی درس‌ها</option>
               {courses.map((course) => <option key={course._id} value={course._id}>{course.title}</option>)}
             </select>
           </label>
           <label className="grid gap-1.5 text-xs font-medium text-slate-700">
             فصل
             <select className="glass-field min-h-12 px-3" value={chapterId} onChange={(event) => { setChapterId(event.target.value); setTopicId("all"); }}>
-              <option value="all">همهٔ فصل‌ها</option>
+              <option value="all">همه‌ی فصل‌ها</option>
               {chapters.map((chapter) => <option key={chapter.id} value={chapter.id}>{chapter.title}</option>)}
             </select>
           </label>
           <label className="grid gap-1.5 text-xs font-medium text-slate-700">
             مبحث
             <select className="glass-field min-h-12 px-3" value={topicId} onChange={(event) => setTopicId(event.target.value)}>
-              <option value="all">همهٔ مباحث</option>
+              <option value="all">همه‌ی مباحث</option>
               {topics.map((choice) => <option key={choice.topic._id} value={choice.topic._id}>{choice.topic.title}</option>)}
             </select>
           </label>
           <label className="grid gap-1.5 text-xs font-medium text-slate-700">
             سال آزمون
             <select className="glass-field min-h-12 px-3" value={year} onChange={(event) => setYear(event.target.value)}>
-              <option value="all">همهٔ سال‌ها</option>
+              <option value="all">همه‌ی سال‌ها</option>
               {years.map((value) => <option key={value} value={value}>{value}</option>)}
             </select>
           </label>
           <label className="grid gap-1.5 text-xs font-medium text-slate-700">
             سختی واقعی
             <select className="glass-field min-h-12 px-3" value={difficulty} onChange={(event) => setDifficulty(event.target.value)}>
-              <option value="all">همهٔ درجه‌ها</option>
+              <option value="all">همه‌ی درجه‌ها</option>
               <option value="unset">تعیین نشده</option>
               <option value="easy">۰ تا ۳۳</option>
               <option value="medium">۳۴ تا ۶۶</option>
@@ -382,7 +382,7 @@ export function StudentPracticeHub({
             </select>
           </label>
           <fieldset className="grid gap-2 text-xs font-medium text-slate-700 sm:col-span-2">
-            <legend>بازهٔ دلخواه سختی (۰ تا ۱۰۰)</legend>
+            <legend>بازه‌ی دلخواه سختی (۰ تا ۱۰۰)</legend>
             <div className="grid grid-cols-2 gap-2">
               <label className="grid gap-1">از
                 <input aria-label="حداقل سختی" type="number" min={0} max={maxDifficulty} step={1} value={minDifficulty}
@@ -393,7 +393,7 @@ export function StudentPracticeHub({
                   className="glass-field min-h-12 w-full px-3" onChange={(event) => setMaxDifficulty(Math.max(minDifficulty, Math.min(100, Math.round(Number(event.target.value) || 0))))} />
               </label>
             </div>
-            <p className="font-normal text-slate-500">سؤال‌های بدون درجهٔ سختی فقط با گزینهٔ «تعیین نشده» نمایش داده می‌شوند.</p>
+            <p className="font-normal text-slate-500">سؤال‌های بدون درجه‌ی سختی فقط با گزینه‌ی «تعیین نشده» نمایش داده می‌شوند.</p>
           </fieldset>
           <label className="grid gap-1.5 text-xs font-medium text-slate-700">
             مرتب‌سازی
@@ -613,7 +613,7 @@ export function StudentSearchScreen({
       ? selectedItems.map((item) => ({ key: item.questionId, title: byTopic.get(item.topicId)?.topic.title ?? "سؤال آموزشی", items: [item] }))
       : [...new Map(selectedItems.filter((item) => filters.content === "exams" ? !!item.examKey : !!item.resourceKey).map((item) => [filters.content === "exams" ? item.examKey! : item.resourceKey!, true])).keys()].map((key) => {
           const rows = selectedItems.filter((item) => (filters.content === "exams" ? item.examKey : item.resourceKey) === key);
-          return { key, title: (filters.content === "exams" ? rows[0]?.examTitle : rows[0]?.resourceTitle) || "مجموعهٔ آموزشی", items: rows };
+          return { key, title: (filters.content === "exams" ? rows[0]?.examTitle : rows[0]?.resourceTitle) || "مجموعه‌ی آموزشی", items: rows };
         });
     const needle = filters.query.trim().toLocaleLowerCase("fa");
     return rows.filter((row) => !needle || [row.title, ...row.items.flatMap((item) => [
@@ -713,14 +713,14 @@ export function StudentSearchScreen({
 
   return (
     <div className="grid gap-6">
-      <section className="hy-learning-hero" aria-label="کتابخانهٔ آموزشی">
+      <section className="hy-learning-hero" aria-label="کتابخانه‌ی آموزشی">
         <div className="hy-learning-hero-content">
-          <span className="hy-learning-eyebrow"><BookOpenCheck size={16} aria-hidden /> کتابخانهٔ من</span>
+          <span className="hy-learning-eyebrow"><BookOpenCheck size={16} aria-hidden /> کتابخانه‌ی من</span>
           <h2 className="hy-learning-hero-title">برای یادگرفتن، از کنجکاوی شروع کن</h2>
           <p className="hy-learning-hero-description">سؤال‌ها و مجموعه‌های آموزشیِ مجاز در کلاس‌هایت را بر اساس درس و مبحث پیدا کن. برای پاسخ‌دادن، مأموریت مرتبط را باز کن.</p>
           <div className="flex flex-wrap gap-2 text-sm text-white/90">
             <span className="rounded-full border border-white/25 px-3 py-1">{mergedItems.length.toLocaleString("fa-IR")} سؤال</span>
-            <span className="rounded-full border border-white/25 px-3 py-1">{new Set(mergedItems.flatMap((item) => item.examKey ? [item.examKey] : [])).size.toLocaleString("fa-IR")} مجموعهٔ آزمون</span>
+            <span className="rounded-full border border-white/25 px-3 py-1">{new Set(mergedItems.flatMap((item) => item.examKey ? [item.examKey] : [])).size.toLocaleString("fa-IR")} مجموعه‌ی آزمون</span>
           </div>
         </div>
       </section>
@@ -824,7 +824,7 @@ export function StudentSearchScreen({
           </fieldset>
         </div>
       </section>
-      {libraryLoading && <p role="status" className="text-sm text-slate-500">در حال دریافت سؤال‌های منتشرشدهٔ درس‌ها…</p>}
+      {libraryLoading && <p role="status" className="text-sm text-slate-500">در حال دریافت سؤال‌های منتشرشده‌ی درس‌ها…</p>}
       {libraryError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{libraryError}</p>}
       <section className="grid gap-4" aria-label="نتایج کتابخانه">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -836,7 +836,7 @@ export function StudentSearchScreen({
           <Search size={28} className="text-[#2457b8]" aria-hidden />
           <h3 className="font-bold text-[#17305e]">محتوایی با این شرایط پیدا نشد</h3>
           <p className="text-sm text-slate-600">کتابخانه شامل مأموریت‌های تو و سؤال‌های منتشرشده برای درس‌هایی است که عضو آن‌ها هستی. فیلترها را پاک کن یا درس دیگری انتخاب کن.</p>
-          <Button onClick={() => update(emptyStudentContentFilters)}>نمایش همهٔ محتوا</Button>
+          <Button onClick={() => update(emptyStudentContentFilters)}>نمایش همه‌ی محتوا</Button>
         </div> : <PagedList items={contentRows} label="محتوای کتابخانه" pageSize={9} className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {(row) => {
             const first = row.items[0];
@@ -845,7 +845,7 @@ export function StudentSearchScreen({
             const score = scores.length ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : null;
             const related = assignments.find((assignment) => assignment.state !== "cancelled" && row.items.some((item) => assignment.questionVersionIds?.includes(item.questionId)));
             return <article key={row.key} className="hy-learning-practice-card grid gap-3">
-              <span className="text-xs font-bold text-[#2457b8]">{filters.content === "questions" ? "سؤال آموزشی" : filters.content === "exams" ? "مجموعهٔ آزمون" : "منبع آموزشی"}</span>
+              <span className="text-xs font-bold text-[#2457b8]">{filters.content === "questions" ? "سؤال آموزشی" : filters.content === "exams" ? "مجموعه‌ی آزمون" : "منبع آموزشی"}</span>
               <h3 className="text-base font-bold text-[#17305e]">{row.title}</h3>
               <p className="text-xs leading-relaxed text-slate-600">{[topic?.book.title, topic?.chapter.title, topic?.topic.title].filter(Boolean).join(" ← ") || "موضوع در دسترس"}</p>
               <div className="flex flex-wrap gap-2 text-xs text-slate-600">

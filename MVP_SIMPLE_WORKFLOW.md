@@ -13,7 +13,7 @@ npm run check      # TypeScript + ESLint + تست‌های سریع؛ بدون b
 ## به‌روزرسانی سایت Staging
 
 1. تغییرات را روی شاخه `staging` Push کنید.
-2. Workflow **Verify HodHodeh MVP** یک‌بار `npm ci`، Typecheck، Lint، اسکن Secret، تست‌های سریع و **یک‌بار Build** را اجرا می‌کند.
+2. Workflow **Verify HodHod MVP** یک‌بار `npm ci`، Typecheck، Lint، اسکن Secret، تست‌های سریع و **یک‌بار Build** را اجرا می‌کند.
 3. پس از موفقیت Verify مربوط به Push همان مخزن، Workflow **Deploy verified staging release** همان Artifact را دانلود می‌کند؛ **روی سرور `npm install` یا `npm run build` اجرا نمی‌کند**.
 4. روی سرور `/usr/local/sbin/hodhod-deploy` بررسی پیش از استقرار، Backup، فعال‌سازی، Health Check و در صورت شکست، بازگشت کد به نسخه قبلی را انجام می‌دهد. Rollback دیتابیس خودکار نیست.
 
@@ -29,7 +29,7 @@ npm run check      # TypeScript + ESLint + تست‌های سریع؛ بدون b
 
 ## کارهای سنگین و اختیاری
 
-Workflow **Deep HodHodeh verification** دیگر هفتگی خودکار اجرا نمی‌شود و از تب Actions به‌صورت دستی اجرا می‌شود؛ شامل MongoDB، مرورگر، OCR و E2E است. تست‌های امنیتی را حذف نکرده‌ایم، فقط اجرای پرهزینه را جدا کرده‌ایم. برای انتشار عمومی با کاربران واقعی، نتیجهٔ موفق بررسی‌های یکپارچه و امنیتی همچنان ضروری است.
+Workflow **Deep HodHod verification** دیگر هفتگی خودکار اجرا نمی‌شود و از تب Actions به‌صورت دستی اجرا می‌شود؛ شامل MongoDB، مرورگر، OCR و E2E است. تست‌های امنیتی را حذف نکرده‌ایم، فقط اجرای پرهزینه را جدا کرده‌ایم. برای انتشار عمومی با کاربران واقعی، نتیجهٔ موفق بررسی‌های یکپارچه و امنیتی همچنان ضروری است.
 
 ## محدودیت‌ها
 

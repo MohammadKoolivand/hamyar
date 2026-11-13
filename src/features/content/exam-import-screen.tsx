@@ -408,7 +408,7 @@ export function ExamImportScreen({
                     onClick={() => {
                       if (
                         !window.confirm(
-                          `آزمون «${e.title}» از فهرست حذف شود؟ سؤال‌های تأییدشدهٔ بانک حفظ می‌شوند.`,
+                          `آزمون «${e.title}» از فهرست حذف شود؟ سؤال‌های تأییدشده‌ی بانک حفظ می‌شوند.`,
                         )
                       )
                         return;
@@ -547,7 +547,7 @@ export function ExamImportScreen({
               >
                 {exam.job?.stage === "queued" || !exam.job?.stage
                   ? "در انتظار worker؛ پردازش هنوز شروع نشده است."
-                  : `مرحلهٔ پردازش: ${exam.job.stage}`}
+                  : `مرحله‌ی پردازش: ${exam.job.stage}`}
                 {exam.job?.processedPage
                   ? ` · ${fa(exam.job.processedPage)} صفحه پردازش شده${exam.job.totalPages ? ` از ${fa(exam.job.totalPages)}` : ""}`
                   : ""}
@@ -694,7 +694,7 @@ export function ExamImportScreen({
               >
                 {!!exam.statistics?.failedPages?.length && (
                   <strong className="block">
-                    استخراج ناقص — صفحات سالم آمادهٔ بازبینی‌اند
+                    استخراج ناقص — صفحات سالم آماده‌ی بازبینی‌اند
                   </strong>
                 )}
                 <p>{exam.extractionNotice}</p>
@@ -791,7 +791,7 @@ export function ExamImportScreen({
                       checked={bulkConfirmed}
                       onChange={(e) => setBulkConfirmed(e.target.checked)}
                     />{" "}
-                    متن، شکل، گزینه و کلید همهٔ موارد انتخاب‌شده را بررسی
+                    متن، شکل، گزینه و کلید همه‌ی موارد انتخاب‌شده را بررسی
                     کرده‌ام.
                   </label>
                   <Button
@@ -917,7 +917,7 @@ function ReviewItem({
       );
     if (q.reference.trim() && !q.options.includes(q.reference))
       reviewErrors.push(
-        "پاسخ مرجع باید دقیقاً متن یکی از گزینه‌ها باشد، نه شمارهٔ گزینه.",
+        "پاسخ مرجع باید دقیقاً متن یکی از گزینه‌ها باشد، نه شماره‌ی گزینه.",
       );
   }
   const visualValidation = questionVisualsSchema.safeParse(q.visuals ?? []);
@@ -1037,7 +1037,7 @@ function ReviewItem({
               }}
             >
               <option value="private">خصوصی</option>
-              <option value="public">عمومی برای همهٔ دانش‌آموزان</option>
+              <option value="public">عمومی برای همه‌ی دانش‌آموزان</option>
             </select>
           </Field>
           <Field
@@ -1104,7 +1104,7 @@ function ReviewItem({
                 }}
               />
               <p className="mt-2 text-xs leading-6 text-slate-500">
-                نمونهٔ گزینهٔ فرمولی:{" "}
+                نمونه‌ی گزینه‌ی فرمولی:{" "}
                 <code dir="ltr">$x^2+\sqrt&#123;3&#125;$</code>. نمایش نهایی هر
                 گزینه در پیش‌نمایش پایین دیده می‌شود.
               </p>
@@ -1121,12 +1121,12 @@ function ReviewItem({
                   setConfirmed(false);
                 }}
               >
-                <option value="">گزینهٔ صحیح را انتخاب کنید</option>
+                <option value="">گزینه‌ی صحیح را انتخاب کنید</option>
                 {q.options.map(
                   (option, optionIndex) =>
                     option.trim() && (
                       <option key={optionIndex} value={option}>
-                        گزینهٔ {fa(optionIndex + 1)}
+                        گزینه‌ی {fa(optionIndex + 1)}
                       </option>
                     ),
                 )}

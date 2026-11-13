@@ -30,7 +30,7 @@ export function nextLearningGuidance(skills: GuidanceSkill[], hasOpenPractice: b
     return {
       kind: "review", skill: priority,
       title: `یک قدم برای مرور «${priority.title}»`,
-      description: `${priority.incorrect.toLocaleString("fa-IR")} پاسخ نادرست ثبت شده؛ اشتباهات قابل‌نمایش را مرور کن و سپس یک سؤال تازه را بدون راهنما حل کن. این یک پیشنهاد بر پایهٔ شواهد است، نه قضاوت قطعی دربارهٔ تسلط.`,
+      description: `${priority.incorrect.toLocaleString("fa-IR")} پاسخ نادرست ثبت شده؛ اشتباهات قابل‌نمایش را مرور کن و سپس یک سؤال تازه را بدون راهنما حل کن. این یک پیشنهاد بر پایه‌ی شواهد است، نه قضاوت قطعی درباره‌ی تسلط.`,
       destination: "student-mistakes",
     };
   }

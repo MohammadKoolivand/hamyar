@@ -48,7 +48,7 @@ export function DiscoveryFiltersEditor() {
       });
       setSettings(next);
       setOption(blank());
-      setNotice("تنظیمات ذخیره شد؛ در صفحهٔ عمومی با تازه‌سازی دیده می‌شود.");
+      setNotice("تنظیمات ذخیره شد؛ در صفحه‌ی عمومی با تازه‌سازی دیده می‌شود.");
     } catch (error) {
       setError((error as Error).message);
     } finally {
@@ -69,7 +69,7 @@ export function DiscoveryFiltersEditor() {
     >
       <summary className="flex cursor-pointer items-center gap-2 font-bold text-slate-700">
         <SlidersHorizontal size={19} />
-        مدیریت فیلترهای صفحهٔ عمومی
+        مدیریت فیلترهای صفحه‌ی عمومی
       </summary>
       <div className="mt-5 grid gap-5">
         <p className="text-sm leading-7 text-slate-500">
@@ -127,7 +127,7 @@ export function DiscoveryFiltersEditor() {
               onChange={(e) => setTitle(e.target.value)}
             />
           </label>
-          <Button disabled={busy || !title}>ذخیرهٔ عنوان</Button>
+          <Button disabled={busy || !title}>ذخیره‌ی عنوان</Button>
         </form>
         <form
           className="grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-2"
@@ -232,7 +232,7 @@ export function DiscoveryFiltersEditor() {
           </label>
           <Button disabled={busy || !settings}>
             <Plus size={16} />
-            {option.id ? "ذخیرهٔ گزینه" : "افزودن گزینه"}
+            {option.id ? "ذخیره‌ی گزینه" : "افزودن گزینه"}
           </Button>
           {option.id && (
             <Button
@@ -240,7 +240,7 @@ export function DiscoveryFiltersEditor() {
               variant="outline"
               onClick={() => setOption(blank())}
             >
-              گزینهٔ جدید
+              گزینه‌ی جدید
             </Button>
           )}
         </form>

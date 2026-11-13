@@ -1,4 +1,4 @@
-name: Verify HodHodeh MVP
+name: Verify HodHod MVP
 
 on:
   push:
@@ -67,7 +67,7 @@ jobs:
         if: (github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/staging') && github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
-          name: hodhodeh-runtime-${{ github.sha }}
+          name: hodhod-runtime-${{ github.sha }}
           path: /tmp/hodhod-release/
           retention-days: 14
           if-no-files-found: error

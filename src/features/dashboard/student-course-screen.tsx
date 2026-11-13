@@ -140,7 +140,7 @@ export function StudentCourseScreen({
       </section>
 
       {ready.length > 0 && (
-        <section className="hy-learning-next-lesson" aria-label="پیشنهاد ادامهٔ درس">
+        <section className="hy-learning-next-lesson" aria-label="پیشنهاد ادامه‌ی درس">
           <div><span className="hy-learning-section-label">قدم بعدی در این درس</span><h3 className="font-bold text-[#19355f]">{ready[0].title}</h3><p className="mt-1 text-xs text-slate-600">{ready.length.toLocaleString("fa-IR")} مأموریت آماده داری؛ همین‌جا ادامه بده.</p></div>
           <Button onClick={() => void open(ready[0])}>شروع / ادامه <ArrowRight size={16} aria-hidden /></Button>
         </section>
