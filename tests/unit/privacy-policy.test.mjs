@@ -6,8 +6,9 @@ test('Production fails closed for student data processing even if env says false
   assert.equal(studentConsentRequired({ NODE_ENV: 'test' }), false);
   assert.equal(studentConsentRequired({ NODE_ENV: 'test', STUDENT_CONSENT_REQUIRED: 'true' }), true);
 });
-test('policy version must be explicit and bounded', () => {
-  assert.throws(() => consentPolicyVersion({}), /STUDENT_CONSENT_POLICY_VERSION/);
+test('policy version defaults to owner-approved 1.0.0 and overrides stay bounded', () => {
+  assert.equal(consentPolicyVersion({}), '1.0.0');
+  assert.throws(() => consentPolicyVersion({ STUDENT_CONSENT_POLICY_VERSION: '' }));
   assert.equal(consentPolicyVersion({ STUDENT_CONSENT_POLICY_VERSION: 'ir-2026.1' }), 'ir-2026.1');
   assert.throws(() => consentPolicyVersion({ STUDENT_CONSENT_POLICY_VERSION: '<script>' }));
 });
