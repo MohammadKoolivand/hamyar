@@ -30,6 +30,7 @@ jobs:
       - name: Install PDF text extraction for import tests
         run: sudo apt-get update && sudo apt-get install -y poppler-utils
       - run: npm run test:fast
+      - run: bash -n ops/cleanup-staging-artifacts.sh
       - run: npm run build
       - name: Package verified runtime for staging
         if: (github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/staging') && github.event_name == 'push'
@@ -41,6 +42,12 @@ jobs:
             --exclude=.env \
             --exclude=.env.* \
             --exclude=.private \
+            --exclude=.next/cache \
+            --exclude=node_modules/.cache \
+            --exclude=tests \
+            --exclude=docs \
+            --exclude=output \
+            --exclude=.data \
             --exclude=test-results \
             --exclude=playwright-report \
             --exclude=coverage \
