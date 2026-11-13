@@ -61,10 +61,8 @@ if systemctl is-active --quiet hodhod-mail-worker; then
 fi
 rollback() {
   trap - ERR INT TERM
-  # Show service failure context before restoring the previous release.
-  # Avoid dumping environment files, tokens or application request payloads.
-  systemctl --no-pager --full status hodhod-web || true
-  journalctl -u hodhod-web --since '-3 minutes' --no-pager -n 60 -o cat || true
+  # Report service state without copying application logs or secrets to CI.
+  systemctl show hodhod-web --property=ActiveState,SubState,Result,ExecMainStatus --no-pager || true
   systemctl stop hodhod-web hodhod-exam-worker || true
   if [[ "$mail_active" == true ]]; then systemctl stop hodhod-mail-worker || true; fi
   ln -sfn "$previous" /srv/hodhod.rollback
