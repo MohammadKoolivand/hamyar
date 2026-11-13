@@ -360,6 +360,24 @@ export function PublicQuestionBank({
           نتیجه
         </span>
         <Button
+          variant="outline"
+          disabled={!results.length || results.every((q) => selected.includes(q._id))}
+          onClick={() =>
+            setSelected((previous) => [
+              ...new Set([...previous, ...results.map((q) => q._id)]),
+            ])
+          }
+        >
+          افزودن همهٔ {results.length.toLocaleString("fa-IR")} سؤال به لیست PDF
+        </Button>
+        <Button
+          variant="outline"
+          disabled={!selected.length}
+          onClick={() => setSelected([])}
+        >
+          پاک‌کردن انتخاب‌ها
+        </Button>
+        <Button
           className="discovery-export"
           disabled={printing || !results.length}
           onClick={() => void exportPdf()}
@@ -502,12 +520,14 @@ export function PublicQuestionBank({
               </div>
               {!!q.options?.length && (
                 <ol
-                  className={`pdf-options${q.options.some((option) => option.length > 65) ? " pdf-options-long" : ""}`}
+                  className="pdf-options"
                 >
                   {q.options.map((option, index) => (
                     <li key={index} className="pdf-option">
                       <span>{(index + 1).toLocaleString("fa-IR")})</span>
-                      <MathText text={option} />
+                      <span className="pdf-option-text">
+                        <MathText text={option} />
+                      </span>
                     </li>
                   ))}
                 </ol>
