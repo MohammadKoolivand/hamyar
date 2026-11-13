@@ -1,4 +1,5 @@
 import { registerPrivacy, ensureStudentConsent } from "./modules/privacy";
+import { registerAdminOverview } from "./modules/admin-overview";
 import { registerPhoneAuth } from "./modules/phone-auth";
 import { MelipayamakProvider, type SmsProvider } from "./auth/sms";
 import { registerEmailVerification } from "./modules/email-verification";
@@ -207,6 +208,7 @@ export async function buildApp(
     }
   });
   registerAccessManagement(app, ctx);
+  registerAdminOverview(app, ctx);
   registerPrivacy(app, ctx);
   const { linkInvitation } = registerIdentity(app, ctx);
   registerPhoneAuth(app, ctx, sms, linkInvitation, db.databaseName);
