@@ -47,6 +47,9 @@ jobs:
           SHA=$(jq -r .head_sha run.json)
           [[ "$SHA" =~ ^[a-f0-9]{40}$ ]]
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.sha }}
       - uses: actions/download-artifact@v4
         with:
           name: hodhodeh-runtime-${{ steps.source.outputs.sha }}
@@ -78,6 +81,8 @@ jobs:
           set -euo pipefail
           [[ "$HOST" =~ ^[a-zA-Z0-9.-]+$ && "$USER" =~ ^[a-z_][a-z0-9_-]*$ && "$PORT" =~ ^[0-9]+$ ]]
           SSH_ARGS=(-i "$HOME/.ssh/staging_key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15)
+          # Inspect storage and remove only known disposable deploy artifacts.
+          ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "bash -s -- $SHA" < ops/cleanup-staging-artifacts.sh
           ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "mkdir -p /var/lib/hodhod/incoming/$SHA"
           scp "${SSH_ARGS[@]}" -P "$PORT" release/* "$USER@$HOST:/var/lib/hodhod/incoming/$SHA/"
           ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sudo -n /usr/local/sbin/hodhod-deploy $SHA $ACTIVATE"
