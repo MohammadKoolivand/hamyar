@@ -18,6 +18,12 @@ import { writeFile, stat, statfs, unlink } from "node:fs/promises";
 import { join } from "node:path";
 
 const uri = process.env.MONGO_URL || "";
+// The Node MongoDB driver authenticates against admin when the URI has no
+// database or authSource. mongodump --db changes that default, so match Node.
+const uriWithoutQuery = uri.split("?")[0];
+const uriPath = uriWithoutQuery.replace(/^mongodb(?:\+srv)?:\/\/[^/]+/, "");
+const useDefaultAdminAuth = !/(?:\?|&)authSource=/i.test(uri)
+  && (!uriPath || uriPath === "/");
 const db = process.env.MONGO_DB || "";
 const expected = process.env.HODHOD_EXPECTED_DB || "";
 if (!/^mongodb(?:\+srv)?:\/\//.test(uri) || !/^[\w-]{1,63}$/.test(db) || db !== expected) {
@@ -35,11 +41,32 @@ const archive = join(dir, "staging-" + Date.now() + "-" + id + ".archive.gz");
 await writeFile(cfg, "uri: " + JSON.stringify(uri) + "\n", { mode: 0o600, flag: "wx" });
 try {
   await new Promise((resolve, reject) => {
-    const child = spawn("mongodump", [
-      "--config=" + cfg, "--db=" + db, "--archive=" + archive, "--gzip", "--quiet"
-    ], { stdio: "ignore" });
+    const args = [
+      "--config=" + cfg, "--db=" + db, "--archive=" + archive, "--gzip",
+      ...(useDefaultAdminAuth ? ["--authenticationDatabase=admin"] : []),
+    ];
+    const child = spawn("mongodump", args, {
+      stdio: ["ignore", "ignore", "pipe"],
+    });
+    let diagnostic = "";
+    child.stderr.on("data", (chunk) => {
+      // Keep private logs in memory. Never emit URI, hostnames, or credentials.
+      diagnostic = (diagnostic + chunk.toString()).slice(-16384);
+    });
     child.once("error", () => reject(new Error("MONGODUMP_UNAVAILABLE")));
-    child.once("exit", code => code === 0 ? resolve() : reject(new Error("MONGODUMP_FAILED")));
+    child.once("exit", (code) => {
+      if (code === 0) return resolve();
+      const category = /authenticat|not authorized|unauthorized|requires auth/i.test(diagnostic)
+        ? "MONGODUMP_AUTH_OR_READ_ROLE_REJECTED"
+        : /tls|ssl|certificate|x509/i.test(diagnostic)
+          ? "MONGODUMP_TLS_HANDSHAKE_FAILED"
+          : /connection|server selection|timeout|refused|network/i.test(diagnostic)
+            ? "MONGODUMP_NETWORK_FAILED"
+            : /invalid|parse|unknown option|conflict/i.test(diagnostic)
+              ? "MONGODUMP_ARGUMENTS_INVALID"
+              : "MONGODUMP_FAILED_UNCLASSIFIED";
+      reject(new Error(category));
+    });
   });
   const result = await stat(archive);
   if (!result.isFile() || result.size === 0) throw new Error("BACKUP_ARCHIVE_INVALID");
