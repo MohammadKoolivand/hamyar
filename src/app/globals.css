@@ -448,6 +448,22 @@
   font-weight: 700;
 }
 
+/* Main question stems are bold. Answer choices must remain regular across
+   public library, teacher bank, practice, and custom option renderers. */
+.hy-question-statement .hy-question-text {
+  font-weight: 700;
+}
+.hy-question-option,
+.hy-question-option .hy-question-text,
+.hy-question-option .hy-question-text math,
+.hy-question-option .hy-question-text math mi,
+.hy-question-option .hy-question-text math mn,
+.hy-question-option .hy-question-text .katex .mathnormal,
+.hy-question-option .hy-question-text .katex .hy-math-number {
+  font-family: var(--font-question-regular), "B Nazanin", serif;
+  font-weight: 400;
+}
+
 /* Student home — one clear next action, with calmer secondary content. */
 .hy-student-home { gap: 2rem; }
 .hy-student-home .hy-home-spotlight {
