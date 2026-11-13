@@ -85,6 +85,20 @@ jobs:
           ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "bash -s -- $SHA" < ops/cleanup-staging-artifacts.sh
           ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "mkdir -p /var/lib/hodhod/incoming/$SHA"
           scp "${SSH_ARGS[@]}" -P "$PORT" release/* "$USER@$HOST:/var/lib/hodhod/incoming/$SHA/"
+          # Diagnose activation gates without printing environment variables or secrets.
+          ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "bash -s -- $SHA" <<'DIAGNOSTICS'
+          set -euo pipefail
+          sha=$1
+          current=$(readlink -f /srv/hodhod || true)
+          case "$current" in /opt/hodhod/releases/*) echo "ACTIVE_RELEASE_PATH_OK";; *) echo "ACTIVE_RELEASE_PATH_INVALID";; esac
+          if [[ -d "$current" ]]; then echo "ACTIVE_RELEASE_EXISTS"; else echo "ACTIVE_RELEASE_MISSING"; fi
+          if [[ "$current" == "/opt/hodhod/releases/$sha" ]]; then echo "CURRENTLY_TARGET_RELEASE"; fi
+          if [[ -e "/opt/hodhod/releases/$sha" ]]; then echo "TARGET_RELEASE_PATH_ALREADY_EXISTS"; else echo "TARGET_RELEASE_PATH_FREE"; fi
+          if [[ -x /etc/hodhod/backup-before-release ]]; then echo "BACKUP_HOOK_EXECUTABLE"; else echo "BACKUP_HOOK_NOT_EXECUTABLE_OR_MISSING"; fi
+          if [[ -e /etc/hodhod/backup-before-release ]]; then
+            if [[ "$(stat -c %u /etc/hodhod/backup-before-release)" == 0 ]]; then echo "BACKUP_HOOK_ROOT_OWNED"; else echo "BACKUP_HOOK_OWNER_INVALID"; fi
+          fi
+          DIAGNOSTICS
           ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sudo -n /usr/local/sbin/hodhod-deploy $SHA $ACTIVATE"
       - name: Remove SSH material
         if: always()
