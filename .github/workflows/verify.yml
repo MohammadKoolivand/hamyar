@@ -38,21 +38,28 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/hodhod-release
+          # Anchor exclusions to repository root; unanchored 'output' also
+          # deletes node_modules/next/dist/build/output, breaking Next.js.
           tar \
-            --exclude=.git \
-            --exclude=.env \
-            --exclude=.env.* \
-            --exclude=.private \
-            --exclude=.next/cache \
-            --exclude=node_modules/.cache \
-            --exclude=tests \
-            --exclude=docs \
-            --exclude=output \
-            --exclude=.data \
-            --exclude=test-results \
-            --exclude=playwright-report \
-            --exclude=coverage \
+            --anchored \
+            --exclude=./.git \
+            --exclude=./.env \
+            --exclude=./.env.* \
+            --exclude=./.private \
+            --exclude=./.next/cache \
+            --exclude=./node_modules/.cache \
+            --exclude=./tests \
+            --exclude=./docs \
+            --exclude=./output \
+            --exclude=./.data \
+            --exclude=./test-results \
+            --exclude=./playwright-report \
+            --exclude=./coverage \
             -czf /tmp/hodhod-release/release.tar.gz .
+          # Check the actual archive, not just the workspace build.
+          tar -tzf /tmp/hodhod-release/release.tar.gz | grep -Fx './node_modules/next/dist/build/output/log.js'
+          tar -tzf /tmp/hodhod-release/release.tar.gz | grep -Fx './node_modules/next/dist/bin/next'
+          tar -tzf /tmp/hodhod-release/release.tar.gz | grep -Fx './.next/BUILD_ID'
           cd /tmp/hodhod-release
           sha256sum release.tar.gz > SHA256SUMS
           printf '%s\n' "$GITHUB_SHA" > COMMIT

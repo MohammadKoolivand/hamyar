@@ -19,6 +19,16 @@ tar -tzf "$incoming/release.tar.gz" | grep -x './.next/BUILD_ID' > /dev/null
 tar -tzf "$incoming/release.tar.gz" | grep -x './node_modules/next/package.json' > /dev/null
 ! tar -tzf "$incoming/release.tar.gz" | grep -E '^\./(\.env|\.private)(/|$)' > /dev/null
 tar -xzf "$incoming/release.tar.gz" -C "$release" --no-same-owner
+# Abort before switching the live symlink if the packaged Next.js runtime is incomplete.
+# A package.json alone does not guarantee the CLI's internal modules survived tar exclusions.
+[[ -f "$release/node_modules/next/dist/build/output/log.js" ]] || {
+  echo "Release missing Next.js runtime: dist/build/output/log.js" >&2
+  exit 1
+}
+[[ -f "$release/node_modules/next/dist/bin/next" ]] || {
+  echo "Release missing Next.js CLI" >&2
+  exit 1
+}
 [[ ! -e "$release/.env" && ! -e "$release/.private" ]]
 ln -s /etc/hodhod/staging.env "$release/.env"
 ln -s /var/lib/hodhod/private "$release/.private"
@@ -51,6 +61,8 @@ if systemctl is-active --quiet hodhod-mail-worker; then
 fi
 rollback() {
   trap - ERR INT TERM
+  # Report service state without copying application logs or secrets to CI.
+  systemctl show hodhod-web --property=ActiveState,SubState,Result,ExecMainStatus --no-pager || true
   systemctl stop hodhod-web hodhod-exam-worker || true
   if [[ "$mail_active" == true ]]; then systemctl stop hodhod-mail-worker || true; fi
   ln -sfn "$previous" /srv/hodhod.rollback
