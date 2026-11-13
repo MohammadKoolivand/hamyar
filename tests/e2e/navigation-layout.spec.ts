@@ -72,8 +72,8 @@ test("student navigation exposes the phase-one learning architecture with workin
 
   const destinations = [
     ["خانه", "/dashboard"],
-    ["درس‌های من", "/courses"],
     ["تمرین و آزمون", "/student-practice"],
+    ["درس‌های من", "/courses"],
     ["مأموریت‌های معلم", "/student-missions"],
     ["مرور اشتباهات", "/mistakes"],
     ["پیشرفت من", "/progress"],
