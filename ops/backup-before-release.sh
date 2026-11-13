@@ -26,6 +26,19 @@ const useDefaultAdminAuth = !/(?:\?|&)authSource=/i.test(uri)
   && (!uriPath || uriPath === "/");
 const db = process.env.MONGO_DB || "";
 const expected = process.env.HODHOD_EXPECTED_DB || "";
+// Follow the pinned CA used by the local MongoDB TLS deployment when the
+// application URI has not explicitly selected its own trusted CA.
+// Never disable TLS or bypass hostname / certificate verification.
+const uriHasCa = /(?:[?&])tlsCAFile=/i.test(uri);
+const pinnedCaPath = "/etc/hodhod/tls/mongodb-ca.pem";
+let pinnedCaAvailable = false;
+if (!uriHasCa) {
+  try {
+    pinnedCaAvailable = (await stat(pinnedCaPath)).isFile();
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw new Error("MONGODUMP_TLS_CA_ACCESS_FAILED");
+  }
+}
 if (!/^mongodb(?:\+srv)?:\/\//.test(uri) || !/^[\w-]{1,63}$/.test(db) || db !== expected) {
   throw new Error("BACKUP_DATABASE_CONFIGURATION_INVALID");
 }
@@ -44,6 +57,7 @@ try {
     const args = [
       "--config=" + cfg, "--db=" + db, "--archive=" + archive, "--gzip",
       ...(useDefaultAdminAuth ? ["--authenticationDatabase=admin"] : []),
+      ...(pinnedCaAvailable ? ["--sslCAFile=" + pinnedCaPath] : []),
     ];
     const child = spawn("mongodump", args, {
       stdio: ["ignore", "ignore", "pipe"],
@@ -56,7 +70,13 @@ try {
     child.once("error", () => reject(new Error("MONGODUMP_UNAVAILABLE")));
     child.once("exit", (code) => {
       if (code === 0) return resolve();
-      const category = /authenticat|not authorized|unauthorized|requires auth/i.test(diagnostic)
+      const category = /certificate signed by unknown authority|unknown authority|self.signed/i.test(diagnostic)
+        ? "MONGODUMP_TLS_CA_UNTRUSTED"
+        : /hostname|not valid for|doesn.t contain any IP SANs|certificate is valid for|cannot validate certificate/i.test(diagnostic)
+          ? "MONGODUMP_TLS_CERTIFICATE_NAME_MISMATCH"
+          : /certificate has expired|certificate is expired|not yet valid/i.test(diagnostic)
+            ? "MONGODUMP_TLS_CERTIFICATE_EXPIRED"
+          : /authenticat|not authorized|unauthorized|requires auth/i.test(diagnostic)
         ? "MONGODUMP_AUTH_OR_READ_ROLE_REJECTED"
         : /tls|ssl|certificate|x509/i.test(diagnostic)
           ? "MONGODUMP_TLS_HANDSHAKE_FAILED"
