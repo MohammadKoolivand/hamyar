@@ -26,6 +26,33 @@ for candidate in "$incoming"/*; do
   echo "Removing completed deploy upload $oldsha"
   rm -rf -- "$candidate"
 done
+# A retry of this exact SHA may encounter a prepared tree left by a failed
+# pre-activation backup. Only remove the exact target if it is NOT the active
+# release, is a regular directory (never a symlink), and matches the verified
+# SHA argument. The deploy script will reconstruct it from the CI artifact.
+target="$releases/$sha"
+if [[ -e "$target" || -L "$target" ]]; then
+  if [[ "$target" == "$active" ]]; then
+    echo "TARGET_RELEASE_IS_ACTIVE_REFUSING_REPLACEMENT" >&2
+    exit 1
+  fi
+  if [[ ! -d "$target" || -L "$target" ]]; then
+    echo "TARGET_RELEASE_NOT_A_REGULAR_DIRECTORY" >&2
+    exit 1
+  fi
+  echo "Removing inactive retry target $sha"
+  if [[ -w "$releases" ]]; then
+    rm -rf -- "$target"
+  elif sudo -n /usr/bin/rm -rf -- "$target"; then
+    echo "Removed inactive retry target with authorized sudo"
+  else
+    echo "TARGET_RELEASE_RETRY_REQUIRES_ADMIN_CLEANUP" >&2
+    exit 1
+  fi
+  [[ ! -e "$target" && ! -L "$target" ]] || {
+    echo "TARGET_RELEASE_RETRY_CLEANUP_INCOMPLETE" >&2; exit 1;
+  }
+fi
 # npm's download cache is reproducible and never stores site/application data.
 if [[ "$HOME" == /var/lib/hodhod && -d "$HOME/.npm/_cacache" && ! -L "$HOME/.npm/_cacache" ]]; then
   echo "Removing disposable npm download cache"
