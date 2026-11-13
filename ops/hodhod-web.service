@@ -23,7 +23,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/srv/hodhod/.private /srv/hodhod/.next/cache
+ReadWritePaths=/srv/hodhod/.private /srv/hodhod/.next/cache /srv/hodhod/.next/server/route-cache
 UMask=0077
 
 [Install]
