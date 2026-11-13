@@ -62,11 +62,7 @@ if (( ${#rollback_candidates[@]} > 2 )); then
     candidate=${newest[$i]}
     [[ "$candidate" == "$releases/"* && "$candidate" != "$active" && "$candidate" != "$releases/$sha" && -d "$candidate" && ! -L "$candidate" ]] || exit 1
     [[ -f "$candidate/.next/BUILD_ID" && -f "$candidate/node_modules/next/package.json" ]] || continue
-    echo "Removing inactive old build 
-df -h /
-{'candidate##*/
-df -h /
-}'"
+    echo "Removing inactive old build ${candidate##*/}"
     if [[ -w "$releases" ]]; then
       rm -rf -- "$candidate"
     elif sudo -n /usr/bin/rm -rf -- "$candidate" 2>/dev/null; then
