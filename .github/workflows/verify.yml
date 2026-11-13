@@ -24,10 +24,10 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      # - run: npm run typecheck
-      # - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run lint
       # - run: npm run security:scan-secrets
-      # - run: npm run test:fast
+      - run: npm run test:fast
       - run: npm run build
       - name: Package verified runtime for staging
         if: (github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/staging') && github.event_name == 'push'
