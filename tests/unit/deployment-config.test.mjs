@@ -14,7 +14,8 @@ const base = {
   STUDENT_CONSENT_POLICY_VERSION: "reviewed-policy-v1",
 };
 test("reviewed consent policy version is packaged while invalid overrides still fail closed", () => {
-  const { STUDENT_CONSENT_POLICY_VERSION: _ignored, ...unset } = base;
+  const unset = { ...base };
+  delete unset.STUDENT_CONSENT_POLICY_VERSION;
   assert.deepEqual(deploymentChecks(unset).errors, []);
   assert.ok(deploymentChecks({ ...base, STUDENT_CONSENT_POLICY_VERSION: "invalid value" }).errors.includes("STUDENT_CONSENT_POLICY_REVIEW_REQUIRED"));
 });
