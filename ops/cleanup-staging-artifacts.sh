@@ -43,5 +43,34 @@ if [[ "$failed" != "$active" && "$failed" != "$releases/$sha" && -d "$failed" &&
     echo "WARNING: failed inactive release requires administrator cleanup: $failed" >&2
   fi
 fi
+# Keep the running release and the two newest inactive, verified build trees
+# as rollback candidates. Only SHA-named, non-symlink directories are eligible.
+# Never inspect, modify or remove the database, backup directories, or shared secrets.
+declare -a rollback_candidates=()
+for candidate in "$releases"/*; do
+  [[ -d "$candidate" && ! -L "$candidate" ]] || continue
+  oldsha=${candidate##*/}
+  [[ "$oldsha" =~ ^[a-f0-9]{40}$ ]] || continue
+  [[ "$candidate" != "$active" && "$candidate" != "$releases/$sha" ]] || continue
+  [[ -f "$candidate/.next/BUILD_ID" && -f "$candidate/node_modules/next/package.json" ]] || continue
+  rollback_candidates+=("$candidate")
+done
+if (( ${#rollback_candidates[@]} > 2 )); then
+  # Sorting by timestamp here controls what stays, not which paths are eligible.
+  mapfile -t newest < <(stat -c '%Y %n' -- "${rollback_candidates[@]}" | sort -rn | cut -d' ' -f2-)
+  for ((i=2; i<${#newest[@]}; i++)); do
+    candidate=${newest[$i]}
+    [[ "$candidate" == "$releases/"* && "$candidate" != "$active" && "$candidate" != "$releases/$sha" && -d "$candidate" && ! -L "$candidate" ]] || exit 1
+    [[ -f "$candidate/.next/BUILD_ID" && -f "$candidate/node_modules/next/package.json" ]] || continue
+    echo "Removing inactive old build ${candidate##*/}"
+    if [[ -w "$releases" ]]; then
+      rm -rf -- "$candidate"
+    elif sudo -n /usr/bin/rm -rf -- "$candidate" 2>/dev/null; then
+      echo "Removed inactive old build with authorized sudo"
+    else
+      echo "WARNING: cannot delete inactive release: $candidate" >&2
+    fi
+  done
+fi
 echo "Disk usage after safe cleanup:"
 df -h /
