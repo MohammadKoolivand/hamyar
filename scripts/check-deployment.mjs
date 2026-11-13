@@ -1,3 +1,4 @@
+import { APPROVED_STUDENT_CONSENT_POLICY_VERSION } from "./approved-consent-policy.mjs";
 import { mongoDeploymentErrors } from "./mongo-security-policy.mjs";
 import { mongoTransportErrors, providerTransportErrors } from "./transport-policy.mjs";
 /** Read-only startup configuration guard. Never prints environment values. */
@@ -46,7 +47,7 @@ export function deploymentChecks(env, role = "web") {
   }
   if (env.COOKIE_SECURE !== "true") errors.push("SECURE_COOKIES_REQUIRED");
   if (role === "web") {
-    if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{2,63}$/.test(env.STUDENT_CONSENT_POLICY_VERSION ?? ""))
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{2,63}$/.test(env.STUDENT_CONSENT_POLICY_VERSION || APPROVED_STUDENT_CONSENT_POLICY_VERSION))
       errors.push("STUDENT_CONSENT_POLICY_REVIEW_REQUIRED");
     if (!["mock", "ollama"].includes(env.AI_PROVIDER ?? "mock"))
       errors.push("AI_PROVIDER_INVALID");

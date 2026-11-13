@@ -13,6 +13,12 @@ const base = {
   COOKIE_SECURE: "true",
   STUDENT_CONSENT_POLICY_VERSION: "reviewed-policy-v1",
 };
+test("reviewed consent policy version is packaged while invalid overrides still fail closed", () => {
+  const unset = { ...base };
+  delete unset.STUDENT_CONSENT_POLICY_VERSION;
+  assert.deepEqual(deploymentChecks(unset).errors, []);
+  assert.ok(deploymentChecks({ ...base, STUDENT_CONSENT_POLICY_VERSION: "invalid value" }).errors.includes("STUDENT_CONSENT_POLICY_REVIEW_REQUIRED"));
+});
 test("deployment guard rejects wrong database, insecure origin and unsafe mail configuration", () => {
   assert.deepEqual(deploymentChecks(base, "exams").errors, []);
   assert.ok(

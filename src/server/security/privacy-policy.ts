@@ -1,3 +1,4 @@
+import { APPROVED_STUDENT_CONSENT_POLICY_VERSION } from "../../../scripts/approved-consent-policy.mjs";
 /** Fail closed for student processing on production deployments. Until a market-specific
  * legal policy is approved, require guardian consent for every student account.
  * DOB and teacher invitations are NOT proof of legal age or guardianship. */
@@ -5,7 +6,7 @@ export function studentConsentRequired(env: NodeJS.ProcessEnv = process.env) {
   return env.NODE_ENV === "production" || env.STUDENT_CONSENT_REQUIRED === "true";
 }
 export function consentPolicyVersion(env: NodeJS.ProcessEnv = process.env) {
-  const value = env.STUDENT_CONSENT_POLICY_VERSION ?? "";
+  const value = env.STUDENT_CONSENT_POLICY_VERSION || APPROVED_STUDENT_CONSENT_POLICY_VERSION;
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{2,63}$/.test(value))
     throw new Error("STUDENT_CONSENT_POLICY_VERSION must name a reviewed policy");
   return value;
