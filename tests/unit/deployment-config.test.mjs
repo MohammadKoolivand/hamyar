@@ -135,7 +135,7 @@ test("only verified staging runtime bundles can activate staging", async () => {
   assert.match(verify, /branches: \[stage, staging\]/);
   assert.doesNotMatch(verify, /branches: \[main, staging\]/);
   assert.match(verify, /npm run build/);
-  assert.match(verify, /hodhodeh-runtime-\$\{\{ github\.sha \}\}/);
+  assert.match(verify, /hodhod-runtime-\$\{\{ github\.sha \}\}/);
   assert.match(verify, /release\.tar\.gz/);
   assert.match(deploy, /workflow_run:/);
   assert.match(deploy, /branches: \[stage, staging\]/);
