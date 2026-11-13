@@ -23,8 +23,11 @@ tar -xzf "$incoming/release.tar.gz" -C "$release" --no-same-owner
 ln -s /etc/hodhod/staging.env "$release/.env"
 ln -s /var/lib/hodhod/private "$release/.private"
 chown -R hodhod:hodhod "$release"
-# Next.js creates its per-release route cache at runtime (not in CI output).
-# Precreate only this writable cache directory for the sandboxed web service.
+# The verified CI archive can omit empty .next/cache. systemd ReadWritePaths
+# requires each writable source to exist before it can mount the service.
+# Both directories are disposable per-release caches; never relax protection
+# on source code, shared secrets or the database.
+install -d -o hodhod -g hodhod -m 0700 -- "$release/.next/cache"
 install -d -o hodhod -g hodhod -m 0700 -- "$release/.next/server/route-cache"
 cd "$release"
 # The runtime bundle was built and verified in CI. Never install or build on
