@@ -133,6 +133,14 @@ async function runLeasedExamJob(ctx: Context) {
         leaseUntil: new Date(Date.now() + 90000),
       },
       $inc: { attempts: 1 },
+      $unset: {
+        errorCode: "",
+        errorMessage: "",
+        completedAt: "",
+        processedPage: "",
+        totalPages: "",
+        progressUpdatedAt: "",
+      },
     },
     { sort: { createdAt: 1 }, returnDocument: "after" },
   );
@@ -155,6 +163,8 @@ async function runLeasedExamJob(ctx: Context) {
     if (!exam || exam.revision !== job.revision)
       throw new Error("Source revision changed");
     const docs: Record<string, DocumentPage[]> = {};
+    const failedPages: { kind: string; page: number; totalPages: number }[] =
+      [];
     for (const kind of ["question", "answer"]) {
       if (!exam.files?.[kind]) continue;
       stage = kind === "question" ? "reading_questions" : "reading_key";
@@ -174,7 +184,12 @@ async function runLeasedExamJob(ctx: Context) {
             await ctx.c("examImportJobs").updateOne(
               { _id: job._id, leaseToken: token },
               {
-                $set: { stage: `${kind}:${p.stage}`, processedPage: p.page, totalPages: p.totalPages, progressUpdatedAt: new Date().toISOString() },
+                $set: {
+                  stage: `${kind}:${p.stage}`,
+                  processedPage: p.page,
+                  totalPages: p.totalPages,
+                  progressUpdatedAt: new Date().toISOString(),
+                },
               },
             );
           })
@@ -207,28 +222,75 @@ async function runLeasedExamJob(ctx: Context) {
         );
       } catch (error) {
         const diagnostic = error as { stderr?: string; message?: string };
-        if (!/FormatError|InvalidPDFException|UnknownErrorException/.test(`${diagnostic.stderr ?? ""} ${diagnostic.message ?? ""}`)) throw error;
+        if (
+          !/FormatError|InvalidPDFException|UnknownErrorException|Page dictionary kid reference points to wrong type of object/.test(
+            `${diagnostic.stderr ?? ""} ${diagnostic.message ?? ""}`,
+          )
+        )
+          throw error;
         stage = `${kind}:ocr_fallback`;
-        await ctx.c("examImportJobs").updateOne({ _id: job._id, leaseToken: token }, { $set: { stage } });
-        await exec(process.execPath, ["--max-old-space-size=768", "--import", "tsx", resolve("scripts/extract-document.ts"), path, dir, "--raster"], {
-          timeout: 20 * 60 * 1000,
-          maxBuffer: 256 * 1024,
-          env: { NODE_ENV: process.env.NODE_ENV ?? "production", PATH: process.env.PATH, OCR_DATA_DIR: process.env.OCR_DATA_DIR, OCR_LANG: exam.ocrLanguage ?? "fas", TESSERACT_BIN: process.env.TESSERACT_BIN, PDFTOPPM_BIN: process.env.PDFTOPPM_BIN, OMP_THREAD_LIMIT: "1" },
-        });
+        await ctx
+          .c("examImportJobs")
+          .updateOne({ _id: job._id, leaseToken: token }, { $set: { stage } });
+        await exec(
+          process.execPath,
+          [
+            "--max-old-space-size=768",
+            "--import",
+            "tsx",
+            resolve("scripts/extract-document.ts"),
+            path,
+            dir,
+            "--raster",
+          ],
+          {
+            timeout: 20 * 60 * 1000,
+            maxBuffer: 256 * 1024,
+            env: {
+              NODE_ENV: process.env.NODE_ENV ?? "production",
+              PATH: process.env.PATH,
+              OCR_DATA_DIR: process.env.OCR_DATA_DIR,
+              OCR_LANG: exam.ocrLanguage ?? "fas",
+              TESSERACT_BIN: process.env.TESSERACT_BIN,
+              PDFTOPPM_BIN: process.env.PDFTOPPM_BIN,
+              OMP_THREAD_LIMIT: "1",
+            },
+          },
+        );
       } finally {
         clearInterval(progress);
       }
       docs[kind] = JSON.parse(await readFile(join(dir, "result.json"), "utf8"));
+      try {
+        const failures: { page: number; totalPages: number }[] = JSON.parse(
+          await readFile(join(dir, "failures.json"), "utf8"),
+        );
+        failedPages.push(...failures.map((failure) => ({ ...failure, kind })));
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      }
     }
     stage = "matching";
     const pages = docs.question;
     const sizes = Object.fromEntries(
       pages.map((p) => [p.page, { width: p.width, height: p.height }]),
     );
-    const questions = parseQuestions(
-      pages.flatMap((p) => p.lines),
-      sizes,
+    // Never join a question across a page that could not be read.
+    const runs: DocumentPage[][] = [];
+    for (const page of pages) {
+      const run = runs[runs.length - 1];
+      if (run && run[run.length - 1].page + 1 === page.page) run.push(page);
+      else runs.push([page]);
+    }
+    const questions = runs.flatMap((run) =>
+      parseQuestions(
+        run.flatMap((p) => p.lines),
+        sizes,
+      ),
     );
+    const partialNotice = failedPages.length
+      ? `استخراج ناقص است. صفحات خوانده‌نشده: ${failedPages.map((p) => `${p.kind === "question" ? "دفترچه" : "پاسخ‌نامه"} ${p.page} از ${p.totalPages}`).join("، ")}. محتوای این صفحات استخراج نشده است؛ سؤال‌هایشان را دستی اضافه کنید یا نسخهٔ سالم را وارد کنید.`
+      : "";
     const key = docs.answer
       ? parseAnswerKey(docs.answer.flatMap((p) => p.lines))
       : { entries: [], warnings: ["پاسخ‌نامه بارگذاری نشده است"] };
@@ -343,7 +405,11 @@ async function runLeasedExamJob(ctx: Context) {
             caption: `اصل سؤال ${item.q.number ?? "بدون شماره"}؛ منبع آزمون`,
           });
         }
-        const warnings = [...item.q.warnings, ...item.match.warnings];
+        const warnings = [
+          ...item.q.warnings,
+          ...item.match.warnings,
+          ...(partialNotice ? [partialNotice] : []),
+        ];
         const duplicated =
           questions.filter(
             (q) => q.number !== null && q.number === item.q.number,
@@ -411,8 +477,10 @@ async function runLeasedExamJob(ctx: Context) {
               .join("\n")
               .slice(0, 200000),
             extractionNotice:
+              partialNotice ||
               "استخراج محلی انجام شد؛ هیچ سؤال بدون تأیید معلم وارد بانک نمی‌شود. تصاویر اصل منبع را با متن، گزینه و کلید تطبیق دهید.",
             statistics: {
+              failedPages,
               pages: pages.length,
               answerPages: docs.answer?.length ?? 0,
               questions: questions.length,
@@ -443,7 +511,9 @@ async function runLeasedExamJob(ctx: Context) {
     });
   } catch (error) {
     const failure = error as { stderr?: string; message?: string };
-    const unreadable = `${failure.stderr ?? ""} ${failure.message ?? ""}`.match(/PDF_PAGE_UNREADABLE:(\d+):(\d+)/);
+    const unreadable = `${failure.stderr ?? ""} ${failure.message ?? ""}`.match(
+      /PDF_PAGE_UNREADABLE:(\d+):(\d+)/,
+    );
     await ctx.c("examImportJobs").updateOne(
       { _id: job._id, leaseToken: token },
       {
@@ -451,10 +521,9 @@ async function runLeasedExamJob(ctx: Context) {
           state: "failed",
           stage: "failed",
           errorCode: "DOCUMENT_PROCESSING_FAILED",
-          errorMessage:
-            unreadable
-              ? `صفحهٔ ${unreadable[1]} از ${unreadable[2]} صفحهٔ PDF قابل خواندن نیست. نسخهٔ سالم فایل را دوباره بارگذاری کنید؛ صفحات خراب خودکار حذف نمی‌شوند.`
-              : "پردازش محلی انجام نشد؛ فایل، نصب ابزار OCR و مدل‌های زبان را بررسی کنید.",
+          errorMessage: unreadable
+            ? `صفحهٔ ${unreadable[1]} از ${unreadable[2]} صفحهٔ PDF قابل خواندن نیست. نسخهٔ سالم فایل را دوباره بارگذاری کنید؛ صفحات خراب خودکار حذف نمی‌شوند.`
+            : "پردازش محلی انجام نشد؛ فایل، نصب ابزار OCR و مدل‌های زبان را بررسی کنید.",
           completedAt: ctx.now(),
         },
         $unset: { leaseToken: "", leaseUntil: "" },
@@ -482,19 +551,17 @@ export async function expireExamSources(ctx: Context) {
     .distinct("examId", { expiresAt: { $exists: false } });
   for (const examId of legacyIds.slice(0, 1000)) {
     const exam = await ctx.c("examImports").findOne({ _id: examId });
-    await ctx
-      .c("examImportChunks")
-      .updateMany(
-        { examId, expiresAt: { $exists: false } },
-        {
-          $set: {
-            expiresAt: new Date(
-              new Date(exam?.createdAt ?? 0).getTime() +
-                retentionDays() * 86400000,
-            ),
-          },
+    await ctx.c("examImportChunks").updateMany(
+      { examId, expiresAt: { $exists: false } },
+      {
+        $set: {
+          expiresAt: new Date(
+            new Date(exam?.createdAt ?? 0).getTime() +
+              retentionDays() * 86400000,
+          ),
         },
-      );
+      },
+    );
   }
 
   const filter = { expiresAt: { $lte: new Date() } };

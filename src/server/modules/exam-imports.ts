@@ -81,10 +81,16 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
   app.delete("/api/exam-imports/:eid", async (r) => {
     const { u, e } = await getExam(r);
     const result = await c("examImports").updateOne(
-      { _id: e._id, ownerId: u._id, state: { $ne: "processing" }, archivedAt: { $exists: false } },
+      {
+        _id: e._id,
+        ownerId: u._id,
+        state: { $ne: "processing" },
+        archivedAt: { $exists: false },
+      },
       { $set: { archivedAt: now() } },
     );
-    if (!result.modifiedCount) fail(409, "ابتدا منتظر پایان پردازش آزمون بمانید");
+    if (!result.modifiedCount)
+      fail(409, "ابتدا منتظر پایان پردازش آزمون بمانید");
     return { deleted: true };
   });
   app.get("/api/exam-imports/:eid", async (r) => {
@@ -363,7 +369,19 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
       fail(409, "پردازش قابل تلاش مجدد نیست؛ حداکثر سه تلاش مجاز است");
     await c("examImportJobs").updateOne(
       { _id: job!._id, state: "failed" },
-      { $set: { state: "queued", stage: "queued" } },
+      {
+        $set: { state: "queued", stage: "queued" },
+        $unset: {
+          errorCode: "",
+          errorMessage: "",
+          completedAt: "",
+          processedPage: "",
+          totalPages: "",
+          progressUpdatedAt: "",
+          leaseToken: "",
+          leaseUntil: "",
+        },
+      },
     );
     await c("examImports").updateOne(
       { _id: e._id },

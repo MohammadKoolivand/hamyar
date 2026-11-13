@@ -5,6 +5,123 @@ import { fixture } from "../helpers/fixture";
 import { createContext } from "../../src/server/context";
 import { runNextExamJob } from "../../src/server/imports/jobs";
 
+test("a damaged middle page preserves readable pages for explicit partial human review", async () => {
+  const f = await fixture();
+  try {
+    const exam = await f.post(
+      "/api/exam-imports",
+      {
+        title: "آزمون ناقص",
+        subject: "ریاضی",
+        source: { family: "mock" },
+        ocrLanguage: "fas+eng",
+      },
+      f.teacher,
+    );
+    const path = `/api/exam-imports/${exam._id}`;
+    const uploaded = await f.app.inject({
+      method: "POST",
+      url: `${path}/files/question`,
+      headers: {
+        cookie: f.teacher,
+        "content-type": "application/pdf",
+        "x-file-name": "damaged.pdf",
+      },
+      payload: await readFile("tests/fixtures/exams/damaged-middle.pdf"),
+    });
+    assert.equal(uploaded.statusCode, 200);
+    await f.post(`${path}/extract`, {}, f.teacher);
+    await runNextExamJob(createContext(f.db));
+    const result = await f.request(path, undefined, f.teacher);
+    const detail = result.json();
+    assert.equal(detail.state, "review", JSON.stringify(detail.job));
+    assert.deepEqual(detail.statistics.failedPages, [
+      { page: 2, totalPages: 3, kind: "question" },
+    ]);
+    assert.match(detail.extractionNotice, /ناقص/);
+    assert.equal(detail.statistics.pages, 2);
+    assert.ok(detail.items.length >= 2);
+    assert.ok(
+      detail.items.every(
+        (item: {
+          state: string;
+          extraction: { regions: { page: number }[] };
+        }) =>
+          item.state === "pending" &&
+          item.extraction.regions.every((r) => r.page !== 2) &&
+          item.extraction.regions.length === 1,
+      ),
+    );
+    assert.equal(
+      await f.c("questionVersions").countDocuments({ sourceExamId: exam._id }),
+      0,
+    );
+  } finally {
+    await f.close();
+  }
+});
+
+test("retry clears stale failure and progress metadata before queueing", async () => {
+  const f = await fixture();
+  try {
+    const exam = await f.post(
+      "/api/exam-imports",
+      {
+        title: "آزمون تلاش مجدد",
+        subject: "ریاضی",
+        source: { family: "mock" },
+      },
+      f.teacher,
+    );
+    const path = `/api/exam-imports/${exam._id}`;
+    const upload = await f.app.inject({
+      method: "POST",
+      url: `${path}/files/question`,
+      headers: {
+        cookie: f.teacher,
+        "content-type": "application/pdf",
+        "x-file-name": "text-fa.pdf",
+      },
+      payload: await readFile("tests/fixtures/exams/text-fa.pdf"),
+    });
+    assert.equal(upload.statusCode, 200);
+    await f.post(`${path}/extract`, {}, f.teacher);
+    const stored = await f.c("examImports").findOne({ _id: exam._id });
+    await f.c("examImportJobs").updateOne(
+      { _id: stored!.jobId },
+      {
+        $set: {
+          state: "failed",
+          attempts: 1,
+          errorCode: "DOCUMENT_PROCESSING_FAILED",
+          errorMessage: "old failure",
+          completedAt: new Date().toISOString(),
+          processedPage: 35,
+          totalPages: 41,
+          progressUpdatedAt: new Date().toISOString(),
+        },
+      },
+    );
+    await f
+      .c("examImports")
+      .updateOne({ _id: exam._id }, { $set: { state: "failed" } });
+    await f.post(`${path}/retry`, {}, f.teacher);
+    const job = await f.c("examImportJobs").findOne({ _id: stored!.jobId });
+    assert.equal(job!.state, "queued");
+    for (const field of [
+      "errorCode",
+      "errorMessage",
+      "completedAt",
+      "processedPage",
+      "totalPages",
+      "progressUpdatedAt",
+    ])
+      assert.equal(job![field], undefined, field);
+  } finally {
+    await f.close();
+  }
+});
+
 test("durable local PDF jobs match actual key numbers, preserve images on publish and delete source safely", async () => {
   const f = await fixture();
   try {

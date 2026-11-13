@@ -1,5 +1,7 @@
 import { splitColumnRows } from "./text-columns";
 import { schoolRows } from "./school-rows";
+import { recoverPageReferences } from "./recover-pages";
+import { PDFDocument } from "pdf-lib";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { readFile, writeFile, stat } from "node:fs/promises";
@@ -448,28 +450,69 @@ export async function rasterDocument(file: string, directory: string) {
   const data = await verifyOcrModels();
   const pages: DocumentPage[] = [];
   let size = 0;
+  const failures: { page: number; totalPages: number }[] = [];
+  // Poppler can skip an invalid page-tree child and render the next page under
+  // the requested number. Validate each original page reference before rendering.
+  const recovered = await recoverPageReferences(bytes, total);
+  failures.push(
+    ...recovered.failed.map((page) => ({ page, totalPages: total })),
+  );
+  const pageIndices = new Map(
+    recovered.entries.map((entry, index) => [entry.page, index]),
+  );
   for (let page = 1; page <= total; page++) {
+    const index = pageIndices.get(page);
+    if (index === undefined) continue;
     const started = Date.now();
     const imageFile = `page-${page}.png`;
     try {
+      const single = await PDFDocument.create();
+      const [copied] = await single.copyPages(recovered.source, [index]);
+      single.addPage(copied);
+      const singleFile = join(directory, `original-page-${page}.pdf`);
+      await writeFile(
+        singleFile,
+        await single.save({ useObjectStreams: false }),
+      );
       await exec(
         process.env.PDFTOPPM_BIN ?? "pdftoppm",
         [
           "-f",
-          String(page),
+          "1",
           "-l",
-          String(page),
+          "1",
           "-scale-to",
           "1600",
           "-png",
           "-singlefile",
-          file,
+          singleFile,
           join(directory, `page-${page}`),
         ],
         { timeout: 45000, maxBuffer: 512 * 1024 },
       );
-    } catch {
-      throw new Error(`PDF_PAGE_UNREADABLE:${page}:${total}`);
+    } catch (error) {
+      const failure = error as {
+        stderr?: string;
+        message?: string;
+        killed?: boolean;
+        code?: string;
+      };
+      const diagnostic = `${failure.stderr ?? ""} ${failure.message ?? ""}`;
+      // Infrastructure failures must not be mistaken for damaged document pages.
+      if (
+        failure.killed ||
+        /ENOSPC|No space left|EACCES|Permission denied/i.test(diagnostic) ||
+        !/Syntax Error|wrong type|Invalid page|Invalid.*PDF|PNGWriter.*invalid/i.test(
+          diagnostic,
+        )
+      )
+        throw error;
+      failures.push({ page, totalPages: total });
+      await writeFile(
+        join(directory, "progress.json"),
+        JSON.stringify({ stage: "page_unreadable", page, totalPages: total }),
+      );
+      continue;
     }
     size += (await stat(join(directory, imageFile))).size;
     if (size > 100 * 1024 * 1024)
@@ -488,7 +531,8 @@ export async function rasterDocument(file: string, directory: string) {
         process.env.OCR_LANG ?? "fas",
         "--psm",
         "3",
-        "tsv",
+        "-c",
+        "tessedit_create_tsv=1",
       ],
       {
         timeout: 60000,
@@ -519,6 +563,8 @@ export async function rasterDocument(file: string, directory: string) {
       JSON.stringify({ stage: "ocr_fallback", page, totalPages: total }),
     );
   }
+  if (!pages.length) throw new Error("PDF has no readable pages");
+  await writeFile(join(directory, "failures.json"), JSON.stringify(failures));
   await writeFile(join(directory, "result.json"), JSON.stringify(pages));
 }
 export async function writeDocumentResult(file: string, directory: string) {

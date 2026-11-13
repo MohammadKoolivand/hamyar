@@ -64,6 +64,7 @@ export interface ExamImport extends ExamMetadata {
     errorMessage?: string;
   };
   statistics?: {
+    failedPages?: { kind: string; page: number; totalPages: number }[];
     pages: number;
     answerPages: number;
     questions: number;

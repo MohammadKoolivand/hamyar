@@ -688,9 +688,25 @@ export function ExamImportScreen({
               </>
             )}
             {exam.state === "review" && (
-              <p className="rounded-xl bg-amber-50 p-4 text-sm leading-8 text-amber-900">
-                {exam.extractionNotice}
-              </p>
+              <div
+                role={exam.statistics?.failedPages?.length ? "alert" : "status"}
+                className="rounded-xl bg-amber-50 p-4 text-sm leading-8 text-amber-900"
+              >
+                {!!exam.statistics?.failedPages?.length && (
+                  <strong className="block">
+                    استخراج ناقص — صفحات سالم آمادهٔ بازبینی‌اند
+                  </strong>
+                )}
+                <p>{exam.extractionNotice}</p>
+                {!!exam.statistics?.failedPages?.length && (
+                  <a
+                    className="underline underline-offset-4"
+                    href="#manual-exam-question"
+                  >
+                    افزودن دستی سؤال‌های صفحات خوانده‌نشده
+                  </a>
+                )}
+              </div>
             )}
           </section>
           {exam.state === "review" && (
@@ -726,6 +742,7 @@ export function ExamImportScreen({
                 >
                   <Field title="افزودن سؤال دستی به این آزمون">
                     <textarea
+                      id="manual-exam-question"
                       required
                       minLength={3}
                       maxLength={5000}
