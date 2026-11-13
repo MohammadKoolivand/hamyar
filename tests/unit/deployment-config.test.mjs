@@ -146,3 +146,13 @@ test("only verified staging runtime bundles can activate staging", async () => {
   assert.doesNotMatch(deploy, /npm ci/);
   assert.doesNotMatch(deploy, /npm run build/);
 });
+
+test("web sandbox writes only dedicated runtime route cache, prepared before activation", async () => {
+  const { readFileSync } = await import("node:fs");
+  const service = readFileSync("ops/hodhod-web.service", "utf8");
+  const deploy = readFileSync("ops/deploy-staging.sh", "utf8");
+  assert.match(service, /^ProtectSystem=strict$/m);
+  assert.match(service, /^ReadWritePaths=\/srv\/hodhod\/\.private \/srv\/hodhod\/\.next\/cache \/srv\/hodhod\/\.next\/server\/route-cache$/m);
+  assert.match(deploy, /install -d -o hodhod -g hodhod -m 0700 -- "\$release\/\.next\/server\/route-cache"/);
+  assert.ok(deploy.indexOf('install -d -o hodhod -g hodhod -m 0700 -- "$release/.next/server/route-cache"') < deploy.indexOf('systemctl stop hodhod-web hodhod-exam-worker'));
+});
