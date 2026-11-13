@@ -41,6 +41,12 @@ jobs:
             --exclude=.env \
             --exclude=.env.* \
             --exclude=.private \
+            --exclude=.next/cache \
+            --exclude=node_modules/.cache \
+            --exclude=tests \
+            --exclude=docs \
+            --exclude=output \
+            --exclude=.data \
             --exclude=test-results \
             --exclude=playwright-report \
             --exclude=coverage \
