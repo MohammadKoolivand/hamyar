@@ -16,7 +16,7 @@ const base = {
 test("reviewed consent policy version is packaged while invalid overrides still fail closed", () => {
   const { STUDENT_CONSENT_POLICY_VERSION: _ignored, ...unset } = base;
   assert.deepEqual(deploymentChecks(unset).errors, []);
-  assert.ok(deploymentChecks({ ...base, STUDENT_CONSENT_POLICY_VERSION: "" }).errors.includes("STUDENT_CONSENT_POLICY_REVIEW_REQUIRED"));
+  assert.ok(deploymentChecks({ ...base, STUDENT_CONSENT_POLICY_VERSION: "invalid value" }).errors.includes("STUDENT_CONSENT_POLICY_REVIEW_REQUIRED"));
 });
 test("deployment guard rejects wrong database, insecure origin and unsafe mail configuration", () => {
   assert.deepEqual(deploymentChecks(base, "exams").errors, []);
