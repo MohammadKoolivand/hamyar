@@ -77,7 +77,7 @@ export function LearningReportOverview({
           </label>
         </div>
         {!missions.length ? (
-          <p className="rounded-xl border border-dashed border-slate-300 p-5 text-sm leading-7 text-slate-600">هنوز تمرین دارای نتیجهٔ قابل‌نمایش وجود ندارد. پس از انجام تمرین، روند یادگیری اینجا نمایش داده می‌شود.</p>
+          <p className="rounded-xl border border-dashed border-slate-300 p-5 text-sm leading-7 text-slate-600">هنوز تمرین دارای نتیجه‌ی قابل‌نمایش وجود ندارد. پس از انجام تمرین، روند یادگیری اینجا نمایش داده می‌شود.</p>
         ) : !visible.length ? (
           <p role="status" className="rounded-xl border border-slate-200 p-5 text-sm text-slate-600">با این جست‌وجو یا فیلتر نتیجه‌ای پیدا نشد.</p>
         ) : (
@@ -97,12 +97,12 @@ export function LearningReportOverview({
                 </>
               );
               return canOpenReports ? (
-                <Link key={mission.assignmentId} href={`/report?assignment=${encodeURIComponent(mission.assignmentId)}`} className="block rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-blue-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">{content}<span className="mt-2 block text-xs font-semibold text-[#233B8F]">مشاهدهٔ گزارش سؤال‌به‌سؤال ←</span></Link>
+                <Link key={mission.assignmentId} href={`/report?assignment=${encodeURIComponent(mission.assignmentId)}`} className="block rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-blue-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">{content}<span className="mt-2 block text-xs font-semibold text-[#233B8F]">مشاهده‌ی گزارش سؤال‌به‌سؤال ←</span></Link>
               ) : <article key={mission.assignmentId} className="rounded-xl border border-slate-200 bg-white p-4">{content}</article>;
             })}
           </div>
         )}
-        <p className="text-xs leading-6 text-slate-500">نمودار هر تمرین نسبت پاسخ‌های صحیح به پاسخ‌های دارای ارزیابی مشخص را نشان می‌دهد؛ سؤال‌های نزده و در انتظار بررسی در مخرج این نسبت نیستند. مقایسهٔ تمرین‌ها به‌تنهایی نشانهٔ تغییر قطعی سطح یادگیری نیست.</p>
+        <p className="text-xs leading-6 text-slate-500">نمودار هر تمرین نسبت پاسخ‌های صحیح به پاسخ‌های دارای ارزیابی مشخص را نشان می‌دهد؛ سؤال‌های نزده و در انتظار بررسی در مخرج این نسبت نیستند. مقایسه‌ی تمرین‌ها به‌تنهایی نشانه‌ی تغییر قطعی سطح یادگیری نیست.</p>
       </div>
     </section>
   );

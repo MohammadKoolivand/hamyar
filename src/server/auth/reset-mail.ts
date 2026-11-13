@@ -49,8 +49,8 @@ export const sendPasswordResetEmail: PasswordResetMailer = async (
     token;
   const message = [
     verification
-      ? "برای تأیید مالکیت ایمیل هدهده لینک زیر را باز کنید:"
-      : "برای تغییر رمز عبور هدهده روی لینک زیر باز کنید:",
+      ? "برای تأیید مالکیت ایمیل هدهد لینک زیر را باز کنید:"
+      : "برای تغییر رمز عبور هدهد روی لینک زیر باز کنید:",
     url,
     "",
     verification
@@ -68,7 +68,7 @@ export const sendPasswordResetEmail: PasswordResetMailer = async (
     "To: <" + to + ">",
     "Subject: =?UTF-8?B?" +
       Buffer.from(
-        verification ? "تأیید ایمیل هدهده" : "بازیابی رمز عبور هدهده",
+        verification ? "تأیید ایمیل هدهد" : "بازیابی رمز عبور هدهد",
       ).toString("base64") +
       "?=",
     "MIME-Version: 1.0",

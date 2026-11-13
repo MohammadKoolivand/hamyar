@@ -1,4 +1,4 @@
-name: Deep HodHodeh verification
+name: Deep HodHod verification
 
 on:
   workflow_dispatch:
@@ -53,7 +53,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: hodhodeh-deep-ui-evidence
+          name: hodhod-deep-ui-evidence
           path: |
             test-results/
             playwright-report/

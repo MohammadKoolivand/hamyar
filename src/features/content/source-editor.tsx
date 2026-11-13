@@ -131,7 +131,7 @@ export function SourceEditor({
                 ["questionNumber", "شماره سؤال در منبع"],
                 ["examDate", "تاریخ آزمون (مثال 1405/08/01)"],
                 ["publishedDate", "تاریخ انتشار منبع (میلادی)"],
-                ["sourcePageUrl", "صفحهٔ معرفی منبع"],
+                ["sourcePageUrl", "صفحه‌ی معرفی منبع"],
                 ["sourcePage", "شماره صفحه در PDF"],
               ]
                 .filter(

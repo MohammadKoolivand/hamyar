@@ -113,7 +113,7 @@ export function AiAuthoring({
                   type,
                   brief:
                     batchCount > 1
-                      ? `${brief}\nسؤال ${i + 1} از مجموعهٔ ${batchCount} سوالی؛ یک سؤال مستقل و متفاوت طراحی کن.`
+                      ? `${brief}\nسؤال ${i + 1} از مجموعه‌ی ${batchCount} سوالی؛ یک سؤال مستقل و متفاوت طراحی کن.`
                       : brief,
                   difficulty: targetDifficulty,
                   visualKind,
@@ -160,7 +160,7 @@ export function AiAuthoring({
           </Field>
         </div>
         <p className="text-xs text-slate-500">
-          هر بار تا ۵ پیش‌نویس با مدل تنظیم‌شده تولید می‌شود؛ هزینهٔ هر درخواست
+          هر بار تا ۵ پیش‌نویس با مدل تنظیم‌شده تولید می‌شود؛ هزینه‌ی هر درخواست
           جداست و ورود به بانک نیازمند تأیید شماست. در صورت توقف، موارد تولیدشده
           در صف بررسی می‌مانند.
         </p>

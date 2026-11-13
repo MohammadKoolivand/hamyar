@@ -232,7 +232,7 @@ export function QuestionBank({
         </div>
       </section>
       <section className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 sm:p-5" aria-label="انتشار امن در کتابخانه">
-        <h3 className="font-bold text-[#17305e]">اشتراک سؤال‌ها در کتابخانهٔ درس</h3>
+        <h3 className="font-bold text-[#17305e]">اشتراک سؤال‌ها در کتابخانه‌ی درس</h3>
         <p className="mt-1 text-sm text-slate-600">انتشار برای هر درس اختیاری است؛ تنها دانش‌آموزان عضو همان درس می‌توانند سؤال را پیدا و تمرین کنند. پاسخ مرجع در فهرست نمایش داده نمی‌شود.</p>
         <label className="mt-3 grid max-w-lg gap-1 text-sm font-medium">انتخاب درس
           <select className={selectStyle} value={libraryCourse} onChange={event => setLibraryCourse(event.target.value)}>
@@ -584,7 +584,7 @@ export function QuestionBank({
             اعمال روی {fa(visible.length)} سؤال فیلترشده
           </Button>
           <p className="w-full text-xs text-slate-500">
-            این تغییر شامل همهٔ صفحه‌های نتیجه است؛ برای بیش از ۵۰۰ سؤال فیلتر
+            این تغییر شامل همه‌ی صفحه‌های نتیجه است؛ برای بیش از ۵۰۰ سؤال فیلتر
             را محدود کنید.
           </p>
           {bulkNotice && <p role="status">{bulkNotice}</p>}
@@ -620,7 +620,7 @@ export function QuestionBank({
                     <span className="text-xs text-slate-500">
                       {q.difficultyScore == null
                         ? "سختی پس از پاسخ دانش‌آموزان مشخص می‌شود"
-                        : `${fa(q.difficultyScore)} از ۱۰۰ · بر پایهٔ ${fa(q.difficultyResponses?.participants ?? 0)} پاسخ`}
+                        : `${fa(q.difficultyScore)} از ۱۰۰ · بر پایه‌ی ${fa(q.difficultyResponses?.participants ?? 0)} پاسخ`}
                     </span>
                   )}
                   {q.difficultyAssessment?.needsReview && (
@@ -648,7 +648,7 @@ export function QuestionBank({
                   aria-pressed={published.has(`${libraryCourse}:${q._id}`)}
                   onClick={() => void toggleLibrary(q._id)}
                   className="w-fit rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800 disabled:opacity-50">
-                  {libraryBusy === `${libraryCourse}:${q._id}` ? "در حال ثبت…" : published.has(`${libraryCourse}:${q._id}`) ? "حذف از کتابخانهٔ این درس" : "انتشار در کتابخانهٔ این درس"}
+                  {libraryBusy === `${libraryCourse}:${q._id}` ? "در حال ثبت…" : published.has(`${libraryCourse}:${q._id}`) ? "حذف از کتابخانه‌ی این درس" : "انتشار در کتابخانه‌ی این درس"}
                 </button>}
                 <div className="absolute left-4 top-4">
                   <Button
@@ -667,7 +667,7 @@ export function QuestionBank({
                 </div>
                 {q.origin === "human_revised" && (
                   <p className="text-xs text-amber-700">
-                    نسخهٔ ویرایش‌شده توسط معلم
+                    نسخه‌ی ویرایش‌شده توسط معلم
                   </p>
                 )}
                 <p className="text-xs font-medium leading-7 text-teal-700">
@@ -697,11 +697,11 @@ export function QuestionBank({
                       </span>
                     ) : q.origin === "exam_import_reviewed" ? (
                       <span className="rounded-md bg-amber-50 px-2 py-1 text-amber-800">
-                        شمارهٔ اصلی دفترچه ثبت نشده
+                        شماره‌ی اصلی دفترچه ثبت نشده
                       </span>
                     ) : null}
                     {q.source.sourcePage && (
-                      <span>صفحهٔ PDF: {fa(q.source.sourcePage)}</span>
+                      <span>صفحه‌ی PDF: {fa(q.source.sourcePage)}</span>
                     )}
                     {q.source.sourcePageUrl && (
                       <a
@@ -710,7 +710,7 @@ export function QuestionBank({
                         rel="noopener noreferrer"
                         className="font-medium text-[#233B8F] underline underline-offset-4"
                       >
-                        صفحهٔ منبع
+                        صفحه‌ی منبع
                       </a>
                     )}
                     {q.source.sourceUrl && (
@@ -727,7 +727,7 @@ export function QuestionBank({
                 )}
                 {q.importEvidence?.answerBasis === "independent_review" && (
                   <p className="rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-xs leading-6 text-amber-800">
-                    پاسخ‌نامهٔ منتشرشده در منبع پیدا نشد؛ پاسخ مرجع مستقل بررسی
+                    پاسخ‌نامه‌ی منتشرشده در منبع پیدا نشد؛ پاسخ مرجع مستقل بررسی
                     شده و ارزیابی پاسخ دانش‌آموز نیازمند بررسی معلم است.
                   </p>
                 )}

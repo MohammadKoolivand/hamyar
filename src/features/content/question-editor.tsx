@@ -93,8 +93,8 @@ export function QuestionEditor({
       <p className="mb-5 text-sm leading-7 text-slate-500">
         گزینه‌ها را در کادرهای جدا وارد کن؛ فرمول LaTeX را داخل $...$ بنویس تا
         پیش‌نمایشش را ببینی. برای حذف عکس، در بخش «نمودار، شکل و فرمول سؤال» روی
-        «حذف این محتوای سؤال» بزن. نسخهٔ جدید در بانک سؤال ذخیره می‌شود.
-        تمرین‌های قبلی نسخهٔ قبلی را حفظ می‌کنند. پس از تغییر گزینه‌ها، پاسخ
+        «حذف این محتوای سؤال» بزن. نسخه‌ی جدید در بانک سؤال ذخیره می‌شود.
+        تمرین‌های قبلی نسخه‌ی قبلی را حفظ می‌کنند. پس از تغییر گزینه‌ها، پاسخ
         صحیح و راهنماها را دوباره بررسی کنید.
       </p>
       {error && (
@@ -108,7 +108,7 @@ export function QuestionEditor({
       {!value && !error && <p role="status">در حال دریافت سؤال…</p>}
       {saved ? (
         <div role="status" className="rounded-xl bg-teal-50 p-4">
-          نسخهٔ جدید ذخیره شد.
+          نسخه‌ی جدید ذخیره شد.
           <Button
             type="button"
             onClick={async () => {
@@ -157,7 +157,7 @@ export function QuestionEditor({
                   }
                 >
                   <option value="private">خصوصی</option>
-                  <option value="public">عمومی — برای همهٔ دانش‌آموزان</option>
+                  <option value="public">عمومی — برای همه‌ی دانش‌آموزان</option>
                 </select>
               </Field>
               <Field title="متن سؤال">

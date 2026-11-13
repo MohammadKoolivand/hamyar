@@ -170,7 +170,7 @@ export function PublicQuestionBank({
     setPrinting(true);
     setError("");
     try {
-      await printQuestions(printable.current, "تمرین و نمونه‌سؤال هدهده");
+      await printQuestions(printable.current, "تمرین و نمونه‌سؤال هدهد");
     } catch (error) {
       setError((error as Error).message);
     } finally {
@@ -246,7 +246,7 @@ export function PublicQuestionBank({
                 change({ ...filters, category: e.target.value, extra: {} })
               }
             >
-              <option value="">همهٔ انواع</option>
+              <option value="">همه‌ی انواع</option>
               {discoveryChoices(settings, "category", {}).map((c) => (
                 <option key={c.id} value={c.value}>
                   {c.label}
@@ -263,7 +263,7 @@ export function PublicQuestionBank({
                 change({ ...filters, difficulty: e.target.value })
               }
             >
-              <option value="">همهٔ درجه‌ها</option>
+              <option value="">همه‌ی درجه‌ها</option>
               {discoveryChoices(settings, "difficulty", {}).map((option) => (
                 <option key={option.id} value={option.value}>
                   {option.label}
@@ -286,7 +286,7 @@ export function PublicQuestionBank({
                   })
                 }
               >
-                <option value="">همهٔ سال‌ها</option>
+                <option value="">همه‌ی سال‌ها</option>
                 {extraOptions("year").map((value) => (
                   <option key={value} value={value}>
                     {value}
@@ -368,7 +368,7 @@ export function PublicQuestionBank({
             ])
           }
         >
-          افزودن همهٔ {results.length.toLocaleString("fa-IR")} سؤال به لیست PDF
+          افزودن همه‌ی {results.length.toLocaleString("fa-IR")} سؤال به لیست PDF
         </Button>
         <Button
           variant="outline"
@@ -390,7 +390,7 @@ export function PublicQuestionBank({
         </Button>
       </div>
       <p className="text-xs leading-6 text-slate-400">
-        در پنجرهٔ چاپ، مقصد «ذخیره به‌صورت PDF / Save as PDF» را انتخاب کن. بدون
+        در پنجره‌ی چاپ، مقصد «ذخیره به‌صورت PDF / Save as PDF» را انتخاب کن. بدون
         انتخاب سؤال، تمام نتایج فیلترشده چاپ می‌شوند.
       </p>
       {loading && <p role="status">در حال دریافت سؤال‌ها…</p>}
@@ -477,7 +477,7 @@ export function PublicQuestionBank({
                 انتخاب سؤال‌های این آزمون برای PDF
               </Button>
               <details className="mt-4">
-                <summary className="cursor-pointer">مشاهدهٔ سؤال‌ها</summary>
+                <summary className="cursor-pointer">مشاهده‌ی سؤال‌ها</summary>
                 {group.items.map((q) => (
                   <div key={q._id} className="border-t py-4">
                     {questionView(q)}
@@ -490,7 +490,7 @@ export function PublicQuestionBank({
       )}
       <div className="hidden" aria-hidden="true">
         <div ref={printable} dir="rtl">
-          <h1>تمرین و نمونه‌سؤال هدهده</h1>
+          <h1>تمرین و نمونه‌سؤال هدهد</h1>
           {output.map((q, i) => (
             <article key={q._id} className="pdf-question">
               <div className="pdf-question-head">

@@ -311,7 +311,7 @@ export default function HamyarApp() {
           <span className="absolute inset-0 animate-spin rounded-full border-[3px] border-transparent border-t-teal-500 border-r-amber-400 motion-reduce:animate-none" />
           <span className="size-2 rounded-full bg-teal-500" />
         </span>
-        <span className="sr-only">در حال بارگذاری هدهده</span>
+        <span className="sr-only">در حال بارگذاری هدهد</span>
       </div>
     );
   const feedback = (
@@ -343,7 +343,7 @@ export default function HamyarApp() {
         <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
           <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-4 px-5 py-3 md:flex-nowrap lg:px-8">
             <button
-              aria-label="خانهٔ هدهده"
+              aria-label="خانه‌ی هدهد"
               className="shrink-0 cursor-pointer"
               onClick={() => navigatePage("dashboard")}
             >
@@ -388,7 +388,7 @@ export default function HamyarApp() {
                 variant="outline"
                 onClick={() => navigatePage("dashboard")}
               >
-                ادامهٔ مرور بدون ورود
+                ادامه‌ی مرور بدون ورود
               </Button>
               <AuthScreen />
             </>

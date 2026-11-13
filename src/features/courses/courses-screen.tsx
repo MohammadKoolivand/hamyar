@@ -236,7 +236,7 @@ export function CoursesScreen({
         </section>
       )}
       <section className="grid gap-4" data-testid="courses-list">
-        {!teacher && <div className="hy-learning-courses-intro"><div><span className="hy-learning-section-label">کتابخانهٔ شخصی تو</span><h2>درس‌های من؛ از اینجا شروع کن</h2><p>یکی از درس‌ها را انتخاب کن تا مأموریت‌ها، مباحث و مسیر پیشرفتت را یک‌جا ببینی.</p></div><span className="hy-learning-courses-count">{courses.length.toLocaleString("fa-IR")} درس</span></div>}
+        {!teacher && <div className="hy-learning-courses-intro"><div><span className="hy-learning-section-label">کتابخانه‌ی شخصی تو</span><h2>درس‌های من؛ از اینجا شروع کن</h2><p>یکی از درس‌ها را انتخاب کن تا مأموریت‌ها، مباحث و مسیر پیشرفتت را یک‌جا ببینی.</p></div><span className="hy-learning-courses-count">{courses.length.toLocaleString("fa-IR")} درس</span></div>}
         {teacher && <h2 className="text-lg font-bold">درس‌های تحت تدریس</h2>}
         {!courses.length && (
           <div className="glass-panel p-6 text-sm leading-loose text-slate-600">
@@ -323,7 +323,7 @@ export function CoursesScreen({
                       </Button>
                       <p className="hy-learning-course-meta text-xs text-slate-500">
                         <span>{count.toLocaleString("fa-IR")} مأموریت در این درس</span>
-                        <span>{count > 0 ? "فعالیت‌ها آمادهٔ بررسی‌اند" : "منتظر اولین مأموریت"}</span>
+                        <span>{count > 0 ? "فعالیت‌ها آماده‌ی بررسی‌اند" : "منتظر اولین مأموریت"}</span>
                       </p>
                       {own && (
                         <Button
