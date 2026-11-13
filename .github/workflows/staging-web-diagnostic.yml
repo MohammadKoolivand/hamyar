@@ -1,0 +1,52 @@
+name: Read-only staging web diagnostic
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/staging-web-diagnostic.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    environment: staging
+    timeout-minutes: 5
+    steps:
+      - name: Probe systemd without changing the server
+        env:
+          DEPLOY_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+          HOST: ${{ vars.STAGING_HOST }}
+          USER: ${{ vars.STAGING_USER }}
+          PORT: ${{ vars.STAGING_PORT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$HOST" =~ ^[a-zA-Z0-9.-]+$ && "$USER" =~ ^[a-z_][a-z0-9_-]*$ && "$PORT" =~ ^[0-9]+$ ]]
+          test -n "$DEPLOY_KEY" && test -n "$KNOWN_HOSTS"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/staging_diagnostic_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/staging_diagnostic_key ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/staging_diagnostic_key ~/.ssh/known_hosts' EXIT
+          ssh -i ~/.ssh/staging_diagnostic_key -p "$PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "$USER@$HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          active=$(readlink -f /srv/hodhod || true)
+          case "$active" in /opt/hodhod/releases/*) echo "ACTIVE_RELEASE=$(basename "$active")";; *) echo "ACTIVE_RELEASE=UNKNOWN";; esac
+          echo "MONGO_STATE=$(systemctl is-active mongod || true)"
+          echo "WEB_STATE=$(systemctl is-active hodhod-web || true)"
+          for prop in Result ExecMainCode ExecMainStatus ActiveState SubState DropInPaths ReadWritePaths; do
+            value=$(systemctl show hodhod-web --property="$prop" --value 2>/dev/null || true)
+            echo "WEB_${prop}=${value:0:400}"
+          done
+          echo "ROUTE_CACHE_EXISTS=$([[ -d "$active/.next/server/route-cache" ]] && echo yes || echo no)"
+          echo "ROUTE_CACHE_WRITABLE=$([[ -w "$active/.next/server/route-cache" ]] && echo yes || echo no)"
+          if systemctl cat hodhod-web 2>/dev/null | grep -Fq '30-route-cache.conf'; then echo "DROPIN_LOADED=yes"; else echo "DROPIN_LOADED=no"; fi
+          # Summarize only recognizable systemd/Node errors; never emit raw log lines.
+          logs=$(journalctl -u hodhod-web --since '2026-11-13 21:58:30 UTC' --until '2026-11-13 22:00:15 UTC' -o cat --no-pager 2>/dev/null || true)
+          if [[ -z "$logs" ]]; then echo "JOURNAL=NOT_READABLE_OR_EMPTY"; else echo "JOURNAL=AVAILABLE"; fi
+          for pair in 'MOUNT_NAMESPACE:Failed to set up mount namespacing' 'NAMESPACE_STATUS:status=226/NAMESPACE' 'CHDIR_STATUS:status=200/CHDIR' 'EXEC_STATUS:status=203/EXEC' 'ENVIRONMENT_FILE:Failed to load environment files' 'READONLY_FS:EROFS' 'PERMISSION_DENIED:EACCES' 'PATH_NOT_FOUND:ENOENT' 'START_LIMIT:start-limit-hit' 'CACHE_PATH:route-cache' 'PREFLIGHT_FAILED:NEEDS CONFIGURATION'; do
+            key=${pair%%:*}; pattern=${pair#*:}
+            if grep -Fiq -- "$pattern" <<< "$logs"; then echo "WEB_ERROR_${key}=yes"; fi
+          done
+          REMOTE
