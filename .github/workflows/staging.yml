@@ -70,6 +70,24 @@ jobs:
           printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/staging_key
           printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/staging_key ~/.ssh/known_hosts
+      - name: Inspect backup tool availability and install rights (read-only)
+        env:
+          HOST: ${{ vars.STAGING_HOST }}
+          USER: ${{ vars.STAGING_USER }}
+          PORT: ${{ vars.STAGING_PORT }}
+        run: |
+          set -euo pipefail
+          [[ "$HOST" =~ ^[a-zA-Z0-9.-]+$ && "$USER" =~ ^[a-z_][a-z0-9_-]*$ && "$PORT" =~ ^[0-9]+$ ]]
+          SSH_ARGS=(-i "$HOME/.ssh/staging_key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15)
+          ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          echo "OS=$( . /etc/os-release; echo "$ID-$VERSION_ID" ) ARCH=$(uname -m)"
+          if command -v node >/dev/null; then echo "NODE_AVAILABLE"; else echo "NODE_MISSING"; fi
+          if command -v mongodump >/dev/null; then echo "MONGODUMP_AVAILABLE"; else echo "MONGODUMP_MISSING"; fi
+          if sudo -n -l /usr/bin/install >/dev/null 2>&1; then echo "ROOT_INSTALL_PERMISSION_AVAILABLE"; else echo "ROOT_INSTALL_PERMISSION_MISSING"; fi
+          if sudo -n -l /usr/bin/apt-get >/dev/null 2>&1; then echo "ROOT_APT_PERMISSION_AVAILABLE"; else echo "ROOT_APT_PERMISSION_MISSING"; fi
+          if test -x /etc/hodhod/backup-before-release; then echo "BACKUP_HOOK_PRESENT"; else echo "BACKUP_HOOK_MISSING"; fi
+          REMOTE
       - name: Provision real backup hook when missing and sudo permits
         env:
           SHA: ${{ steps.source.outputs.sha }}
