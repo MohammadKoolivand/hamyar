@@ -102,7 +102,16 @@ jobs:
           bash -n ops/backup-before-release.sh
           current=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" 'if [ -e /etc/hodhod/backup-before-release ]; then if [ -f /etc/hodhod/backup-before-release ] && [ ! -L /etc/hodhod/backup-before-release ] && [ "$(stat -c "%u:%a:%F" /etc/hodhod/backup-before-release)" = "0:700:regular file" ]; then echo VALID; else echo INVALID; fi; else echo MISSING; fi')
           if [[ "$current" == VALID ]]; then
-            echo "BACKUP_HOOK_ALREADY_INSTALLED"
+            # A root-owned 0700 file cannot be read by the deployment user.
+            # Check its byte size against this verified release to catch an
+            # outdated hook before stopping any services for activation.
+            expected_bytes=$(wc -c < ops/backup-before-release.sh)
+            installed_bytes=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "stat -c %s /etc/hodhod/backup-before-release")
+            if [[ "$installed_bytes" != "$expected_bytes" ]]; then
+              echo "BACKUP_HOOK_OPERATOR_UPDATE_REQUIRED" >&2
+              exit 1
+            fi
+            echo "BACKUP_HOOK_ROOT_ONLY_INSTALLED"
           elif [[ "$current" == INVALID ]]; then
             echo "BACKUP_HOOK_EXISTS_BUT_NEEDS_ROOT_REVIEW" >&2
             exit 1
