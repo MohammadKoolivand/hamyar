@@ -1,5 +1,6 @@
 "use client";
 import { AccessConsole } from "@/features/access/access-console";
+import { AdminSystemOverviewScreen } from "@/features/access/admin-system-overview";
 import { PublicQuestionBank } from "@/features/content/public-question-bank";
 import { clsx } from "clsx";
 
@@ -16,6 +17,7 @@ import {
   FileUp,
   UsersRound,
   Settings,
+  Database,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Brand } from "./ui/brand";
@@ -171,6 +173,10 @@ export default function HamyarApp() {
 
   async function restoreLocation(currentUser = me) {
     let next = pageFromPath(window.location.pathname);
+    if (next === "admin-overview" && currentUser?.role !== "super_admin") {
+      next = "dashboard";
+      window.history.replaceState(window.history.state, "", "/dashboard");
+    }
     if (currentUser?.role === "student") {
       if (
         ["student-practice", "student-search", "public-bank"].includes(next)
@@ -437,7 +443,10 @@ export default function HamyarApp() {
             ["learning", "یادگیری و مرور", BarChart3],
             ["settings", "تنظیمات", Settings],
             ...(me.role === "super_admin"
-              ? [["access", "مدیریت دسترسی‌ها", Settings] as const]
+              ? [
+                  ["admin-overview", "آمار سامانه", Database] as const,
+                  ["access", "مدیریت دسترسی‌ها", Settings] as const,
+                ]
               : []),
           ] as const)
         : ([
@@ -621,6 +630,9 @@ export default function HamyarApp() {
           </header>
         ) : null}
         {feedback}
+        {me.role === "super_admin" && page === "admin-overview" && (
+          <AdminSystemOverviewScreen />
+        )}
         {page === "courses" && (
           <CoursesScreen
             teacher={teacher}
