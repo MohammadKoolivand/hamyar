@@ -86,7 +86,7 @@ jobs:
           if command -v mongodump >/dev/null; then echo "MONGODUMP_AVAILABLE"; else echo "MONGODUMP_MISSING"; fi
           if sudo -n -l /usr/bin/install >/dev/null 2>&1; then echo "ROOT_INSTALL_PERMISSION_AVAILABLE"; else echo "ROOT_INSTALL_PERMISSION_MISSING"; fi
           if sudo -n -l /usr/bin/apt-get >/dev/null 2>&1; then echo "ROOT_APT_PERMISSION_AVAILABLE"; else echo "ROOT_APT_PERMISSION_MISSING"; fi
-          if test -x /etc/hodhod/backup-before-release; then echo "BACKUP_HOOK_PRESENT"; else echo "BACKUP_HOOK_MISSING"; fi
+          if [ -f /etc/hodhod/backup-before-release ] && [ ! -L /etc/hodhod/backup-before-release ] && [ "$(stat -c "%u:%a:%F" /etc/hodhod/backup-before-release)" = "0:700:regular file" ]; then echo "BACKUP_HOOK_ROOT_ONLY_READY"; else echo "BACKUP_HOOK_MISSING_OR_INVALID"; fi
           REMOTE
       - name: Provision real backup hook when missing and sudo permits
         env:
@@ -100,7 +100,7 @@ jobs:
           [[ "$HOST" =~ ^[a-zA-Z0-9.-]+$ && "$USER" =~ ^[a-z_][a-z0-9_-]*$ && "$PORT" =~ ^[0-9]+$ ]]
           SSH_ARGS=(-i "$HOME/.ssh/staging_key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15)
           bash -n ops/backup-before-release.sh
-          current=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" 'if [ -e /etc/hodhod/backup-before-release ]; then if [ -x /etc/hodhod/backup-before-release ] && [ "$(stat -c %u /etc/hodhod/backup-before-release)" = "0" ]; then echo VALID; else echo INVALID; fi; else echo MISSING; fi')
+          current=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" 'if [ -e /etc/hodhod/backup-before-release ]; then if [ -f /etc/hodhod/backup-before-release ] && [ ! -L /etc/hodhod/backup-before-release ] && [ "$(stat -c "%u:%a:%F" /etc/hodhod/backup-before-release)" = "0:700:regular file" ]; then echo VALID; else echo INVALID; fi; else echo MISSING; fi')
           if [[ "$current" == VALID ]]; then
             echo "BACKUP_HOOK_ALREADY_INSTALLED"
           elif [[ "$current" == INVALID ]]; then
@@ -138,7 +138,7 @@ jobs:
           if [[ -d "$current" ]]; then echo "ACTIVE_RELEASE_EXISTS"; else echo "ACTIVE_RELEASE_MISSING"; fi
           if [[ "$current" == "/opt/hodhod/releases/$sha" ]]; then echo "CURRENTLY_TARGET_RELEASE"; fi
           if [[ -e "/opt/hodhod/releases/$sha" ]]; then echo "TARGET_RELEASE_PATH_ALREADY_EXISTS"; else echo "TARGET_RELEASE_PATH_FREE"; fi
-          if [[ -x /etc/hodhod/backup-before-release ]]; then echo "BACKUP_HOOK_EXECUTABLE"; else echo "BACKUP_HOOK_NOT_EXECUTABLE_OR_MISSING"; fi
+          if [[ -f /etc/hodhod/backup-before-release && ! -L /etc/hodhod/backup-before-release ]] && [[ "$(stat -c "%u:%a:%F" /etc/hodhod/backup-before-release)" == "0:700:regular file" ]]; then echo "BACKUP_HOOK_ROOT_ONLY_READY"; else echo "BACKUP_HOOK_MISSING_OR_INVALID"; fi
           if [[ -e /etc/hodhod/backup-before-release ]]; then
             if [[ "$(stat -c %u /etc/hodhod/backup-before-release)" == 0 ]]; then echo "BACKUP_HOOK_ROOT_OWNED"; else echo "BACKUP_HOOK_OWNER_INVALID"; fi
           fi
