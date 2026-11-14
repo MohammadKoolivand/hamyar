@@ -165,6 +165,7 @@ export interface Question {
   origin?: string;
   originalOrigin?: string;
   visuals?: QuestionVisual[];
+  optionImages?: (import("./question-visuals").QuestionOptionImage | null)[];
   visualLayout?: "below" | "beside";
   _id: string;
   statement: string;
@@ -240,6 +241,7 @@ export interface ReportQuestion {
   statement: string;
   type: string;
   options: string[];
+  optionImages?: (import("./question-visuals").QuestionOptionImage | null)[];
   visuals: QuestionVisual[];
   visualLayout?: "below" | "beside";
   reference?: string;
