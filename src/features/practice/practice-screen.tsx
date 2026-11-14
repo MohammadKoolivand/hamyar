@@ -152,6 +152,7 @@ export function PracticeScreen({
               </legend>
               <QuestionOptionsLayout
                 options={q.options}
+                optionImages={q.optionImages}
                 renderOption={(option, i) => (
                   <label
                     key={i}
@@ -180,7 +181,8 @@ export function PracticeScreen({
                         {fa(i + 1)}
                       </span>
                       <span className="min-w-0 break-words">
-                        <MathText text={option} />
+                        {!(q.optionImages?.[i] && option === `تصویر گزینه ${i + 1}`) && <MathText text={option} />}
+                        {q.optionImages?.[i] && <span className="mt-2 block max-w-sm"><QuestionVisualView visual={q.optionImages[i]!} /></span>}
                       </span>
                     </span>
                   </label>
