@@ -39,7 +39,13 @@ export async function printQuestions(content: HTMLElement, title: string) {
     return ready;
   });
   const css = doc.createElement("style");
-  css.textContent = `@page{size:A4;margin:14mm 16mm}
+  css.textContent = `/* Remove Chromium print-generated date/title/URL header and footer. */
+    @page{size:A4;margin:0}
+    @page{ @top-left{content:none} @top-center{content:none} @top-right{content:none} @bottom-left{content:none} @bottom-center{content:none} @bottom-right{content:none} }
+    .hodhod-print-content{position:relative;z-index:1;padding:14mm 16mm;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+    .hodhod-watermark{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:0;pointer-events:none}
+    .hodhod-watermark img{display:block;width:135mm;height:135mm;max-width:none;max-height:none;opacity:0.075;object-fit:contain}
+    @media screen{.hodhod-watermark{display:none}}
     body{margin:0;background:white!important;color:#000!important;font-family:var(--font-question-text),"B Nazanin",serif;font-size:13pt;line-height:1.65}
     h1{font-size:17pt;text-align:center;margin:0 0 7mm;padding-bottom:3mm;border-bottom:2px solid black}
     .pdf-question{break-inside:avoid;margin:0 0 4mm;padding:0;border:0}
@@ -63,7 +69,21 @@ export async function printQuestions(content: HTMLElement, title: string) {
     .pdf-option .hy-question-text{white-space:pre-wrap;text-align:justify}
     .pdf-question p{margin:0}`;
   doc.head.appendChild(css);
-  doc.body.appendChild(content.cloneNode(true));
+  // A fixed positioned element is repeated in each printed page by Chromium.
+  // Use the real brand icon as an <img> rather than a CSS background so it
+  // prints even when the user disables the browser's background graphics.
+  const watermark = doc.createElement("div");
+  watermark.className = "hodhod-watermark";
+  watermark.setAttribute("aria-hidden", "true");
+  const logo = doc.createElement("img");
+  logo.src = new URL("/icon.svg", document.baseURI).href;
+  logo.alt = "";
+  watermark.appendChild(logo);
+  doc.body.appendChild(watermark);
+  const printedContent = doc.createElement("main");
+  printedContent.className = "hodhod-print-content";
+  printedContent.appendChild(content.cloneNode(true));
+  doc.body.appendChild(printedContent);
   try {
     await Promise.all(loaded);
     await doc.fonts.ready;
