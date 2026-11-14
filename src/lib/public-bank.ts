@@ -15,6 +15,7 @@ export type PublicBankQuestion = Pick<
   | "statement"
   | "type"
   | "options"
+  | "optionImages"
   | "visuals"
   | "visualLayout"
   | "source"
