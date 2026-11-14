@@ -10,10 +10,8 @@ const range = z
 const coord = z.number().finite().min(0).max(100);
 const caption = z.string().trim().min(3).max(300);
 export const visualKind = z.enum(["none", "chart", "geometry", "formula"]);
-export const questionVisualSchema = z
-  .discriminatedUnion("kind", [
-    z
-      .object({
+export const questionOptionImageSchema = z
+  .object({
         kind: z.literal("image"),
         caption,
         assetId: z.string().uuid(),
@@ -33,7 +31,11 @@ export const questionVisualSchema = z
           )
           .optional(),
       })
-      .strict(),
+      .strict();
+export type QuestionOptionImage = z.infer<typeof questionOptionImageSchema>;
+export const questionVisualSchema = z
+  .discriminatedUnion("kind", [
+    questionOptionImageSchema,
     z
       .object({
         kind: z.literal("chart"),

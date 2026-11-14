@@ -397,6 +397,7 @@ export function QuestionPicker({
                   options={
                     preview.type === "choice" ? preview.options : undefined
                   }
+                  optionImages={preview.optionImages}
                 />
               </div>
             </div>

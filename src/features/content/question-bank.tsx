@@ -734,6 +734,7 @@ export function QuestionBank({
                 <QuestionPresentation
                   statement={q.statement}
                   options={q.type === "choice" ? q.options : undefined}
+                  optionImages={q.optionImages}
                   correctReference={q.reference}
                   visuals={q.visuals}
                   visualLayout={q.visualLayout}

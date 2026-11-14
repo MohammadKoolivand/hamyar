@@ -52,6 +52,8 @@ export async function printQuestions(content: HTMLElement, title: string) {
     .pdf-option{display:flex;align-items:baseline;gap:1.5mm;min-width:0;font-family:var(--font-question-regular),"B Nazanin",serif;font-weight:400;text-align:justify;overflow-wrap:anywhere}
     .pdf-option .hy-question-text,.pdf-option .hy-question-text math mn,.pdf-option .hy-question-text .katex .hy-math-number{font-family:var(--font-question-regular),"B Nazanin",serif!important;font-weight:400!important}
     .pdf-option-text{min-width:0;flex:1;white-space:pre-wrap;text-align:justify}
+    .pdf-option figure{display:block;break-inside:avoid;max-width:75mm;margin:1mm 0 2mm}
+    .pdf-option figcaption{display:none}
     .pdf-visuals{direction:ltr;text-align:left}
     .pdf-visuals figure{display:table;border:0;padding:0;margin:2mm 0 2mm 0;max-width:75mm;max-width:min(75mm,100%);margin-right:auto;margin-left:0;direction:rtl;text-align:center}
     .pdf-visuals figcaption{display:none}
@@ -69,7 +71,7 @@ export async function printQuestions(content: HTMLElement, title: string) {
     // Measuring all four options avoids clipping at PDF/A4 widths.
     for (const list of doc.querySelectorAll<HTMLOListElement>(".pdf-options")) {
       const items = Array.from(list.querySelectorAll<HTMLElement>(".pdf-option"));
-      if (items.length !== 4) {
+      if (items.length !== 4 || items.some((item) => item.querySelector("img,svg"))) {
         list.dataset.layout = "stack";
         continue;
       }

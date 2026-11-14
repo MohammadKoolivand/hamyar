@@ -4,9 +4,11 @@ import { PagedList } from "@/components/ui/paged-list";
 import { SourceEditor } from "./source-editor";
 import type { QuestionSource } from "@/lib/question-source";
 import { VisualEditor } from "./visual-editor";
+import { OptionImageInput } from "./option-image-input";
 import {
   questionVisualsSchema,
   type QuestionVisual,
+  type QuestionOptionImage,
 } from "@/lib/question-visuals";
 import { CurriculumCatalog } from "./curriculum-catalog";
 import { AppLink as Link } from "@/components/app-link";
@@ -115,6 +117,12 @@ export function ContentScreen({
   setRelativeTolerance: (v: number) => void;
 }) {
   const [visuals, setVisuals] = useState<QuestionVisual[]>([]);
+  const [optionImages, setOptionImages] = useState<(QuestionOptionImage | null)[]>([]);
+  const optionLines = options.split("\n");
+  const optionRows = Array.from({ length: Math.min(8, Math.max(optionLines.length, optionImages.length)) }, (_, i) => ({
+    text: optionLines[i]?.trim() || (optionImages[i] ? `تصویر گزینه ${i + 1}` : ""),
+    image: optionImages[i] ?? null,
+  })).filter(({ text }) => text.length > 0);
   const [nodeSearch, setNodeSearch] = useState("");
   const [entryMode, setEntryMode] = useState("topic");
   const [visibility, setVisibility] = useState<"private" | "public">("private");
@@ -409,10 +417,14 @@ export function ContentScreen({
                           ],
                         }
                       : {}),
-                    options: options.split("\n").filter(Boolean),
+                    options: optionRows.map(({ text }) => text),
+                    ...(qtype === "choice" && optionRows.some(({ image }) => image)
+                      ? { optionImages: optionRows.map(({ image }) => image) }
+                      : {}),
                   });
                   setStatement("");
                   setVisuals([]);
+                  setOptionImages([]);
                   setReference("");
                   setHints("");
                   setNotice("نسخه ثابت سؤال ذخیره شد.");
@@ -621,22 +633,44 @@ export function ContentScreen({
                 </Field>
               )}
               {qtype === "choice" && (
-                <Field title="گزینه‌ها (هر خط یک گزینه)">
-                  <textarea
-                    required
-                    value={options}
-                    onChange={(e) => setOptions(e.target.value)}
-                    className="w-full min-h-[100px] resize-y glass-field p-3"
-                  />
-                </Field>
+                <div className="grid gap-3">
+                  <Field title="گزینه‌ها (هر خط یک گزینه)">
+                    <textarea
+                      required={!optionImages.some(Boolean)}
+                      value={options}
+                      onChange={(e) => setOptions(e.target.value)}
+                      className="w-full min-h-[100px] resize-y glass-field p-3"
+                    />
+                  </Field>
+                  <p className="text-xs leading-6 text-slate-500">
+                    برای هر گزینه می‌توانید تصویر بارگذاری کنید؛ گزینه‌ای که تصویر دارد می‌تواند بدون متن باشد. پاسخ صحیح را از فهرست پایین انتخاب کنید.
+                  </p>
+                  {Array.from({ length: Math.min(8, Math.max(4, options.split("\n").length)) }, (_, i) => (
+                    <OptionImageInput
+                      key={i}
+                      index={i}
+                      value={optionImages[i] ?? null}
+                      onChange={(image) => setOptionImages((old) => Array.from({ length: Math.max(old.length, i + 1) }, (_, j) => j === i ? image : (old[j] ?? null)))}
+                    />
+                  ))}
+                </div>
               )}
               <Field title="پاسخ مرجع خصوصی">
-                <textarea
-                  required
-                  value={reference}
-                  onChange={(e) => setReference(e.target.value)}
-                  className="w-full min-h-[100px] resize-y glass-field p-3"
-                />
+                {qtype === "choice" ? (
+                  <select required value={reference} onChange={(e) => setReference(e.target.value)} className="w-full min-h-11 glass-field p-3">
+                    <option value="">پاسخ صحیح را انتخاب کنید</option>
+                    {optionRows.map(({ text }, i) => (
+                      <option key={i} value={text}>{i + 1}. {text}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <textarea
+                    required
+                    value={reference}
+                    onChange={(e) => setReference(e.target.value)}
+                    className="w-full min-h-[100px] resize-y glass-field p-3"
+                  />
+                )}
               </Field>
               <Field title="راهنمایی‌های تأییدشده (هر خط یک راهنما، حداکثر ۳)">
                 <textarea

@@ -179,6 +179,7 @@ export function registerPractice(
         ...(q.visualLayout ? { visualLayout: q.visualLayout } : {}),
         type: q.type,
         options: q.options,
+        ...(q.optionImages ? { optionImages: q.optionImages } : {}),
         skillIds: q.skillIds,
         version: q.version,
       })),
