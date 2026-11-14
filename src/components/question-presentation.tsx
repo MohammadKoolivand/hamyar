@@ -272,11 +272,13 @@ export function QuestionPresentation({
   visualLayout = "below",
   onCrop,
   options,
+  optionImages,
   correctReference,
   renderOption,
 }: {
   renderOption?: (option: string, index: number) => React.ReactNode;
   options?: string[];
+  optionImages?: (import("@/lib/question-visuals").QuestionOptionImage | null)[];
   correctReference?: string;
   statement: string;
   visuals?: QuestionVisual[];
@@ -310,6 +312,7 @@ export function QuestionPresentation({
         {statementView}
         <QuestionOptionsLayout
           options={options}
+          optionImages={optionImages}
           correctReference={correctReference}
           renderOption={renderOption}
         >
@@ -335,12 +338,14 @@ export function QuestionPresentation({
 // Measure rendered mathematical content, rather than counting LaTeX characters.
 export function QuestionOptionsLayout({
   options,
+  optionImages,
   correctReference,
   children,
   renderOption,
 }: {
   renderOption?: (option: string, index: number) => React.ReactNode;
   options: string[];
+  optionImages?: (import("@/lib/question-visuals").QuestionOptionImage | null)[];
   correctReference?: string;
   children?: React.ReactNode;
 }) {
@@ -366,7 +371,7 @@ export function QuestionOptionsLayout({
         (Math.max(0, ...widths) + 56) * options.length +
         Math.max(0, options.length - 1) * 16;
       setCompact(
-        options.length > 0 && required <= container.current.clientWidth,
+        !optionImages?.some(Boolean) && options.length > 0 && required <= container.current.clientWidth,
       );
     };
     const observer = new ResizeObserver(check);
@@ -380,7 +385,7 @@ export function QuestionOptionsLayout({
       alive = false;
       observer.disconnect();
     };
-  }, [options]);
+  }, [options, optionImages]);
   const hasVisuals = Array.isArray(children)
     ? children.length > 0
     : Boolean(children);
@@ -421,12 +426,9 @@ export function QuestionOptionsLayout({
                 <span className="shrink-0 text-slate-500">
                   {(i + 1).toLocaleString("fa-IR")}.
                 </span>
-                <span
-                  className="min-w-0 flex-1 break-words"
-                  dir="auto"
-                  data-option-measure
-                >
-                  <MathText text={option} />
+                <span className="min-w-0 flex-1 break-words" dir="auto" data-option-measure>
+                  {!(optionImages?.[i] && option === `تصویر گزینه ${i + 1}`) && <MathText text={option} />}
+                  {optionImages?.[i] && <span className="mt-2 block max-w-sm"><QuestionVisualView visual={optionImages[i]} /></span>}
                 </span>
                 {correctReference === option && (
                   <span
