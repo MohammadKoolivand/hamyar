@@ -118,6 +118,11 @@ export function ContentScreen({
 }) {
   const [visuals, setVisuals] = useState<QuestionVisual[]>([]);
   const [optionImages, setOptionImages] = useState<(QuestionOptionImage | null)[]>([]);
+  const optionLines = options.split("\n");
+  const optionRows = Array.from({ length: Math.min(8, Math.max(optionLines.length, optionImages.length)) }, (_, i) => ({
+    text: optionLines[i]?.trim() || (optionImages[i] ? `تصویر گزینه ${i + 1}` : ""),
+    image: optionImages[i] ?? null,
+  })).filter(({ text }) => text.length > 0);
   const [nodeSearch, setNodeSearch] = useState("");
   const [entryMode, setEntryMode] = useState("topic");
   const [visibility, setVisibility] = useState<"private" | "public">("private");
@@ -361,10 +366,6 @@ export function ContentScreen({
               onSubmit={(e) => {
                 e.preventDefault();
                 run(async () => {
-                  const optionRows = options.split("\n").slice(0, 8).map((text, i) => ({
-                      text: text.trim() || (optionImages[i] ? `تصویر گزینه ${i + 1}` : ""),
-                      image: optionImages[i] ?? null,
-                    })).filter(({ text }) => text.length > 0);
                   await api("/questions", {
                     visibility,
                     ...(entryMode === "free"
@@ -642,7 +643,7 @@ export function ContentScreen({
                     />
                   </Field>
                   <p className="text-xs leading-6 text-slate-500">
-                    برای هر گزینه می‌توانید تصویر بارگذاری کنید. اگر گزینه فقط تصویر دارد، خط مربوط به آن را خالی بگذارید و برای پاسخ صحیح «تصویر گزینه 1» (شماره همان گزینه) را وارد کنید.
+                    برای هر گزینه می‌توانید تصویر بارگذاری کنید؛ گزینه‌ای که تصویر دارد می‌تواند بدون متن باشد. پاسخ صحیح را از فهرست پایین انتخاب کنید.
                   </p>
                   {Array.from({ length: Math.min(8, Math.max(4, options.split("\n").length)) }, (_, i) => (
                     <OptionImageInput
@@ -655,12 +656,21 @@ export function ContentScreen({
                 </div>
               )}
               <Field title="پاسخ مرجع خصوصی">
-                <textarea
-                  required
-                  value={reference}
-                  onChange={(e) => setReference(e.target.value)}
-                  className="w-full min-h-[100px] resize-y glass-field p-3"
-                />
+                {qtype === "choice" ? (
+                  <select required value={reference} onChange={(e) => setReference(e.target.value)} className="w-full min-h-11 glass-field p-3">
+                    <option value="">پاسخ صحیح را انتخاب کنید</option>
+                    {optionRows.map(({ text }, i) => (
+                      <option key={i} value={text}>{i + 1}. {text}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <textarea
+                    required
+                    value={reference}
+                    onChange={(e) => setReference(e.target.value)}
+                    className="w-full min-h-[100px] resize-y glass-field p-3"
+                  />
+                )}
               </Field>
               <Field title="راهنمایی‌های تأییدشده (هر خط یک راهنما، حداکثر ۳)">
                 <textarea
