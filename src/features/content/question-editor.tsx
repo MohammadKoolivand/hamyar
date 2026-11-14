@@ -11,6 +11,7 @@ import {
 } from "@/components/question-presentation";
 import { QuestionTextInput } from "@/components/question-text-input";
 import { VisualEditor } from "./visual-editor";
+import { OptionImageInput } from "./option-image-input";
 import { TopicSelector } from "./topic-selector";
 import type { Node } from "@/lib/types";
 const style = "glass-field min-h-11 w-full p-3 text-sm";
@@ -252,10 +253,10 @@ export function QuestionEditor({
                 <fieldset className="grid gap-3 rounded-2xl border border-slate-200 p-4">
                   <legend>گزینه‌ها و پاسخ صحیح</legend>
                   {value.options.map((option, i) => (
-                    <div key={i} className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                    <div key={i} className="grid gap-2 rounded-xl border border-slate-100 p-3 sm:grid-cols-[1fr_auto]">
                       <Field title={`گزینه ${i + 1}`}>
                         <textarea
-                          required
+                          required={!value.optionImages?.[i]}
                           maxLength={2000}
                           dir="auto"
                           placeholder={"مثلاً: $\\sqrt{2}$ یا $\\frac{a}{b}$"}
@@ -280,7 +281,7 @@ export function QuestionEditor({
                             $\sqrt{"{"}2{"}"}$
                           </code>
                         </p>
-                        {option.trim() && (
+                        {option.trim() && !(value.optionImages?.[i] && option === `تصویر گزینه ${i + 1}`) && (
                           <div className="rounded-lg bg-slate-50 p-3 text-sm leading-8">
                             <span className="text-xs text-slate-500">
                               پیش‌نمایش:{" "}
@@ -288,6 +289,24 @@ export function QuestionEditor({
                             <MathText text={option} />
                           </div>
                         )}
+                        <OptionImageInput
+                          index={i}
+                          value={value.optionImages?.[i] ?? null}
+                          onChange={(image) => {
+                            const oldText = value.options[i];
+                            const nextText = image && !oldText.trim()
+                              ? `تصویر گزینه ${i + 1}`
+                              : !image && oldText === `تصویر گزینه ${i + 1}`
+                                ? ""
+                                : oldText;
+                            change({
+                              ...value,
+                              optionImages: value.options.map((_, j) => j === i ? image : (value.optionImages?.[j] ?? null)),
+                              options: value.options.map((text, j) => j === i ? nextText : text),
+                              reference: value.reference === oldText ? nextText : value.reference,
+                            });
+                          }}
+                        />
                       </Field>
                       <label className="flex items-center gap-2 text-sm">
                         <input
@@ -309,7 +328,7 @@ export function QuestionEditor({
                       variant="outline"
                       disabled={value.options.length >= 8}
                       onClick={() =>
-                        change({ ...value, options: [...value.options, ""] })
+                        change({ ...value, options: [...value.options, ""], optionImages: [...(value.options.map((_, i) => value.optionImages?.[i] ?? null)), null] })
                       }
                     >
                       افزودن گزینه
@@ -323,6 +342,7 @@ export function QuestionEditor({
                         change({
                           ...value,
                           options,
+                          optionImages: value.optionImages?.slice(0, -1),
                           reference: options.includes(value.reference)
                             ? value.reference
                             : "",
@@ -396,6 +416,7 @@ export function QuestionEditor({
                   <QuestionPresentation
                     statement={value.statement}
                     visuals={value.visuals}
+                    optionImages={value.optionImages}
                     visualLayout={value.visualLayout}
                     options={
                       value.type === "choice" ? value.options : undefined
