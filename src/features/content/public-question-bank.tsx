@@ -181,6 +181,7 @@ export function PublicQuestionBank({
     <QuestionPresentation
       statement={q.statement}
       options={q.type === "choice" ? q.options : undefined}
+      optionImages={q.optionImages}
       visuals={q.visuals}
       visualLayout={q.visualLayout}
     />
@@ -526,7 +527,8 @@ export function PublicQuestionBank({
                     <li key={index} className="pdf-option">
                       <span>{(index + 1).toLocaleString("fa-IR")})</span>
                       <span className="pdf-option-text">
-                        <MathText text={option} />
+                        {!(q.optionImages?.[index] && option === `تصویر گزینه ${index + 1}`) && <MathText text={option} />}
+                        {q.optionImages?.[index] && <span className="block max-w-[75mm]"><QuestionVisualView visual={q.optionImages[index]!} /></span>}
                       </span>
                     </li>
                   ))}
