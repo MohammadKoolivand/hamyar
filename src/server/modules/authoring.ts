@@ -27,8 +27,8 @@ export async function validateQuestion(
     const topic = await ctx.owned("curriculum", b.topicId, ownerId);
     if (topic.kind !== "topic") ctx.fail(400, "مبحث را انتخاب کنید");
   }
-  for (const visual of b.visuals ?? [])
-    if (visual.kind === "image")
+  for (const visual of [...(b.visuals ?? []), ...(b.optionImages ?? []).filter((v) => v !== null)])
+    if (visual?.kind === "image")
       await ctx.owned("questionAssets", visual.assetId, ownerId);
   for (const sid of b.skillIds) {
     const s = await ctx.owned("curriculum", sid, ownerId);
