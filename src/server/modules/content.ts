@@ -50,6 +50,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
             statement: 1,
             type: 1,
             options: 1,
+            optionImages: 1,
             visuals: 1,
             visualLayout: 1,
             source: 1,
@@ -164,7 +165,10 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           $match: {
             "version.visibility": "public",
             "version.verifiedAt": { $exists: true },
-            "version.visuals": { $elemMatch: { kind: "image", assetId } },
+            $or: [
+              { "version.visuals": { $elemMatch: { kind: "image", assetId } } },
+              { "version.optionImages": { $elemMatch: { kind: "image", assetId } } },
+            ],
             $expr: { $eq: ["$ownerId", "$version.ownerId"] },
           },
         },
@@ -203,7 +207,10 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         .find(
           {
             ownerId: imageAsset!.ownerId,
-            visuals: { $elemMatch: { kind: "image", assetId } },
+            $or: [
+              { visuals: { $elemMatch: { kind: "image", assetId } } },
+              { optionImages: { $elemMatch: { kind: "image", assetId } } },
+            ],
           },
           { projection: { _id: 1 } },
         )
