@@ -4,9 +4,11 @@ import { PagedList } from "@/components/ui/paged-list";
 import { SourceEditor } from "./source-editor";
 import type { QuestionSource } from "@/lib/question-source";
 import { VisualEditor } from "./visual-editor";
+import { OptionImageInput } from "./option-image-input";
 import {
   questionVisualsSchema,
   type QuestionVisual,
+  type QuestionOptionImage,
 } from "@/lib/question-visuals";
 import { CurriculumCatalog } from "./curriculum-catalog";
 import { AppLink as Link } from "@/components/app-link";
@@ -115,6 +117,7 @@ export function ContentScreen({
   setRelativeTolerance: (v: number) => void;
 }) {
   const [visuals, setVisuals] = useState<QuestionVisual[]>([]);
+  const [optionImages, setOptionImages] = useState<(QuestionOptionImage | null)[]>([]);
   const [nodeSearch, setNodeSearch] = useState("");
   const [entryMode, setEntryMode] = useState("topic");
   const [visibility, setVisibility] = useState<"private" | "public">("private");
@@ -358,6 +361,10 @@ export function ContentScreen({
               onSubmit={(e) => {
                 e.preventDefault();
                 run(async () => {
+                  const optionRows = options.split("\n").slice(0, 8).map((text, i) => ({
+                      text: text.trim() || (optionImages[i] ? `تصویر گزینه ${i + 1}` : ""),
+                      image: optionImages[i] ?? null,
+                    })).filter(({ text }) => text.length > 0);
                   await api("/questions", {
                     visibility,
                     ...(entryMode === "free"
@@ -409,10 +416,14 @@ export function ContentScreen({
                           ],
                         }
                       : {}),
-                    options: options.split("\n").filter(Boolean),
+                    options: optionRows.map(({ text }) => text),
+                    ...(qtype === "choice" && optionRows.some(({ image }) => image)
+                      ? { optionImages: optionRows.map(({ image }) => image) }
+                      : {}),
                   });
                   setStatement("");
                   setVisuals([]);
+                  setOptionImages([]);
                   setReference("");
                   setHints("");
                   setNotice("نسخه ثابت سؤال ذخیره شد.");
@@ -621,14 +632,27 @@ export function ContentScreen({
                 </Field>
               )}
               {qtype === "choice" && (
-                <Field title="گزینه‌ها (هر خط یک گزینه)">
-                  <textarea
-                    required
-                    value={options}
-                    onChange={(e) => setOptions(e.target.value)}
-                    className="w-full min-h-[100px] resize-y glass-field p-3"
-                  />
-                </Field>
+                <div className="grid gap-3">
+                  <Field title="گزینه‌ها (هر خط یک گزینه)">
+                    <textarea
+                      required={!optionImages.some(Boolean)}
+                      value={options}
+                      onChange={(e) => setOptions(e.target.value)}
+                      className="w-full min-h-[100px] resize-y glass-field p-3"
+                    />
+                  </Field>
+                  <p className="text-xs leading-6 text-slate-500">
+                    برای هر گزینه می‌توانید تصویر بارگذاری کنید. اگر گزینه فقط تصویر دارد، خط مربوط به آن را خالی بگذارید و برای پاسخ صحیح «تصویر گزینه 1» (شماره همان گزینه) را وارد کنید.
+                  </p>
+                  {Array.from({ length: Math.min(8, Math.max(4, options.split("\n").length)) }, (_, i) => (
+                    <OptionImageInput
+                      key={i}
+                      index={i}
+                      value={optionImages[i] ?? null}
+                      onChange={(image) => setOptionImages((old) => Array.from({ length: Math.max(old.length, i + 1) }, (_, j) => j === i ? image : (old[j] ?? null)))}
+                    />
+                  ))}
+                </div>
               )}
               <Field title="پاسخ مرجع خصوصی">
                 <textarea
