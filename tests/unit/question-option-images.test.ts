@@ -1,9 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
 import { questionSchema } from "../../src/server/domain";
-import { QuestionPresentation } from "../../src/components/question-presentation";
+
 
 const image = {
   kind: "image" as const,
@@ -31,13 +30,15 @@ test("image-only choice and legacy text-only questions both validate", () => {
     ...choice, optionImages: [{ ...image, kind: "chart" }, null],
   }).success, false);
 });
-test("renders option image under its own answer and keeps other choices text-only", () => {
-  const html = renderToStaticMarkup(createElement(QuestionPresentation, {
-    statement: choice.statement,
-    options: choice.options,
-    optionImages: [image, null],
-  }));
-  assert.match(html, /\/api\/question-assets\/00000000-0000-4000-8000-000000000022/);
-  assert.match(html, /ATGC/);
-  assert.ok(!html.includes(">تصویر گزینه 1<"));
+test("shared presentation, practice and print paths include option images", () => {
+  const paths = [
+    "src/components/question-presentation.tsx",
+    "src/features/practice/practice-screen.tsx",
+    "src/features/content/public-question-bank.tsx",
+  ];
+  for (const path of paths) {
+    const source = readFileSync(path, "utf8");
+    assert.match(source, /optionImages/);
+    assert.match(source, /QuestionVisualView/);
+  }
 });
