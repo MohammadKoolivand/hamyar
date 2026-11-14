@@ -1,6 +1,6 @@
 import { normalizePersianQuestionText } from "../lib/persian-question-text";
 import { questionSourceSchema } from "../lib/question-source";
-import { questionVisualsSchema, visualKind } from "../lib/question-visuals";
+import { questionOptionImageSchema, questionVisualsSchema, visualKind } from "../lib/question-visuals";
 import { mathMarkup } from "../lib/math-render";
 import { z } from "zod";
 import { numericValue } from "./evaluation/numeric";
@@ -35,6 +35,7 @@ export const questionSchema = z
       .array(z.string().min(1).transform(normalizePersianQuestionText))
       .max(8)
       .default([]),
+    optionImages: z.array(questionOptionImageSchema.nullable()).max(8).optional(),
     tolerance: z.number().min(0).max(1e9).default(0),
     relativeTolerance: z.number().min(0).max(1).optional(),
     mathContext: z
@@ -99,6 +100,8 @@ export const questionSchema = z
         }
       }
 
+    if (q.optionImages?.some(Boolean) && (q.type !== "choice" || q.optionImages.length !== q.options.length))
+      c.addIssue({ code: "custom", message: "تصاویر گزینه‌ها باید با تعداد گزینه‌ها مطابقت داشته باشند" });
     if (q.type === "symbolic" && !q.mathContext)
       c.addIssue({
         code: "custom",
