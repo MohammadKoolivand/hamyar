@@ -73,6 +73,65 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
     });
   });
 
+  // Reports identify public CURRENT versions only; no private source or answer is returned.
+  app.post("/api/questions/:vid/report", {
+    config: { rateLimit: { max: 12, timeWindow: "1 hour" } },
+  }, async (r) => {
+    const actor = await ctx.user(r);
+    if (!["student", "teacher", "parent"].includes(actor.role))
+      fail(403, "ارسال گزارش برای این نقش مجاز نیست");
+    const { vid } = z.object({ vid: uuid }).parse(r.params);
+    const input = z.object({
+      category: z.enum(["wrong_answer", "typo", "duplicate", "copyright", "other"]),
+      description: z.string().trim().min(10).max(1000),
+    }).strict().parse(r.body);
+    const version = await c("questionVersions").findOne({
+      _id: vid, visibility: "public", verifiedAt: { $exists: true },
+    });
+    const question = version ? await c("questions").findOne({
+      _id: version.questionId, ownerId: version.ownerId, currentVersionId: vid,
+    }) : null;
+    if (!version || !question) fail(404, "سؤال عمومی فعلی یافت نشد");
+    return ctx.atomic(r, actor._id, "report-public-question:" + vid, input, async (session) => {
+      const row = {
+        _id: id(), versionId: vid, questionId: question._id, reporterId: actor._id,
+        category: input.category, description: input.description,
+        status: "pending", createdAt: now(),
+      };
+      await c("publicQuestionReports").insertOne(row, { session });
+      return { reportId: row._id, status: "pending" };
+    });
+  });
+
+  app.get("/api/admin/public-question-reports", async (r) => {
+    await ctx.user(r, "super_admin");
+    return c("publicQuestionReports").find({ status: "pending" })
+      .project({ reporterId: 0 }).sort({ createdAt: 1 }).limit(100).toArray();
+  });
+
+  app.post("/api/admin/public-question-reports/:rid/resolve", async (r) => {
+    const admin = await ctx.user(r, "super_admin");
+    const { rid } = z.object({ rid: uuid }).parse(r.params);
+    const input = z.object({
+      decision: z.enum(["resolved", "dismissed"]),
+      note: z.string().trim().min(10).max(1000),
+    }).strict().parse(r.body);
+    return ctx.atomic(r, admin._id, "review-public-question-report:" + rid, input, async (session) => {
+      const updated = await c("publicQuestionReports").updateOne({
+        _id: rid, status: "pending",
+      }, { $set: {
+        status: input.decision, note: input.note,
+        reviewedAt: now(), reviewedBy: admin._id,
+      } }, { session });
+      if (!updated.modifiedCount) fail(409, "این گزارش قبلاً رسیدگی شده است");
+      await c("auditLogs").insertOne({
+        _id: id(), actorId: admin._id, action: "review_public_question_report",
+        resourceId: rid, createdAt: now(),
+      }, { session });
+      return { status: input.decision };
+    });
+  });
+
   app.get("/api/admin/public-question-submissions", async (r, reply) => {
     await ctx.user(r, "super_admin");
     reply.header("Cache-Control", "private, no-store");
