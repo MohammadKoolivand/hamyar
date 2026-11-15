@@ -1,5 +1,6 @@
 export const tabPaths = {
   dashboard: "/dashboard",
+  home: "/home",
   login: "/login",
   access: "/management",
   "admin-overview": "/system-overview",
