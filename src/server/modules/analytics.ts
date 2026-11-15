@@ -1,3 +1,4 @@
+import { isIndependentLibraryPractice } from "../../lib/independent-practice";
 import { finalResultVisible } from "../../lib/practice-answer";
 import type { FastifyInstance } from "fastify";
 import type { Context } from "../context";
@@ -219,6 +220,7 @@ export function registerAnalytics(
         { _id: ev.assignmentId, teacherId: u._id },
         { session },
       ))!;
+      if (isIndependentLibraryPractice(a)) fail(404, "مأموریت یافت نشد");
       if (a.state === "cancelled") fail(409, "مأموریت لغو شده است");
       await c("assignments").updateOne(
         { _id: a._id },
