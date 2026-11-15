@@ -1,3 +1,5 @@
+export const PDF_LIBRARY_UPLOAD_CHUNK_BYTES = 512 * 1024;
+
 export type PdfTaxonomy = {
   level: string;
   grade: string;
