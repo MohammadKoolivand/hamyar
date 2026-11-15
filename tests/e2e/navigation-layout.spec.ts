@@ -181,7 +181,7 @@ test("all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime 
   });
   await registerSyntheticUser(page, "ممیزی نمایشگر");
   await expect(
-    page.getByRole("button", { name: "خروج", exact: true }),
+    page.locator('summary[aria-label="پروفایل کاربر"]'),
   ).toBeVisible();
   for (const route of [
     "dashboard",
@@ -198,7 +198,7 @@ test("all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime 
   ]) {
     await page.goto("/" + route);
     await expect(
-      page.getByRole("button", { name: "خروج", exact: true }),
+      page.locator('summary[aria-label="پروفایل کاربر"]'),
     ).toBeVisible();
     for (const width of [360, 390, 768, 1280]) {
       await page.setViewportSize({ width, height: 844 });
@@ -225,4 +225,49 @@ test("all teacher MVP pages fit 360/390/768/1280 RTL and reload without runtime 
     }
   }
   expect(errors).toEqual([]);
+});
+
+test("mobile teacher navigation stays at the bottom and opens role-aware More destinations", async ({ page }) => {
+  await registerSyntheticUser(page, "معلم ناوبری موبایل");
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobile = page.getByRole("navigation", { name: "ناوبری پایین صفحه" });
+  await expect(mobile).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "بخش‌های اصلی" })).toBeHidden();
+  await expect(mobile.getByRole("button")).toHaveCount(5);
+
+  const bounds = await mobile.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    return { bottom: rect.bottom, innerWidth: document.documentElement.scrollWidth };
+  });
+  expect(Math.abs(bounds.bottom - 844)).toBeLessThan(3);
+  expect(bounds.innerWidth).toBeLessThanOrEqual(390);
+
+  await mobile.getByRole("button", { name: "بانک من" }).click();
+  await expect(page).toHaveURL(/\/content$/);
+  await expect(mobile.getByRole("button", { name: "بانک من" })).toHaveAttribute("aria-current", "page");
+
+  await mobile.getByRole("button", { name: "بیشتر" }).click();
+  const sheet = page.getByRole("dialog", { name: "سایر بخش‌ها" });
+  await expect(sheet).toBeVisible();
+  await sheet.getByRole("button", { name: "منابع آموزشی و PDF" }).click();
+  await expect(page).toHaveURL(/\/resources$/);
+  await expect(sheet).toHaveCount(0);
+
+  await page.reload();
+  await expect(mobile).toBeVisible();
+  await mobile.getByRole("button", { name: "بیشتر" }).click();
+  await expect(sheet).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(sheet).toHaveCount(0);
+});
+
+test("public mobile keeps practice and login in one bottom navigation", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  await page.goto("/dashboard");
+  const mobile = page.getByRole("navigation", { name: "ناوبری پایین صفحه" });
+  await expect(mobile).toBeVisible();
+  await expect(mobile.getByRole("button")).toHaveCount(3);
+  await mobile.getByRole("button", { name: "ورود" }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" })).toBeVisible();
 });

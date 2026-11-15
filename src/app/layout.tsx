@@ -57,7 +57,7 @@ export default function RootLayout({
       dir="rtl"
       className={`${poppins.variable} ${persian.variable} ${questionText.variable} ${questionRegular.variable} ${questionMath.variable}`}
     >
-      <body className="hamyar-ambient min-h-screen text-[#17305E] [font-family:var(--font-question-text),var(--font-persian),Tahoma,serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
+      <body className="hamyar-ambient min-h-screen text-[#17305E] [font-family:var(--font-persian),Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
         {children}
       </body>
     </html>

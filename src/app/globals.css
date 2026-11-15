@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
-/* HamYar — Luminous Learning. One token system across teacher, student, parent
-   and PWA. Reference-inspired light-glass visual design, not raster tracing. */
+/* Hodhod Learn UI — clear, calm learning surfaces across public, educator, student,
+   parent and PWA views. Semantic tokens keep components visually consistent. */
 :root {
   color-scheme: light;
   --hy-primary: #1f3f97;
   --hy-primary-hover: #19347e;
   --hy-primary-mid: #2b56b4;
-  --hy-primary-soft: #eaf0ff;
-  --hy-secondary: #2ec8c3;
-  --hy-secondary-ink: #08746f;
+  --hy-primary-soft: #edf2fd;
+  --hy-secondary: #138d83;
+  --hy-secondary-ink: #0b7169;
   --hy-mint-soft: #e5faf5;
   --hy-accent: #f4c15d;
   --hy-amber-soft: #fff6df;
@@ -17,19 +17,18 @@
   --hy-lavender-soft: #f3eeff;
   --hy-pink: #e86aa7;
   --hy-pink-soft: #fff0f7;
-  --hy-background: #ffffff;
-  --hy-surface: rgba(255, 255, 255, 0.73);
-  --hy-surface-strong: rgba(255, 255, 255, 0.89);
-  --hy-glass: rgba(255, 255, 255, 0.73);
-  --hy-glass-strong: rgba(255, 255, 255, 0.89);
-  --hy-glass-border: rgba(207, 224, 246, 0.77);
-  --hy-glass-blur: 18px;
-  --hy-glass-shadow:
-    0 12px 36px rgba(65, 94, 170, 0.085), inset 0 1px rgba(255, 255, 255, 0.92);
-  --hy-text: #17305e;
-  --hy-muted: #526886;
-  --hy-radius-card: 24px;
-  --hy-radius-control: 15px;
+  --hy-background: #f7f9fc;
+  --hy-surface: #ffffff;
+  --hy-surface-strong: #ffffff;
+  --hy-glass: #ffffff;
+  --hy-glass-strong: #ffffff;
+  --hy-glass-border: #e0e6ef;
+  --hy-glass-blur: 0px;
+  --hy-glass-shadow: 0 2px 10px rgba(18, 43, 77, 0.035);
+  --hy-text: #243449;
+  --hy-muted: #637389;
+  --hy-radius-card: 18px;
+  --hy-radius-control: 12px;
   --hy-focus: #285bb0;
 }
 @layer base {
@@ -67,29 +66,27 @@
   .glass-sidebar,
   .glass-header {
     border: 1px solid var(--hy-glass-border);
-    background: rgba(255, 255, 255, 0.88);
+    background: var(--hy-surface);
     box-shadow: var(--hy-glass-shadow);
-    -webkit-backdrop-filter: blur(var(--hy-glass-blur)) saturate(145%);
-    backdrop-filter: blur(var(--hy-glass-blur)) saturate(145%);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
   .glass-panel {
     border-radius: var(--hy-radius-card);
   }
   .glass-card {
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.92);
+    border-radius: var(--hy-radius-card);
+    background: var(--hy-surface);
     transition:
       transform 180ms ease,
       box-shadow 180ms ease,
       border-color 180ms ease;
   }
   .glass-stat {
-    border-radius: 21px;
+    border-radius: var(--hy-radius-card);
     position: relative;
     overflow: hidden;
-    box-shadow:
-      0 10px 28px rgba(65, 94, 170, 0.075),
-      inset 0 1px rgba(255, 255, 255, 0.9);
+    box-shadow: var(--hy-glass-shadow);
     transition:
       transform 180ms ease,
       box-shadow 180ms ease;
@@ -115,28 +112,26 @@
   }
   .glass-sidebar {
     border-radius: 29px;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow:
-      0 20px 55px rgba(41, 70, 155, 0.105),
-      inset 0 1px rgba(255, 255, 255, 0.94);
+    background: var(--hy-surface);
+    box-shadow: var(--hy-glass-shadow);
   }
   .glass-header {
     border-radius: 23px;
-    box-shadow: 0 8px 30px rgba(54, 85, 162, 0.065);
+    box-shadow: var(--hy-glass-shadow);
   }
   .glass-hero {
     position: relative;
     isolation: isolate;
     overflow: hidden;
     border: 1px solid rgba(202, 221, 246, 0.8);
-    border-radius: 29px;
+    border-radius: 20px;
     color: var(--hy-text);
-    background: #f1f6ff;
+    background: #f0f6f7;
     box-shadow:
       0 18px 45px rgba(61, 101, 177, 0.09),
       inset 0 1px rgba(255, 255, 255, 0.94);
-    -webkit-backdrop-filter: blur(22px) saturate(145%);
-    backdrop-filter: blur(22px) saturate(145%);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
   .glass-hero::after {
     content: "";
@@ -165,14 +160,14 @@
   }
   .glass-note {
     border: 1px solid rgba(201, 216, 247, 0.78);
-    border-radius: 17px;
-    background: #eef5ff;
+    border-radius: 14px;
+    background: #f2f7fb;
     color: #253f7a;
   }
   .glass-option {
     border: 1px solid rgba(203, 220, 244, 0.82);
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.68);
+    border-radius: 14px;
+    background: #fff;
     transition:
       background-color 180ms ease,
       border-color 180ms ease,
@@ -181,11 +176,11 @@
   .glass-field {
     border: 1px solid rgba(182, 204, 235, 0.85);
     border-radius: var(--hy-radius-control);
-    background: rgba(255, 255, 255, 0.85);
+    background: #fff;
     color: var(--hy-text);
-    box-shadow: inset 0 1px 2px rgba(48, 85, 157, 0.035);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     transition:
       border-color 180ms ease,
       box-shadow 180ms ease;
@@ -202,24 +197,20 @@
   }
   .glass-button-outline {
     border: 1px solid rgba(182, 204, 237, 0.88);
-    background: rgba(255, 255, 255, 0.79);
-    box-shadow:
-      inset 0 1px rgba(255, 255, 255, 0.96),
-      0 5px 15px rgba(42, 74, 153, 0.06);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    background: #fff;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
   .hy-button-primary {
     color: #fff;
     background: #2858b3;
-    box-shadow:
-      0 9px 24px rgba(35, 77, 168, 0.18),
-      inset 0 1px rgba(255, 255, 255, 0.18);
+    box-shadow: none;
   }
   .hy-button-primary:hover:not(:disabled) {
     background: #214392;
-    box-shadow: 0 12px 28px rgba(35, 77, 168, 0.22);
-    transform: translateY(-1px);
+    box-shadow: none;
+    transform: none;
   }
   .hy-navigation-item {
     color: var(--hy-muted);
@@ -242,10 +233,10 @@
   }
   .hy-student-site {
     min-height: 100vh;
-    background: #fff;
+    background: var(--hy-background);
   }
   .hy-student-site-header {
-    box-shadow: 0 5px 24px rgba(35, 63, 125, 0.055);
+    box-shadow: 0 1px 3px rgba(18, 43, 77, 0.04);
   }
   .hy-student-nav-link {
     border: 1px solid transparent;
@@ -571,8 +562,8 @@
 /* Quiet, flat colors for public discovery; question typography stays unchanged. */
 .hy-discovery { color:#263b55; }
 .hy-discovery { --discovery-gama-gold:#ffb600; --discovery-gama-teal:#48a9a6; --discovery-gama-blue:#1f5592; }
-.hy-discovery .discovery-hero { padding:1.8rem 2rem; border:1px solid #f3e8c9; border-radius:24px; background:#fffcf3; }
-.hy-discovery .discovery-eyebrow { font-size:.72rem; font-weight:600; color:#94710d; }
+.hy-discovery .discovery-hero { padding:1.8rem 2rem; border:1px solid var(--hy-glass-border); border-radius:20px; background:#f0f6f7; }
+.hy-discovery .discovery-eyebrow { font-size:.72rem; font-weight:700; color:var(--hy-secondary-ink); }
 .hy-discovery .discovery-hero h1 { color:var(--discovery-gama-blue); }
 .hy-discovery .discovery-hero p { max-width:42rem; line-height:1.9; color:#64758b; }
 .hy-discovery .discovery-hero-icon { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:72px; height:72px; border-radius:22px; color:#37857e; background:#e5f2ee; }
@@ -585,8 +576,8 @@
 .hy-discovery .discovery-filters > button { justify-self:start; border:none; background:transparent; color:#6f8197; min-height:36px; padding:.3rem 0; font-size:.73rem; box-shadow:none; }
 .hy-discovery .discovery-tabs { padding:4px; border-radius:14px; background:#f0f3f8; }
 .hy-discovery .discovery-tabs button { background:transparent; border:none; border-radius:10px; min-height:38px; padding:.5rem 1.1rem; color:#7a8799; box-shadow:none; font-size:.8rem; }
-.hy-discovery .discovery-tabs button[aria-pressed=true] { background:#fff3d4; color:#825f00; box-shadow:0 1px 4px #263b5510; }
-.hy-discovery .discovery-export { background:#018786; border:1px solid #018786; border-radius:12px; box-shadow:none; font-size:.78rem; }
+.hy-discovery .discovery-tabs button[aria-pressed=true] { background:#fff; color:var(--hy-primary); box-shadow:0 1px 3px #263b5510; }
+.hy-discovery .discovery-export { background:var(--hy-secondary-ink); border:1px solid var(--hy-secondary-ink); border-radius:12px; box-shadow:none; font-size:.78rem; }
 .hy-discovery .discovery-export:hover { background:#226c65; }
 .hy-discovery .discovery-count { margin-inline-end:auto; font-size:.75rem; color:#8591a1; }
 .hy-discovery .discovery-question { background:#fff; border-color:#e5eaf1; box-shadow:0 3px 16px #213e6304; }
@@ -649,4 +640,115 @@
 }
 @media (max-width: 767px) {
   .hy-header-dropdown { position: fixed; top: 7rem; right: .75rem; left: .75rem; width: auto; min-width: 0; }
+}
+
+/* --- Hodhod Learn UI / adaptive navigation and shared component rhythm --- */
+.hy-site-shell { background: var(--hy-background); color: var(--hy-text); }
+.hy-site-main { min-width: 0; }
+.hy-site-main > section,
+.hy-site-main > article { min-width: 0; }
+.hy-site-main :is(h1,h2,h3,h4) { line-height: 1.5; }
+.hy-site-main :is(p,li) { overflow-wrap: break-word; }
+.hy-site-main :is(.glass-panel,.glass-card,.glass-stat,.glass-option) { box-shadow: var(--hy-glass-shadow); }
+.hy-site-main :is(.glass-panel,.glass-card,.glass-stat) { border-color: var(--hy-glass-border); }
+.hy-site-main .glass-card:hover,
+.hy-site-main .glass-stat:hover { transform: none; }
+.hy-site-main .glass-hero::after { display: none; }
+.hy-site-main .glass-hero { box-shadow: none; }
+.hy-site-main :is(input,select,textarea) { max-width: 100%; }
+.hy-site-main .glass-field { min-height: 44px; }
+.hy-site-main :is(button,select,input,textarea):disabled { cursor: not-allowed; }
+.hy-site-shell .hy-header-menu > summary { background: white; }
+.hy-site-shell .hy-student-site-header { border-color: var(--hy-glass-border); }
+
+.hy-mobile-bottom-nav {
+  position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 90;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  min-height: 70px;
+  padding: 5px max(6px, env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+  border-top: 1px solid var(--hy-glass-border);
+  background: #fff;
+  box-shadow: 0 -3px 14px rgba(20, 46, 71, 0.045);
+}
+.hy-mobile-bottom-item {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 62px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 12px;
+  color: #65758a;
+  font-size: .68rem;
+  font-weight: 650;
+  line-height: 1.4;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.hy-mobile-bottom-icon {
+  display: grid;
+  width: 46px;
+  height: 30px;
+  place-items: center;
+  border-radius: 999px;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.hy-mobile-bottom-item[data-active="true"] { color: var(--hy-secondary-ink); }
+.hy-mobile-bottom-item[data-active="true"] .hy-mobile-bottom-icon {
+  background: #e1f3ee;
+  color: var(--hy-secondary-ink);
+}
+.hy-mobile-bottom-item:focus-visible,
+.hy-mobile-sheet-item:focus-visible {
+  outline: 3px solid var(--hy-focus);
+  outline-offset: -3px;
+}
+.hy-mobile-sheet-layer { position: fixed; inset: 0; z-index: 80; }
+.hy-mobile-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: rgba(23, 38, 58, .3);
+}
+.hy-mobile-sheet {
+  position: absolute;
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  inset-inline: 0;
+  max-height: min(70dvh, 580px);
+  overflow-y: auto;
+  border: 1px solid var(--hy-glass-border);
+  border-bottom: 0;
+  border-radius: 22px 22px 0 0;
+  background: #fff;
+  padding: 22px 18px 18px;
+  box-shadow: 0 -8px 36px rgba(23, 38, 58, .13);
+}
+.hy-mobile-sheet-close { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: #f3f6f9; }
+.hy-mobile-sheet-item { display: flex; align-items: center; gap: 12px; text-align: right; min-height: 51px; padding: 6px 10px; border-radius: 12px; font-size: .9rem; font-weight: 600; }
+.hy-mobile-sheet-item:hover,
+.hy-mobile-sheet-item[aria-current="page"] { background: #f1f7f7; color: var(--hy-secondary-ink); }
+.hy-mobile-sheet-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; color: var(--hy-secondary-ink); background: #e6f5f0; flex: none; }
+@media (max-width: 767px) {
+  .hy-site-main { padding-bottom: calc(105px + env(safe-area-inset-bottom)) !important; }
+  .hy-site-shell .hy-student-site-header { min-height: 64px; }
+  .hy-site-shell .hy-brand img { width: 42px; height: 42px; }
+  .hy-site-shell .hy-brand-wordmark { font-size: 1.35rem; }
+  .hy-site-main :is(h1,h2) { overflow-wrap: anywhere; }
+  .hy-site-main input:not([type="checkbox"]):not([type="radio"]),
+  .hy-site-main select,
+  .hy-site-main textarea { font-size: 16px; }
+}
+@media (min-width: 768px) {
+  .hy-mobile-bottom-nav,.hy-mobile-sheet-layer { display: none; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .hy-mobile-bottom-icon { transition: none; }
 }
