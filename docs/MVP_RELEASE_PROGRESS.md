@@ -162,3 +162,31 @@
 ### Status
 
 **STEP 6 CODE IMPLEMENTED PARTIALLY — EXACT-GUARD AND TEXT PREVIEW ADDED; TESTS, SCALE VALIDATION, MODERATION AND RELEASE NOT VERIFIED.**
+
+## Step 7 — moderated public question bank and contributions (2026-11-16)
+
+### Implemented
+
+1. Introduced `publicQuestionSubmissions` (one reusable proposal record per logical question), `questionContributions` (an attribution record for exact-duplicate links), and `publicQuestionReports` for user quality reports. Added additive MongoDB indexes.
+2. Teacher-side publication proposal for a **CURRENT PRIVATE version** with attested rights basis (`original`, `licensed`, or `public_domain`), source reference and optional rights note. Only the owning teacher can submit; privacy remains unchanged while pending. Existing private versions and assignments are not rewritten.
+3. Administrator-only pending queue; reviewers can approve, reject with a reason, or link an **exact duplicate** to an existing current public question. Approval creates a NEW immutable version pointing the logical question to the approved public version, preserves original owner, registers a fingerprint, and records the moderator, justification and source/rights statements.
+4. Linking an exact duplicate does **not** publish the teacher's private question or duplicate the canonical public version. It creates an owner-scoped contributor record to preserve its separate provenance.
+5. Review operations are transaction-backed and change the pending status conditionally, with audit entries. Stale requests after a revision cannot be approved.
+6. In environments where `NODE_ENV=production` (including production-built staging), create and revise APIs now **fail closed** to `private`, even if a client requests direct public publication. The moderation endpoint is the only route here that promotes a private version to public. Development/test environments intentionally retain legacy direct-public API semantics for older tests; **do not infer production behavior from tests alone**.
+7. Connected the teacher proposal form and the administrator moderation queue to the content bank. Manual authoring UI defaults private and directs public publication through moderation.
+8. Added a signed-in quality-report workflow for current public questions, with rate limiting, category, description, and an admin-only report queue. Marking a report resolved records review but does not silently change a question's answer or version.
+9. Added unit tests for publication policy and MongoDB integration regression tests for private submissions, admin RBAC, immutable publication, duplicate canonical linking, stale revisions, private-report blocking and quality-report resolution.
+
+### Significant remaining limitations
+
+- **No test execution in this connector context.** Typecheck, lint, production build, MongoDB integration and Playwright tests are UNRUN; no deployment was performed. Direct Git clone failed due to GitHub DNS resolution.
+- The source/license declaration is an **attestation**. Independent verification of rights, publisher permissions, scientific accuracy and moderator training are manual release requirements.
+- Existing public versions remain public for backwards compatibility. A historical-content moderation/backfill and licensing review has NOT happened. Existing public examples therefore are not evidence of having passed this new review.
+- The Step 6 fingerprint comparison uses a capped recent-public candidate scan. Full legacy duplicate coverage, accuracy calibration and large-catalog performance tests are outstanding.
+- The report queue resolves complaints but does not provide a one-click editing/takedown workflow; a correct, versioned revision still belongs to the author or a separately authorized operator.
+- Linking duplicates records contributor provenance but does not yet automatically grant other teachers the right to assign a canonical question in private class assignments. That requires the cross-owner reference policy from the remaining MVP work.
+- Existing prior test/deployment and privacy gates from Steps 2–6 are still open. This stage must be verified in CI and an isolated MongoDB replica set before staging or production release.
+
+### Status
+
+**STEP 7 CODE ADDED; INDEPENDENT TESTS, RIGHTS REVIEW, FULL CATALOG VALIDATION AND PUBLIC RELEASE APPROVAL PENDING.**
