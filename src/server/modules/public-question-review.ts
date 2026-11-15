@@ -65,6 +65,11 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
         },
         { upsert: true, session },
       );
+      await c("publicQuestionSubmissionEvents").insertOne({
+        _id: id(), questionId: question.questionId, versionId: vid,
+        actorId: actor._id, event: "submitted", sourceReference: input.sourceReference,
+        licenseBasis: input.licenseBasis, rightsNote: input.rightsNote, at: now(),
+      }, { session });
       await c("auditLogs").insertOne({
         _id: id(), actorId: actor._id, resourceId: question.questionId,
         action: "propose_public_question", createdAt: now(),
@@ -219,6 +224,13 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
           createdAt: now(),
         } }, { upsert: true, session });
       }
+      await c("publicQuestionSubmissionEvents").insertOne({
+        _id: id(), questionId: qid, versionId: prior._id,
+        actorId: admin._id, event: status, reason: input.reason,
+        ...(publishedVersionId ? { publishedVersionId } : {}),
+        ...(input.decision === "use_existing" ? { existingVersionId: input.existingVersionId } : {}),
+        at: now(),
+      }, { session });
       await c("auditLogs").insertOne({
         _id: id(), actorId: admin._id, resourceId: qid,
         action: "review_public_question_" + status, createdAt: now(),
