@@ -31,13 +31,13 @@ test("bank removes global difficulty bulk action and preserves current page when
 
 test("PDF upload reports measured aggregate chunk progress and distinct server confirmation", () => {
   const input = file("src/features/content/pdf-library-teacher.tsx");
-  assert.match(input, /new XMLHttpRequest\\(\\)/);
-  assert.match(input, /xhr\\.upload\\.onprogress/);
+  assert.match(input, /new XMLHttpRequest\(\)/);
+  assert.match(input, /xhr\.upload\.onprogress/);
   assert.match(input, /PDF_LIBRARY_UPLOAD_CHUNK_BYTES/);
-  assert.match(input, /offset \\+ event\\.loaded/);
+  assert.match(input, /offset \+ event\.loaded/);
   assert.match(input, /upload-session/);
-  assert.match(input, /xhr\\.timeout = 60_000/);
+  assert.match(input, /xhr\.timeout = 60_000/);
   assert.match(input, /role="progressbar"/);
-  assert.match(input, /xhr\\.status >= 200 && xhr\\.status < 300/);
+  assert.match(input, /xhr\.status >= 200 && xhr\.status < 300/);
   assert.match(input, /uploadProgress}%/);
 });
