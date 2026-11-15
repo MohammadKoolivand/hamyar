@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import {
-  BookOpenCheck, ChartNoAxesCombined, ClipboardList, Database, FilePlus2,
-  FileUp, House, Library, ListChecks, LogIn, Menu, Settings, UsersRound, X,
+  BookOpenCheck, ChartNoAxesCombined, Database, FilePlus2,
+  FileUp, House, Library, ListChecks, LogIn, Menu, Settings, UsersRound, X, GraduationCap, NotebookPen,
 } from "lucide-react";
 import type { User } from "@/lib/types";
 
@@ -14,19 +14,24 @@ export type MobileNavItem = {
   label: string;
   icon: IconComponent;
   aliases?: string[];
+  tone?: "mint" | "sky" | "peach" | "violet" | "yellow";
 };
 
 export function mobileDestinations(role: NavigationRole): {
   primary: MobileNavItem[];
   additional: MobileNavItem[];
 } {
-  const publicBank = { page: "public-bank", label: "نمونه‌سؤال", icon: Library };
+  // The middle destination is consistently the public question-selection home.
+  // No role needs to navigate into a separate teacher panel just to find it.
+  const home: MobileNavItem = { page: "home", label: "خانه", icon: House, tone: "mint",
+    aliases: role === "guest" ? ["dashboard", "public-bank", "student-practice", "student-search"]
+      : role === "student" ? ["dashboard", "public-bank"] : ["public-bank"] };
   if (role === "guest") {
     return {
       primary: [
-        { page: "dashboard", label: "تمرین‌ها", icon: Library, aliases: ["public-bank", "student-practice", "student-search"] },
-        { page: "courses", label: "درس‌ها", icon: BookOpenCheck },
-        { page: "login", label: "ورود", icon: LogIn },
+        { page: "courses", label: "درس‌ها", icon: GraduationCap, tone: "sky" },
+        home,
+        { page: "login", label: "ورود", icon: LogIn, tone: "violet" },
       ],
       additional: [],
     };
@@ -34,8 +39,9 @@ export function mobileDestinations(role: NavigationRole): {
   if (role === "parent") {
     return {
       primary: [
-        { page: "dashboard", label: "فرزند من", icon: UsersRound },
-        publicBank,
+        { page: "dashboard", label: "فرزند من", icon: UsersRound, tone: "sky" },
+        home,
+        { page: "public-bank", label: "بانک سؤال", icon: Library, tone: "peach" },
       ],
       additional: [],
     };
@@ -43,25 +49,26 @@ export function mobileDestinations(role: NavigationRole): {
   if (role === "student") {
     return {
       primary: [
-        { page: "dashboard", label: "تمرین‌ها", icon: Library, aliases: ["public-bank", "student-practice"] },
-        { page: "courses", label: "درس‌ها", icon: BookOpenCheck, aliases: ["student-course"] },
-        { page: "student-missions", label: "تکلیف‌ها", icon: ClipboardList, aliases: ["practice", "report"] },
-        { page: "student-progress", label: "پیشرفت", icon: ChartNoAxesCombined },
-        { page: "more", label: "بیشتر", icon: Menu },
+        { page: "courses", label: "درس‌ها", icon: GraduationCap, tone: "sky", aliases: ["student-course"] },
+        { page: "student-missions", label: "تکلیف‌ها", icon: NotebookPen, tone: "peach", aliases: ["practice", "report"] },
+        home,
+        { page: "student-progress", label: "پیشرفت", icon: ChartNoAxesCombined, tone: "violet" },
+        { page: "more", label: "بیشتر", icon: Menu, tone: "yellow" },
       ],
       additional: [
-        { page: "student-mistakes", label: "مرور اشتباهات", icon: ListChecks },
+        { page: "dashboard", label: "نمای کلی یادگیری", icon: ChartNoAxesCombined, tone: "sky" },
+        { page: "student-mistakes", label: "مرور اشتباهات", icon: ListChecks, tone: "peach" },
       ],
     };
   }
   if (role === "secretary") {
     return {
       primary: [
-        publicBank,
-        { page: "content", label: "بانک سؤال", icon: ListChecks, aliases: ["content-new"] },
-        { page: "exam-import", label: "ورود آزمون", icon: FileUp },
-        { page: "resources", label: "منابع", icon: BookOpenCheck },
-        { page: "more", label: "بیشتر", icon: Menu },
+        { page: "content", label: "بانک سؤال", icon: Library, tone: "sky", aliases: ["content-new"] },
+        { page: "exam-import", label: "ورود آزمون", icon: FileUp, tone: "peach" },
+        home,
+        { page: "resources", label: "منابع", icon: BookOpenCheck, tone: "violet" },
+        { page: "more", label: "بیشتر", icon: Menu, tone: "yellow" },
       ],
       additional: [
         { page: "access", label: "دسترسی‌های تفویض‌شده", icon: Settings },
@@ -70,17 +77,17 @@ export function mobileDestinations(role: NavigationRole): {
   }
   return {
     primary: [
-      publicBank,
-      { page: "dashboard", label: "خانه", icon: House },
-      { page: "content", label: "بانک من", icon: ListChecks, aliases: ["content-new"] },
-      { page: "missions", label: "مأموریت‌ها", icon: ClipboardList, aliases: ["practice", "report"] },
-      { page: "more", label: "بیشتر", icon: Menu },
+      { page: "dashboard", label: "نمای کلی", icon: ChartNoAxesCombined, tone: "sky" },
+      { page: "content", label: "بانک من", icon: Library, tone: "peach", aliases: ["content-new"] },
+      home,
+      { page: "missions", label: "مأموریت‌ها", icon: NotebookPen, tone: "violet", aliases: ["practice", "report"] },
+      { page: "more", label: "بیشتر", icon: Menu, tone: "yellow" },
     ],
     additional: [
       { page: "content-new", label: "افزودن سؤال", icon: FilePlus2 },
       { page: "exam-import", label: "ورود آزمون", icon: FileUp },
       { page: "resources", label: "منابع آموزشی و PDF", icon: BookOpenCheck },
-      { page: "courses", label: "درس‌های من", icon: BookOpenCheck },
+      { page: "courses", label: "درس‌های من", icon: GraduationCap },
       { page: "students", label: "دانش‌آموزان", icon: UsersRound },
       { page: "classes", label: "کلاس‌های گروهی", icon: UsersRound },
       { page: "learning", label: "یادگیری و مرور", icon: ChartNoAxesCombined },
@@ -177,6 +184,8 @@ export function MobileBottomNav({
               aria-current={active && item.page !== "more" ? "page" : undefined}
               aria-expanded={item.page === "more" ? moreOpen : undefined}
               data-active={active}
+              data-tone={item.tone ?? "mint"}
+              data-home={item.page === "home"}
               onClick={() => item.page === "more" ? setMoreOpen((old) => !old) : navigate(item.page)}
             >
               <span className="hy-mobile-bottom-icon"><Icon size={21} aria-hidden /></span>

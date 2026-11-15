@@ -34,10 +34,12 @@ const inputStyle =
 export function PublicQuestionBank({
   home = false,
   signedIn = false,
+  onlinePractice = true,
   onLogin,
 }: {
   home?: boolean;
   signedIn?: boolean;
+  onlinePractice?: boolean;
   onLogin?: () => void;
 }) {
   const [questions, setQuestions] = useState<PublicBankQuestion[]>([]);
@@ -193,7 +195,7 @@ export function PublicQuestionBank({
     ? results.filter((q) => selected.includes(q._id))
     : results;
   return (
-    <section className="hy-discovery grid gap-5 bg-white" dir="rtl">
+    <section className="hy-discovery grid gap-5" dir="rtl">
       <header className="discovery-hero flex items-center justify-between gap-5">
         <div>
           <span className="discovery-eyebrow">یادگیری، یک سؤال در هر قدم</span>
@@ -444,7 +446,7 @@ export function PublicQuestionBank({
                 </span>
               </label>
               {questionView(q)}
-              {home && (
+              {home && onlinePractice && (
                 <Button
                   className="discovery-practice mt-5"
                   disabled={!!starting}

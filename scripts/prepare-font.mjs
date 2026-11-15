@@ -1,15 +1,10 @@
-import { copyFile, access } from "node:fs/promises";
-const licensed = ".private/fonts/IRANSansXFaNum-Regular.ttf";
-let source = "src/assets/fonts/Poppins-Regular.ttf";
-try {
-  await access(licensed);
-  source = licensed;
-} catch {
-  /* Optional local font is absent on a fresh checkout. */
-}
-await copyFile(source, "src/assets/fonts/PersianLocal.ttf");
-console.log(
-  source === licensed
-    ? "Licensed local IRANSans enabled for this build."
-    : "Persian uses system fallback; optional licensed font not present.",
+import { copyFile } from "node:fs/promises";
+
+// Keep the prebuilt Persian fallback consistent with the bundled question font.
+// The previous fallback copied Poppins into the Persian face, making Persian UI
+// text look incorrect on servers without the optional private font.
+await copyFile(
+  "src/assets/fonts/BNazanin-Regular.ttf",
+  "src/assets/fonts/PersianLocal.ttf",
 );
+console.log("B Nazanin Persian fallback prepared.");
