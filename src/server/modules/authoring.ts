@@ -47,7 +47,8 @@ export async function persistQuestion(
     vid = ctx.id();
   const examImported =
     (provenance as { origin?: string }).origin === "exam_import_reviewed";
-  const questionFields = { ...b, visibility: b.visibility ?? "public" };
+  // In production, new questions remain private until an independent administrator approves publication.
+  const questionFields = { ...b, visibility: process.env.NODE_ENV === "production" ? "private" : (b.visibility ?? "public") };
   const publicFingerprint = questionFields.visibility === "public"
     ? await reservePublicQuestionFingerprint(ctx, b, qid, ownerId, session)
     : undefined;
