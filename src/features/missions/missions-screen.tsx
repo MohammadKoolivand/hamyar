@@ -78,6 +78,7 @@ export function MissionsScreen({
 }) {
   const [feedbackMode, setFeedbackMode] = useState<"immediate" | "end">("end");
   const [courseId, setCourseId] = useState("");
+  const [dueAt, setDueAt] = useState("");
   const allowedStudents = courseId
     ? students.filter((person) =>
         enrollments.some(
@@ -106,6 +107,7 @@ export function MissionsScreen({
                   title: missionTitle,
                   studentId: student,
                   ...(courseId ? { courseId } : {}),
+                  ...(dueAt ? { dueAt: new Date(dueAt).toISOString() } : {}),
                   questionVersionIds: selected,
                   policy: {
                     feedbackMode,
@@ -117,6 +119,7 @@ export function MissionsScreen({
                   },
                 });
                 setMissionTitle("");
+                setDueAt("");
                 setSelected([]);
                 await refresh();
                 setNotice("پیش‌نویس ساخته شد؛ برای تخصیص، منتشر کنید.");
@@ -167,6 +170,10 @@ export function MissionsScreen({
                   ))}
                 </select>
               </Field>
+              <Field title="مهلت انجام تکلیف (اختیاری)">
+                <input type="datetime-local" className="w-full min-h-[46px] glass-field p-3"
+                  value={dueAt} onChange={(e) => setDueAt(e.target.value)} />
+              </Field>
               <Field title="حداکثر تلاش هر سؤال">
                 <input
                   type="number"
@@ -210,6 +217,9 @@ export function MissionsScreen({
               />
               سنجش مستقل (راهنمایی در سرور غیرفعال می‌شود)
             </label>
+            <details className="rounded-xl border border-slate-200 p-4">
+              <summary className="cursor-pointer font-medium">تنظیمات پیشرفته پاسخ و راهنمایی</summary>
+              <div className="mt-4 grid gap-3">
             <Field title="حداکثر سطح راهنمایی">
               <select
                 value={maxHintLevel}
@@ -242,6 +252,8 @@ export function MissionsScreen({
                 اجازه صریح نمایش پاسخ مرجع کامل
               </label>
             )}
+              </div>
+            </details>
             <h3 className="text-base font-bold">انتخاب سؤال از بانک معتبر</h3>
             <QuestionPicker
               onRefresh={refresh}
@@ -250,8 +262,9 @@ export function MissionsScreen({
               onChange={setSelected}
               disabled={busy}
             />
+            <p className="text-xs text-slate-500">ابتدا پیش‌نویس ساخته می‌شود؛ سپس از فهرست پایین آن را منتشر کن.</p>
             <Button
-              disabled={busy || !selected.length}
+              disabled={busy || !selected.length || !student || !missionTitle.trim()}
               className="justify-self-start"
             >
               ساخت پیش‌نویس مأموریت
