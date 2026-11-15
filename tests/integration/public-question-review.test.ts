@@ -123,3 +123,36 @@ test("a stale public proposal cannot publish an older revised private version", 
     assert.equal(denied.statusCode, 409);
   } finally { await f.close(); }
 });
+
+test("users may report only current published questions; manager resolves without altering answers", async () => {
+  const f = await fixture();
+  try {
+    const admin = await adminCookie(f);
+    const q = await f.post("/api/questions", privateQuestion, f.teacher);
+    const privateReport = await f.request(`/api/questions/${q._id}/report`, {
+      category: "wrong_answer", description: "پاسخ این سؤال به بررسی نیاز دارد",
+    }, f.student);
+    assert.equal(privateReport.statusCode, 404);
+    await f.post(`/api/questions/${q._id}/propose-public`, proposal(q._id), f.teacher);
+    const approved = await f.post(
+      `/api/admin/public-question-submissions/${q.questionId}/review`,
+      { decision: "approve", reason: "صحت علمی و مجوز حق استفاده بررسی شد" }, admin);
+    const report = await f.post(`/api/questions/${approved.publishedVersionId}/report`, {
+      category: "wrong_answer", description: "لطفاً صحت جواب پیشنهادی را بررسی کنید",
+    }, f.student);
+    assert.equal(report.status, "pending");
+    const listed = (await f.request("/api/admin/public-question-reports", undefined, admin)).json();
+    assert.equal(listed.length, 1);
+    assert.equal(listed[0].reporterId, undefined);
+    assert.equal((await f.request("/api/admin/public-question-reports", undefined, f.teacher)).statusCode, 403);
+    assert.equal((await f.request(
+      `/api/admin/public-question-reports/${report.reportId}/resolve`,
+      { decision: "resolved", note: "محتوای سؤال با منبع علمی مقایسه شد" }, f.student,
+    )).statusCode, 403);
+    await f.post(`/api/admin/public-question-reports/${report.reportId}/resolve`, {
+      decision: "resolved", note: "محتوای سؤال با منبع علمی مقایسه شد",
+    }, admin);
+    assert.equal((await f.c("publicQuestionReports").findOne({ _id: report.reportId }))?.status, "resolved");
+    assert.equal((await f.c("questionVersions").findOne({ _id: approved.publishedVersionId }))?.visibility, "public");
+  } finally { await f.close(); }
+});
