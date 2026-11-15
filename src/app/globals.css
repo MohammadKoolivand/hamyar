@@ -605,3 +605,8 @@
   .hy-discovery .discovery-toolbar { align-items:center; }
   .hy-discovery .discovery-count { margin-inline-end:0; }
 }
+
+/* Preserve sidebar and mobile navigation scrolling while hiding the visible track. */
+.hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.hide-scrollbar::-webkit-scrollbar,
+.hide-scrollbar nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
