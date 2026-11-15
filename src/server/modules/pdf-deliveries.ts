@@ -51,6 +51,12 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
       if (enrollments.length !== input.studentIds.length)
         fail(409, "تمام دریافت‌کنندگان باید عضو فعال درس باشند");
 
+      // Serialize delivery creation against deletion of the source PDF.
+      const locked = await c("pdfLibrary").updateOne({
+        _id: input.pdfId, ownerId: teacher._id, state: "ready",
+        archivedAt: { $exists: false },
+      }, { $inc: { deliveryRevision: 1 } }, { session });
+      if (!locked.modifiedCount) fail(409, "فایل PDF دیگر برای ارسال آماده نیست");
       const batchId = id();
       const createdAt = now();
       const base = {
@@ -91,7 +97,7 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
     return rows.filter((row) => permitted.has(row.enrollmentId) && active(row));
   });
 
-  async function accessible(r: Parameters<typeof user>[0], update = false) {
+  async function accessible(r: Parameters<typeof user>[0]) {
     const current = await user(r);
     const { aid } = z.object({ aid: uuid }).parse(r.params);
     const row = await c("pdfDeliveries").findOne({ _id: aid, studentId: current._id });
@@ -105,7 +111,6 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
       _id: row.courseId, teacherId: row.teacherId, status: "active",
     });
     if (!enrollment || !course) fail(404, "دسترسی به این تکلیف لغو شده است");
-    if (update && row.state === "completed") return { row, current };
     return { row, current };
   }
 
@@ -136,14 +141,16 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
   });
 
   app.post("/api/pdf-deliveries/:aid/complete", async (r) => {
-    const { row, current } = await accessible(r, true);
+    const { row, current } = await accessible(r);
     return ctx.atomic(r, current._id, "complete-pdf-delivery:" + row._id, {}, async (session) => {
       const updated = await c("pdfDeliveries").updateOne({
         _id: row._id, studentId: current._id, state: "assigned",
+        cancelledAt: { $exists: false },
       }, { $set: { state: "completed", completedAt: now() } }, { session });
       if (!updated.modifiedCount) {
-        const latest = await c("pdfDeliveries").findOne({ _id: row._id }, { session });
-        if (latest?.state !== "completed") fail(409, "وضعیت تکلیف تغییر کرده است");
+        const latest = await c("pdfDeliveries").findOne({ _id: row._id, studentId: current._id }, { session });
+        if (latest?.state !== "completed" || latest.cancelledAt)
+          fail(409, "وضعیت تکلیف تغییر کرده است");
       }
       return { ok: true };
     });
