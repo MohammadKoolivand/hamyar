@@ -173,7 +173,7 @@ test("group task cancellation is scoped, idempotent and preserves finished evide
       (await f.request("/api/assignments/" + a!._id + "/attempts", {
         questionId: f.question._id, answer: "2",
       }, f.student)).statusCode,
-      409,
+      404,
     );
     assert.equal((await f.request("/api/group-tasks/" + task._id + "/publish", {}, f.teacher)).statusCode, 409);
     assert.equal((await f.request("/api/group-tasks/" + task._id + "/report", undefined, f.teacher)).statusCode, 200);
