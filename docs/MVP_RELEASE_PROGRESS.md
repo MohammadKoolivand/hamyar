@@ -190,3 +190,32 @@
 ### Status
 
 **STEP 7 CODE ADDED; INDEPENDENT TESTS, RIGHTS REVIEW, FULL CATALOG VALIDATION AND PUBLIC RELEASE APPROVAL PENDING.**
+
+## Step 7 — common public bank, private proposals, human review (2026-11-16)
+
+### Changes committed in the Step 7 feature branch
+
+1. Added a dedicated private-to-public submission workflow (`src/server/modules/public-question-review.ts`), separated from original teacher-owned questions. A teacher may propose only the CURRENT private version of a question they own, with a rights-basis declaration, source reference, affirmative publication permission, and optional supporting note.
+2. Added a super-admin-only queue to approve, reject, or link an **exact** duplicate to an already current, verified public question. Decisions require a human explanation. Approval generates a NEW immutable public question version; historical private versions, owner IDs and existing question-related evidence remain intact.
+3. Added `publicQuestionContributions` **conceptually** via the actual `questionContributions` collection: a canonical link for a matched duplicate that keeps the submitted question private and attributes its original owner internally, without duplicating the public question.
+4. Added `publicQuestionSubmissionEvents` as an append-only audit trail for submission and moderation decisions, alongside the existing audit logs. Proposal rows may be reused following rejection or revision while the event history remains intact.
+5. Added a centralized fail-closed policy: in Node production environments (including deployment environments using `NODE_ENV=production`), normal manual, PDF-import and AI-approved question creation/revision persists private regardless of a client-provided public-visibility flag. Only the dedicated administrator review can publish a new version. Existing public questions are not retroactively unpublished.
+6. Teacher-side proposal form and status list were added to the content bank; the manual question editor now defaults private. Admin content bank now displays pending proposals and the reference answer/options for *authorized human review only*. Private answers are not returned to the public duplicate-preview endpoint.
+7. Added an authenticated `POST /api/questions/:vid/report` for public CURRENT question mistakes (category, explanation, rate limit), and an administrator-only list/resolve workflow for reports, with audit records. Closing a report does **not** silently rewrite a historical question version.
+8. Added the required explicit role registry entries and additive MongoDB indexes. Also repaired the missing registered access-route entry for the earlier duplicate preview endpoint.
+9. Wrote unit and MongoDB integration tests for the production publication policy, ownership/RBAC, immutable admin approval, linking canonical exact matches, rejection, stale version protection, reporting and privacy of answer keys.
+
+### Open limitations and release gates
+
+- **Tests are written, NOT executed**. This environment has repository-content tools but no working clone/network access to GitHub; `git ls-remote` failed DNS resolution. Typecheck, lint, unit/integration suites, build, E2E and real deployments are not verified.
+- Legacy previously-published question versions remain public and have not undergone a rights/scientific/duplicate audit. A non-destructive moderation/backfill plan for those is required.
+- The Step 6 similarity search is bounded to the 5,000 latest public candidates; full-bank uniqueness and matching for legacy data remain best-effort until a reviewed backfill and scaling/index strategy is completed.
+- Licensing/source assertions must be checked by a trained human; code cannot establish ownership or permission. No automated science or copyright clearance is claimed.
+- Canonical contribution links preserve provenance but do not yet implement cross-owner classroom assignment permissions.
+- User reports can be administratively closed, but changes to erroneous questions still require separately authorized versioned editing; automatic takedown, appeals and cross-system retention remain future work.
+- Development/test mode retains legacy direct-public behavior to avoid silently breaking old test fixtures; test plans must explicitly validate `NODE_ENV=production` fail-closed enforcement before release.
+- Privacy, backup, monitoring, production deployment, complete browser workflows and prior Steps 2–6 unverified gates are still open.
+
+### Status
+
+**STEP 7 IMPLEMENTATION COMMITTED IN SOURCE; TEST EXECUTION AND PUBLIC RELEASE READINESS NOT VERIFIED.**
