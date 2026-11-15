@@ -164,3 +164,61 @@ export function AdminPublicReview() {
     </section>
   );
 }
+
+type PublicReport = {
+  _id: string; versionId: string; category: string;
+  description: string; createdAt: string;
+};
+
+export function AdminPublicQuestionReports() {
+  const [reports, setReports] = useState<PublicReport[]>([]);
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState("");
+  async function refresh() {
+    setReports(await api<PublicReport[]>("/admin/public-question-reports"));
+  }
+  useEffect(() => { void refresh().catch(() => setError("گزارش‌های کاربران دریافت نشد.")); }, []);
+  async function resolve(id: string, decision: "resolved" | "dismissed") {
+    setError(""); setMessage(""); setBusy(id);
+    try {
+      await api(`/admin/public-question-reports/${id}/resolve`, {
+        decision, note: (notes[id] ?? "").trim(),
+      });
+      await refresh();
+      setMessage("نتیجه بررسی گزارش ثبت شد.");
+    } catch (e) { setError((e as Error).message); }
+    finally { setBusy(""); }
+  }
+  return (
+    <section className="grid gap-3 rounded-2xl border border-amber-200 bg-white p-4 sm:p-5" dir="rtl">
+      <h3 className="font-bold">گزارش اشکال سؤال‌های عمومی</h3>
+      <p className="text-xs text-slate-600">بستن گزارش به معنی اصلاح خودکار سؤال نیست؛ نسخه سؤال باید جداگانه توسط صاحب محتوا اصلاح شود.</p>
+      <button type="button" className="w-fit rounded-lg border px-3 py-2 text-sm"
+        onClick={() => void refresh()}>به‌روزرسانی گزارش‌ها</button>
+      {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
+      {message && <p role="status" className="text-sm text-teal-700">{message}</p>}
+      {!reports.length && <p className="text-sm text-slate-500">گزارش بررسی‌نشده وجود ندارد.</p>}
+      {reports.map((report) => (
+        <article key={report._id} className="grid gap-2 rounded-xl border p-3">
+          <p className="text-sm">نوع: {report.category} · شناسه نسخه: {report.versionId}</p>
+          <p className="text-sm">{report.description}</p>
+          <label className="grid gap-1 text-xs">یادداشت رسیدگی
+            <textarea className={field} minLength={10} maxLength={1000} rows={2}
+              value={notes[report._id] ?? ""}
+              onChange={(e) => setNotes((old) => ({ ...old, [report._id]: e.target.value }))} />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" disabled={busy === report._id || (notes[report._id] ?? "").trim().length < 10}
+              className="rounded-lg border px-3 py-2 text-sm"
+              onClick={() => void resolve(report._id, "resolved")}>رسیدگی شد</button>
+            <button type="button" disabled={busy === report._id || (notes[report._id] ?? "").trim().length < 10}
+              className="rounded-lg border px-3 py-2 text-sm"
+              onClick={() => void resolve(report._id, "dismissed")}>رد گزارش با دلیل</button>
+          </div>
+        </article>
+      ))}
+    </section>
+  );
+}
