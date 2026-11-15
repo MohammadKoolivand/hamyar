@@ -134,6 +134,10 @@ export function ContentScreen({
   const [source, setSource] = useState<QuestionSource>();
   const [difficulty, setDifficulty] = useState("");
   const [year, setYear] = useState("");
+  const [similarMatches, setSimilarMatches] = useState<Array<{ questionVersionId: string; statement: string; kind: "exact" | "similar"; score: number }>>([]);
+  const [similarCheckedFor, setSimilarCheckedFor] = useState("");
+  const [similarBusy, setSimilarBusy] = useState(false);
+  const [similarError, setSimilarError] = useState("");
   const availableSkills = topic ? curriculumSkills(nodes, topic) : [];
   const visibleNodes = nodes.filter((n) => n.title.includes(nodeSearch.trim()));
   return (
@@ -535,6 +539,43 @@ export function ContentScreen({
                   className="w-full min-h-[100px] resize-y glass-field p-3"
                 />
               </Field>
+              <section className="grid gap-2 rounded-xl border border-teal-200 bg-teal-50/40 p-3" aria-label="بررسی سؤال تکراری">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-medium">بررسی سؤال‌های مشابه در بانک عمومی</p>
+                  <Button type="button" variant="outline" disabled={similarBusy || statement.trim().length < 3}
+                    onClick={async () => {
+                      setSimilarBusy(true);
+                      setSimilarError("");
+                      try {
+                        const response = await api<{ matches: typeof similarMatches }>("/questions/duplicates/check", {
+                          statement, type: qtype, options: qtype === "choice" ? optionRows.map(({ text }) => text) : [],
+                        });
+                        setSimilarMatches(response.matches);
+                        setSimilarCheckedFor(JSON.stringify([statement, qtype, optionRows.map(({ text }) => text)]));
+                      } catch (error) {
+                        setSimilarError((error as Error).message);
+                      } finally {
+                        setSimilarBusy(false);
+                      }
+                    }}>
+                    {similarBusy ? "در حال بررسی…" : "جست‌وجوی سؤال مشابه"}
+                  </Button>
+                </div>
+                {similarError && <p role="alert" className="text-xs text-rose-700">{similarError}</p>}
+                {similarCheckedFor && similarCheckedFor !== JSON.stringify([statement, qtype, optionRows.map(({ text }) => text)]) &&
+                  <p className="text-xs text-amber-800">متن یا گزینه‌ها تغییر کرده‌اند؛ برای نتیجه جدید دوباره بررسی کن.</p>}
+                {similarCheckedFor && similarCheckedFor === JSON.stringify([statement, qtype, optionRows.map(({ text }) => text)]) &&
+                  (similarMatches.length ? (
+                    <ul className="grid gap-2 text-sm">
+                      {similarMatches.map((match) => <li key={match.questionVersionId} className="rounded-lg border bg-white p-3">
+                        <strong>{match.kind === "exact" ? "تکراری دقیق" : "مشابه احتمالی"} · {Math.round(match.score * 100).toLocaleString("fa-IR")}٪</strong>
+                        <p className="mt-1">{match.statement}</p>
+                        <p className="text-xs text-slate-500">شناسه سؤال موجود: {match.questionVersionId}</p>
+                      </li>)}
+                    </ul>
+                  ) : <p className="text-xs text-teal-800">در محدوده جست‌وجوی فعلی مورد مشابهی پیدا نشد؛ این نتیجه تضمین نبود تکرار در کل بانک نیست.</p>)}
+                <p className="text-xs text-slate-600">فقط سؤال‌های عمومی تأییدشده نمایش داده می‌شوند. سؤال‌های تصویری و فرمولی نیاز به بازبینی انسانی دارند.</p>
+              </section>
               <details className="rounded-xl border border-slate-200 p-3">
                 <summary className="cursor-pointer text-sm font-medium">
                   افزودن نمودار، شکل یا فرمول به سؤال دستی
