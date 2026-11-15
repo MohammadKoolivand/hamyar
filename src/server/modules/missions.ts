@@ -32,6 +32,7 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
           title: z.string().min(3).max(150),
           studentId: z.string().uuid(),
           courseId: z.string().uuid().optional(),
+          dueAt: z.string().datetime({ offset: true }).optional(),
           questionVersionIds: z
             .array(z.string().uuid())
             .min(1)
@@ -139,6 +140,7 @@ export function registerMissions(app: FastifyInstance, ctx: Context) {
             ? { courseId: m!.courseId, enrollmentId: m!.enrollmentId }
             : {}),
           title: m!.title,
+          ...(m!.dueAt ? { dueAt: m!.dueAt } : {}),
           policy: m!.policy,
           questionVersionIds: m!.questionVersionIds,
           state: "published",
