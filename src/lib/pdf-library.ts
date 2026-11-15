@@ -8,6 +8,8 @@ export type PdfTaxonomy = {
 
 export interface PdfLibraryItem {
   _id: string;
+  ownerId?: string;
+  ownerName?: string;
   title: string;
   description: string;
   taxonomy: PdfTaxonomy;
