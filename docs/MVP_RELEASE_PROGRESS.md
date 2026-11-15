@@ -41,3 +41,30 @@
 ### Status
 
 **Step 2: CODE CHANGES COMPLETE; TEST/DEPLOYMENT VERIFICATION PENDING.**
+
+## Step 3 — independent student practice (partial implementation, 2026-11-15)
+
+### Verified in existing source
+
+- Public questions already start an authorized individual assignment using `courseId = questionVersionId` as an **intentional synthetic identifier**, not an accidental course-ID bug.
+- `activeLibraryAccess` independently rechecks current public visibility/version, and existing integration coverage verifies access revocation.
+- The current authenticated practice entry point is still single-question. A multi-question persisted session is **not** implemented here.
+
+### Changes made
+
+1. Added a clearly labeled, up-to-ten-question **guest preview** that accepts input locally without grading, sending answers or permanently storing personal responses; completion reports only how many answers were entered.
+2. Added a `practiceMode: "self"` marker for newly created independent public-library assignments, retaining compatibility with legacy records identified by `courseId === libraryQuestionId`.
+3. Restrict direct assignment access for non-students, list visibility and teacher review access for independently initiated public-library practice. Publishing a question must not grant its author access to a learner's independent exercise records.
+4. Added tests for classification of current/legacy independent practice and cross-role access to independent student assignments.
+
+### Verification and limitations
+
+- No Typecheck, Build, unit/integration or E2E tests were executed in this connector-only environment. Added tests are **unverified**.
+- Guest preview deliberately has no score, server-side answer validation, or saved history and does not bypass consent/authorization to use existing authenticated practice.
+- Authenticated multi-question sessions, guest auto-grading (if authorized), durable session continuation, separate progress reports, and full browser tests remain **outstanding**.
+- Publication/deployment of Step 3 is **not authorized by CI evidence** merely because these source changes are committed.
+- The earlier Stage 2 staging deployment `43754665073` was in progress when queried; a successful website activation was not independently established.
+
+### Status
+
+**STEP 3 PARTIAL — SOURCE CHANGES COMMITTED; COMPLETE MVP ACCEPTANCE NOT MET.**
