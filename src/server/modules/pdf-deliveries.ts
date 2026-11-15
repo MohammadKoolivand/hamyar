@@ -51,6 +51,14 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
       }, { session }).toArray();
       if (enrollments.length !== input.studentIds.length)
         fail(409, "تمام دریافت‌کنندگان باید عضو فعال درس باشند");
+      // Force a write conflict when a student leaves during delivery creation.
+      for (const enrollment of enrollments) {
+        const guard = await c("enrollments").updateOne({
+          _id: enrollment._id, teacherId: teacher._id,
+          courseId: input.courseId, status: "active",
+        }, { $inc: { accessRevision: 1 } }, { session });
+        if (!guard.modifiedCount) fail(409, "عضویت دانش‌آموز در حال تغییر است");
+      }
 
       // Serialize delivery creation against deletion of the source PDF.
       const locked = await c("pdfLibrary").updateOne({
@@ -158,6 +166,14 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
   app.post("/api/pdf-deliveries/:aid/complete", async (r) => {
     const { row, current } = await accessible(r);
     return ctx.atomic(r, current._id, "complete-pdf-delivery:" + row._id, {}, async (session) => {
+      const membership = await c("enrollments").findOne({
+        _id: row.enrollmentId, studentId: current._id,
+        teacherId: row.teacherId, courseId: row.courseId, status: "active",
+      }, { session });
+      const course = await c("courses").findOne({
+        _id: row.courseId, teacherId: row.teacherId, status: "active",
+      }, { session });
+      if (!membership || !course) fail(404, "دسترسی به تکلیف PDF لغو شده است");
       const updated = await c("pdfDeliveries").updateOne({
         _id: row._id, studentId: current._id, state: "assigned",
         cancelledAt: { $exists: false },
