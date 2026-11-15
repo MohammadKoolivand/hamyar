@@ -144,7 +144,7 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
       .sort({ createdAt: 1 }).limit(100).toArray();
     const ids = submissions.map((item) => item.versionId);
     const versions = await c("questionVersions").find({ _id: { $in: ids } })
-      .project({ _id: 1, statement: 1, type: 1, options: 1, source: 1 })
+      .project({ _id: 1, statement: 1, type: 1, options: 1, reference: 1, hints: 1, source: 1 })
       .toArray();
     const byVersion = new Map(versions.map((v) => [v._id, v]));
     return submissions.map((submission) => ({
