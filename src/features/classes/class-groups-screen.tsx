@@ -28,6 +28,7 @@ interface GroupTask {
   title: string;
   state: string;
   studentIds: string[];
+  dueAt?: string | null;
 }
 interface GroupReport {
   _id: string;
@@ -71,6 +72,7 @@ export function ClassGroupsScreen({
   const [groupStudents, setGroupStudents] = useState<string[]>([]);
   const [taskGroup, setTaskGroup] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
+  const [taskDueAt, setTaskDueAt] = useState("");
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [maxAttempts, setMaxAttempts] = useState(3);
   const [feedbackMode, setFeedbackMode] = useState<"immediate" | "end">("end");
@@ -254,6 +256,7 @@ export function ClassGroupsScreen({
       await api("/group-tasks", {
         groupId: taskGroup,
         title: taskTitle.trim(),
+        ...(taskDueAt ? { dueAt: new Date(taskDueAt).toISOString() } : {}),
         questionVersionIds: selectedQuestions,
         policy: {
           feedbackMode,
@@ -265,6 +268,7 @@ export function ClassGroupsScreen({
         },
       });
       setTaskTitle("");
+      setTaskDueAt("");
       setSelectedQuestions([]);
       setNotice("پیش‌نویس مأموریت گروهی ساخته شد.");
     });
@@ -380,6 +384,10 @@ export function ClassGroupsScreen({
               onChange={(e) => setTaskTitle(e.target.value)}
             />
           </Field>
+          <Field title="مهلت انجام تکلیف (اختیاری)">
+            <input type="datetime-local" className="glass-field min-h-11 w-full p-3"
+              value={taskDueAt} onChange={(e) => setTaskDueAt(e.target.value)} />
+          </Field>
           <div className="grid gap-2">
             <strong className="text-sm">سؤال‌های مأموریت</strong>
             <QuestionPicker
@@ -458,8 +466,9 @@ export function ClassGroupsScreen({
               <p className="text-xs text-slate-600">
                 {groups.find((g) => g._id === task.groupId)?.title ?? "کلاس"} ·
                 {task.studentIds.length.toLocaleString("fa-IR")} دانش‌آموز ·
-                {task.state === "draft" ? "پیش‌نویس" : "منتشرشده"}
+                {task.state === "draft" ? "پیش‌نویس" : task.state === "cancelled" ? "لغوشده" : "منتشرشده"}
               </p>
+              {task.dueAt && <p className="text-xs text-slate-600">مهلت: {new Date(task.dueAt).toLocaleString("fa-IR")}</p>}
               {task.state === "draft" ? (
                 <Button
                   disabled={busy}
@@ -472,7 +481,7 @@ export function ClassGroupsScreen({
                 >
                   انتشار برای تمام اعضای کلاس
                 </Button>
-              ) : (
+              ) : task.state !== "draft" ? (
                 <Button
                   variant="outline"
                   disabled={busy}
@@ -487,6 +496,13 @@ export function ClassGroupsScreen({
                 >
                   <BarChart3 size={16} /> نمایش / به‌روزرسانی گزارش گروه
                 </Button>
+              )}
+              {task.state !== "cancelled" && (
+                <Button type="button" variant="outline" disabled={busy}
+                  onClick={() => void act(async () => {
+                    await api("/group-tasks/" + task._id + "/cancel", {});
+                    setNotice("تکلیف گروهی لغو شد؛ سوابق پاسخ‌ها محفوظ است.");
+                  })}>لغو تکلیف گروهی</Button>
               )}
               {reports[task._id] && (
                 <div data-testid="class-group-report" className="grid gap-2">
