@@ -16,6 +16,8 @@ type Delivery = {
   courseId: string;
   state: string;
   createdAt: string;
+  completedAt?: string;
+  fileAccessCount?: number;
 };
 
 export function PdfDeliveryTeacher({
@@ -191,7 +193,11 @@ export function PdfDeliveryTeacher({
           <FileUp size={17} aria-hidden /> ارسال PDF به {activeRecipients.length.toLocaleString("fa-IR")} دانش‌آموز
         </button>
       </form>
-      <h4 className="font-semibold">ارسال‌های قبلی</h4>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h4 className="font-semibold">ارسال‌های قبلی</h4>
+        <button type="button" className="rounded-lg border px-3 py-2 text-xs" disabled={busy}
+          onClick={() => void refresh()}>به‌روزرسانی وضعیت</button>
+      </div>
       {!batches.length && <p className="text-sm text-slate-500">هنوز PDF اختصاصی ارسال نشده است.</p>}
       {batches.map((batch) => {
         const rows = deliveries.filter((item) => item.batchId === batch.batchId);
@@ -201,7 +207,8 @@ export function PdfDeliveryTeacher({
             <p className="font-medium">{batch.title}</p>
             <p className="text-xs text-slate-600">
               {rows.length.toLocaleString("fa-IR")} دریافت‌کننده ·
-              {rows.filter((item) => item.state === "completed").length.toLocaleString("fa-IR")} نفر اعلام انجام ·
+              {rows.filter((item) => !!item.fileAccessCount).length.toLocaleString("fa-IR")} نفر درخواست فایل ·
+              {rows.filter((item) => !!item.completedAt).length.toLocaleString("fa-IR")} نفر اعلام انجام ·
               {cancelled ? "لغوشده" : "فعال"}
             </p>
           </div>
