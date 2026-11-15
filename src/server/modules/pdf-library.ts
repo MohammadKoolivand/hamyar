@@ -29,7 +29,7 @@ const metadata = z.object({
   title: z.string().trim().min(3).max(150),
   taxonomy,
   topicId: z.string().uuid().optional(),
-  visibility: z.enum(["public", "private"]).default("public"),
+  visibility: z.enum(["public", "private"]).default("private"),
   description: z.string().trim().max(700).default(""),
 }).strict();
 
