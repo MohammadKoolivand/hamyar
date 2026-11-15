@@ -1,4 +1,5 @@
 import { backend } from "@/server/backend";
+import { PDF_LIBRARY_UPLOAD_CHUNK_BYTES } from "@/lib/pdf-library";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 class PayloadLimit extends Error {}
@@ -27,6 +28,8 @@ async function handle(request: Request) {
   try {
     const url = new URL(request.url);
     const app = await backend();
+    const pdfChunk = request.method === "POST" &&
+      /^\/api\/pdf-library\/[a-f0-9-]{36}\/chunks\/[a-f0-9-]{36}\/\d+$/.test(url.pathname);
     const large =
       request.method === "POST" &&
       (/^\/api\/exam-imports\/[a-f0-9-]{36}\/files\/(question|answer)$/.test(
@@ -49,7 +52,7 @@ async function handle(request: Request) {
         });
     }
     const body = !["GET", "HEAD"].includes(request.method)
-      ? await payload(request, large ? 20 * 1024 * 1024 : 65536)
+      ? await payload(request, pdfChunk ? PDF_LIBRARY_UPLOAD_CHUNK_BYTES : large ? 20 * 1024 * 1024 : 65536)
       : undefined;
     const headers = Object.fromEntries(request.headers.entries());
     const response = await app.inject({
