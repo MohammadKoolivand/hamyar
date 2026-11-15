@@ -23,6 +23,7 @@ import {
 } from "./auth/reset-mail";
 import { registerExamImports } from "./modules/exam-imports";
 import { registerPdfLibrary } from "./modules/pdf-library";
+import { registerPdfDeliveries } from "./modules/pdf-deliveries";
 import { registerContent } from "./modules/content";
 import { registerDiscoverySettings } from "./modules/discovery-settings";
 import { registerMissions } from "./modules/missions";
@@ -226,6 +227,7 @@ export async function buildApp(
   registerDiscoverySettings(app, ctx);
   registerExamImports(app, ctx);
   registerPdfLibrary(app, ctx);
+  registerPdfDeliveries(app, ctx);
   registerAiSettings(app, ctx, avalai);
   registerAuthoring(app, ctx, questionGenerator, avalai);
   registerMissions(app, ctx);
