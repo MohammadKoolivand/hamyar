@@ -141,3 +141,64 @@ test("group publishing rejects inactive recipients atomically without partial as
     await f.close();
   }
 });
+
+
+test("group task cancellation is scoped, idempotent and preserves finished evidence", async () => {
+  const f = await fixture();
+  try {
+    const studentId = f.assignment.studentId;
+    const course = await f.post("/api/courses", { title: "درس آزمون لغو", subject: "ریاضی" }, f.teacher);
+    const invitation = await f.post("/api/invitations", { email: "s@test.dev", courseId: course._id }, f.teacher);
+    await f.post("/api/invitations/claim", { token: invitation.token }, f.student);
+    const group = await f.post("/api/class-groups", {
+      courseId: course._id, title: "کلاس آزمون لغو", studentIds: [studentId],
+    }, f.teacher);
+    const dueAt = "2027-02-01T10:30:00.000Z";
+    const task = await f.post("/api/group-tasks", {
+      groupId: group._id, title: "تکلیف قابل لغو", dueAt,
+      questionVersionIds: [f.question._id], policy,
+    }, f.teacher);
+    assert.equal((await f.c("groupTasks").findOne({ _id: task._id }))?.dueAt, dueAt);
+    await f.post("/api/group-tasks/" + task._id + "/publish", {}, f.teacher);
+    const a = await f.c("assignments").findOne({ groupTaskId: task._id });
+    assert.equal(a?.dueAt, dueAt);
+    const noAccess = await f.request("/api/group-tasks/" + task._id + "/cancel", {}, f.student);
+    assert.equal(noAccess.statusCode, 403);
+    await f.post("/api/group-tasks/" + task._id + "/cancel", {}, f.teacher);
+    await f.post("/api/group-tasks/" + task._id + "/cancel", {}, f.teacher);
+    assert.equal((await f.c("groupTasks").findOne({ _id: task._id }))?.state, "cancelled");
+    assert.equal((await f.c("assignments").findOne({ _id: a!._id }))?.state, "cancelled");
+    assert.equal((await f.c("missions").findOne({ _id: a!.missionId }))?.state, "cancelled");
+    assert.equal(
+      (await f.request("/api/assignments/" + a!._id + "/attempts", {
+        questionId: f.question._id, answer: "2",
+      }, f.student)).statusCode,
+      409,
+    );
+    assert.equal((await f.request("/api/group-tasks/" + task._id + "/publish", {}, f.teacher)).statusCode, 409);
+    assert.equal((await f.request("/api/group-tasks/" + task._id + "/report", undefined, f.teacher)).statusCode, 200);
+  } finally {
+    await f.close();
+  }
+});
+
+test("cancelling a draft group task does not create student assignments", async () => {
+  const f = await fixture();
+  try {
+    const course = await f.post("/api/courses", { title: "درس پیش‌نویس", subject: "ریاضی" }, f.teacher);
+    const invitation = await f.post("/api/invitations", { email: "s@test.dev", courseId: course._id }, f.teacher);
+    await f.post("/api/invitations/claim", { token: invitation.token }, f.student);
+    const group = await f.post("/api/class-groups", {
+      courseId: course._id, title: "کلاس پیش‌نویس", studentIds: [f.assignment.studentId],
+    }, f.teacher);
+    const task = await f.post("/api/group-tasks", {
+      groupId: group._id, title: "پیش‌نویس لغوشده",
+      questionVersionIds: [f.question._id], policy,
+    }, f.teacher);
+    await f.post("/api/group-tasks/" + task._id + "/cancel", {}, f.teacher);
+    assert.equal(await f.c("assignments").countDocuments({ groupTaskId: task._id }), 0);
+    assert.equal((await f.request("/api/group-tasks/" + task._id + "/publish", {}, f.teacher)).statusCode, 409);
+  } finally {
+    await f.close();
+  }
+});
