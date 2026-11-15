@@ -24,10 +24,9 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
   const getExam = async (r: Parameters<typeof user>[0], adminReadOnly = false) => {
     const u = await user(r, "teacher");
     const { eid } = params.parse(r.params);
-    const e = adminReadOnly && u.role === "super_admin"
+    const e = (adminReadOnly && u.role === "super_admin"
       ? await c("examImports").findOne({ _id: eid })
-      : await owned("examImports", eid, u._id);
-    if (!e) fail(404, "آزمون یافت نشد");
+      : await owned("examImports", eid, u._id)) ?? fail(404, "آزمون یافت نشد");
     if (e.archivedAt) fail(404, "آزمون یافت نشد");
     return { u, e };
   };
