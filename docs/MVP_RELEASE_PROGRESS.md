@@ -97,3 +97,37 @@
 ### Status
 
 **STEP 4 PARTIAL — deadlines, group cancellation and targeted tests implemented; end-to-end acceptance not verified.**
+
+## Step 5 — direct private PDF assignments to course members (2026-11-16)
+
+### Prior functionality reused
+
+- The existing PDF library supports validated ready/pending PDF state, chunked upload (512 KiB), SHA-256 verification and independent optional OCR import.
+- Teacher-owned courses, active student enrollments, class groups and per-student lesson authorization already exist.
+
+### Implemented
+
+1. Added the isolated `pdfDeliveries` record family, with one record per recipient, batch association, optional `dueAt` and separate `assigned` / manually `completed` / `cancelled` states. It does **not** treat file access as completed homework or grading.
+2. Added `POST /api/pdf-deliveries` for private, ready teacher-owned PDFs; checks course ownership, all active recipients, exact class roster when a group is selected and runs inside an idempotent transaction. Recipient IDs are snapshotted. Writes to enrollments and the source file protect against concurrent membership revocation and deletion.
+3. Added role-scoped `GET /api/pdf-deliveries`, secured `GET /api/pdf-deliveries/:aid/file`, student `POST /api/pdf-deliveries/:aid/complete` and teacher `POST /api/pdf-deliveries/:batchId/cancel`. Student access checks current course + enrollment and cancelled state; PDF bytes are integrity-checked and response headers disable caching and PDF scripts.
+4. Successful file retrieval increments a separate `fileAccessCount` / `lastFileAccessAt`, which means **file request**, not confirmed actual viewing or academic completion.
+5. Blocked permanent deletion of a PDF referenced by any past delivery to preserve historical homework; per-file data remain intact after cancelling recipients. This needs future retention/cleanup policy review.
+6. Wired a teacher send form into the existing PDF library, with choices for lesson, selected students or complete class and optional deadline; installed a receiving list on the student's homework screen with secure download and explicit "done" control.
+7. Defaulted the teacher upload UI to **private** and requires private PDFs for recipient-only delivery; public PDFs remain separately browseable and are not misrepresented as exclusive to recipients.
+8. Added per-teacher delivery history with counts of file requests and manually completed work, plus cancellation controls. Added transient 512-KiB chunk retry (up to 3 attempts; 4xx errors are not retried).
+9. Extended the request client idempotency keys and added additive MongoDB indexes.
+10. Added `tests/integration/pdf-deliveries.test.ts` for replay-safe sends, class/lesson enrollment, private-download RBAC, actual PDF bytes, cancellation, deletion protection, and independent completion status.
+
+### Remaining or unverified
+
+- Full `npm run typecheck`, `npm run lint`, `npm run test:fast`, `npm test`, `npm run build`, and actual browser E2E were **not executed** because only remote repository editing was available; direct cloning failed due to DNS resolution to GitHub. The tests above are **written, not passed**.
+- The existing upload system still deletes a pending upload after final failure; new retry covers transient individual chunks but does not persist/restart an interrupted session across browser reloads.
+- Due dates are metadata for the UI; automatic blocking of late submissions is **not implemented**.
+- An actual file request is measured; the server cannot prove whether a document was read or that a download was saved.
+- No browser E2E for a full teacher → student → secure PDF → complete workflow was run.
+- Retention, storage quota, archival and legal/privacy review must be completed before general release.
+- Previous Step 3 and Step 4 acceptance gates also remain partly open.
+
+### Status
+
+**STEP 5 CODE IMPLEMENTED — TEST EXECUTION, BROWSER VERIFICATION AND DEPLOYMENT PENDING. DO NOT DECLARE RELEASE READY.**
