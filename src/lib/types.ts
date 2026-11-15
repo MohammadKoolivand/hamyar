@@ -39,8 +39,9 @@ export interface GroupTask {
   groupId: string;
   courseId: string;
   title: string;
-  state: "draft" | "published";
+  state: "draft" | "published" | "cancelled";
   studentIds: string[];
+  dueAt?: string | null;
 }
 export interface Course {
   _id: string;
@@ -202,6 +203,7 @@ export interface Assignment {
   groupId?: string;
   courseId?: string;
   enrollmentId?: string;
+  dueAt?: string;
   _id: string;
   title: string;
   state: string;
