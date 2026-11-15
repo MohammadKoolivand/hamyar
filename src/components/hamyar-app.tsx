@@ -428,7 +428,6 @@ export default function HamyarApp() {
   const roleLabel =
     me.role === "super_admin" ? "مدیر سامانه" :
     me.role === "secretary" ? "همکار اجرایی" :
-    me.role === "parent" ? "والد" :
     me.role === "student" ? "دانش‌آموز" : "معلم";
   function navigateFromMenu(event: React.MouseEvent<HTMLButtonElement>, nextPage: string) {
     event.currentTarget.closest("details")?.removeAttribute("open");
