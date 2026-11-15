@@ -32,13 +32,14 @@ async function bytes(ctx: Context, pdfId: string) {
 
 export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
   const { c, id, now, user, fail } = ctx;
-  const teacherPdf = async (r: Parameters<typeof user>[0]) => {
+  const teacherPdf = async (r: Parameters<typeof user>[0], adminReadOnly = false) => {
     const u = await user(r, "teacher");
     const { pid } = idParams.parse(r.params);
-    const pdf = await c("pdfLibrary").findOne({
-      _id: pid, ownerId: u._id, archivedAt: { $exists: false },
-    });
-    if (!pdf) fail(404, "فایل یافت نشد");
+    const pdf = (await c("pdfLibrary").findOne({
+      _id: pid,
+      ...(adminReadOnly && u.role === "super_admin" ? {} : { ownerId: u._id }),
+      archivedAt: { $exists: false },
+    })) ?? fail(404, "فایل یافت نشد");
     return { u, pdf: pdf! };
   };
 
@@ -51,9 +52,15 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
 
   app.get("/api/pdf-library", async (r) => {
     const u = await user(r, "teacher");
-    return c("pdfLibrary").find({
-      ownerId: u._id, archivedAt: { $exists: false },
-    }).sort({ createdAt: -1 }).limit(100).toArray();
+    const rows = await c("pdfLibrary").find({
+      ...(u.role === "super_admin" ? {} : { ownerId: u._id }),
+      archivedAt: { $exists: false },
+    }).sort({ createdAt: -1 }).limit(u.role === "super_admin" ? 1000 : 100).toArray();
+    if (u.role !== "super_admin") return rows;
+    const owners = await c("users").find({ _id: { $in: [...new Set(rows.map((row) => row.ownerId))] } })
+      .project({ _id: 1, name: 1, email: 1 }).toArray();
+    const names = new Map(owners.map((owner) => [owner._id, owner.name || owner.email || "کاربر"]));
+    return rows.map((row) => ({ ...row, ownerName: names.get(row.ownerId) ?? "کاربر" }));
   });
 
   app.post("/api/pdf-library", async (r) => {
@@ -125,7 +132,7 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
     })) ?? fail(404, "PDF یافت نشد");
     if (pdf.visibility !== "public") {
       const u = await user(r, "teacher");
-      if (pdf.ownerId !== u._id) fail(404, "PDF یافت نشد");
+      if (pdf.ownerId !== u._id && u.role !== "super_admin") fail(404, "PDF یافت نشد");
     }
     const file = await bytes(ctx, pid);
     if (createHash("sha256").update(file).digest("hex") !== pdf.file?.sha256)
@@ -142,7 +149,9 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
   // Import copies the source into the EXISTING review workflow without changing
   // or removing the original PDF resource. Extraction requires a separate action.
   app.post("/api/pdf-library/:pid/send-to-import", async (r) => {
-    const { u, pdf } = await teacherPdf(r);
+    // An admin may make a personal review copy of another teacher’s PDF.
+    // The original resource and its owner remain unchanged.
+    const { u, pdf } = await teacherPdf(r, true);
     if (pdf.state !== "ready") fail(409, "ابتدا فایل PDF را بارگذاری کنید");
     const data = await bytes(ctx, pdf._id);
     if (createHash("sha256").update(data).digest("hex") !== pdf.file?.sha256)
