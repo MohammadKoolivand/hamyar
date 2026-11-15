@@ -481,7 +481,7 @@ export function ClassGroupsScreen({
                 >
                   انتشار برای تمام اعضای کلاس
                 </Button>
-              ) : task.state !== "draft" ? (
+              ) : (
                 <Button
                   variant="outline"
                   disabled={busy}
