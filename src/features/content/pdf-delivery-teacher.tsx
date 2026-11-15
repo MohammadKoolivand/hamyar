@@ -40,10 +40,12 @@ export function PdfDeliveryTeacher({
   const [dueAt, setDueAt] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
   const refresh = useCallback(async () => {
+    setRefreshing(true);
     try {
       const [nextCourses, nextEnrollments, nextStudents, nextGroups, nextDeliveries] =
         await Promise.all([
@@ -63,6 +65,7 @@ export function PdfDeliveryTeacher({
       setError((e as Error).message);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
   useEffect(() => { void refresh(); }, [refresh]);
@@ -127,7 +130,7 @@ export function PdfDeliveryTeacher({
   }
 
   return (
-    <section id="pdf-delivery-form" className="mt-6 grid gap-4 rounded-2xl border border-teal-200 bg-teal-50/40 p-4 sm:p-6" dir="rtl">
+    <section id="pdf-delivery-form" className="mt-6 grid min-w-0 gap-4 rounded-2xl border border-teal-200 bg-teal-50/40 p-4 sm:p-6" dir="rtl" aria-label="ارسال PDF برای دانش‌آموز">
       <h3 className="flex items-center gap-2 text-lg font-bold">
         <Send size={20} aria-hidden /> ارسال مستقیم PDF برای کلاس یا دانش‌آموز
       </h3>
@@ -136,9 +139,9 @@ export function PdfDeliveryTeacher({
         فایل فقط از مسیر اختصاصی تکلیف برای دریافت‌کنندگان مجاز باز می‌شود.
       </p>
       {loading && <p role="status">در حال دریافت کلاس‌ها…</p>}
-      {error && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
+      {error && <div role="alert" className="grid gap-2 rounded-xl bg-rose-50 p-3 text-sm text-rose-800"><p>{error}</p><button type="button" className="min-h-11 justify-self-start rounded-lg border border-rose-300 px-3" onClick={() => void refresh()}>تلاش مجدد برای دریافت فهرست‌ها</button></div>}
       {notice && <p role="status" className="rounded-xl bg-teal-100 p-3 text-sm text-teal-900">{notice}</p>}
-      {!available.length && <p className="text-sm text-amber-900">برای ارسال، ابتدا یک PDF خصوصی کامل در بانک خودت بارگذاری کن.</p>}
+      {!loading && !available.length && <p className="text-sm text-amber-900">برای ارسال، ابتدا یک PDF خصوصی کامل در بانک خودت بارگذاری کن.</p>}
       <form onSubmit={(e) => void send(e)} className="grid gap-3">
         <label className="grid gap-1 text-sm">PDF آماده
           <select required className="min-h-11 rounded-lg border bg-white p-2" value={pdfId}
@@ -196,13 +199,13 @@ export function PdfDeliveryTeacher({
             value={dueAt} onChange={(e) => setDueAt(e.target.value)} />
         </label>
         <button type="submit" disabled={busy || !pdfId || !courseId || !activeRecipients.length || invalidGroup || !title.trim()}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 text-sm font-medium text-white disabled:opacity-50">
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 text-sm font-medium text-white disabled:opacity-50" aria-busy={busy}>
           <FileUp size={17} aria-hidden /> ارسال PDF به {activeRecipients.length.toLocaleString("fa-IR")} دانش‌آموز
         </button>
       </form>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h4 className="font-semibold">ارسال‌های قبلی</h4>
-        <button type="button" className="rounded-lg border px-3 py-2 text-xs" disabled={busy}
+        <button type="button" className="min-h-11 rounded-lg border px-3 py-2 text-xs disabled:opacity-50" disabled={busy || refreshing}
           onClick={() => void refresh()}>به‌روزرسانی وضعیت</button>
       </div>
       {!batches.length && <p className="text-sm text-slate-500">هنوز PDF اختصاصی ارسال نشده است.</p>}
