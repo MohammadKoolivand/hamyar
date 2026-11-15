@@ -24,7 +24,8 @@ export function mobileDestinations(role: NavigationRole): {
   // The middle destination is consistently the public question-selection home.
   // No role needs to navigate into a separate teacher panel just to find it.
   const home: MobileNavItem = { page: "home", label: "خانه", icon: House, tone: "mint",
-    aliases: role === "guest" ? ["dashboard", "public-bank", "student-practice", "student-search"] : ["public-bank"] };
+    aliases: role === "guest" ? ["dashboard", "public-bank", "student-practice", "student-search"]
+      : role === "student" ? ["dashboard", "public-bank"] : ["public-bank"] };
   if (role === "guest") {
     return {
       primary: [
