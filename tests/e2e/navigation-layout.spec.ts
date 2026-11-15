@@ -106,7 +106,7 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
     page.getByRole("heading", { name: "نمای کلی", exact: true }),
   ).toBeVisible();
   const measured = await page.evaluate(() => {
-    const header = document.querySelector<HTMLElement>("body > div > header");
+    const header = document.querySelector<HTMLElement>("header.hy-student-site-header");
     const first = document.querySelector<HTMLElement>('nav[aria-label="بخش‌های اصلی"] button');
     if (!header || !first) throw new Error("Unified site header not rendered");
     return {
