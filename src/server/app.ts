@@ -25,6 +25,7 @@ import { registerExamImports } from "./modules/exam-imports";
 import { registerPdfLibrary } from "./modules/pdf-library";
 import { registerPdfDeliveries } from "./modules/pdf-deliveries";
 import { registerContent } from "./modules/content";
+import { registerPublicQuestionReview } from "./modules/public-question-review";
 import { registerDiscoverySettings } from "./modules/discovery-settings";
 import { registerMissions } from "./modules/missions";
 import { registerRemediation } from "./modules/remediation";
@@ -224,6 +225,7 @@ export async function buildApp(
   registerStudentDashboard(app, ctx);
   registerLibrary(app, ctx);
   registerContent(app, ctx);
+  registerPublicQuestionReview(app, ctx);
   registerDiscoverySettings(app, ctx);
   registerExamImports(app, ctx);
   registerPdfLibrary(app, ctx);
