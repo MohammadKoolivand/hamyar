@@ -15,7 +15,7 @@ const taxonomy = z.object({
   topic: z.string().trim().max(150).default(""),
 }).strict();
 const uploadSessionInput = z.object({
-  name: z.string().trim().min(1).max(160).regex(/\\.pdf$/i),
+  name: z.string().trim().min(1).max(160).regex(/\.pdf$/i),
   size: z.number().int().positive().max(MAX_PDF_BYTES),
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
   chunkCount: z.number().int().positive().max(Math.ceil(MAX_PDF_BYTES / PDF_LIBRARY_UPLOAD_CHUNK_BYTES)),
