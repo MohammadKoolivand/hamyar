@@ -5,6 +5,8 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
     body !== undefined &&
     (path === "/exam-imports" ||
       path === "/pdf-library" ||
+      path === "/pdf-deliveries" ||
+      /^\/pdf-deliveries\/[^/]+\/(complete|cancel)$/.test(path) ||
       /^\/pdf-library\/[^/]+\/send-to-import$/.test(path) ||
       /^\/exam-imports\/[^/]+\/(items|extract|items\/[^/]+\/review)$/.test(
         path,
