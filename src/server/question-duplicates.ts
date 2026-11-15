@@ -21,7 +21,7 @@ export type DuplicateInput = {
 
 /** Leave mathematical operators, units, signs, exponent syntax, and image references intact. */
 export function normalizeDuplicateText(value: string): string {
-  return value.normalize("NFKC")
+  return value.normalize("NFC")
     .replace(/[يى]/g, "ی").replace(/ك/g, "ک")
     .replace(/[٠-٩۰-۹]/g, (digit) =>
       String("٠١٢٣٤٥٦٧٨٩".indexOf(digit) >= 0
