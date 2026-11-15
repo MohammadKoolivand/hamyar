@@ -21,10 +21,12 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     { parseAs: "buffer", bodyLimit: MAX_PDF_BYTES },
     (_r, body, done) => done(null, body),
   );
-  const getExam = async (r: Parameters<typeof user>[0]) => {
+  const getExam = async (r: Parameters<typeof user>[0], adminReadOnly = false) => {
     const u = await user(r, "teacher");
     const { eid } = params.parse(r.params);
-    const e = await owned("examImports", eid, u._id);
+    const e = (adminReadOnly && u.role === "super_admin"
+      ? await c("examImports").findOne({ _id: eid })
+      : await owned("examImports", eid, u._id)) ?? fail(404, "آزمون یافت نشد");
     if (e.archivedAt) fail(404, "آزمون یافت نشد");
     return { u, e };
   };
@@ -52,14 +54,19 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
   };
   app.get("/api/exam-imports", async (r) => {
     const u = await user(r, "teacher");
-    return c("examImports")
+    const rows = await c("examImports")
       .find(
-        { ownerId: u._id, archivedAt: { $exists: false } },
+        { ...(u.role === "super_admin" ? {} : { ownerId: u._id }), archivedAt: { $exists: false } },
         { projection: { questionText: 0, answerText: 0 } },
       )
       .sort({ createdAt: -1 })
-      .limit(100)
+      .limit(200)
       .toArray();
+    if (u.role !== "super_admin") return rows;
+    const owners = await c("users").find({ _id: { $in: [...new Set(rows.map((row) => row.ownerId))] } })
+      .project({ _id: 1, name: 1, email: 1 }).toArray();
+    const names = new Map(owners.map((owner) => [owner._id, owner.name || owner.email || "کاربر"]));
+    return rows.map((row) => ({ ...row, ownerName: names.get(row.ownerId) ?? "کاربر" }));
   });
   app.post("/api/exam-imports", async (r) => {
     const u = await user(r, "teacher"),
@@ -94,9 +101,11 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     return { deleted: true };
   });
   app.get("/api/exam-imports/:eid", async (r) => {
-    const { e } = await getExam(r);
+    const { e } = await getExam(r, true);
+    const owner = await c("users").findOne({ _id: e.ownerId }, { projection: { name: 1, email: 1 } });
     return {
       ...e,
+      ownerName: owner?.name || owner?.email || "کاربر",
       job: e.jobId
         ? await c("examImportJobs").findOne(
             { _id: e.jobId, ownerId: e.ownerId },
@@ -318,7 +327,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     return { deleted: true };
   });
   app.get("/api/exam-imports/:eid/files/:kind", async (r, reply) => {
-    const { e } = await getExam(r),
+    const { e } = await getExam(r, true),
       kind = z
         .enum(["question", "answer"])
         .parse((r.params as { kind: string }).kind),
@@ -411,7 +420,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     return { deleted: true };
   });
   app.get("/api/exam-imports/:eid/pages/:kind/:page", async (r, reply) => {
-    const { e } = await getExam(r);
+    const { e } = await getExam(r, true);
     const p = z
       .object({
         kind: z.enum(["question", "answer"]),

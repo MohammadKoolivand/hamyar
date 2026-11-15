@@ -720,10 +720,12 @@ export default function HamyarApp() {
         {teacher && page === "public-bank" && <PublicQuestionBank />}
         {page === "settings" && teacher && <AiSettingsScreen />}
         {page === "exam-import" && teacher && (
-          <ExamImportScreen nodes={nodes} onApproved={refresh} />
+          <ExamImportScreen nodes={nodes} onApproved={refresh} currentUserId={me._id} superAdmin={me.role === "super_admin"} />
         )}
         {["content", "content-new", "resources"].includes(page) && teacher && (
           <ContentScreen
+            currentUserId={me._id}
+            superAdmin={me.role === "super_admin"}
             key={page}
             view={
               page === "resources"

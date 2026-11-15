@@ -26,6 +26,7 @@ import {
   type PublicBankQuestion,
 } from "@/lib/public-bank";
 import { printQuestions } from "@/lib/print-questions";
+import { PdfLibraryPublic } from "./pdf-library-public";
 import { BookOpen, SlidersHorizontal, FileDown } from "lucide-react";
 
 const inputStyle =
@@ -208,7 +209,7 @@ export function PublicQuestionBank({
           <BookOpen size={30} strokeWidth={1.6} />
         </span>
       </header>
-      <button
+      {filters.content !== "pdf" && <button
         type="button"
         className="discovery-filter-toggle flex items-center gap-2 rounded-xl border p-3 text-right md:hidden"
         aria-expanded={filtersOpen}
@@ -216,8 +217,8 @@ export function PublicQuestionBank({
       >
         <SlidersHorizontal size={17} aria-hidden />
         فیلتر سؤال‌ها
-      </button>
-      <div
+      </button>}
+      {filters.content !== "pdf" && <div
         className={`discovery-filters ${filtersOpen ? "grid" : "hidden"} gap-4 rounded-2xl border p-4 md:grid md:p-5`}
       >
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -336,31 +337,32 @@ export function PublicQuestionBank({
         <Button variant="outline" onClick={() => change(emptyBankFilters())}>
           پاک‌کردن فیلترها
         </Button>
-      </div>
+      </div>}
       <div className="discovery-toolbar flex flex-wrap items-center justify-between gap-3">
         <div className="discovery-tabs flex gap-1">
           {[
             ["questions", "سؤال‌ها"],
             ["exams", "نمونه‌امتحان‌ها"],
+            ["pdf", "فایل‌های PDF"],
           ].map(([value, label]) => (
             <Button
               key={value}
               variant="outline"
-              onClick={() => change({ ...filters, content: value })}
+              onClick={() => change(value === "pdf" ? { ...emptyBankFilters(), content: "pdf" } : { ...filters, content: value })}
               aria-pressed={filters.content === value}
             >
               {label}
             </Button>
           ))}
         </div>
-        <span className="discovery-count text-sm text-slate-500">
+        {filters.content !== "pdf" && <span className="discovery-count text-sm text-slate-500">
           {(filters.content === "exams"
             ? groups.length
             : visible.length
           ).toLocaleString("fa-IR")}{" "}
           نتیجه
-        </span>
-        <Button
+        </span>}
+        {filters.content !== "pdf" && <><Button
           variant="outline"
           disabled={!results.length || results.every((q) => selected.includes(q._id))}
           onClick={() =>
@@ -388,12 +390,12 @@ export function PublicQuestionBank({
           {selected.length
             ? `(${selected.length.toLocaleString("fa-IR")} سؤال)`
             : "نتایج"}
-        </Button>
+        </Button></>}
       </div>
-      <p className="text-xs leading-6 text-slate-400">
+      {filters.content !== "pdf" && <p className="text-xs leading-6 text-slate-400">
         در پنجره‌ی چاپ، مقصد «ذخیره به‌صورت PDF / Save as PDF» را انتخاب کن. بدون
         انتخاب سؤال، تمام نتایج فیلترشده چاپ می‌شوند.
-      </p>
+      </p>}
       {loading && <p role="status">در حال دریافت سؤال‌ها…</p>}
       {error && (
         <div
@@ -409,12 +411,14 @@ export function PublicQuestionBank({
           </Button>
         </div>
       )}
-      {!loading &&
+      {filters.content !== "pdf" && !loading &&
         !error &&
         !(filters.content === "exams" ? groups.length : visible.length) && (
           <p>با این فیلترها موردی یافت نشد.</p>
         )}
-      {filters.content === "questions" ? (
+      {filters.content === "pdf" ? (
+        <PdfLibraryPublic taxonomy={filters} />
+      ) : filters.content === "questions" ? (
         <PagedList items={visible} label="سؤال‌ها">
           {(q) => (
             <article

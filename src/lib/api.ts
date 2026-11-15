@@ -4,6 +4,8 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
   const protectedMutation =
     body !== undefined &&
     (path === "/exam-imports" ||
+      path === "/pdf-library" ||
+      /^\/pdf-library\/[^/]+\/send-to-import$/.test(path) ||
       /^\/exam-imports\/[^/]+\/(items|extract|items\/[^/]+\/review)$/.test(
         path,
       ) ||
