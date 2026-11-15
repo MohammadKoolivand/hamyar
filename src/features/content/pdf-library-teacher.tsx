@@ -4,7 +4,7 @@ import { FileText, UploadCloud, ArrowLeft, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Node } from "@/lib/types";
 import {
-  formatPdfTaxonomy, type PdfLibraryItem, type PdfTaxonomy,
+  formatPdfTaxonomy, PDF_LIBRARY_UPLOAD_CHUNK_BYTES, type PdfLibraryItem, type PdfTaxonomy,
 } from "@/lib/pdf-library";
 
 const input = "w-full min-h-11 rounded-xl border border-slate-200 bg-white p-3 text-sm";
@@ -81,43 +81,58 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
     finally { setBusy(false); }
   }
 
-  function uploadTo(pdfId: string, upload: File): Promise<void> {
-    // fetch() does not expose upload byte progress to the browser.
-    return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", `/api/pdf-library/${encodeURIComponent(pdfId)}/file`);
-      xhr.withCredentials = true;
-      xhr.setRequestHeader("Content-Type", "application/pdf");
-      xhr.setRequestHeader("X-File-Name", encodeURIComponent(upload.name));
-      setUploadProgress(0);
-      setUploadPhase("uploading");
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable && event.total > 0) {
-          setUploadProgress(Math.min(100, Math.round((event.loaded / event.total) * 100)));
-        }
-      };
-      xhr.upload.onload = () => {
-        setUploadProgress(100);
-        setUploadPhase("saving");
-      };
-      xhr.onerror = () => reject(new Error("اتصال هنگام بارگذاری PDF قطع شد."));
-      xhr.onabort = () => reject(new Error("بارگذاری PDF لغو شد."));
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          setUploadProgress(100);
-          setUploadPhase("complete");
-          resolve();
-          return;
-        }
-        let message = "ثبت فایل PDF روی سرور موفق نبود.";
-        try {
-          const body = JSON.parse(xhr.responseText) as { message?: string };
-          if (body.message) message = body.message;
-        } catch { /* Keep the generic server error. */ }
-        reject(new Error(message));
-      };
-      xhr.send(upload);
+  async function uploadTo(pdfId: string, upload: File): Promise<void> {
+    const digest = await crypto.subtle.digest("SHA-256", await upload.arrayBuffer());
+    const sha256 = Array.from(new Uint8Array(digest))
+      .map((byte) => byte.toString(16).padStart(2, "0")).join("");
+    const chunkCount = Math.ceil(upload.size / PDF_LIBRARY_UPLOAD_CHUNK_BYTES);
+    const session = await api<{ uploadId: string }>(`/pdf-library/${encodeURIComponent(pdfId)}/upload-session`, {
+      name: upload.name, size: upload.size, sha256, chunkCount,
     });
+    setUploadProgress(0);
+    setUploadPhase("uploading");
+
+    const sendChunk = (position: number, chunk: Blob, offset: number) =>
+      new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `/api/pdf-library/${encodeURIComponent(pdfId)}/chunks/${encodeURIComponent(session.uploadId)}/${position}`);
+        xhr.withCredentials = true;
+        xhr.timeout = 60_000;
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            setUploadProgress(Math.min(99, Math.round(((offset + event.loaded) / upload.size) * 100)));
+          }
+        };
+        xhr.onerror = () => reject(new Error(`ارتباط هنگام ارسال بخش ${position + 1} از ${chunkCount} قطع شد.`));
+        xhr.ontimeout = () => reject(new Error(`ارسال بخش ${position + 1} بیش از ۶۰ ثانیه طول کشید؛ دوباره تلاش کنید.`));
+        xhr.onabort = () => reject(new Error("بارگذاری PDF لغو شد."));
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            setUploadProgress(Math.min(99, Math.round(((offset + chunk.size) / upload.size) * 100)));
+            resolve();
+            return;
+          }
+          let message = `ثبت بخش ${position + 1} از فایل ناموفق بود.`;
+          try {
+            const body = JSON.parse(xhr.responseText) as { message?: string };
+            if (body.message) message = body.message;
+          } catch { /* Keep the chunk-specific error. */ }
+          reject(new Error(message));
+        };
+        xhr.send(chunk);
+      });
+
+    for (let position = 0; position < chunkCount; position++) {
+      const offset = position * PDF_LIBRARY_UPLOAD_CHUNK_BYTES;
+      const chunk = upload.slice(offset, Math.min(upload.size, offset + PDF_LIBRARY_UPLOAD_CHUNK_BYTES));
+      await sendChunk(position, chunk, offset);
+    }
+
+    setUploadPhase("saving");
+    await api(`/pdf-library/${encodeURIComponent(pdfId)}/complete`, { uploadId: session.uploadId });
+    setUploadProgress(100);
+    setUploadPhase("complete");
   }
 
   function validate(pdf: File) {
@@ -148,7 +163,12 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
             taxonomy: derived,
             ...(selectedNode ? { topicId: selectedNode } : {}),
           });
-          await uploadTo(row._id, file);
+          try {
+            await uploadTo(row._id, file);
+          } catch (uploadError) {
+            await fetch(`/api/pdf-library/${encodeURIComponent(row._id)}`, { method: "DELETE", credentials: "same-origin" }).catch(() => undefined);
+            throw uploadError;
+          }
           await refresh();
           setFile(null);
           setTitle("");
@@ -208,7 +228,7 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
               <span role="status" aria-live="polite">{uploadPhase === "complete" ? "فایل با موفقیت روی سرور ثبت شد" : uploadPhase === "saving" ? "انتقال کامل شد؛ در حال تأیید ذخیره‌سازی…" : uploadPhase === "failed" ? "بارگذاری یا ثبت فایل ناموفق بود" : "در حال انتقال فایل PDF"}</span>
               <span className="tabular-nums" dir="ltr">{uploadProgress}٪</span>
             </div>
-            <progress className="h-3 w-full accent-teal-700" max={100} value={uploadProgress} aria-label="درصد آپلود PDF" />
+            <div dir="ltr" className="h-3 w-full overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-label="درصد آپلود PDF" aria-valuemin={0} aria-valuemax={100} aria-valuenow={uploadProgress}><div className="h-full rounded-full bg-teal-600 transition-[width] duration-150" style={{ width: `${uploadProgress}%` }} /></div>
           </div>
         )}
       </form>
