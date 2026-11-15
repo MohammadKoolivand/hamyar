@@ -131,6 +131,7 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
         courseId: 1,
         title: 1,
         state: 1,
+        dueAt: 1,
         studentIds: 1,
         createdAt: 1,
       })
@@ -143,6 +144,7 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
       .object({
         groupId: uuid,
         title: z.string().trim().min(3).max(150),
+        dueAt: z.string().datetime({ offset: true }).optional(),
         questionVersionIds: z
           .array(uuid)
           .min(1)
@@ -172,6 +174,7 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
       groupId: group!._id,
       courseId: group!.courseId,
       title: body.title,
+      ...(body.dueAt ? { dueAt: body.dueAt } : {}),
       studentIds: [...group!.studentIds],
       questionVersionIds: body.questionVersionIds,
       policy: body.policy,
@@ -185,6 +188,7 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
       courseId: task!.courseId,
       title: task!.title,
       state: task!.state,
+      dueAt: task!.dueAt ?? null,
       studentIds: task!.studentIds,
     };
   });
@@ -263,6 +267,7 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
               groupId: task!.groupId,
               groupTaskId: task!._id,
               title: task!.title,
+              ...(task!.dueAt ? { dueAt: task!.dueAt } : {}),
               questionVersionIds: task!.questionVersionIds,
               policy: task!.policy,
               state: "published",
@@ -281,6 +286,7 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
               groupId: task!.groupId,
               groupTaskId: task!._id,
               title: task!.title,
+              ...(task!.dueAt ? { dueAt: task!.dueAt } : {}),
               questionVersionIds: task!.questionVersionIds,
               policy: task!.policy,
               state: "published",
@@ -310,6 +316,44 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
         return { ok: true };
       },
     );
+  });
+
+  // Cancelling a published group task stops only unfinished student work.
+  // Completed evidence and student reports remain available for audit.
+  app.post("/api/group-tasks/:tid/cancel", async (r) => {
+    const teacher = await user(r, "teacher");
+    const { tid } = z.object({ tid: uuid }).parse(r.params);
+    return ctx.atomic(r, teacher._id, "group-cancel:" + tid, {}, async (session) => {
+      const task = await c("groupTasks").findOne(
+        { _id: tid, teacherId: teacher._id }, { session },
+      );
+      if (!task) fail(404, "مأموریت گروهی یافت نشد");
+      if (task.state === "cancelled") return { ok: true };
+      if (task.state !== "draft" && task.state !== "published")
+        fail(409, "وضعیت مأموریت قابل لغو نیست");
+
+      const scope = { groupTaskId: tid, teacherId: teacher._id };
+      await c("assignments").updateMany(
+        { ...scope, state: { $in: ["published", "in_progress"] } },
+        { $set: { state: "cancelled" }, $inc: { revision: 1 } },
+        { session },
+      );
+      await c("missions").updateMany(
+        { ...scope, state: { $in: ["published", "in_progress"] } },
+        { $set: { state: "cancelled" } },
+        { session },
+      );
+      await c("groupTasks").updateOne(
+        { _id: tid, teacherId: teacher._id, state: task.state },
+        { $set: { state: "cancelled", cancelledAt: now() } },
+        { session },
+      );
+      await c("auditLogs").insertOne({
+        _id: id(), actorId: teacher._id, action: "cancel_group_task",
+        resourceId: tid, createdAt: now(),
+      }, { session });
+      return { ok: true };
+    });
   });
 
   // Summary rows are deliberately scoped to a group task, and never include
