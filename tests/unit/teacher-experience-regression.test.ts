@@ -35,6 +35,6 @@ test("PDF upload reports measured transfer bytes and distinct server-confirmatio
   assert.match(input, /xhr\.upload\.onprogress/);
   assert.match(input, /event\.loaded \/ event\.total/);
   assert.match(input, /xhr\.upload\.onload/);
-  assert.match(input, /<progress /);
+  assert.match(input, /role="progressbar"/);
   assert.match(input, /xhr\.status >= 200 && xhr\.status < 300/);
 });
