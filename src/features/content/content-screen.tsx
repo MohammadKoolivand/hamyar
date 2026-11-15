@@ -36,6 +36,8 @@ import type { Node, Question } from "@/lib/types";
 
 export function ContentScreen({
   view = "bank",
+  currentUserId,
+  superAdmin = false,
   nodes,
   questions,
   courses,
@@ -77,6 +79,8 @@ export function ContentScreen({
   setRelativeTolerance,
 }: {
   view?: "bank" | "add" | "resources";
+  currentUserId?: string;
+  superAdmin?: boolean;
   setNotice: (v: string) => void;
   nodes: Node[];
   questions: Question[];
@@ -185,7 +189,7 @@ export function ContentScreen({
         </nav>
       )}
       <div className="grid min-w-0 gap-3">
-        {view === "resources" && <PdfLibraryTeacher nodes={nodes} />}
+        {view === "resources" && <PdfLibraryTeacher nodes={nodes} currentUserId={currentUserId} superAdmin={superAdmin} />}
         {view === "resources" && (
           <ContentSection
             title="کتاب‌ها و مباحث درسی"
