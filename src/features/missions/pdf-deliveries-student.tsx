@@ -18,11 +18,13 @@ type PdfDelivery = {
 export function PdfDeliveriesStudent() {
   const [items, setItems] = useState<PdfDelivery[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
   const refresh = useCallback(async () => {
+    setRefreshing(true);
     try {
       const rows = await api<PdfDelivery[]>("/pdf-deliveries");
       setItems(rows);
@@ -31,6 +33,7 @@ export function PdfDeliveriesStudent() {
       setError((e as Error).message);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
   useEffect(() => { void refresh(); }, [refresh]);
@@ -51,20 +54,20 @@ export function PdfDeliveriesStudent() {
   }
 
   return (
-    <section className="glass-panel grid gap-4 p-5" dir="rtl">
+    <section className="glass-panel grid min-w-0 gap-4 p-4 sm:p-5" dir="rtl" aria-label="تکلیف‌های PDF دانش‌آموز">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-lg font-bold">
           <FileText size={20} aria-hidden /> فایل‌های PDF فرستاده‌شده توسط معلم
         </h2>
-        <button type="button" className="rounded-lg border px-3 py-2 text-sm"
+        <button type="button" disabled={refreshing} className="flex min-h-11 min-w-11 items-center justify-center rounded-lg border px-3 py-2 text-sm disabled:opacity-50"
           onClick={() => void refresh()} aria-label="به‌روزرسانی تکلیف‌های PDF">
           <RotateCcw size={16} aria-hidden />
         </button>
       </div>
       {loading && <p role="status">در حال دریافت تکلیف‌های PDF…</p>}
-      {error && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
+      {error && <div role="alert" className="grid gap-2 rounded-xl bg-rose-50 p-3 text-sm text-rose-800"><p>{error}</p><button type="button" className="min-h-11 justify-self-start rounded-lg border border-rose-300 px-3" onClick={() => void refresh()}>تلاش مجدد</button></div>}
       {notice && <p role="status" className="rounded-xl bg-teal-50 p-3 text-sm text-teal-800">{notice}</p>}
-      {!loading && !items.length && <p className="text-sm text-slate-600">هنوز PDF اختصاصی دریافت نکرده‌ای.</p>}
+      {!loading && !error && !items.length && <p className="rounded-xl border border-dashed border-slate-200 p-4 text-sm text-slate-600">هنوز PDF اختصاصی دریافت نکرده‌ای. تکلیف‌هایی که معلم برای کلاس یا خودت می‌فرستد، اینجا نمایش داده می‌شوند.</p>}
       {items.map((item) => (
         <article key={item._id} className="grid gap-3 rounded-xl border border-slate-200 p-4">
           <div>
@@ -76,7 +79,7 @@ export function PdfDeliveriesStudent() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <a className="inline-flex min-h-11 items-center rounded-lg border border-teal-300 px-4 text-sm text-teal-800"
+            <a className="inline-flex min-h-11 items-center justify-center rounded-lg border border-teal-300 px-4 text-sm text-teal-800"
               href={`/api/pdf-deliveries/${item._id}/file`}
               target="_blank" rel="noopener noreferrer">
               مشاهده / دریافت PDF
