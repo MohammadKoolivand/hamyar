@@ -68,3 +68,32 @@
 ### Status
 
 **STEP 3 PARTIAL — SOURCE CHANGES COMMITTED; COMPLETE MVP ACCEPTANCE NOT MET.**
+
+## Step 4 — teacher lessons, individual assignments and group tasks (2026-11-15)
+
+### Existing behavior confirmed from source
+
+- Teacher course creation, enrollment requests with explicit approval, question selection/paging/preview, individual mission drafts and publication already exist.
+- Group classes, immutable student recipient snapshots, atomic per-student publication, distinct student evidence and teacher reports already exist.
+- Server-side ownership is enforced for individually/group-assigned question versions. Allowing a teacher to assign questions in the shared public bank **owned by other teachers** needs an explicit cross-owner permission/reference model and is not yet provided by these changes.
+
+### Implemented
+
+1. Individual and group mission creation accept optional ISO `dueAt` and carry it to student assignments; existing records without `dueAt` are unaffected.
+2. Teacher interfaces now offer optional date/time fields; individual mission creation shows publication as a distinct follow-up step, with advanced hint configuration under a collapsible control.
+3. Group tasks can be cancelled with a teacher-only, transaction-backed endpoint. Draft cancellation does not publish, and cancellation of an already published task cancels only `published`/`in_progress` assignments and missions; existing completed/submitted evidence is retained.
+4. Group task list includes deadlines and cancellation state; teacher can still inspect saved per-student reports after cancellation.
+5. Added MongoDB integration regression tests for due-date propagation, idempotent group cancellation, authorization and blocking publication after cancellation.
+
+### Notes and remaining work
+
+- A due date is currently **metadata for scheduling/display**, not a hard server-side submission cutoff. Do not advertise automatic late-submission enforcement.
+- The shared public question bank is not automatically assignable by a different teacher, because authorization/data ownership and reference control need a compatible design.
+- Group recipient selection remains a separate class-management workflow, rather than a single unified assignment wizard.
+- Client end-to-end wizard/mobile verification and full MongoDB integration were **not run** from this connector-only environment.
+- The Step 3 multi-question, saved independent practice acceptance gate remains open.
+- Tests requiring a real MongoDB replica set, browser E2E, build, typecheck and lint need to be run in a full local/CI checkout; no success is claimed without execution.
+
+### Status
+
+**STEP 4 PARTIAL — deadlines, group cancellation and targeted tests implemented; end-to-end acceptance not verified.**
