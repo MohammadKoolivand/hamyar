@@ -183,7 +183,7 @@ export default function HamyarApp() {
     }
     if (currentUser?.role === "student") {
       if (
-        ["student-practice", "student-search", "public-bank"].includes(next)
+        ["student-search", "public-bank"].includes(next)
       ) {
         next = "dashboard";
         window.history.replaceState(
@@ -675,8 +675,51 @@ export default function HamyarApp() {
             setInviteToken={setInviteToken}
           />
         )}
-        {page === "home" && <PublicQuestionBank home signedIn onlinePractice={!teacher} />}
+        {(page === "home" || (page === "student-practice" && !teacher)) &&
+          <PublicQuestionBank home signedIn onlinePractice={!teacher} />}
         {teacher && page === "public-bank" && <PublicQuestionBank />}
+        {page === "account" && (
+          <section className="glass-panel grid gap-4 p-5 sm:p-7" aria-label="حساب کاربری" dir="rtl">
+            <div className="flex items-center gap-3">
+              <span className="flex size-12 items-center justify-center rounded-2xl bg-teal-100 text-teal-800">
+                <UserRound size={24} aria-hidden />
+              </span>
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold">حساب من</h1>
+                <p className="break-words text-sm text-slate-600">{me.name}</p>
+                <p className="text-xs text-slate-500">{roleLabel}</p>
+              </div>
+            </div>
+            {me.email && <p className="break-all rounded-xl bg-slate-50 p-3 text-sm" dir="auto">{me.email}</p>}
+            <h2 className="text-sm font-bold">بخش‌های دیگر</h2>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {(teacher ? [
+                ["dashboard", "نمای کلی معلم"],
+                ["courses", "درس‌های من"],
+                ["students", "دانش‌آموزان"],
+                ["content-new", "افزودن سؤال"],
+                ["exam-import", "ورود آزمون و PDF"],
+                ["resources", "منابع آموزشی"],
+                ["learning", "یادگیری و گزارش"],
+                ...(me.role === "super_admin" ? [["admin-overview", "مدیریت سامانه"], ["access", "مدیریت دسترسی"]] : []),
+                ...(me.role === "secretary" ? [["access", "دسترسی‌های من"]] : []),
+              ] : [
+                ["courses", "درس‌ها و کلاس‌های من"],
+                ["dashboard", "نمای کلی یادگیری"],
+                ["student-mistakes", "مرور اشتباهات"],
+              ]).map(([destination, title]) => (
+                <button type="button" key={destination} onClick={() => navigatePage(destination)}
+                  className="hy-navigation-item min-h-11 rounded-xl border border-slate-200 bg-white p-3 text-right text-sm font-medium">
+                  {title}
+                </button>
+              ))}
+            </div>
+            <button type="button" disabled={busy} onClick={() => void run(logout)}
+              className="inline-flex min-h-11 w-fit items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 text-sm font-medium text-rose-800 disabled:opacity-50">
+              <LogOut size={17} aria-hidden /> خروج امن از حساب
+            </button>
+          </section>
+        )}
         {page === "settings" && teacher && <AiSettingsScreen />}
         {page === "exam-import" && teacher && (
           <ExamImportScreen nodes={nodes} onApproved={refresh} currentUserId={me._id} superAdmin={me.role === "super_admin"} />
