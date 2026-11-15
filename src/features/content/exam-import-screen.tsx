@@ -408,7 +408,7 @@ export function ExamImportScreen({
                   <Button
                     type="button"
                     variant="outline"
-                    disabled={busy || e.state === "processing" || e.ownerId !== currentUserId}
+                    disabled={busy || e.state === "processing" || (!!currentUserId && e.ownerId !== currentUserId)}
                     onClick={() => {
                       if (
                         !window.confirm(
@@ -437,7 +437,7 @@ export function ExamImportScreen({
             </PagedList>
           </section>
         </>
-      ) : exam.ownerId !== currentUserId ? (
+      ) : currentUserId && exam.ownerId !== currentUserId ? (
         <section className="glass-panel grid gap-4 p-5 sm:p-7">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-bold">{exam.title} · {exam.ownerName ?? "کاربر"}</h3>
