@@ -59,7 +59,7 @@ test("teacher keeps a whole PDF, publishes it by topic, and independently sends 
   } finally { await f.close(); }
 });
 
-test("private PDFs remain owner-only and super admin can view everyone’s exam imports without editing", async () => {
+test("private PDFs remain hidden from public, while super admin can inspect imports and copy sources without editing owners", async () => {
   const f = await fixture();
   try {
     const teacherPdf = await f.post("/api/pdf-library", {
@@ -93,7 +93,20 @@ test("private PDFs remain owner-only and super admin can view everyone’s exam 
     })).statusCode, 404);
     assert.equal((await f.request("/api/exam-imports", undefined, f.teacher)).json().length, 1);
     assert.equal((await f.request("/api/pdf-library/public")).json().length, 0);
-    assert.equal((await f.request(`/api/pdf-library/${teacherPdf._id}/file`, undefined, adminCookie)).statusCode, 404);
+    const source = textPdf(["Private teacher exam"]);
+    const uploaded = await f.app.inject({ method: "POST", url: `/api/pdf-library/${teacherPdf._id}/file`,
+      headers: { cookie: f.teacher, "content-type": "application/pdf", "x-file-name": "teacher.pdf" }, payload: source });
+    assert.equal(uploaded.statusCode, 200, uploaded.body);
+    assert.equal((await f.request(`/api/pdf-library/${teacherPdf._id}/file`)).statusCode, 401);
+    assert.deepEqual((await f.request(`/api/pdf-library/${teacherPdf._id}/file`, undefined, adminCookie)).rawPayload, source);
+    const adminLibrary = (await f.request("/api/pdf-library", undefined, adminCookie)).json();
+    assert.ok(adminLibrary.find((x: { _id: string; ownerName: string }) => x._id === teacherPdf._id && x.ownerName === "Teacher"));
+    const clone = await f.post(`/api/pdf-library/${teacherPdf._id}/send-to-import`, {}, adminCookie);
+    const adminExam = (await f.request(`/api/exam-imports/${clone.examId}`, undefined, adminCookie)).json();
+    assert.equal(adminExam.sourcePdfLibraryId, teacherPdf._id);
+    assert.equal(adminExam.ownerId, own.ownerId);
+    assert.equal((await f.request(`/api/exam-imports/${clone.examId}`, undefined, f.teacher)).statusCode, 404);
+    assert.equal((await f.app.inject({ method: "DELETE", url: `/api/pdf-library/${teacherPdf._id}`, headers: { cookie: adminCookie } })).statusCode, 404);
     assert.ok(own._id);
   } finally { await f.close(); }
 });
