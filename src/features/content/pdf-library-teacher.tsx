@@ -93,6 +93,7 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
     setUploadProgress(0);
     setUploadPhase("uploading");
 
+    const transient = (message: string) => Object.assign(new Error(message), { retryable: true });
     const sendChunk = (position: number, chunk: Blob, offset: number) =>
       new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -105,8 +106,8 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
             setUploadProgress(Math.min(99, Math.round(((offset + event.loaded) / upload.size) * 100)));
           }
         };
-        xhr.onerror = () => reject(new Error(`ارتباط هنگام ارسال بخش ${position + 1} از ${chunkCount} قطع شد.`));
-        xhr.ontimeout = () => reject(new Error(`ارسال بخش ${position + 1} بیش از ۶۰ ثانیه طول کشید؛ دوباره تلاش کنید.`));
+        xhr.onerror = () => reject(transient(`ارتباط هنگام ارسال بخش ${position + 1} از ${chunkCount} قطع شد.`));
+        xhr.ontimeout = () => reject(transient(`ارسال بخش ${position + 1} بیش از ۶۰ ثانیه طول کشید؛ دوباره تلاش کنید.`));
         xhr.onabort = () => reject(new Error("بارگذاری PDF لغو شد."));
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
@@ -119,7 +120,7 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
             const body = JSON.parse(xhr.responseText) as { message?: string };
             if (body.message) message = body.message;
           } catch { /* Keep the chunk-specific error. */ }
-          reject(new Error(message));
+          reject(xhr.status >= 500 || xhr.status === 429 ? transient(message) : new Error(message));
         };
         xhr.send(chunk);
       });
@@ -127,7 +128,15 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
     for (let position = 0; position < chunkCount; position++) {
       const offset = position * PDF_LIBRARY_UPLOAD_CHUNK_BYTES;
       const chunk = upload.slice(offset, Math.min(upload.size, offset + PDF_LIBRARY_UPLOAD_CHUNK_BYTES));
-      await sendChunk(position, chunk, offset);
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          await sendChunk(position, chunk, offset);
+          break;
+        } catch (error) {
+          if (!(error as { retryable?: boolean }).retryable || attempt === 2) throw error;
+          await new Promise((resolve) => setTimeout(resolve, 350 * (attempt + 1)));
+        }
+      }
     }
 
     setUploadPhase("saving");
