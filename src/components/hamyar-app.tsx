@@ -2,18 +2,12 @@
 import { AccessConsole } from "@/features/access/access-console";
 import { AdminSystemOverviewScreen } from "@/features/access/admin-system-overview";
 import { PublicQuestionBank } from "@/features/content/public-question-bank";
-import { clsx } from "clsx";
-
 import React, { useState, useEffect } from "react";
 import {
-  LayoutDashboard,
-  Users,
   Library,
   Target,
   LogOut,
-  BarChart3,
   BookOpenCheck,
-  FileUp,
   UsersRound,
   Settings,
   Database,
