@@ -41,8 +41,9 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
           _id: input.groupId, teacherId: teacher._id, courseId: input.courseId,
         }, { session });
         if (!group) fail(404, "کلاس یافت نشد");
-        if (input.studentIds.some((sid) => !group.studentIds.includes(sid)))
-          fail(409, "دانش‌آموز انتخاب‌شده عضو کلاس نیست");
+        if (group.studentIds.length !== input.studentIds.length ||
+          input.studentIds.some((sid) => !group.studentIds.includes(sid)))
+          fail(409, "برای ارسال به کلاس باید تمام اعضای آن انتخاب شوند؛ فهرست کلاس را به‌روزرسانی کنید");
       }
       const enrollments = await c("enrollments").find({
         teacherId: teacher._id, courseId: input.courseId,
@@ -94,7 +95,11 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
       _id: { $in: enrollmentIds }, studentId: current._id, status: "active",
     }).toArray();
     const permitted = new Set(enrollments.map((e) => e._id));
-    return rows.filter((row) => permitted.has(row.enrollmentId) && active(row));
+    const courses = await c("courses").find({
+      _id: { $in: [...new Set(rows.map((row) => row.courseId))] }, status: "active",
+    }).toArray();
+    const activeCourses = new Set(courses.map((course) => course._id));
+    return rows.filter((row) => permitted.has(row.enrollmentId) && activeCourses.has(row.courseId) && active(row));
   });
 
   async function accessible(r: Parameters<typeof user>[0]) {
@@ -131,6 +136,16 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
     ));
     if (createHash("sha256").update(data).digest("hex") !== pdf.file?.sha256)
       fail(503, "صحت فایل PDF تأیید نشد");
+    // Record only successful requests for file bytes, not learning completion.
+    const accessed = await c("pdfDeliveries").updateOne({
+      _id: row._id, studentId: row.studentId,
+      state: { $in: ["assigned", "completed"] },
+      cancelledAt: { $exists: false },
+    }, {
+      $set: { lastFileAccessAt: now() },
+      $inc: { fileAccessCount: 1 },
+    });
+    if (!accessed.modifiedCount) fail(404, "دسترسی به PDF لغو شده است");
     // Never mark a PDF assignment completed merely because it was downloaded.
     reply.header("Content-Type", "application/pdf")
       .header("Cache-Control", "private, no-store")
