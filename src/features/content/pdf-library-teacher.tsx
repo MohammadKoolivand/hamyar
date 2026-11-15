@@ -18,7 +18,7 @@ const keyForKind = (kind: string): keyof PdfTaxonomy | null => {
   return null;
 };
 
-export function PdfLibraryTeacher({ nodes }: { nodes: Node[] }) {
+export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: { nodes: Node[]; currentUserId?: string; superAdmin?: boolean }) {
   const [items, setItems] = useState<PdfLibraryItem[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -175,11 +175,12 @@ export function PdfLibraryTeacher({ nodes }: { nodes: Node[] }) {
       </form>
       {error && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
       {notice && <p role="status" className="rounded-xl bg-teal-50 p-3 text-sm text-teal-800">{notice}</p>}
-      <h3 className="font-bold">PDFهای ثبت‌شدهٔ من</h3>
+      <h3 className="font-bold">{superAdmin ? "همهٔ PDFهای معلمان" : "PDFهای ثبت‌شدهٔ من"}</h3>
       {!items.length && <p className="text-sm text-slate-500">هنوز PDF مستقلی ثبت نشده است.</p>}
       {items.map((item) => <article key={item._id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 p-4">
         <div className="min-w-0">
           <div className="font-medium">{item.title}</div>
+          {superAdmin && <p className="text-xs text-teal-700">ثبت‌کننده: {item.ownerName ?? "نامشخص"}</p>}
           <p className="text-xs text-slate-500">{formatPdfTaxonomy(item)} · {item.visibility === "public" ? "عمومی" : "خصوصی"}</p>
           {item.state === "pending" && <p className="text-xs text-amber-800">بارگذاری فایل کامل نشده است</p>}
         </div>
@@ -190,10 +191,10 @@ export function PdfLibraryTeacher({ nodes }: { nodes: Node[] }) {
               const { examId } = await api<{ examId: string }>(`/pdf-library/${item._id}/send-to-import`, {});
               window.location.assign(`/exam-import?exam=${encodeURIComponent(examId)}`);
             })} className="inline-flex items-center gap-1 rounded-lg border border-teal-200 px-3 py-2 text-xs text-teal-800">
-              ارسال کپی به ورود آزمون <ArrowLeft size={14} />
+              {superAdmin && item.ownerId !== currentUserId ? "ساخت کپی برای ورود آزمون مدیریت" : "ارسال کپی به ورود آزمون"} <ArrowLeft size={14} />
             </button>
           </>}
-          <button type="button" disabled={busy} onClick={() => {
+          {(!currentUserId || item.ownerId === currentUserId) && <button type="button" disabled={busy} onClick={() => {
             if (!window.confirm("فایل PDF از این بانک حذف شود؟ نسخه‌های قبلاً ارسال‌شده به ورود آزمون باقی می‌مانند.")) return;
             void run(async () => {
               const response = await fetch(`/api/pdf-library/${item._id}`, { method: "DELETE" });
@@ -202,7 +203,7 @@ export function PdfLibraryTeacher({ nodes }: { nodes: Node[] }) {
             });
           }} className="rounded-lg border border-rose-200 px-3 py-2 text-xs text-rose-700" aria-label="حذف فایل PDF">
             <Trash2 size={16} />
-          </button>
+          </button>}
         </div>
       </article>)}
     </section>
