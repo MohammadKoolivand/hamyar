@@ -28,10 +28,10 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
     const input = assignInput.parse(r.body);
     return ctx.atomic(r, teacher._id, "create-pdf-delivery", input, async (session) => {
       const pdf = await c("pdfLibrary").findOne({
-        _id: input.pdfId, ownerId: teacher._id, state: "ready",
+        _id: input.pdfId, ownerId: teacher._id, state: "ready", visibility: "private",
         archivedAt: { $exists: false },
       }, { session });
-      if (!pdf) fail(404, "فایل PDF آماده و متعلق به شما یافت نشد");
+      if (!pdf) fail(404, "فقط PDF خصوصی، آماده و متعلق به شما قابل ارسال اختصاصی است");
       const course = await c("courses").findOne({
         _id: input.courseId, teacherId: teacher._id, status: "active",
       }, { session });
@@ -53,7 +53,7 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
 
       // Serialize delivery creation against deletion of the source PDF.
       const locked = await c("pdfLibrary").updateOne({
-        _id: input.pdfId, ownerId: teacher._id, state: "ready",
+        _id: input.pdfId, ownerId: teacher._id, state: "ready", visibility: "private",
         archivedAt: { $exists: false },
       }, { $inc: { deliveryRevision: 1 } }, { session });
       if (!locked.modifiedCount) fail(409, "فایل PDF دیگر برای ارسال آماده نیست");
