@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { FileText, UploadCloud, ArrowLeft, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
+import { PdfDeliveryTeacher } from "./pdf-delivery-teacher";
 import type { Node } from "@/lib/types";
 import {
   formatPdfTaxonomy, PDF_LIBRARY_UPLOAD_CHUNK_BYTES, type PdfLibraryItem, type PdfTaxonomy,
@@ -265,6 +266,7 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
           </button>}
         </div>
       </article>)}
+      <PdfDeliveryTeacher pdfs={items} currentUserId={currentUserId} />
     </section>
   );
 }
