@@ -915,15 +915,7 @@ body.hamyar-ambient .hy-question-option .hy-question-text {
 }
 
 
-/* Cohesive Persian/Latin typography and gentle, cheerful accents. */
-@font-face {
-  font-family: "Hodhod UI";
-  src: url("../assets/fonts/Poppins-Regular.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400 900;
-  font-display: swap;
-  unicode-range: U+0000-05FF, U+1E00-1EFF, U+2010-2027, U+20A0-20CF;
-}
+/* Latin subset is declared once at the top of this stylesheet. */
 body.hamyar-ambient {
   font-family: "Hodhod UI", var(--font-persian), var(--font-latin), sans-serif;
   background: radial-gradient(ellipse at 9% 5%, rgba(139, 111, 245, .09), transparent 31%),
