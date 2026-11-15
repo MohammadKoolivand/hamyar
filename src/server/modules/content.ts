@@ -759,6 +759,12 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
             : {}),
         };
         await c("questionVersions").insertOne(row, { session });
+        // The unique claim tracks the CURRENT public version only.
+        // When a question becomes private or changes content, release its old claim.
+        if (previous.publicFingerprint && previous.publicFingerprint !== publicFingerprint)
+          await c("publicQuestionFingerprints").deleteOne({
+            _id: previous.publicFingerprint, questionId: previous.questionId,
+          }, { session });
         if (row.visibility === "public" && b.topicId)
           await addDiscoveryPath(ctx.db, u._id, b.topicId, session);
         await ctx.boundary("after_question_version_insert");
