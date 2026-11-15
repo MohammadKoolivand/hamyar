@@ -1,5 +1,34 @@
 @import "tailwindcss";
 
+/* B Nazanin for Persian script, Poppins for Latin script.
+   Unicode ranges make mixed Persian/English text render correctly in one line.
+   Next's CSS asset pipeline bundles the existing local font files. */
+@font-face {
+  font-family: "Hodhod UI";
+  src: url("../assets/fonts/BNazanin-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200D;
+}
+@font-face {
+  font-family: "Hodhod UI";
+  src: url("../assets/fonts/BNazanin-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200C-200D;
+}
+@font-face {
+  font-family: "Hodhod UI";
+  src: url("../assets/fonts/Poppins-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-05FF, U+1E00-1EFF, U+2010-2027, U+20A0-20CF;
+}
+
+
 /* Hodhod Learn UI — clear, calm learning surfaces across public, educator, student,
    parent and PWA views. Semantic tokens keep components visually consistent. */
 :root {
@@ -36,6 +65,7 @@
     background: var(--hy-background);
   }
   body.hamyar-ambient {
+    font-family: "Hodhod UI", var(--font-persian), var(--font-latin), sans-serif;
     min-height: 100vh;
     background: var(--hy-background);
     background-attachment: fixed;
