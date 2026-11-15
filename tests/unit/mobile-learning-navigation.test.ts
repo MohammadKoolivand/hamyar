@@ -45,8 +45,8 @@ test("shared educational visual language uses clear surfaces and readable UI fon
   assert.match(css, /--hy-radius-card: 18px/);
   assert.match(css, /--hy-glass-border: #e0e6ef/);
   assert.match(css, /font-family: "Hodhod UI"/);
-  assert.match(css, /BNazanin-Regular\\.ttf/);
-  assert.match(css, /BNazanin-Bold\\.ttf/);
-  assert.match(css, /Poppins-Regular\\.ttf/);
+  assert.match(css, /BNazanin-Regular\.ttf/);
+  assert.match(css, /BNazanin-Bold\.ttf/);
+  assert.match(css, /Poppins-Regular\.ttf/);
   assert.doesNotMatch(layout, /font-family:var\(--font-persian\),Tahoma,sans-serif/);
 });
