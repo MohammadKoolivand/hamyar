@@ -130,7 +130,7 @@ export function ContentScreen({
   })).filter(({ text }) => text.length > 0);
   const [nodeSearch, setNodeSearch] = useState("");
   const [entryMode, setEntryMode] = useState("topic");
-  const [visibility, setVisibility] = useState<"private" | "public">("private");
+  const [visibility, setVisibility] = useState<"private" | "public">("public");
   const [source, setSource] = useState<QuestionSource>();
   const [difficulty, setDifficulty] = useState("");
   const [year, setYear] = useState("");
@@ -448,8 +448,8 @@ export function ContentScreen({
                     setVisibility(e.target.value as "private" | "public")
                   }
                 >
-                  <option value="private">خصوصی</option>
                   <option value="public">عمومی برای همه‌ی دانش‌آموزان</option>
+                  <option value="private">خصوصی</option>
                 </select>
               </label>
               {entryMode === "free" ? (
