@@ -17,6 +17,11 @@ export function HeaderDropdownController() {
         if (!menu.contains(target)) menu.open = false;
       });
     };
+    const onClickOutside = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      all().forEach((menu) => { if (!menu.contains(target)) menu.open = false; });
+    };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       const opened = Array.from(all()).filter((menu) => menu.open);
@@ -32,10 +37,12 @@ export function HeaderDropdownController() {
       });
     };
     document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("click", onClickOutside, true);
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("toggle", onToggle, true);
     return () => {
       document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("click", onClickOutside, true);
       document.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("toggle", onToggle, true);
     };
