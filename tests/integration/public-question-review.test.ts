@@ -156,3 +156,21 @@ test("users may report only current published questions; manager resolves withou
     assert.equal((await f.c("questionVersions").findOne({ _id: approved.publishedVersionId }))?.visibility, "public");
   } finally { await f.close(); }
 });
+
+test("rejection preserves private question and an append-only decision trail", async () => {
+  const f = await fixture();
+  try {
+    const admin = await adminCookie(f);
+    const q = await f.post("/api/questions", privateQuestion, f.teacher);
+    await f.post(`/api/questions/${q._id}/propose-public`, proposal(q._id), f.teacher);
+    const rejected = await f.post(
+      `/api/admin/public-question-submissions/${q.questionId}/review`,
+      { decision: "reject", reason: "مجوز استفاده از متن منبع به اندازه کافی معتبر نیست" }, admin);
+    assert.equal(rejected.status, "rejected");
+    assert.equal((await f.c("questionVersions").findOne({ _id: q._id }))?.visibility, "private");
+    assert.equal((await f.c("questions").findOne({ _id: q.questionId }))?.currentVersionId, q._id);
+    assert.equal(await f.c("publicQuestionSubmissionEvents").countDocuments({ questionId: q.questionId }), 2);
+    assert.equal((await f.c("publicQuestionSubmissions").findOne({ _id: q.questionId }))?.status, "rejected");
+    assert.equal((await f.request("/api/admin/public-question-submissions", undefined, f.teacher)).statusCode, 403);
+  } finally { await f.close(); }
+});
