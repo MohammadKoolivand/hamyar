@@ -34,11 +34,15 @@ export function ExamImportScreen({
   onApproved,
   embedded = false,
   onUseQuestions,
+  currentUserId,
+  superAdmin = false,
 }: {
   nodes: Node[];
   onApproved: () => Promise<void>;
   embedded?: boolean;
   onUseQuestions?: (ids: string[]) => Promise<void>;
+  currentUserId?: string;
+  superAdmin?: boolean;
 }) {
   const [list, setList] = useState<ExamImport[]>([]),
     [exam, setExam] = useState<Detail | null>(null);
@@ -375,7 +379,7 @@ export function ExamImportScreen({
             </Button>
           </form>
           <section className="glass-panel grid gap-3 p-5">
-            <h3 className="font-bold">آزمون‌های ذخیره‌شده من</h3>
+            <h3 className="font-bold">{superAdmin ? "تمام آزمون‌های واردشدهٔ کاربران" : "آزمون‌های ذخیره‌شدهٔ من"}</h3>
             {!list.length && (
               <p className="text-sm text-slate-500">
                 هنوز آزمونی ثبت نشده است.
@@ -394,7 +398,7 @@ export function ExamImportScreen({
                     onClick={() => void run(() => load(e._id))}
                     className="flex flex-1 flex-wrap justify-between gap-2 p-2 text-right"
                   >
-                    <span>{e.title}</span>
+                    <span>{e.title}{superAdmin && <span className="mr-2 text-xs text-teal-800">· ثبت‌کننده: {e.ownerName ?? "نامشخص"}</span>}</span>
                     <span className="text-xs text-slate-500">
                       {e.state === "review"
                         ? "آماده بازبینی"
@@ -404,7 +408,7 @@ export function ExamImportScreen({
                   <Button
                     type="button"
                     variant="outline"
-                    disabled={busy || e.state === "processing"}
+                    disabled={busy || e.state === "processing" || e.ownerId !== currentUserId}
                     onClick={() => {
                       if (
                         !window.confirm(
@@ -433,6 +437,23 @@ export function ExamImportScreen({
             </PagedList>
           </section>
         </>
+      ) : exam.ownerId !== currentUserId ? (
+        <section className="glass-panel grid gap-4 p-5 sm:p-7">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-bold">{exam.title} · {exam.ownerName ?? "کاربر"}</h3>
+            <Button type="button" variant="outline" onClick={() => { setExam(null); void loadList(); }}>بازگشت به فهرست</Button>
+          </div>
+          <p className="text-sm text-slate-600">نمایش مدیریتی فقط برای مشاهده است. ویرایش، تأیید و حذف سؤال‌های دیگر کاربران از این صفحه مجاز نیست.</p>
+          <div className="flex flex-wrap gap-2">
+            {exam.files?.question && <a className="rounded-xl border p-3 text-sm" href={`/api/exam-imports/${exam._id}/files/question`} target="_blank" rel="noopener noreferrer">مشاهده فایل سؤال</a>}
+            {exam.files?.answer && <a className="rounded-xl border p-3 text-sm" href={`/api/exam-imports/${exam._id}/files/answer`} target="_blank" rel="noopener noreferrer">مشاهده فایل پاسخ‌نامه</a>}
+          </div>
+          <p className="text-sm">تعداد سؤال‌های استخراج‌شده: {fa(exam.items.length)}</p>
+          {exam.items.map((item) => <article key={item._id} className="rounded-xl border p-4">
+            <p className="text-xs text-slate-500">{item.state === "approved" ? "تأییدشده" : item.state === "pending" ? "در انتظار تأیید" : "ردشده"}</p>
+            <QuestionPresentation statement={item.question.statement} options={item.question.type === "choice" ? item.question.options : undefined} visuals={item.question.visuals} />
+          </article>)}
+        </section>
       ) : (
         <>
           <section className="glass-panel grid min-w-0 gap-4 p-5 sm:p-7">
