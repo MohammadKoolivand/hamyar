@@ -225,3 +225,41 @@ for (const role of ["super_admin", "secretary"]) {
     }
   });
 }
+
+
+test("public independent practice is private to the student, not the question author", async () => {
+  const f = await fixture();
+  try {
+    const q = await f.post("/api/questions", {
+      classification: "free",
+      visibility: "public",
+      statement: "تمرین آزاد دانش‌آموز",
+      type: "numeric",
+      reference: "3",
+    }, f.teacher);
+    const started = await f.post(
+      `/api/student/library/${q._id}/start`,
+      { courseId: q._id },
+      f.student,
+    );
+    const assignment = await f.c("assignments").findOne({ _id: started.assignmentId });
+    assert.equal(assignment?.practiceMode, "self");
+    assert.equal((await f.request(`/api/assignments/${started.assignmentId}`, undefined, f.student)).statusCode, 200);
+
+    const ownListing = await f.request("/api/assignments", undefined, f.student);
+    assert.ok(ownListing.json().some((a: { _id: string }) => a._id === started.assignmentId));
+
+    const teacherListing = await f.request("/api/assignments", undefined, f.teacher);
+    assert.ok(!teacherListing.json().some((a: { _id: string }) => a._id === started.assignmentId));
+    assert.equal(
+      (await f.request(`/api/assignments/${started.assignmentId}`, undefined, f.teacher)).statusCode,
+      404,
+    );
+    assert.equal(
+      (await f.request(`/api/assignments/${started.assignmentId}/report`, undefined, f.teacher)).statusCode,
+      404,
+    );
+  } finally {
+    await f.close();
+  }
+});
