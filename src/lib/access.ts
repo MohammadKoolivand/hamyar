@@ -31,6 +31,9 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/discovery-filters",
     "/api/admin/discovery-filters",
     "/api/questions/public",
+    "/api/pdf-library/public",
+    "/api/pdf-library",
+    "/api/pdf-library/:pid/file",
     "/api/health",
     "/api/auth/me",
     "/api/access/me",
@@ -140,6 +143,9 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/question-drafts/:did/reject",
     "/api/settings/authoring",
     "/api/exam-imports",
+    "/api/pdf-library",
+    "/api/pdf-library/:pid/file",
+    "/api/pdf-library/:pid/send-to-import",
     "/api/exam-imports/:eid/items/:iid/source-image",
     "/api/exam-imports/:eid/files/:kind",
     "/api/exam-imports/:eid/extract",
@@ -150,6 +156,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/exam-imports/:eid/items/:iid/review",
   ],
   DELETE: [
+    "/api/pdf-library/:pid",
     "/api/exam-imports/:eid",
     "/api/exam-imports/:eid/files/:kind",
     "/api/exam-imports/:eid/files",
@@ -164,7 +171,7 @@ export const registeredAccessRoutes = new Set(
 
 // Route-level roles are only the first gate; ownership/relationship checks remain mandatory.
 export function isAuthoringRoute(route: string): boolean {
-  return /^\/api\/(curriculum|questions|question-drafts|exam-imports|question-assets)(\/|$)/.test(
+  return /^\/api\/(curriculum|questions|question-drafts|exam-imports|question-assets|pdf-library)(\/|$)/.test(
     route,
   );
 }
@@ -182,6 +189,10 @@ export function routeRoles(method: string, route: string): Role[] | null {
 }
 
 function baseRouteRoles(method: string, route: string): Role[] | null {
+  if (method.toUpperCase() === "GET" && route === "/api/pdf-library/public")
+    return null;
+  if (method.toUpperCase() === "GET" && route === "/api/pdf-library/:pid/file")
+    return null; // PDF file handler verifies publication or current owner.
   if (method.toUpperCase() === "GET" && route === "/api/discovery-filters")
     return null;
   if (
@@ -266,6 +277,7 @@ function baseRouteRoles(method: string, route: string): Role[] | null {
     "/api/question-drafts",
     "/api/settings/",
     "/api/exam-imports",
+    "/api/pdf-library",
     "/api/class-groups",
     "/api/group-tasks",
     "/api/missions",
