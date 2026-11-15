@@ -71,3 +71,33 @@ jobs:
           path: /tmp/hodhod-release/
           retention-days: 14
           if-no-files-found: error
+
+  pdf-library-integration:
+    name: Resumable PDF upload and exam handoff integration
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      TEST_MONGO_URL: mongodb://127.0.0.1:27017/?replicaSet=hamyar-rs
+      MONGO_DB: hamyar_pdf_upload_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Start isolated MongoDB replica set
+        env:
+          HODHOD_MONGO_GLIBC_TUNABLES: glibc.pthread.rseq=1
+        run: |
+          set -euo pipefail
+          docker compose up -d mongo
+          for i in $(seq 1 45); do
+            if [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q mongo)")" = "healthy" ]; then exit 0; fi
+            sleep 2
+          done
+          docker compose logs mongo
+          exit 1
+      - name: Verify full PDF transfer and exam-import handoff
+        run: node --import tsx --test --test-concurrency=1 --test-timeout=120000 tests/integration/pdf-library.test.ts

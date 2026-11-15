@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { Context } from "../context";
 import { MAX_PDF_BYTES } from "../../lib/exam-import";
+import { PDF_LIBRARY_UPLOAD_CHUNK_BYTES } from "../../lib/pdf-library";
 
 const idParams = z.object({ pid: z.string().uuid() });
 const taxonomy = z.object({
@@ -13,6 +14,17 @@ const taxonomy = z.object({
   chapter: z.string().trim().max(150).default(""),
   topic: z.string().trim().max(150).default(""),
 }).strict();
+const uploadSessionInput = z.object({
+  name: z.string().trim().min(1).max(160).regex(/\.pdf$/i),
+  size: z.number().int().positive().max(MAX_PDF_BYTES),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/),
+  chunkCount: z.number().int().positive().max(Math.ceil(MAX_PDF_BYTES / PDF_LIBRARY_UPLOAD_CHUNK_BYTES)),
+}).strict();
+const uploadCompleteInput = z.object({ uploadId: z.string().uuid() }).strict();
+const chunkParams = z.object({
+  pid: z.string().uuid(), uploadId: z.string().uuid(),
+  position: z.coerce.number().int().min(0).max(Math.ceil(MAX_PDF_BYTES / PDF_LIBRARY_UPLOAD_CHUNK_BYTES) - 1),
+});
 const metadata = z.object({
   title: z.string().trim().min(3).max(150),
   taxonomy,
@@ -80,6 +92,97 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
       await c("pdfLibrary").insertOne(row, { session });
       return row;
     });
+  });
+
+  // Resumable upload: each request transfers at most 512 KiB, so a slow
+  // reverse proxy or connection cannot strand a single 20 MiB request.
+  app.post("/api/pdf-library/:pid/upload-session", async (r) => {
+    const { u, pdf } = await teacherPdf(r);
+    const input = uploadSessionInput.parse(r.body);
+    if (pdf.state !== "pending") fail(409, "این PDF قبلاً ثبت شده است");
+    if (input.chunkCount !== Math.ceil(input.size / PDF_LIBRARY_UPLOAD_CHUNK_BYTES))
+      fail(400, "تعداد بخش‌های فایل معتبر نیست");
+    const uploadId = id();
+    await ctx.transaction(async (session) => {
+      await c("pdfLibraryChunks").deleteMany({ pdfId: pdf._id }, { session });
+      const updated = await c("pdfLibrary").updateOne(
+        { _id: pdf._id, ownerId: u._id, state: "pending" },
+        { $set: {
+          uploadSession: {
+            id: uploadId, name: input.name, size: input.size,
+            sha256: input.sha256, chunkCount: input.chunkCount,
+            chunkSize: PDF_LIBRARY_UPLOAD_CHUNK_BYTES, startedAt: now(),
+          },
+          updatedAt: now(),
+        } },
+        { session },
+      );
+      if (!updated.matchedCount) fail(409, "وضعیت فایل تغییر کرده است");
+    });
+    return { uploadId, chunkSize: PDF_LIBRARY_UPLOAD_CHUNK_BYTES, chunkCount: input.chunkCount };
+  });
+
+  app.post("/api/pdf-library/:pid/chunks/:uploadId/:position", {
+    bodyLimit: PDF_LIBRARY_UPLOAD_CHUNK_BYTES,
+    config: { rateLimit: { max: 100, timeWindow: "10 minutes" } },
+    onRequest: async (r) => { await user(r, "teacher"); },
+  }, async (r) => {
+    const { u, pdf } = await teacherPdf(r);
+    const { uploadId, position } = chunkParams.parse(r.params);
+    const session = pdf.uploadSession;
+    if (pdf.state !== "pending" || session?.id !== uploadId)
+      fail(409, "نشست بارگذاری منقضی شده است؛ دوباره تلاش کنید");
+    if (String(r.headers["content-type"] ?? "").split(";")[0] !== "application/octet-stream")
+      fail(415, "نوع دادهٔ بخش فایل معتبر نیست");
+    const data = r.body as Buffer;
+    const expectedLength = Math.min(
+      PDF_LIBRARY_UPLOAD_CHUNK_BYTES,
+      session.size - position * PDF_LIBRARY_UPLOAD_CHUNK_BYTES,
+    );
+    if (position >= session.chunkCount || !Buffer.isBuffer(data) ||
+      data.length !== expectedLength || data.length <= 0)
+      fail(400, "اندازه یا شمارهٔ بخش فایل معتبر نیست");
+    const chunkId = `${pdf._id}:${uploadId}:${position}`;
+    await c("pdfLibraryChunks").replaceOne(
+      { _id: chunkId },
+      { _id: chunkId, pdfId: pdf._id, ownerId: u._id, uploadId, position, data: new Binary(data) },
+      { upsert: true },
+    );
+    return { accepted: data.length, position };
+  });
+
+  app.post("/api/pdf-library/:pid/complete", async (r) => {
+    const { u, pdf } = await teacherPdf(r);
+    const { uploadId } = uploadCompleteInput.parse(r.body);
+    const session = pdf.uploadSession;
+    if (pdf.state !== "pending" || session?.id !== uploadId)
+      fail(409, "نشست بارگذاری منقضی شده است؛ دوباره تلاش کنید");
+    const chunks = await c("pdfLibraryChunks")
+      .find({ pdfId: pdf._id, ownerId: u._id, uploadId })
+      .sort({ position: 1 }).toArray();
+    if (chunks.length !== session.chunkCount ||
+      chunks.some((chunk, index) => chunk.position !== index))
+      fail(409, "همهٔ بخش‌های PDF دریافت نشده‌اند؛ بارگذاری را دوباره انجام دهید");
+    const data = Buffer.concat(chunks.map((chunk) =>
+      chunk.data instanceof Binary ? Buffer.from(chunk.data.value()) : Buffer.from(chunk.data)
+    ));
+    const digest = createHash("sha256").update(data).digest("hex");
+    if (data.length !== session.size || digest !== session.sha256 ||
+      data.subarray(0, 5).toString() !== "%PDF-" ||
+      !data.subarray(-2048).includes(Buffer.from("%%EOF")))
+      fail(400, "فایل کامل دریافت نشد یا صحت PDF تأیید نشد؛ لطفاً دوباره بارگذاری کنید");
+    const updated = await c("pdfLibrary").updateOne(
+      { _id: pdf._id, ownerId: u._id, state: "pending", "uploadSession.id": uploadId },
+      {
+        $set: {
+          file: { name: session.name, size: data.length, sha256: digest },
+          state: "ready", updatedAt: now(),
+        },
+        $unset: { uploadSession: "" },
+      },
+    );
+    if (!updated.matchedCount) fail(409, "وضعیت فایل هنگام ثبت نهایی تغییر کرده است");
+    return { _id: pdf._id, state: "ready", file: { name: session.name, size: data.length, sha256: digest } };
   });
 
   app.post("/api/pdf-library/:pid/file", {
@@ -170,12 +273,15 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
           name: pdf.file.name, size: data.length, sha256: pdf.file.sha256,
         } },
       }, { session });
-      for (let offset = 0, position = 0; offset < data.length; offset += 256 * 1024, position++) {
-        await c("examImportChunks").insertOne({
+      const importChunks = Array.from(
+        { length: Math.ceil(data.length / (256 * 1024)) },
+        (_, position) => ({
           _id: id(), examId, ownerId: u._id, kind: "question", position,
-          data: new Binary(data.subarray(offset, offset + 256 * 1024)), expiresAt,
-        }, { session });
-      }
+          data: new Binary(data.subarray(position * 256 * 1024, (position + 1) * 256 * 1024)),
+          expiresAt,
+        }),
+      );
+      await c("examImportChunks").insertMany(importChunks, { session });
     });
     return { examId };
   });

@@ -1,8 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { fixture } from "../helpers/fixture";
 import { textPdf } from "../helpers/pdf";
-import { matchesPdfTaxonomy } from "../../src/lib/pdf-library";
+import { matchesPdfTaxonomy, PDF_LIBRARY_UPLOAD_CHUNK_BYTES } from "../../src/lib/pdf-library";
 
 test("teacher keeps a whole PDF, publishes it by topic, and independently sends a copy to exam review", async () => {
   const f = await fixture();
@@ -108,5 +109,76 @@ test("private PDFs remain hidden from public, while super admin can inspect impo
     assert.equal((await f.request(`/api/exam-imports/${clone.examId}`, undefined, f.teacher)).statusCode, 404);
     assert.equal((await f.app.inject({ method: "DELETE", url: `/api/pdf-library/${teacherPdf._id}`, headers: { cookie: adminCookie } })).statusCode, 404);
     assert.ok(own._id);
+  } finally { await f.close(); }
+});
+
+test("resumable PDF upload verifies every chunk before publishing and copies the complete file to exam import", async () => {
+  const f = await fixture();
+  try {
+    const pdf = await f.post("/api/pdf-library", {
+      title: "PDF چندبخشی",
+      taxonomy: { level: "متوسطه دوم", grade: "دهم", book: "زیست", chapter: "اول", topic: "سلول" },
+      visibility: "public",
+    }, f.teacher);
+    const prefix = textPdf(["Full source document"]);
+    const data = Buffer.concat([
+      prefix.subarray(0, prefix.length - 8),
+      Buffer.alloc(PDF_LIBRARY_UPLOAD_CHUNK_BYTES + 173, 65),
+      Buffer.from("\\n%%EOF\\n"),
+    ]);
+    const sha256 = createHash("sha256").update(data).digest("hex");
+    const chunkCount = Math.ceil(data.length / PDF_LIBRARY_UPLOAD_CHUNK_BYTES);
+    const start = await f.post(`/api/pdf-library/${pdf._id}/upload-session`, {
+      name: "full-source.pdf", size: data.length, sha256, chunkCount,
+    }, f.teacher);
+    for (let position = 0; position < chunkCount; position++) {
+      const offset = position * PDF_LIBRARY_UPLOAD_CHUNK_BYTES;
+      const chunk = data.subarray(offset, Math.min(data.length, offset + PDF_LIBRARY_UPLOAD_CHUNK_BYTES));
+      const response = await f.app.inject({
+        method: "POST",
+        url: `/api/pdf-library/${pdf._id}/chunks/${start.uploadId}/${position}`,
+        headers: { cookie: f.teacher, "content-type": "application/octet-stream" },
+        payload: chunk,
+      });
+      assert.equal(response.statusCode, 200, response.body);
+      assert.equal(response.json().accepted, chunk.length);
+    }
+    const completed = await f.post(`/api/pdf-library/${pdf._id}/complete`, { uploadId: start.uploadId }, f.teacher);
+    assert.equal(completed.state, "ready");
+    assert.equal(completed.file.size, data.length);
+    assert.equal(completed.file.sha256, sha256);
+    assert.deepEqual((await f.request(`/api/pdf-library/${pdf._id}/file`)).rawPayload, data);
+
+    const handoff = await f.post(`/api/pdf-library/${pdf._id}/send-to-import`, {}, f.teacher);
+    const copied = await f.request(`/api/exam-imports/${handoff.examId}/files/question`, undefined, f.teacher);
+    assert.equal(copied.statusCode, 200);
+    assert.deepEqual(copied.rawPayload, data);
+  } finally { await f.close(); }
+});
+
+test("resumable PDF upload refuses finalization when even one chunk is missing", async () => {
+  const f = await fixture();
+  try {
+    const pdf = await f.post("/api/pdf-library", {
+      title: "PDF ناقص",
+      taxonomy: { level: "", grade: "یازدهم", book: "زیست", chapter: "", topic: "" },
+    }, f.teacher);
+    const data = Buffer.concat([textPdf(["Incomplete source"]), Buffer.alloc(PDF_LIBRARY_UPLOAD_CHUNK_BYTES, 66), Buffer.from("\\n%%EOF\\n")]);
+    const sha256 = createHash("sha256").update(data).digest("hex");
+    const chunkCount = Math.ceil(data.length / PDF_LIBRARY_UPLOAD_CHUNK_BYTES);
+    const start = await f.post(`/api/pdf-library/${pdf._id}/upload-session`, {
+      name: "incomplete.pdf", size: data.length, sha256, chunkCount,
+    }, f.teacher);
+    const first = data.subarray(0, PDF_LIBRARY_UPLOAD_CHUNK_BYTES);
+    const upload = await f.app.inject({
+      method: "POST",
+      url: `/api/pdf-library/${pdf._id}/chunks/${start.uploadId}/0`,
+      headers: { cookie: f.teacher, "content-type": "application/octet-stream" },
+      payload: first,
+    });
+    assert.equal(upload.statusCode, 200, upload.body);
+    const complete = await f.request(`/api/pdf-library/${pdf._id}/complete`, { uploadId: start.uploadId }, f.teacher);
+    assert.equal(complete.statusCode, 409);
+    assert.equal((await f.request("/api/pdf-library/public")).json().length, 0);
   } finally { await f.close(); }
 });

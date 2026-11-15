@@ -17,7 +17,7 @@ const params = z.object({ eid: z.string().uuid() });
 export function registerExamImports(app: FastifyInstance, ctx: Context) {
   const { c, id, now, owned, user, fail } = ctx;
   app.addContentTypeParser(
-    ["application/pdf", "image/png", "image/jpeg", "image/webp"],
+    ["application/pdf", "application/octet-stream", "image/png", "image/jpeg", "image/webp"],
     { parseAs: "buffer", bodyLimit: MAX_PDF_BYTES },
     (_r, body, done) => done(null, body),
   );
