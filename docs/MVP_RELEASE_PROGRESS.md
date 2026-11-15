@@ -131,3 +131,34 @@
 ### Status
 
 **STEP 5 CODE IMPLEMENTED — TEST EXECUTION, BROWSER VERIFICATION AND DEPLOYMENT PENDING. DO NOT DECLARE RELEASE READY.**
+
+## Step 6 — public question exact-duplicate protection and similarity preview (2026-11-16)
+
+### Existing functionality examined
+
+- Import review had its own owner-scoped normalized statement/options fingerprint.
+- `persistQuestion` is shared by manual question creation, confirmed PDF-extracted questions, and AI draft approval; version revision uses a separate write path.
+- Public questions are currently accepted immediately as verified; the admin approval queue and licensing/moderation workflow is **Step 7** scope, not yet implemented here.
+
+### Implemented
+
+1. Added `src/server/question-duplicates.ts`: versioned SHA-256 exact fingerprint with Persian/Arabic letter and digit normalization. Mathematical operators, superscripts, options order and image references remain distinct to avoid unsafe auto-merging.
+2. Added lexical similarity screening (not a claim of semantic/embedding equivalence) over up to 5,000 latest verified CURRENT public versions. The return is at most 10 matching questions, exposing only public statement/ID/classification/score, never private questions, answers, hints, or owner private data.
+3. Added teacher-only `POST /api/questions/duplicates/check` to preview exact and probable matches before manual entry, with clear UI warning when text or choices change after a check.
+4. Added transactional `publicQuestionFingerprints` claims keyed by the fingerprint. Exact matches reject new public submissions, and unique `_id` guarantees that concurrent writers cannot reserve the same fingerprint. Private teacher questions do not reserve public fingerprints.
+5. Connected the guard to `persistQuestion` (manual, PDF, AI-reviewed) and the revision path, including release of old fingerprints when the CURRENT question becomes private or changes.
+6. Preserved all prior versions and existing private question data; did not run a data migration/backfill.
+7. Added unit and MongoDB integration tests for Persian normalization, numeric/math differences, option order, images, public/private filtering, exact/near matches, concurrent teachers, revision and fingerprint release.
+
+### Limitations / outstanding acceptance
+
+- **Tests and production build were not executed**: the available connector can edit GitHub contents but cannot execute a full checkout; direct GitHub clone failed due to DNS resolution. Added tests are not evidence of passing tests.
+- The 5,000-record recent-public catalog cap means similarity (and legacy unindexed duplicate coverage) is **best effort**, not a guarantee across a larger bank. New exact duplicates are transactionally protected only within the new fingerprint registry; an approved, indexed backfill strategy is needed before claiming comprehensive cross-bank protection.
+- Lexical similarity is a suggestion, not semantic equivalence. Image and formula matching still require human review.
+- Similar-but-not-exact questions currently remain eligible to register separately; only exact duplicates are blocked. A structured "use existing", "independent with reason", and "send to moderator" workflow, full rights/provenance policy and public moderation belong to Step 7.
+- Existing owner-scoped PDF import check remains for import-specific idempotency; the shared public guard is an additional cross-owner check.
+- All prior incomplete Step 3/4/5 test/release gates remain open.
+
+### Status
+
+**STEP 6 CODE IMPLEMENTED PARTIALLY — EXACT-GUARD AND TEXT PREVIEW ADDED; TESTS, SCALE VALIDATION, MODERATION AND RELEASE NOT VERIFIED.**
