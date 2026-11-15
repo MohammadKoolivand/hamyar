@@ -80,7 +80,7 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
     config: { rateLimit: { max: 10, timeWindow: "1 minute" } },
   }, async (r) => {
     const { u, pdf } = await teacherPdf(r);
-    const buffer = r.body;
+    const buffer = r.body as Buffer;
     if (pdf.state !== "pending") fail(409, "فایل قبلاً بارگذاری شده است");
     if (String(r.headers["content-type"] ?? "").split(";")[0] !== "application/pdf" ||
       !Buffer.isBuffer(buffer) || buffer.length < 8 ||
@@ -120,10 +120,9 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
 
   app.get("/api/pdf-library/:pid/file", async (r, reply) => {
     const { pid } = idParams.parse(r.params);
-    const pdf = await c("pdfLibrary").findOne({
+    const pdf = (await c("pdfLibrary").findOne({
       _id: pid, state: "ready", archivedAt: { $exists: false },
-    });
-    if (!pdf) fail(404, "PDF یافت نشد");
+    })) ?? fail(404, "PDF یافت نشد");
     if (pdf.visibility !== "public") {
       const u = await user(r, "teacher");
       if (pdf.ownerId !== u._id) fail(404, "PDF یافت نشد");
