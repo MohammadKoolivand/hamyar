@@ -56,9 +56,21 @@ export function PublicQuestionBank({
   const printable = useRef<HTMLDivElement>(null);
   const [retry, setRetry] = useState(0);
   const [starting, setStarting] = useState("");
+  const [guestSession, setGuestSession] = useState<PublicBankQuestion[] | null>(null);
+  const [guestIndex, setGuestIndex] = useState(0);
+  const [guestAnswers, setGuestAnswers] = useState<Record<string, string>>({});
+  const [guestFinished, setGuestFinished] = useState(false);
+  function beginGuestSession(items: PublicBankQuestion[]) {
+    if (!items.length) return;
+    setGuestSession(items.slice(0, 10));
+    setGuestIndex(0);
+    setGuestAnswers({});
+    setGuestFinished(false);
+  }
   async function startPractice(questionId: string) {
     if (!signedIn) {
-      onLogin?.();
+      const question = questions.find((item) => item._id === questionId);
+      if (question) beginGuestSession([question]);
       return;
     }
     setStarting(questionId);
@@ -394,6 +406,69 @@ export function PublicQuestionBank({
             : "نتایج"}
         </Button></>}
       </div>
+      {home && onlinePractice && !signedIn && filters.content === "questions" && !loading && visible.length > 0 && (
+        <div className="rounded-2xl border border-teal-200 bg-teal-50/70 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-teal-900">بدون ورود، تا ۱۰ سؤال را برای آشنایی با تمرین آنلاین امتحان کن. پاسخ‌ها ذخیره یا تصحیح نمی‌شوند.</p>
+            <Button variant="outline" onClick={() => beginGuestSession(
+              selected.length ? visible.filter((item) => selected.includes(item._id)) : visible,
+            )}>شروع تمرین آزمایشی</Button>
+          </div>
+        </div>
+      )}
+      {guestSession && guestSession.length > 0 && (
+        <section aria-label="تمرین آزمایشی مهمان" className="rounded-2xl border border-sky-200 bg-white p-4 sm:p-6">
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <strong>تمرین آزمایشی · سؤال {(guestIndex + 1).toLocaleString("fa-IR")} از {guestSession.length.toLocaleString("fa-IR")}</strong>
+            <Button variant="outline" onClick={() => setGuestSession(null)}>بستن تمرین</Button>
+          </div>
+          {!guestFinished ? (
+            <>
+              {questionView(guestSession[guestIndex])}
+              {guestSession[guestIndex].type === "choice" && guestSession[guestIndex].options?.length ? (
+                <fieldset className="mt-4 grid gap-2">
+                  <legend className="mb-2 font-medium">پاسخ شما</legend>
+                  {guestSession[guestIndex].options.map((option) => (
+                    <label key={option} className="flex items-center gap-2 rounded-lg border p-3">
+                      <input type="radio" name="guest-answer" value={option}
+                        checked={guestAnswers[guestSession[guestIndex]._id] === option}
+                        onChange={() => setGuestAnswers((previous) => ({ ...previous, [guestSession[guestIndex]._id]: option }))} />
+                      <MathText text={option} />
+                    </label>
+                  ))}
+                </fieldset>
+              ) : (
+                <label className="mt-4 block">
+                  پاسخ شما
+                  <textarea className={inputStyle} rows={3}
+                    value={guestAnswers[guestSession[guestIndex]._id] ?? ""}
+                    onChange={(event) => setGuestAnswers((previous) => ({
+                      ...previous, [guestSession[guestIndex]._id]: event.target.value,
+                    }))} />
+                </label>
+              )}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button variant="outline" disabled={guestIndex === 0}
+                  onClick={() => setGuestIndex((index) => index - 1)}>سؤال قبل</Button>
+                <Button onClick={() => guestIndex + 1 === guestSession.length
+                  ? setGuestFinished(true)
+                  : setGuestIndex((index) => index + 1)}>
+                  {guestIndex + 1 === guestSession.length ? "پایان تمرین آزمایشی" : "سؤال بعد"}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="grid gap-3">
+              <p role="status">به {Object.values(guestAnswers).filter((answer) => answer.trim()).length.toLocaleString("fa-IR")} سؤال از {guestSession.length.toLocaleString("fa-IR")} سؤال پاسخ دادی.</p>
+              <p className="text-sm text-slate-600">این نسخه مهمان فقط برای آشنایی است؛ نمره، تصحیح و ذخیره پاسخ ندارد. برای تمرین تصحیح‌شونده و ثبت پیشرفت با حساب دانش‌آموز وارد شو.</p>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => beginGuestSession(guestSession)}>تمرین دوباره</Button>
+                {onLogin && <Button onClick={onLogin}>ورود دانش‌آموز</Button>}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
       {filters.content !== "pdf" && <p className="text-xs leading-6 text-slate-400">
         در پنجره‌ی چاپ، مقصد «ذخیره به‌صورت PDF / Save as PDF» را انتخاب کن. بدون
         انتخاب سؤال، تمام نتایج فیلترشده چاپ می‌شوند.
@@ -453,7 +528,7 @@ export function PublicQuestionBank({
                   onClick={() => void startPractice(q._id)}
                 >
                   {!signedIn
-                    ? "ورود برای تمرین آنلاین"
+                    ? "تمرین آزمایشی این سؤال"
                     : starting === q._id
                       ? "در حال شروع…"
                       : "تمرین آنلاین این سؤال"}
