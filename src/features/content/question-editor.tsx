@@ -149,7 +149,7 @@ export function QuestionEditor({
               <Field title="دسترسی سؤال">
                 <select
                   className={style}
-                  value={value.visibility ?? "private"}
+                  value={value.visibility ?? "public"}
                   onChange={(event) =>
                     change({
                       ...value,
