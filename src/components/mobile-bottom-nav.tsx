@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import {
-  BookOpenCheck, ChartNoAxesCombined, ClipboardList, Database, FilePlus2,
+  BookOpenCheck, ChartNoAxesCombined, Database, FilePlus2,
   FileUp, House, Library, ListChecks, LogIn, Menu, Settings, UsersRound, X, GraduationCap, NotebookPen,
 } from "lucide-react";
 import type { User } from "@/lib/types";
