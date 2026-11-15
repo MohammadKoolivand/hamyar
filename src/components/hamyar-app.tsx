@@ -5,12 +5,12 @@ import { PublicQuestionBank } from "@/features/content/public-question-bank";
 import React, { useState, useEffect } from "react";
 import {
   Library,
-  Target,
   GraduationCap,
   NotebookPen,
   FolderOpen,
+  FileUp,
+  ChartNoAxesCombined,
   LogOut,
-  BookOpenCheck,
   UsersRound,
   Settings,
   Database,
@@ -360,7 +360,7 @@ export default function HamyarApp() {
             >
               <button
                 data-active={publicPage}
-                className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
+                className="hy-student-nav-link hy-nav-illustrated flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
                 onClick={() => navigatePage("home")}
               >
                 <Library size={17} aria-hidden />
@@ -368,7 +368,7 @@ export default function HamyarApp() {
               </button>
               <button
                 data-active={page === "courses"}
-                className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
+                className="hy-student-nav-link hy-nav-illustrated flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
                 onClick={() => navigatePage("courses")}
               >
                 <GraduationCap size={18} aria-hidden />
@@ -489,7 +489,7 @@ export default function HamyarApp() {
               type="button"
               onClick={() => navigatePage("home")}
               data-active={page === "home" || page === "public-bank"}
-              className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
+              className="hy-student-nav-link hy-nav-illustrated flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
             >
               <Library size={17} aria-hidden />
               تمرین و نمونه‌سؤال
@@ -498,7 +498,7 @@ export default function HamyarApp() {
               type="button"
               onClick={() => navigatePage("courses")}
               data-active={page === "courses" || page === "student-course"}
-              className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
+              className="hy-student-nav-link hy-nav-illustrated flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
             >
               <GraduationCap size={18} aria-hidden />
               معلم و درس‌های من
@@ -506,44 +506,44 @@ export default function HamyarApp() {
             {teacher && (
               <>
                 {educator && <details className="hy-header-menu relative shrink-0">
-                  <summary data-active={["students", "classes"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
+                  <summary data-active={["students", "classes"].includes(page)} className="hy-student-nav-link hy-nav-illustrated flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
                     <UsersRound size={17} aria-hidden /> کلاس و دانش‌آموزان <ChevronDown size={14} />
                   </summary>
                   <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-52 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-                    <button type="button" onClick={(event) => navigateFromMenu(event, "students")}>دانش‌آموزان</button>
-                    <button type="button" onClick={(event) => navigateFromMenu(event, "classes")}>کلاس‌های گروهی</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "students")}><UsersRound size={16} aria-hidden /> دانش‌آموزان</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "classes")}><UsersRound size={16} aria-hidden /> کلاس‌های گروهی</button>
                   </div>
                 </details>}
                 <details className="hy-header-menu relative shrink-0">
-                  <summary data-active={["content", "exam-import", "resources"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
+                  <summary data-active={["content", "exam-import", "resources"].includes(page)} className="hy-student-nav-link hy-nav-illustrated flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
                     <FolderOpen size={18} aria-hidden /> محتوا و منابع <ChevronDown size={14} />
                   </summary>
                   <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-56 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-                    <button type="button" onClick={(event) => navigateFromMenu(event, "content")}>بانک سؤال و محتوا</button>
-                    <button type="button" onClick={(event) => navigateFromMenu(event, "exam-import")}>ورود آزمون</button>
-                    <button type="button" onClick={(event) => navigateFromMenu(event, "resources")}>منابع آموزشی</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "content")}><Library size={16} aria-hidden /> بانک سؤال و محتوا</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "exam-import")}><FileUp size={16} aria-hidden /> ورود آزمون</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "resources")}><FolderOpen size={16} aria-hidden /> منابع آموزشی</button>
                   </div>
                 </details>
                 {educator && <details className="hy-header-menu relative shrink-0">
-                  <summary data-active={["missions", "learning"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
+                  <summary data-active={["missions", "learning"].includes(page)} className="hy-student-nav-link hy-nav-illustrated flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
                     <NotebookPen size={18} aria-hidden /> تمرین و تحلیل <ChevronDown size={14} />
                   </summary>
                   <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-52 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-                    <button type="button" onClick={(event) => navigateFromMenu(event, "missions")}>مأموریت‌ها</button>
-                    <button type="button" onClick={(event) => navigateFromMenu(event, "learning")}>یادگیری و مرور</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "missions")}><NotebookPen size={16} aria-hidden /> مأموریت‌ها</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "learning")}><ChartNoAxesCombined size={16} aria-hidden /> یادگیری و مرور</button>
                   </div>
                 </details>}
               </>
             )}
             {!teacher && me.role === "student" && (
               <details className="hy-header-menu relative shrink-0">
-                <summary data-active={["student-missions", "student-mistakes", "student-progress"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
+                <summary data-active={["student-missions", "student-mistakes", "student-progress"].includes(page)} className="hy-student-nav-link hy-nav-illustrated flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
                   <NotebookPen size={18} aria-hidden /> فعالیت‌های من <ChevronDown size={14} />
                 </summary>
                 <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-52 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-missions")}>مأموریت‌های معلم</button>
-                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-mistakes")}>مرور اشتباهات</button>
-                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-progress")}>پیشرفت من</button>
+                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-missions")}><NotebookPen size={16} aria-hidden /> مأموریت‌های معلم</button>
+                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-mistakes")}><Library size={16} aria-hidden /> مرور اشتباهات</button>
+                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-progress")}><ChartNoAxesCombined size={16} aria-hidden /> پیشرفت من</button>
                 </div>
               </details>
             )}
@@ -561,7 +561,7 @@ export default function HamyarApp() {
                 <p className="font-bold">{me.name}</p>
                 <p className="text-xs text-slate-500">{roleLabel}</p>
               </div>
-              <button type="button" onClick={(event) => navigateFromMenu(event, "dashboard")}>نمای کلی</button>
+              <button type="button" onClick={(event) => navigateFromMenu(event, "dashboard")}><ChartNoAxesCombined size={16} aria-hidden /> نمای کلی</button>
               {educator && <button type="button" onClick={(event) => navigateFromMenu(event, "settings")}><Settings size={15} /> تنظیمات</button>}
               {me.role === "super_admin" && (
                 <>
