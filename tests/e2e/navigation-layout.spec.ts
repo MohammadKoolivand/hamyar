@@ -281,6 +281,7 @@ test("Home is centered on mobile and consistently opens sample-question selectio
   await expect(mobile.getByRole("button").nth(1)).toHaveAttribute("aria-label", "خانه");
   await expect(mobile.getByRole("button", { name: "خانه" })).toHaveAttribute("aria-current", "page");
 
+  await page.goto("/login");
   await registerSyntheticUser(page, "معلم تست خانه");
   await page.setViewportSize({ width: 390, height: 844 });
   await mobile.getByRole("button").nth(2).click();
