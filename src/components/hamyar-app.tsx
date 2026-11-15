@@ -61,7 +61,7 @@ export default function HamyarApp() {
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false),
-    [page, setPage] = useState("dashboard");
+    [page, setPage] = useState("home");
   const [courses, setCourses] = useState<Course[]>([]),
     [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [studentDashboard, setStudentDashboard] =
