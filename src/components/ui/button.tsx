@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 const variants = cva(
-  "inline-flex cursor-pointer motion-reduce:transition-none items-center justify-center gap-2 rounded-[15px] text-sm font-semibold transition-all duration-200 focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#285BB0] disabled:pointer-events-none disabled:opacity-50 min-h-11 px-5 py-3",
+  "inline-flex cursor-pointer motion-reduce:transition-none items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-colors duration-150 focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#285BB0] disabled:pointer-events-none disabled:opacity-50 min-h-11 px-5 py-3",
   {
     variants: {
       variant: {
