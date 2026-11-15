@@ -22,6 +22,7 @@ import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
 import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
+import { visibilityForAuthoredQuestion } from "../publication-policy";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
   app.get("/api/questions/public", async (r) => {
@@ -707,7 +708,9 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           { session },
         );
         if (!previous) ctx.fail(404, "سؤال یافت نشد");
-        const visibility = process.env.NODE_ENV === "production" ? "private" : (b.visibility ?? previous.visibility ?? "private");
+        const visibility = visibilityForAuthoredQuestion(
+          b.visibility, previous.visibility ?? "private",
+        );
         const publicFingerprint = visibility === "public"
           ? await reservePublicQuestionFingerprint(ctx, b, previous.questionId, u._id, session)
           : undefined;
