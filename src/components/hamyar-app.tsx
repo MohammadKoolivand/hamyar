@@ -6,6 +6,9 @@ import React, { useState, useEffect } from "react";
 import {
   Library,
   Target,
+  GraduationCap,
+  NotebookPen,
+  FolderOpen,
   LogOut,
   BookOpenCheck,
   UsersRound,
@@ -17,6 +20,7 @@ import {
 import { Button } from "./ui/button";
 import { Brand } from "./ui/brand";
 import { MobileBottomNav } from "./mobile-bottom-nav";
+import { HeaderDropdownController } from "./header-dropdown-controller";
 import type {
   User,
   Node,
@@ -173,7 +177,7 @@ export default function HamyarApp() {
       next = "dashboard";
       window.history.replaceState(window.history.state, "", "/dashboard");
     }
-    if (currentUser?.role === "parent" && !["dashboard", "public-bank"].includes(next)) {
+    if (currentUser?.role === "parent" && !["dashboard", "home", "public-bank"].includes(next)) {
       next = "dashboard";
       window.history.replaceState(window.history.state, "", "/dashboard");
     }
@@ -334,6 +338,7 @@ export default function HamyarApp() {
   if (!me) {
     const publicPage = [
       "dashboard",
+      "home",
       "student-practice",
       "student-search",
       "public-bank",
@@ -345,7 +350,7 @@ export default function HamyarApp() {
             <button
               aria-label="خانه‌ی هدهد"
               className="shrink-0 cursor-pointer"
-              onClick={() => navigatePage("dashboard")}
+              onClick={() => navigatePage("home")}
             >
               <Brand />
             </button>
@@ -356,7 +361,7 @@ export default function HamyarApp() {
               <button
                 data-active={publicPage}
                 className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
-                onClick={() => navigatePage("dashboard")}
+                onClick={() => navigatePage("home")}
               >
                 <Library size={17} aria-hidden />
                 تمرین و نمونه‌سؤال
@@ -366,7 +371,7 @@ export default function HamyarApp() {
                 className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
                 onClick={() => navigatePage("courses")}
               >
-                <BookOpenCheck size={17} aria-hidden />
+                <GraduationCap size={18} aria-hidden />
                 معلم و درس‌های من
               </button>
             </nav>
@@ -386,7 +391,7 @@ export default function HamyarApp() {
             <>
               <Button
                 variant="outline"
-                onClick={() => navigatePage("dashboard")}
+                onClick={() => navigatePage("home")}
               >
                 ادامه‌ی مرور بدون ورود
               </Button>
@@ -401,13 +406,14 @@ export default function HamyarApp() {
   if (me.role === "parent")
     return (
       <div className="hy-student-site hy-site-shell min-h-screen" dir="rtl">
+        <HeaderDropdownController />
         <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95">
           <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-4 py-2 sm:px-6 lg:px-8">
-            <button type="button" onClick={() => navigatePage("dashboard")} className="shrink-0" aria-label="خانه هدهد">
+            <button type="button" onClick={() => navigatePage("home")} className="shrink-0" aria-label="خانه هدهد">
               <Brand />
             </button>
             <nav aria-label="بخش‌های اصلی" className="hidden flex-1 gap-2 md:flex">
-              <button type="button" onClick={() => navigatePage("public-bank")} data-active={page === "public-bank"} className="hy-student-nav-link rounded-xl px-4 py-2 text-sm">تمرین و نمونه‌سؤال</button>
+              <button type="button" onClick={() => navigatePage("home")} data-active={page === "home" || page === "public-bank"} className="hy-student-nav-link rounded-xl px-4 py-2 text-sm">تمرین و نمونه‌سؤال</button>
               <button type="button" onClick={() => navigatePage("dashboard")} data-active={page === "dashboard"} className="hy-student-nav-link rounded-xl px-4 py-2 text-sm">گزارش فرزند</button>
             </nav>
             <details className="hy-header-menu relative ms-auto">
@@ -425,7 +431,7 @@ export default function HamyarApp() {
           </div>
         </header>
         <main className="hy-site-main mx-auto grid w-full max-w-[1440px] gap-5 px-4 py-6 sm:px-6 lg:px-8">
-          {page === "public-bank" ? <PublicQuestionBank /> : <ParentDashboard me={me} />}
+          {page === "home" ? <PublicQuestionBank home signedIn /> : page === "public-bank" ? <PublicQuestionBank /> : <ParentDashboard me={me} />}
         </main>
         <MobileBottomNav role="parent" page={page} onNavigate={navigatePage} />
       </div>
@@ -434,6 +440,7 @@ export default function HamyarApp() {
   const educator = ["teacher", "super_admin"].includes(me.role);
   const pageTitles: Record<string, string> = {
     dashboard: teacher ? "نمای کلی" : "تمرین و نمونه‌سؤال",
+    home: "انتخاب نمونه‌سؤال",
     "public-bank": "بانک سؤال عمومی",
     courses: "معلم و درس‌های من",
     students: "دانش‌آموزان",
@@ -466,11 +473,12 @@ export default function HamyarApp() {
   }
   return (
     <div className="hy-student-site hy-site-shell min-h-screen" dir="rtl">
+      <HeaderDropdownController />
       <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 lg:px-8">
           <button
             type="button"
-            onClick={() => navigatePage("dashboard")}
+            onClick={() => navigatePage("home")}
             className="shrink-0 cursor-pointer"
             aria-label="رفتن به خانه هدهد"
           >
@@ -479,8 +487,8 @@ export default function HamyarApp() {
           <nav aria-label="بخش‌های اصلی" className="order-3 hidden min-w-0 w-full flex-1 items-center gap-1 border-t border-slate-100 pt-2 md:order-none md:flex md:w-auto md:flex-wrap md:overflow-visible md:border-0 md:pt-0">
             <button
               type="button"
-              onClick={() => navigatePage(teacher ? "public-bank" : "dashboard")}
-              data-active={page === (teacher ? "public-bank" : "dashboard")}
+              onClick={() => navigatePage("home")}
+              data-active={page === "home" || page === "public-bank"}
               className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
             >
               <Library size={17} aria-hidden />
@@ -492,7 +500,7 @@ export default function HamyarApp() {
               data-active={page === "courses" || page === "student-course"}
               className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
             >
-              <BookOpenCheck size={17} aria-hidden />
+              <GraduationCap size={18} aria-hidden />
               معلم و درس‌های من
             </button>}
             {teacher && (
@@ -508,7 +516,7 @@ export default function HamyarApp() {
                 </details>}
                 <details className="hy-header-menu relative shrink-0">
                   <summary data-active={["content", "exam-import", "resources"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
-                    <Library size={17} aria-hidden /> محتوا و منابع <ChevronDown size={14} />
+                    <FolderOpen size={18} aria-hidden /> محتوا و منابع <ChevronDown size={14} />
                   </summary>
                   <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-56 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
                     <button type="button" onClick={(event) => navigateFromMenu(event, "content")}>بانک سؤال و محتوا</button>
@@ -518,7 +526,7 @@ export default function HamyarApp() {
                 </details>
                 {educator && <details className="hy-header-menu relative shrink-0">
                   <summary data-active={["missions", "learning"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
-                    <Target size={17} aria-hidden /> تمرین و تحلیل <ChevronDown size={14} />
+                    <NotebookPen size={18} aria-hidden /> تمرین و تحلیل <ChevronDown size={14} />
                   </summary>
                   <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-52 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
                     <button type="button" onClick={(event) => navigateFromMenu(event, "missions")}>مأموریت‌ها</button>
@@ -530,7 +538,7 @@ export default function HamyarApp() {
             {!teacher && me.role === "student" && (
               <details className="hy-header-menu relative shrink-0">
                 <summary data-active={["student-missions", "student-mistakes", "student-progress"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
-                  <Target size={17} aria-hidden /> فعالیت‌های من <ChevronDown size={14} />
+                  <NotebookPen size={18} aria-hidden /> فعالیت‌های من <ChevronDown size={14} />
                 </summary>
                 <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-52 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
                   <button type="button" onClick={(event) => navigateFromMenu(event, "student-missions")}>مأموریت‌های معلم</button>
@@ -568,7 +576,7 @@ export default function HamyarApp() {
         </div>
       </header>
       <main className="hy-site-main relative mx-auto grid w-full max-w-[1440px] min-w-0 content-start gap-[18px] px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
-        {(teacher || page !== "dashboard") && (
+        {page !== "home" && (teacher || page !== "dashboard") && (
           <header className="mb-1 flex items-end justify-between gap-4 border-b border-slate-200/80 pb-4">
             <div>
               <small className="text-xs text-slate-500">هدهد / {roleLabel}</small>
@@ -667,6 +675,7 @@ export default function HamyarApp() {
             setInviteToken={setInviteToken}
           />
         )}
+        {page === "home" && <PublicQuestionBank home signedIn />}
         {teacher && page === "public-bank" && <PublicQuestionBank />}
         {page === "settings" && teacher && <AiSettingsScreen />}
         {page === "exam-import" && teacher && (
