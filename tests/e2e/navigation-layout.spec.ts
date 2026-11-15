@@ -271,3 +271,41 @@ test("public mobile keeps practice and login in one bottom navigation", async ({
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" })).toBeVisible();
 });
+
+
+test("Home is centered on mobile and consistently opens sample-question selection", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/home");
+  await expect(page.getByRole("heading", { name: "تمرین و نمونه‌سؤال", exact: true })).toBeVisible();
+  const mobile = page.getByRole("navigation", { name: "ناوبری پایین صفحه" });
+  await expect(mobile.getByRole("button").nth(1)).toHaveAttribute("aria-label", "خانه");
+  await expect(mobile.getByRole("button", { name: "خانه" })).toHaveAttribute("aria-current", "page");
+
+  await registerSyntheticUser(page, "معلم تست خانه");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mobile.getByRole("button").nth(2).click();
+  await expect(page).toHaveURL(/\/home$/);
+  await expect(page.getByRole("heading", { name: "تمرین و نمونه‌سؤال", exact: true })).toBeVisible();
+  await expect(mobile.getByRole("button").nth(2)).toHaveAttribute("aria-label", "خانه");
+  await expect(mobile.getByRole("button").nth(2)).toHaveAttribute("aria-current", "page");
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "تمرین و نمونه‌سؤال", exact: true })).toBeVisible();
+});
+
+test("desktop header dropdowns close after outside click, next menu and Escape", async ({ page }) => {
+  await registerSyntheticUser(page, "معلم منوی هدر");
+  await page.setViewportSize({ width: 1280, height: 850 });
+  const contentMenu = page.locator("details.hy-header-menu").filter({ hasText: "محتوا و منابع" });
+  const analysisMenu = page.locator("details.hy-header-menu").filter({ hasText: "تمرین و تحلیل" });
+  await contentMenu.locator("summary").click();
+  await expect(contentMenu).toHaveAttribute("open", "");
+  await page.locator("main").click({ position: { x: 10, y: 10 } });
+  await expect(contentMenu).not.toHaveAttribute("open", "");
+
+  await contentMenu.locator("summary").click();
+  await analysisMenu.locator("summary").click();
+  await expect(contentMenu).not.toHaveAttribute("open", "");
+  await expect(analysisMenu).toHaveAttribute("open", "");
+  await page.keyboard.press("Escape");
+  await expect(analysisMenu).not.toHaveAttribute("open", "");
+});
