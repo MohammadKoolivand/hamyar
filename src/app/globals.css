@@ -648,5 +648,5 @@
   outline-offset: 2px;
 }
 @media (max-width: 767px) {
-  .hy-header-dropdown { position: fixed; top: auto; right: .75rem; left: .75rem; width: auto; min-width: 0; }
+  .hy-header-dropdown { position: fixed; top: 7rem; right: .75rem; left: .75rem; width: auto; min-width: 0; }
 }
