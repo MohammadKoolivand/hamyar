@@ -445,7 +445,7 @@ export default function HamyarApp() {
           >
             <Brand />
           </button>
-          <nav aria-label="بخش‌های اصلی" className="order-3 flex min-w-0 w-full flex-1 items-center gap-1 overflow-x-auto border-t border-slate-100 pt-2 md:order-none md:w-auto md:border-0 md:pt-0">
+          <nav aria-label="بخش‌های اصلی" className="order-3 flex min-w-0 w-full flex-1 items-center gap-1 overflow-x-auto border-t border-slate-100 pt-2 md:order-none md:w-auto md:flex-wrap md:overflow-visible md:border-0 md:pt-0">
             <button
               type="button"
               onClick={() => navigatePage(teacher ? "public-bank" : "dashboard")}
