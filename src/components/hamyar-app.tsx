@@ -498,15 +498,14 @@ export default function HamyarApp() {
             )}
             {!teacher && me.role === "student" && (
               <details className="hy-header-menu relative shrink-0">
-                <summary data-active={["student-missions", "student-mistakes", "student-progress", "student-search"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
+                <summary data-active={["student-missions", "student-mistakes", "student-progress"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
                   <Target size={17} aria-hidden /> فعالیت‌های من <ChevronDown size={14} />
                 </summary>
                 <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-52 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
                   <button type="button" onClick={(event) => navigateFromMenu(event, "student-missions")}>مأموریت‌های معلم</button>
                   <button type="button" onClick={(event) => navigateFromMenu(event, "student-mistakes")}>مرور اشتباهات</button>
                   <button type="button" onClick={(event) => navigateFromMenu(event, "student-progress")}>پیشرفت من</button>
-                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-search")}>جست‌وجو</button>
-                </div>
+                                  </div>
               </details>
             )}
           </nav>
