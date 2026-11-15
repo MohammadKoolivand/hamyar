@@ -60,6 +60,11 @@ export function PublicQuestionBank({
   const [guestIndex, setGuestIndex] = useState(0);
   const [guestAnswers, setGuestAnswers] = useState<Record<string, string>>({});
   const [guestFinished, setGuestFinished] = useState(false);
+  const [reportingQuestion, setReportingQuestion] = useState("");
+  const [reportCategory, setReportCategory] = useState<"wrong_answer" | "typo" | "duplicate" | "copyright" | "other">("wrong_answer");
+  const [reportDescription, setReportDescription] = useState("");
+  const [reportPending, setReportPending] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
   function beginGuestSession(items: PublicBankQuestion[]) {
     if (!items.length) return;
     setGuestSession(items.slice(0, 10));
@@ -521,6 +526,49 @@ export function PublicQuestionBank({
                 </span>
               </label>
               {questionView(q)}
+              <div className="mt-3">
+                <button type="button" className="text-xs text-slate-500 underline"
+                  onClick={() => {
+                    setReportingQuestion(reportingQuestion === q._id ? "" : q._id);
+                    setReportDescription("");
+                    setReportMessage("");
+                  }}>گزارش اشکال سؤال</button>
+                {reportingQuestion === q._id && (
+                  <form className="mt-3 grid gap-2 rounded-xl border bg-slate-50 p-3"
+                    onSubmit={async (event) => {
+                      event.preventDefault();
+                      if (!signedIn) { onLogin?.(); return; }
+                      setReportPending(true); setReportMessage("");
+                      try {
+                        await api(`/questions/${q._id}/report`, {
+                          category: reportCategory, description: reportDescription.trim(),
+                        });
+                        setReportMessage("گزارش برای بررسی مدیر بانک ثبت شد.");
+                        setReportDescription("");
+                      } catch (error) { setReportMessage((error as Error).message); }
+                      finally { setReportPending(false); }
+                    }}>
+                    <label className="text-xs">نوع اشکال
+                      <select className={inputStyle} value={reportCategory}
+                        onChange={(event) => setReportCategory(event.target.value as typeof reportCategory)}>
+                        <option value="wrong_answer">پاسخ نادرست</option>
+                        <option value="typo">خطای متن</option>
+                        <option value="duplicate">سؤال تکراری</option>
+                        <option value="copyright">مشکل حق نشر</option>
+                        <option value="other">سایر</option>
+                      </select>
+                    </label>
+                    <label className="text-xs">توضیح اشکال
+                      <textarea className={inputStyle} rows={2} minLength={10} maxLength={1000}
+                        value={reportDescription} onChange={(event) => setReportDescription(event.target.value)} />
+                    </label>
+                    <Button disabled={reportPending || reportDescription.trim().length < 10}>
+                      {signedIn ? "ثبت گزارش" : "ورود برای ثبت گزارش"}
+                    </Button>
+                    {reportMessage && <p role="status" className="text-xs">{reportMessage}</p>}
+                  </form>
+                )}
+              </div>
               {home && onlinePractice && (
                 <Button
                   className="discovery-practice mt-5"
