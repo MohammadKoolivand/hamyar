@@ -33,6 +33,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/questions/public",
     "/api/questions/publication-requests",
     "/api/admin/public-question-submissions",
+    "/api/admin/public-question-reports",
     "/api/pdf-library/public",
     "/api/pdf-library",
     "/api/pdf-library/:pid/file",
@@ -141,6 +142,8 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/questions/:vid/propose-public",
     "/api/questions/duplicates/check",
     "/api/admin/public-question-submissions/:qid/review",
+    "/api/admin/public-question-reports/:rid/resolve",
+    "/api/questions/:vid/report",
     "/api/question-assets",
     "/api/questions",
     "/api/question-drafts/generate",
@@ -275,6 +278,7 @@ function baseRouteRoles(method: string, route: string): Role[] | null {
     route.startsWith("/api/student/")
   )
     return ["student"];
+  if (route === "/api/questions/:vid/report") return ["teacher", "student", "parent"];
   if (route === "/api/question-assets") return ["teacher"];
   if (route.startsWith("/api/question-assets/"))
     return ["teacher", "student", "parent"];
