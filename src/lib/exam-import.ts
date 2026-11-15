@@ -44,6 +44,8 @@ export interface ExamFile {
 }
 export interface ExamImport extends ExamMetadata {
   _id: string;
+  ownerId: string;
+  ownerName?: string;
   state: "collecting" | "processing" | "failed" | "review";
   revision: number;
   createdAt: string;
