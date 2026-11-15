@@ -38,7 +38,7 @@ test("teacher submission remains private until a super-admin approves a NEW immu
     const pending = (await f.request("/api/admin/public-question-submissions", undefined, admin)).json();
     assert.equal(pending.length, 1);
     assert.equal(pending[0].question.statement, privateQuestion.statement);
-    assert.equal(pending[0].question.reference, undefined);
+    assert.equal(pending[0].question.reference, privateQuestion.reference, "Only the administrator review response can include the answer key");
     assert.equal((await f.request("/api/admin/public-question-submissions", undefined, f.teacher)).statusCode, 403);
     const rejectedRole = await f.request(
       `/api/admin/public-question-submissions/${q.questionId}/review`,
