@@ -431,7 +431,7 @@ export default function HamyarApp() {
           </div>
         </header>
         <main className="hy-site-main mx-auto grid w-full max-w-[1440px] gap-5 px-4 py-6 sm:px-6 lg:px-8">
-          {page === "home" ? <PublicQuestionBank home signedIn /> : page === "public-bank" ? <PublicQuestionBank /> : <ParentDashboard me={me} />}
+          {page === "home" ? <PublicQuestionBank home signedIn onlinePractice={false} /> : page === "public-bank" ? <PublicQuestionBank /> : <ParentDashboard me={me} />}
         </main>
         <MobileBottomNav role="parent" page={page} onNavigate={navigatePage} />
       </div>
@@ -675,7 +675,7 @@ export default function HamyarApp() {
             setInviteToken={setInviteToken}
           />
         )}
-        {page === "home" && <PublicQuestionBank home signedIn />}
+        {page === "home" && <PublicQuestionBank home signedIn onlinePractice={!teacher} />}
         {teacher && page === "public-bank" && <PublicQuestionBank />}
         {page === "settings" && teacher && <AiSettingsScreen />}
         {page === "exam-import" && teacher && (
