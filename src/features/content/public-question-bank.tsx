@@ -34,10 +34,12 @@ const inputStyle =
 export function PublicQuestionBank({
   home = false,
   signedIn = false,
+  onlinePractice = true,
   onLogin,
 }: {
   home?: boolean;
   signedIn?: boolean;
+  onlinePractice?: boolean;
   onLogin?: () => void;
 }) {
   const [questions, setQuestions] = useState<PublicBankQuestion[]>([]);
