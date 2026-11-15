@@ -9,7 +9,7 @@ type Submission = {
   _id: string; questionId?: string; versionId: string; status: string;
   licenseBasis: string; sourceReference: string; rightsNote?: string;
   existingVersionId?: string; decidedReason?: string;
-  question?: { statement: string; type: string; options?: string[] } | null;
+  question?: { statement: string; type: string; options?: string[]; reference?: string; hints?: string[] } | null;
 };
 type Similar = { questionVersionId: string; statement: string; kind: "exact" | "similar"; score: number };
 const field = "min-h-11 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm";
@@ -136,6 +136,8 @@ export function AdminPublicReview() {
         return <article key={key} className="grid gap-3 rounded-xl border p-4">
           <p className="font-medium">{item.question?.statement ?? "نسخه سؤال در دسترس نیست"}</p>
           <p className="text-xs text-slate-600">منبع: {item.sourceReference} · حق استفاده: {item.licenseBasis}</p>
+          <p className="rounded-lg bg-indigo-50 p-2 text-sm">پاسخ مرجع (فقط مدیر): {item.question?.reference ?? "ثبت نشده"}</p>
+          {!!item.question?.options?.length && <p className="text-xs text-slate-600">گزینه‌ها: {item.question.options.join(" | ")}</p>}
           {item.rightsNote && <p className="text-xs text-slate-600">توضیح: {item.rightsNote}</p>}
           <button type="button" disabled={busy === key || !item.question} onClick={() => void check(item)}
             className="w-fit rounded-lg border px-3 py-2 text-sm">بررسی سؤال‌های مشابه</button>
