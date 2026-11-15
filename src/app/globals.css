@@ -940,3 +940,37 @@ body.hamyar-ambient {
   color: #2356a3;
   border-radius: 17px;
 }
+
+
+/* MVP mobile polish: long Persian labels and PDFs must not overflow compact screens. */
+@media (max-width: 430px) {
+  .hy-mobile-bottom-nav {
+    padding-inline: max(3px, env(safe-area-inset-left));
+  }
+  .hy-mobile-bottom-item {
+    padding-inline: 2px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+    font-size: clamp(.59rem, 2.4vw, .7rem);
+  }
+  .hy-mobile-bottom-label {
+    display: block;
+    max-width: 100%;
+    line-height: 1.25;
+  }
+  .hy-site-main :is(pre, table, .katex-display) {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .hy-site-main :is(button, a, input, textarea, select) {
+    min-width: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hy-mobile-bottom-item,
+  .hy-mobile-bottom-icon {
+    animation: none !important;
+    transition: none !important;
+  }
+}
