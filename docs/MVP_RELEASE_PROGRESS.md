@@ -219,3 +219,33 @@
 ### Status
 
 **STEP 7 IMPLEMENTATION COMMITTED IN SOURCE; TEST EXECUTION AND PUBLIC RELEASE READINESS NOT VERIFIED.**
+
+## Step 8 — mobile navigation and UX stabilization (2026-11-16)
+
+### Source-verified existing behavior
+
+- Local B Nazanin (Persian) and Poppins (Latin) `@font-face` declarations, existing focus styles, RTL shell, Lucide navigation and outside-click/Escape handling for header menus were already implemented. They were retained, not duplicated.
+- The public question bank already has loading, error/retry and no-results states, with mathematical text and PDF preview paths. Practice remains a separate authenticated / guest experience.
+- Student PDFs and teacher PDF delivery forms were available from Steps 4–5 but their retry/empty states and compact-screen presentation needed improvement.
+
+### Changes made
+
+1. Replaced the student mobile menu with exactly five primary tabs: **تمرین‌ها / تکلیف‌ها / خانه / پیشرفت / حساب**, with Home as position three. Teacher/super-admin now see **کلاس‌ها / تکلیف‌ها / خانه / سؤال و PDF / حساب**, also centered on Home. Specialized guest, parent and secretary menus remain available.
+2. Corrected an existing student routing bug: `/student-practice` previously redirected to `/dashboard` on refresh and did not render a signed-in practice-selection page. It now retains its own URL and renders the public question bank. Home still opens public question selection independently.
+3. Added `/account` and a genuine accessible account hub with profile name/role/email, links to secondary sections (including teacher import, lesson management, admin functions where applicable) and secure logout; this replaces the mobile primary "More" button while preserving discoverability of secondary features.
+4. Adjusted narrow-screen navigation label wrapping, overflow handling for tables and math, touch targets and reduced-motion behavior in `globals.css`, without adding a new CSS framework or changing the licensed/local font files.
+5. Added useful busy/refresh/retry/empty affordances to student PDF homework and teacher direct PDF delivery. The student screen clearly distinguishes a file-request from a submitted academic answer and retains manual "انجام دادم".
+6. Added `tests/unit/mvp-mobile-navigation.test.ts` to cover the exact five item order for student and teacher, centered Home, URL mappings for practice/account, and specialized role navigation.
+7. Left existing server-side role/consent, source content, and domain models unchanged; no production data mutation was performed.
+
+### Outstanding verification / limitations
+
+- **Not executed here**: Typecheck, lint, test:fast, MongoDB integration, Playwright, production build, visual screenshot review and deployed smoke test. The available GitHub connector provides repository editing but no local verified checkout; results of unrun tests must not be claimed.
+- Real browser verification at 320, 360, 390, 430, 768px and desktop is still required, especially mixed RTL math, keyboard focus, mobile navigation and PDF preview.
+- Account page currently provides profile details and navigation, not a complete account-management/editor workflow.
+- Older public bank, homework and progress views remain; MVP simplification is navigation/presentation, not deletion of advanced feature code.
+- The earlier unverified Step 3–7 release/security/licensing/duplication gates remain open.
+
+### Status
+
+**STEP 8 CODE CHANGES COMMITTED; BROWSER/TEST EXECUTION AND RELEASE VALIDATION PENDING.**
