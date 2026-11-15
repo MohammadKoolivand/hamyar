@@ -29,6 +29,8 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadPhase, setUploadPhase] = useState<"idle" | "uploading" | "saving" | "complete" | "failed">("idle");
 
   const byId = useMemo(() => new Map(nodes.map((n) => [n._id, n])), [nodes]);
   function ancestorLabel(n: Node) {
@@ -69,25 +71,53 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
     setBusy(true);
     setError("");
     setNotice("");
+    setUploadProgress(null);
+    setUploadPhase("idle");
     try { await work(); }
-    catch (e) { setError((e as Error).message || "انجام عملیات ممکن نشد"); }
+    catch (e) {
+      setError((e as Error).message || "انجام عملیات ممکن نشد");
+      setUploadPhase("failed");
+    }
     finally { setBusy(false); }
   }
 
-  async function uploadTo(pdfId: string, upload: File) {
-    const response = await fetch(`/api/pdf-library/${pdfId}/file`, {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/pdf",
-        "X-File-Name": encodeURIComponent(upload.name),
-      },
-      body: upload,
+  function uploadTo(pdfId: string, upload: File): Promise<void> {
+    // fetch() does not expose upload byte progress to the browser.
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `/api/pdf-library/${encodeURIComponent(pdfId)}/file`);
+      xhr.withCredentials = true;
+      xhr.setRequestHeader("Content-Type", "application/pdf");
+      xhr.setRequestHeader("X-File-Name", encodeURIComponent(upload.name));
+      setUploadProgress(0);
+      setUploadPhase("uploading");
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable && event.total > 0) {
+          setUploadProgress(Math.min(100, Math.round((event.loaded / event.total) * 100)));
+        }
+      };
+      xhr.upload.onload = () => {
+        setUploadProgress(100);
+        setUploadPhase("saving");
+      };
+      xhr.onerror = () => reject(new Error("اتصال هنگام بارگذاری PDF قطع شد."));
+      xhr.onabort = () => reject(new Error("بارگذاری PDF لغو شد."));
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          setUploadProgress(100);
+          setUploadPhase("complete");
+          resolve();
+          return;
+        }
+        let message = "ثبت فایل PDF روی سرور موفق نبود.";
+        try {
+          const body = JSON.parse(xhr.responseText) as { message?: string };
+          if (body.message) message = body.message;
+        } catch { /* Keep the generic server error. */ }
+        reject(new Error(message));
+      };
+      xhr.send(upload);
     });
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      throw new Error(body.message ?? "ذخیره فایل PDF انجام نشد");
-    }
   }
 
   function validate(pdf: File) {
@@ -170,8 +200,17 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
         </div>
         <button type="submit" disabled={busy || !file || !title.trim() || !derived.book}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 text-sm font-medium text-white disabled:opacity-50">
-          <UploadCloud size={18} /> {busy ? "در حال ثبت…" : "ذخیره PDF کامل در بانک"}
+          <UploadCloud size={18} /> {busy ? uploadPhase === "uploading" ? `در حال بارگذاری: ${uploadProgress ?? 0}٪` : uploadPhase === "saving" ? "در حال ثبت نهایی فایل…" : "در حال آماده‌سازی…" : "ذخیره PDF کامل در بانک"}
         </button>
+        {uploadProgress !== null && (
+          <div className="grid gap-2" role="group" aria-label="پیشرفت بارگذاری فایل PDF">
+            <div className="flex items-center justify-between gap-2 text-sm">
+              <span role="status" aria-live="polite">{uploadPhase === "complete" ? "فایل با موفقیت روی سرور ثبت شد" : uploadPhase === "saving" ? "انتقال کامل شد؛ در حال تأیید ذخیره‌سازی…" : uploadPhase === "failed" ? "بارگذاری یا ثبت فایل ناموفق بود" : "در حال انتقال فایل PDF"}</span>
+              <span className="tabular-nums" dir="ltr">{uploadProgress}٪</span>
+            </div>
+            <progress className="h-3 w-full accent-teal-700" max={100} value={uploadProgress} aria-label="درصد آپلود PDF" />
+          </div>
+        )}
       </form>
       {error && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
       {notice && <p role="status" className="rounded-xl bg-teal-50 p-3 text-sm text-teal-800">{notice}</p>}

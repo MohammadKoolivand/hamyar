@@ -6,7 +6,6 @@ import { clsx } from "clsx";
 
 import React, { useState, useEffect } from "react";
 import {
-  Sparkles,
   LayoutDashboard,
   Users,
   Library,
@@ -474,7 +473,7 @@ export default function HamyarApp() {
       )}
     >
       {teacher ? (
-        <aside className="glass-sidebar min-w-0 min-[651px]:w-max min-[651px]:min-w-max mx-3 my-3 flex flex-col gap-6 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
+        <aside className="glass-sidebar hide-scrollbar min-w-0 min-[651px]:w-max min-[651px]:min-w-max mx-3 my-3 flex flex-col gap-6 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
           <Brand showTagline />
           <small className="text-xs leading-loose text-slate-500">
             {teacher ? "فضای کار معلم" : "فضای تمرین دانش‌آموز"}
@@ -508,16 +507,6 @@ export default function HamyarApp() {
               </button>
             ))}
           </nav>
-          <footer className="grid gap-[18px] mt-auto">
-            <div className="glass-note p-3.5 leading-[1.9]">
-              <Sparkles size={18} />
-              <small className="text-xs leading-loose text-slate-500">
-                معلم آموزش می‌دهد،
-                <br />
-                هدهد راهنمایی می‌کند.
-              </small>
-            </div>
-          </footer>
           <Button
             variant="outline"
             onClick={() =>
