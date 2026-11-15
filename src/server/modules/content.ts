@@ -707,7 +707,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           { session },
         );
         if (!previous) ctx.fail(404, "سؤال یافت نشد");
-        const visibility = b.visibility ?? previous.visibility ?? "private";
+        const visibility = process.env.NODE_ENV === "production" ? "private" : (b.visibility ?? previous.visibility ?? "private");
         const publicFingerprint = visibility === "public"
           ? await reservePublicQuestionFingerprint(ctx, b, previous.questionId, u._id, session)
           : undefined;
@@ -728,7 +728,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           previous!.originalOrigin === "exam_import_reviewed";
         const questionFields = {
           ...b,
-          visibility: b.visibility ?? previous!.visibility ?? "private",
+          visibility,
         };
         if (examImported) delete questionFields.difficulty;
         const row = {
