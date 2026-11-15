@@ -400,6 +400,7 @@ export default function HamyarApp() {
       </>
     );
   const teacher = ["teacher", "super_admin", "secretary"].includes(me.role);
+  const educator = ["teacher", "super_admin"].includes(me.role);
   const pageTitles: Record<string, string> = {
     dashboard: teacher ? "نمای کلی" : "تمرین و نمونه‌سؤال",
     "public-bank": "بانک سؤال عمومی",
@@ -455,7 +456,7 @@ export default function HamyarApp() {
               <Library size={17} aria-hidden />
               تمرین و نمونه‌سؤال
             </button>
-            <button
+            {me.role !== "secretary" && <button
               type="button"
               onClick={() => navigatePage("courses")}
               data-active={page === "courses" || page === "student-course"}
@@ -463,10 +464,10 @@ export default function HamyarApp() {
             >
               <BookOpenCheck size={17} aria-hidden />
               معلم و درس‌های من
-            </button>
+            </button>}
             {teacher && (
               <>
-                <details className="hy-header-menu relative shrink-0">
+                {educator && <details className="hy-header-menu relative shrink-0">
                   <summary data-active={["students", "classes"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
                     <UsersRound size={17} aria-hidden /> کلاس و دانش‌آموزان <ChevronDown size={14} />
                   </summary>
@@ -474,7 +475,7 @@ export default function HamyarApp() {
                     <button type="button" onClick={(event) => navigateFromMenu(event, "students")}>دانش‌آموزان</button>
                     <button type="button" onClick={(event) => navigateFromMenu(event, "classes")}>کلاس‌های گروهی</button>
                   </div>
-                </details>
+                </details>}
                 <details className="hy-header-menu relative shrink-0">
                   <summary data-active={["content", "exam-import", "resources"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
                     <Library size={17} aria-hidden /> محتوا و منابع <ChevronDown size={14} />
@@ -485,7 +486,7 @@ export default function HamyarApp() {
                     <button type="button" onClick={(event) => navigateFromMenu(event, "resources")}>منابع آموزشی</button>
                   </div>
                 </details>
-                <details className="hy-header-menu relative shrink-0">
+                {educator && <details className="hy-header-menu relative shrink-0">
                   <summary data-active={["missions", "learning"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
                     <Target size={17} aria-hidden /> تمرین و تحلیل <ChevronDown size={14} />
                   </summary>
@@ -493,7 +494,7 @@ export default function HamyarApp() {
                     <button type="button" onClick={(event) => navigateFromMenu(event, "missions")}>مأموریت‌ها</button>
                     <button type="button" onClick={(event) => navigateFromMenu(event, "learning")}>یادگیری و مرور</button>
                   </div>
-                </details>
+                </details>}
               </>
             )}
             {!teacher && me.role === "student" && (
@@ -505,7 +506,7 @@ export default function HamyarApp() {
                   <button type="button" onClick={(event) => navigateFromMenu(event, "student-missions")}>مأموریت‌های معلم</button>
                   <button type="button" onClick={(event) => navigateFromMenu(event, "student-mistakes")}>مرور اشتباهات</button>
                   <button type="button" onClick={(event) => navigateFromMenu(event, "student-progress")}>پیشرفت من</button>
-                                  </div>
+                </div>
               </details>
             )}
           </nav>
@@ -523,7 +524,7 @@ export default function HamyarApp() {
                 <p className="text-xs text-slate-500">{roleLabel}</p>
               </div>
               <button type="button" onClick={(event) => navigateFromMenu(event, "dashboard")}>نمای کلی</button>
-              {teacher && <button type="button" onClick={(event) => navigateFromMenu(event, "settings")}><Settings size={15} /> تنظیمات</button>}
+              {educator && <button type="button" onClick={(event) => navigateFromMenu(event, "settings")}><Settings size={15} /> تنظیمات</button>}
               {me.role === "super_admin" && (
                 <>
                   <button type="button" onClick={(event) => navigateFromMenu(event, "admin-overview")}><Database size={15} /> آمار سامانه</button>
