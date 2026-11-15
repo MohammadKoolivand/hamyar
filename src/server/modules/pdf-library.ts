@@ -273,12 +273,15 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
           name: pdf.file.name, size: data.length, sha256: pdf.file.sha256,
         } },
       }, { session });
-      for (let offset = 0, position = 0; offset < data.length; offset += 256 * 1024, position++) {
-        await c("examImportChunks").insertOne({
+      const importChunks = Array.from(
+        { length: Math.ceil(data.length / (256 * 1024)) },
+        (_, position) => ({
           _id: id(), examId, ownerId: u._id, kind: "question", position,
-          data: new Binary(data.subarray(offset, offset + 256 * 1024)), expiresAt,
-        }, { session });
-      }
+          data: new Binary(data.subarray(position * 256 * 1024, (position + 1) * 256 * 1024)),
+          expiresAt,
+        }),
+      );
+      await c("examImportChunks").insertMany(importChunks, { session });
     });
     return { examId };
   });
