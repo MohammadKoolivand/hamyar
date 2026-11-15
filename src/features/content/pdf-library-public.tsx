@@ -9,6 +9,7 @@ import {
 
 export function PdfLibraryPublic({ taxonomy }: { taxonomy: Partial<PdfTaxonomy> }) {
   const [rows, setRows] = useState<PdfLibraryItem[]>([]);
+  const [local, setLocal] = useState<Partial<PdfTaxonomy>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   useEffect(() => {
@@ -24,10 +25,16 @@ export function PdfLibraryPublic({ taxonomy }: { taxonomy: Partial<PdfTaxonomy> 
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, []);
+  const selected = useMemo(() => ({ ...taxonomy, ...local }), [taxonomy, local]);
   const visible = useMemo(
-    () => rows.filter((row) => matchesPdfTaxonomy(row, taxonomy)),
-    [rows, taxonomy],
+    () => rows.filter((row) => matchesPdfTaxonomy(row, selected)),
+    [rows, selected],
   );
+  const fields: { key: keyof PdfTaxonomy; title: string }[] = [
+    { key: "level", title: "مقطع" }, { key: "grade", title: "پایه" },
+    { key: "book", title: "درس" }, { key: "chapter", title: "فصل" },
+    { key: "topic", title: "مبحث" },
+  ];
   return (
     <section className="grid gap-4" dir="rtl">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -38,6 +45,22 @@ export function PdfLibraryPublic({ taxonomy }: { taxonomy: Partial<PdfTaxonomy> 
           </p>
         </div>
         <span className="text-sm text-slate-500">{visible.length.toLocaleString("fa-IR")} فایل PDF</span>
+      </div>
+      <div className="grid gap-3 rounded-xl border border-slate-100 p-3 sm:grid-cols-2 lg:grid-cols-5">
+        {fields.map(({ key, title }) => <label key={key} className="grid gap-1 text-xs text-slate-600">{title}
+          <select className="min-h-11 rounded-lg border border-slate-200 bg-white p-2 text-sm"
+            value={local[key] ?? ""}
+            onChange={(event) => setLocal((current) => {
+              const next = { ...current, [key]: event.target.value };
+              const index = fields.findIndex((field) => field.key === key);
+              for (const field of fields.slice(index + 1)) delete next[field.key];
+              return next;
+            })}>
+            <option value="">همه</option>
+            {[...new Set(rows.map((row) => row.taxonomy[key]).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fa"))
+              .map((value) => <option key={value} value={value}>{value}</option>)}
+          </select>
+        </label>)}
       </div>
       {loading && <p role="status">در حال بارگذاری PDFها…</p>}
       {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
