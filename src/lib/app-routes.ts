@@ -37,7 +37,7 @@ const tabEntries = Object.entries(tabPaths) as [TabPage, string][];
 export function pageFromPath(pathname: string): AppPage {
   if (pathname === "/practice") return "practice";
   if (pathname === "/report") return "report";
-  return tabEntries.find(([, path]) => path === pathname)?.[0] ?? "dashboard";
+  return tabEntries.find(([, path]) => path === pathname)?.[0] ?? "home";
 }
 
 export function pathForPage(page: string, contextId?: string): string {
