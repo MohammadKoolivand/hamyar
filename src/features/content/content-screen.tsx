@@ -14,7 +14,7 @@ import { CurriculumCatalog } from "./curriculum-catalog";
 import { AppLink as Link } from "@/components/app-link";
 import { QuestionBank } from "./question-bank";
 import { PdfLibraryTeacher } from "./pdf-library-teacher";
-import { AdminPublicReview, TeacherPublicProposals } from "./public-question-review";
+import { AdminPublicReview, AdminPublicQuestionReports, TeacherPublicProposals } from "./public-question-review";
 import { curriculumSkills } from "@/lib/curriculum";
 import { TopicSelector } from "./topic-selector";
 import { NodeSelector } from "./node-selector";
@@ -151,7 +151,7 @@ export function ContentScreen({
             courses={courses}
             onSaved={refresh}
           />
-          {superAdmin ? <AdminPublicReview /> : <TeacherPublicProposals questions={questions} />}
+          {superAdmin ? <><AdminPublicReview /><AdminPublicQuestionReports /></> : <TeacherPublicProposals questions={questions} />}
         </>
       )}
       {view !== "bank" && (
