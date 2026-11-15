@@ -913,3 +913,38 @@ body.hamyar-ambient .hy-question-option .hy-question-text {
   .hy-site-shell .hy-nav-illustrated > svg:first-child { transition: none; }
   .hy-site-shell .hy-student-nav-link:hover > svg:first-child { transform: none; }
 }
+
+
+/* Cohesive Persian/Latin typography and gentle, cheerful accents. */
+@font-face {
+  font-family: "Hodhod UI";
+  src: url("../assets/fonts/Poppins-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  unicode-range: U+0000-05FF, U+1E00-1EFF, U+2010-2027, U+20A0-20CF;
+}
+body.hamyar-ambient {
+  font-family: "Hodhod UI", var(--font-persian), var(--font-latin), sans-serif;
+  background: radial-gradient(ellipse at 9% 5%, rgba(139, 111, 245, .09), transparent 31%),
+              radial-gradient(ellipse at 95% 24%, rgba(31, 185, 163, .10), transparent 33%),
+              #f8faff;
+}
+.hy-student-site { background: transparent; }
+.hy-student-site-header { border-bottom-color: #dfe8f7; }
+.hy-student-nav-link:hover { background: #eaf5ff; color: #2453a4; }
+.hy-student-nav-link[data-active="true"] {
+  background: linear-gradient(115deg, #e9efff, #e6f8f5);
+  border-color: #c8dcf8;
+}
+.glass-hero { background: linear-gradient(125deg, #eaf2ff 0%, #e9fbf6 65%, #fff5e2 100%); }
+.glass-panel, .glass-card { border-color: #dce6f4; }
+.hy-icon-container, .hy-home-quick-icon { border-radius: 16px; transform: rotate(-3deg); }
+.hy-icon-container svg, .hy-home-quick-icon svg { stroke-width: 2.1; }
+.hy-header-dropdown { border-color: #d8e6f5; box-shadow: 0 15px 34px rgba(40, 73, 132, .13); }
+.hy-header-menu[open] > summary { background: #eaf2ff; color: #2256aa; }
+.hy-mobile-bottom-item[data-home="true"] .hy-mobile-bottom-icon {
+  background: linear-gradient(135deg, #c5f6e8, #dce7ff);
+  color: #2356a3;
+  border-radius: 17px;
+}
