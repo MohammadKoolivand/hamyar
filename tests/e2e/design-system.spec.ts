@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 
-test("reference-inspired luminous glass identity is consistent on login and mobile", async ({
+test("unified calm education design and navigation work on login and mobile", async ({
   page,
 }, testInfo) => {
-  await page.goto("/");
+  await page.goto("/login");
   await expect(page.getByRole("heading", { name: "ورود یا ثبت‌نام در هدهد" })).toBeVisible();
   await expect(page.locator(".hy-brand")).toBeVisible();
   const mark = page.locator(".hy-brand img");
@@ -30,10 +30,10 @@ test("reference-inspired luminous glass identity is consistent on login and mobi
     };
   });
   expect(visual.primary).toBe("#1f3f97");
-  expect(visual.teal).toBe("#2ec8c3");
-  expect(visual.background).toBe("#f8fbff");
-  expect(visual.blur).toContain("blur(");
-  expect(parseFloat(visual.radius)).toBeGreaterThanOrEqual(20);
+  expect(visual.teal).toBe("#138d83");
+  expect(visual.background).toBe("#f7f9fc");
+  expect(visual.blur).toBe("none");
+  expect(parseFloat(visual.radius)).toBeGreaterThanOrEqual(16);
   expect(visual.direction).toBe("rtl");
   await page.screenshot({
     path: testInfo.outputPath("luminous-login-desktop.png"),
