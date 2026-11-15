@@ -22,7 +22,7 @@ export function PdfDeliveryTeacher({
   pdfs, currentUserId,
 }: { pdfs: PdfLibraryItem[]; currentUserId?: string }) {
   const available = useMemo(() => pdfs.filter((pdf) =>
-    pdf.state === "ready" && (!currentUserId || pdf.ownerId === currentUserId),
+    pdf.state === "ready" && pdf.visibility === "private" && (!currentUserId || pdf.ownerId === currentUserId),
   ), [pdfs, currentUserId]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
@@ -122,13 +122,13 @@ export function PdfDeliveryTeacher({
         <Send size={20} aria-hidden /> ارسال مستقیم PDF برای کلاس یا دانش‌آموز
       </h3>
       <p className="text-sm text-slate-600">
-        PDF را بدون استخراج سؤال یا OCR برای اعضای فعال درس ارسال کن.
+        PDF خصوصی را بدون استخراج سؤال یا OCR برای اعضای فعال درس ارسال کن.
         فایل فقط از مسیر اختصاصی تکلیف برای دریافت‌کنندگان مجاز باز می‌شود.
       </p>
       {loading && <p role="status">در حال دریافت کلاس‌ها…</p>}
       {error && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
       {notice && <p role="status" className="rounded-xl bg-teal-100 p-3 text-sm text-teal-900">{notice}</p>}
-      {!available.length && <p className="text-sm text-amber-900">برای ارسال، ابتدا یک PDF کامل در بانک خودت بارگذاری کن.</p>}
+      {!available.length && <p className="text-sm text-amber-900">برای ارسال، ابتدا یک PDF خصوصی کامل در بانک خودت بارگذاری کن.</p>}
       <form onSubmit={(e) => void send(e)} className="grid gap-3">
         <label className="grid gap-1 text-sm">PDF آماده
           <select required className="min-h-11 rounded-lg border bg-white p-2" value={pdfId}
