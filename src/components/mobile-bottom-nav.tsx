@@ -25,7 +25,7 @@ export function mobileDestinations(role: NavigationRole): {
   // No role needs to navigate into a separate teacher panel just to find it.
   const home: MobileNavItem = { page: "home", label: "خانه", icon: House, tone: "mint",
     aliases: role === "guest" ? ["dashboard", "public-bank", "student-practice", "student-search"]
-      : role === "student" ? ["public-bank"] : ["public-bank"] };
+      : ["public-bank"] };
   if (role === "guest") {
     return {
       primary: [
