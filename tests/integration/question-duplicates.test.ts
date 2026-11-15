@@ -94,3 +94,23 @@ test("version revision retains history; identical own question version is allowe
     await f.close();
   }
 });
+
+test("making a public question private releases its reserved fingerprint without deleting its history", async () => {
+  const f = await fixture();
+  try {
+    const originalQuestion = await f.post("/api/questions", original, f.teacher);
+    const reservedBefore = await f.c("publicQuestionFingerprints").countDocuments();
+    assert.equal(reservedBefore, 1);
+    const result = await f.request(`/api/questions/${originalQuestion._id}/revise`, {
+      ...original, visibility: "private",
+    }, f.teacher);
+    assert.equal(result.statusCode, 200, result.body);
+    assert.equal(await f.c("publicQuestionFingerprints").countDocuments(), 0);
+    const again = await f.request("/api/questions", original, f.teacher);
+    assert.equal(again.statusCode, 200, again.body);
+    assert.equal(await f.c("publicQuestionFingerprints").countDocuments(), 1);
+    assert.equal((await f.c("questionVersions").countDocuments({ questionId: originalQuestion.questionId })), 2);
+  } finally {
+    await f.close();
+  }
+});
