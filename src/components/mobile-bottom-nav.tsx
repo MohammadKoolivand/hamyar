@@ -116,7 +116,7 @@ export function MobileBottomNav({
   }, [moreOpen]);
   const activeOn = (item: MobileNavItem) =>
     item.page === page || item.aliases?.includes(page) === true;
-  const moreIsActive = additional.some(activeOn);
+  const moreIsActive = !primary.some((item) => item.page !== "more" && activeOn(item)) && additional.some(activeOn);
 
   const navigate = (nextPage: string) => {
     setMoreOpen(false);
