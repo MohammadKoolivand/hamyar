@@ -45,7 +45,7 @@ export function parseBankFilters(search: string): BankFilters {
     f = emptyBankFilters();
   for (const key of [...taxonomyKeys, "category", "difficulty"] as const)
     f[key] = (p.get(key) ?? "").slice(0, 200);
-  f.content = p.get("content") === "exams" ? "exams" : "questions";
+  f.content = p.get("content") === "pdf" ? "pdf" : p.get("content") === "exams" ? "exams" : "questions";
   for (const field of sourceFields.filter((field) =>
     field.categories.includes(f.category),
   )) {
@@ -59,7 +59,7 @@ export function bankFilterSearch(f: BankFilters) {
   const p = new URLSearchParams();
   for (const key of [...taxonomyKeys, "category", "difficulty"] as const)
     if (f[key]) p.set(key, f[key]);
-  if (f.content === "exams") p.set("content", "exams");
+  if (f.content === "exams" || f.content === "pdf") p.set("content", f.content);
   for (const [key, value] of Object.entries(f.extra))
     if (value) p.set(key === "year" ? "year" : `source_${key}`, value);
   return p.toString();
