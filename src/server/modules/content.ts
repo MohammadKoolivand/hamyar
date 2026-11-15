@@ -21,6 +21,7 @@ import { questionSchema } from "../domain";
 import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
+import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
   app.get("/api/questions/public", async (r) => {
@@ -675,6 +676,16 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
     }
     return question;
   });
+  app.post("/api/questions/duplicates/check", async (r) => {
+    await user(r, "teacher");
+    const input = z.object({
+      statement: z.string().trim().min(3).max(5000),
+      type: z.enum(["numeric", "choice", "short", "essay", "symbolic"]),
+      options: z.array(z.string().max(2000)).max(8).default([]),
+    }).strict().parse(r.body);
+    return { matches: await findPublicQuestionMatches(ctx, input) };
+  });
+
   app.post("/api/questions/:vid/revise", async (r) => {
     const u = await user(r, "teacher"),
       vid = (r.params as { vid: string }).vid,
@@ -696,6 +707,10 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           { session },
         );
         if (!previous) ctx.fail(404, "سؤال یافت نشد");
+        const visibility = b.visibility ?? previous.visibility ?? "private";
+        const publicFingerprint = visibility === "public"
+          ? await reservePublicQuestionFingerprint(ctx, b, previous.questionId, u._id, session)
+          : undefined;
         const nextId = id();
         const updated = await c("questions").updateOne(
           { _id: previous!.questionId, ownerId: u._id, currentVersionId: vid },
@@ -718,6 +733,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         if (examImported) delete questionFields.difficulty;
         const row = {
           ...questionFields,
+          ...(publicFingerprint ? { publicFingerprint, fingerprintVersion: 1 } : {}),
           ...(examImported
             ? {
                 difficultyAssessment: {
