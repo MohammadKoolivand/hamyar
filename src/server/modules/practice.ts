@@ -1,3 +1,4 @@
+import { isIndependentLibraryPractice } from "../../lib/independent-practice";
 import { assertActiveAssignmentCourse } from "../course-access";
 import { assessHint, HINT_SAFETY_VERSION } from "../ai/hint-safety";
 import { feedbackVisible } from "../../lib/practice-answer";
@@ -24,15 +25,16 @@ export function registerPractice(
     if (u.role === "parent") {
       const links = await c("parentLinks").find({ parentId: u._id }).toArray();
       if (!links.length) return [];
-      return c("assignments")
+      const linked = await c("assignments")
         .find({
           $or: links.map((l) => ({
             studentId: l.studentId,
             teacherId: l.teacherId,
           })),
         })
-        .project({ _id: 1, title: 1, state: 1, studentId: 1, teacherId: 1 })
+        .project({ _id: 1, title: 1, state: 1, studentId: 1, teacherId: 1, courseId: 1, libraryQuestionId: 1, practiceMode: 1 })
         .toArray();
+      return linked.filter((row) => !isIndependentLibraryPractice(row));
     }
     const assignments = await c("assignments")
       .find(
@@ -41,7 +43,8 @@ export function registerPractice(
           : { studentId: u._id },
       )
       .toArray();
-    if (u.role !== "student" || !assignments.length) return assignments;
+    if (u.role !== "student") return assignments.filter((row) => !isIndependentLibraryPractice(row));
+    if (!assignments.length) return assignments;
     // Never expose private course assignments by replaying an old list URL.
     const permitted = [];
     for (const a of assignments) {
