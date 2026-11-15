@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Brand } from "./ui/brand";
+import { MobileBottomNav } from "./mobile-bottom-nav";
 import type {
   User,
   Node,
@@ -169,6 +170,10 @@ export default function HamyarApp() {
   async function restoreLocation(currentUser = me) {
     let next = pageFromPath(window.location.pathname);
     if (next === "admin-overview" && currentUser?.role !== "super_admin") {
+      next = "dashboard";
+      window.history.replaceState(window.history.state, "", "/dashboard");
+    }
+    if (currentUser?.role === "parent" && !["dashboard", "public-bank"].includes(next)) {
       next = "dashboard";
       window.history.replaceState(window.history.state, "", "/dashboard");
     }
@@ -334,7 +339,7 @@ export default function HamyarApp() {
       "public-bank",
     ].includes(page);
     return (
-      <div className="min-h-screen bg-white" dir="rtl">
+      <div className="hy-student-site hy-site-shell min-h-screen" dir="rtl">
         <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
           <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-4 px-5 py-3 md:flex-nowrap lg:px-8">
             <button
@@ -346,7 +351,7 @@ export default function HamyarApp() {
             </button>
             <nav
               aria-label="بخش‌های اصلی"
-              className="order-3 flex w-full gap-1 overflow-x-auto border-t border-slate-100 pt-2 md:order-none md:w-auto md:flex-1 md:border-0 md:pt-0"
+              className="order-3 hidden w-full gap-1 overflow-x-auto border-t border-slate-100 pt-2 md:order-none md:flex md:w-auto md:flex-1 md:border-0 md:pt-0"
             >
               <button
                 data-active={publicPage}
@@ -366,7 +371,7 @@ export default function HamyarApp() {
               </button>
             </nav>
             <Button
-              className="ms-auto shrink-0"
+              className="ms-auto hidden shrink-0 md:inline-flex"
               variant="outline"
               onClick={() => navigatePage("login")}
             >
@@ -374,7 +379,7 @@ export default function HamyarApp() {
             </Button>
           </div>
         </header>
-        <main className="mx-auto max-w-7xl px-5 py-8">
+        <main className="hy-site-main mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           {publicPage ? (
             <PublicQuestionBank home onLogin={() => navigatePage("login")} />
           ) : (
@@ -389,15 +394,41 @@ export default function HamyarApp() {
             </>
           )}
         </main>
+        <MobileBottomNav role="guest" page={page} onNavigate={navigatePage} />
       </div>
     );
   }
   if (me.role === "parent")
     return (
-      <>
-        <ParentDashboard me={me} onLogout={logout} />
-        <PublicQuestionBank />
-      </>
+      <div className="hy-student-site hy-site-shell min-h-screen" dir="rtl">
+        <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95">
+          <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-4 py-2 sm:px-6 lg:px-8">
+            <button type="button" onClick={() => navigatePage("dashboard")} className="shrink-0" aria-label="خانه هدهد">
+              <Brand />
+            </button>
+            <nav aria-label="بخش‌های اصلی" className="hidden flex-1 gap-2 md:flex">
+              <button type="button" onClick={() => navigatePage("public-bank")} data-active={page === "public-bank"} className="hy-student-nav-link rounded-xl px-4 py-2 text-sm">تمرین و نمونه‌سؤال</button>
+              <button type="button" onClick={() => navigatePage("dashboard")} data-active={page === "dashboard"} className="hy-student-nav-link rounded-xl px-4 py-2 text-sm">گزارش فرزند</button>
+            </nav>
+            <details className="hy-header-menu relative ms-auto">
+              <summary aria-label="پروفایل کاربر" className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 pe-3 shadow-sm">
+                <span className="flex size-9 items-center justify-center rounded-full bg-[#e3f4ee] font-bold text-[#10766f]">{me.name.trim().charAt(0)}</span>
+                <span className="hidden text-xs font-bold sm:block">{me.name}</span>
+                <ChevronDown size={15} />
+              </summary>
+              <div className="hy-header-dropdown absolute left-0 top-full z-50 mt-2 grid min-w-48 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg">
+                <p className="px-3 py-2 text-xs text-slate-500">حساب والد</p>
+                <button type="button" onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); navigatePage("dashboard"); }}>گزارش فرزند</button>
+                <button type="button" className="!text-rose-700" onClick={() => void run(logout)}><LogOut size={16} /> خروج از حساب</button>
+              </div>
+            </details>
+          </div>
+        </header>
+        <main className="hy-site-main mx-auto grid w-full max-w-[1440px] gap-5 px-4 py-6 sm:px-6 lg:px-8">
+          {page === "public-bank" ? <PublicQuestionBank /> : <ParentDashboard me={me} />}
+        </main>
+        <MobileBottomNav role="parent" page={page} onNavigate={navigatePage} />
+      </div>
     );
   const teacher = ["teacher", "super_admin", "secretary"].includes(me.role);
   const educator = ["teacher", "super_admin"].includes(me.role);
@@ -434,7 +465,7 @@ export default function HamyarApp() {
     navigatePage(nextPage);
   }
   return (
-    <div className="hy-student-site min-h-screen" dir="rtl">
+    <div className="hy-student-site hy-site-shell min-h-screen" dir="rtl">
       <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 lg:px-8">
           <button
@@ -445,7 +476,7 @@ export default function HamyarApp() {
           >
             <Brand />
           </button>
-          <nav aria-label="بخش‌های اصلی" className="order-3 flex min-w-0 w-full flex-1 items-center gap-1 overflow-x-auto border-t border-slate-100 pt-2 md:order-none md:w-auto md:flex-wrap md:overflow-visible md:border-0 md:pt-0">
+          <nav aria-label="بخش‌های اصلی" className="order-3 hidden min-w-0 w-full flex-1 items-center gap-1 border-t border-slate-100 pt-2 md:order-none md:flex md:w-auto md:flex-wrap md:overflow-visible md:border-0 md:pt-0">
             <button
               type="button"
               onClick={() => navigatePage(teacher ? "public-bank" : "dashboard")}
@@ -536,7 +567,7 @@ export default function HamyarApp() {
           </details>
         </div>
       </header>
-      <main className="relative mx-auto grid w-full max-w-[1440px] min-w-0 content-start gap-[18px] px-5 py-6 lg:px-8 lg:py-9">
+      <main className="hy-site-main relative mx-auto grid w-full max-w-[1440px] min-w-0 content-start gap-[18px] px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
         {(teacher || page !== "dashboard") && (
           <header className="mb-1 flex items-end justify-between gap-4 border-b border-slate-200/80 pb-4">
             <div>
@@ -770,6 +801,7 @@ export default function HamyarApp() {
           هدهد · تمرین و تحلیل یادگیری تحت هدایت معلم · نسخه توسعه
         </footer>
       </main>
+      <MobileBottomNav role={me.role} page={page} onNavigate={navigatePage} />
     </div>
   );
 }
