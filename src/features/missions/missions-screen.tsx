@@ -6,6 +6,7 @@ import { Field } from "@/components/ui/field";
 import { api } from "@/lib/api";
 import { QuestionPicker } from "@/features/content/question-picker";
 import { IndividualRemediation } from "./individual-remediation";
+import { PdfDeliveriesStudent } from "./pdf-deliveries-student";
 import { fa, stateLabel } from "@/lib/presentation";
 import type {
   User,
@@ -97,7 +98,8 @@ export function MissionsScreen({
         />
       )}
       {teacher && (
-        <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
+        {!teacher && <PdfDeliveriesStudent />}
+      <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
           <h2 className="text-[19px] font-bold">طراحی مأموریت تمرینی</h2>
           <form
             onSubmit={(e) => {
