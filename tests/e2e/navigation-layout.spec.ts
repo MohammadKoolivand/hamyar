@@ -159,7 +159,7 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
   await page.getByRole("button", { name: "پروفایل کاربر" }).click();
   await expect(page.getByRole("button", { name: "تنظیمات", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "تنظیمات", exact: true }).click();
-  await expect(page).toHaveURL(/\\/settings$/);
+  await expect(page).toHaveURL(/\/settings$/);
 
   await page.setViewportSize({ width: 390, height: 844 });
   expect(
