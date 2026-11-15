@@ -9,6 +9,7 @@ export function PagedList<T>({
   label,
   pageSize = 10,
   initialPage = 1,
+  resetOnItemsChange = true,
   className = "grid gap-3",
 }: {
   items: T[];
@@ -16,6 +17,7 @@ export function PagedList<T>({
   label: string;
   pageSize?: number;
   initialPage?: number;
+  resetOnItemsChange?: boolean;
   className?: string;
 }) {
   const signature = JSON.stringify(
@@ -26,9 +28,14 @@ export function PagedList<T>({
     ),
   );
   const [state, setState] = useState({ signature, page: initialPage });
-  if (state.signature !== signature) setState({ signature, page: 1 });
+  if (state.signature !== signature) {
+    // Keep the current page on data refresh when requested by the caller.
+    // Only clamp if results have shrunk; filters can still opt into resetting.
+    const maxPage = Math.max(1, Math.ceil(items.length / pageSize));
+    setState({ signature, page: resetOnItemsChange ? 1 : Math.min(state.page, maxPage) });
+  }
   const pages = Math.max(1, Math.ceil(items.length / pageSize));
-  const page = state.signature === signature ? Math.min(state.page, pages) : 1;
+  const page = Math.min(state.page, pages);
   const start = (page - 1) * pageSize;
   return (
     <div className="grid min-w-0 gap-4">
