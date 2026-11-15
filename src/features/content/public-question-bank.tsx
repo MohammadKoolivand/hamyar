@@ -446,7 +446,7 @@ export function PublicQuestionBank({
                 </span>
               </label>
               {questionView(q)}
-              {home && (
+              {home && onlinePractice && (
                 <Button
                   className="discovery-practice mt-5"
                   disabled={!!starting}
