@@ -21,6 +21,7 @@ const keyForKind = (kind: string): keyof PdfTaxonomy | null => {
 
 export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: { nodes: Node[]; currentUserId?: string; superAdmin?: boolean }) {
   const [items, setItems] = useState<PdfLibraryItem[]>([]);
+  const [requestedDeliveryPdfId, setRequestedDeliveryPdfId] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState<"public" | "private">("private");
@@ -256,6 +257,12 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
         <div className="flex flex-wrap gap-2">
           {item.state === "ready" && <>
             <a className="rounded-lg border px-3 py-2 text-xs" href={`/api/pdf-library/${item._id}/file`} target="_blank" rel="noopener noreferrer">مشاهده PDF</a>
+            {item.visibility === "private" && (!currentUserId || item.ownerId === currentUserId) && <button type="button"
+              className="rounded-lg border border-teal-300 bg-teal-50 px-3 py-2 text-xs text-teal-800"
+              onClick={() => {
+                setRequestedDeliveryPdfId(item._id);
+                document.getElementById("pdf-delivery-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}>ارسال برای دانش‌آموزان</button>}
             <button type="button" disabled={busy} onClick={() => void run(async () => {
               const { examId } = await api<{ examId: string }>(`/pdf-library/${item._id}/send-to-import`, {});
               window.location.assign(`/exam-import?exam=${encodeURIComponent(examId)}`);
@@ -275,7 +282,7 @@ export function PdfLibraryTeacher({ nodes, currentUserId, superAdmin = false }: 
           </button>}
         </div>
       </article>)}
-      <PdfDeliveryTeacher pdfs={items} currentUserId={currentUserId} />
+      <PdfDeliveryTeacher pdfs={items} currentUserId={currentUserId} requestedPdfId={requestedDeliveryPdfId} />
     </section>
   );
 }
