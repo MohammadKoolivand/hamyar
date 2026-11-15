@@ -3,6 +3,7 @@ import { difficultySchema, difficultyLabels } from "../../lib/difficulty";
 import { difficultyMetadata } from "../../lib/difficulty";
 import { visualKind } from "../../lib/question-visuals";
 import { addDiscoveryPath } from "../discovery-settings";
+import { reservePublicQuestionFingerprint } from "../question-duplicates";
 import type { AvalaiClient } from "../ai/avalai";
 import type { FastifyInstance } from "fastify";
 import type { ClientSession } from "mongodb";
@@ -47,6 +48,9 @@ export async function persistQuestion(
   const examImported =
     (provenance as { origin?: string }).origin === "exam_import_reviewed";
   const questionFields = { ...b, visibility: b.visibility ?? "public" };
+  const publicFingerprint = questionFields.visibility === "public"
+    ? await reservePublicQuestionFingerprint(ctx, b, qid, ownerId, session)
+    : undefined;
   if (examImported) delete questionFields.difficulty;
   await ctx
     .c("questions")
@@ -59,6 +63,7 @@ export async function persistQuestion(
     verifiedBy: ownerId,
     verifiedAt: ctx.now(),
     ...questionFields,
+    ...(publicFingerprint ? { publicFingerprint, fingerprintVersion: 1 } : {}),
     ...(examImported
       ? {
           difficultyAssessment: {
