@@ -346,6 +346,7 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
               courseId: input.courseId,
               enrollmentId: access!.enrollment._id,
               libraryQuestionId: qid,
+              ...(publicLibrary ? { practiceMode: "self" } : {}),
               title: "تمرین انتخابی از کتابخانه",
               questionVersionIds: [qid],
               state: "published",
