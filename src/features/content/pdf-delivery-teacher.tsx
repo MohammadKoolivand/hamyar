@@ -21,8 +21,8 @@ type Delivery = {
 };
 
 export function PdfDeliveryTeacher({
-  pdfs, currentUserId,
-}: { pdfs: PdfLibraryItem[]; currentUserId?: string }) {
+  pdfs, currentUserId, requestedPdfId,
+}: { pdfs: PdfLibraryItem[]; currentUserId?: string; requestedPdfId?: string }) {
   const available = useMemo(() => pdfs.filter((pdf) =>
     pdf.state === "ready" && pdf.visibility === "private" && (!currentUserId || pdf.ownerId === currentUserId),
   ), [pdfs, currentUserId]);
@@ -76,6 +76,13 @@ export function PdfDeliveryTeacher({
   const invalidGroup = Boolean(groupId && (!chosenGroup || activeRecipients.length !== chosenGroup.studentIds.length));
   const batches = [...new Map(deliveries.map((row) => [row.batchId, row])).values()];
   const selectedPdf = available.find((pdf) => pdf._id === pdfId);
+  useEffect(() => {
+    const requested = available.find((pdf) => pdf._id === requestedPdfId);
+    if (requested) {
+      setPdfId(requested._id);
+      setTitle(requested.title);
+    }
+  }, [requestedPdfId, available]);
 
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -120,7 +127,7 @@ export function PdfDeliveryTeacher({
   }
 
   return (
-    <section className="mt-6 grid gap-4 rounded-2xl border border-teal-200 bg-teal-50/40 p-4 sm:p-6" dir="rtl">
+    <section id="pdf-delivery-form" className="mt-6 grid gap-4 rounded-2xl border border-teal-200 bg-teal-50/40 p-4 sm:p-6" dir="rtl">
       <h3 className="flex items-center gap-2 text-lg font-bold">
         <Send size={20} aria-hidden /> ارسال مستقیم PDF برای کلاس یا دانش‌آموز
       </h3>
