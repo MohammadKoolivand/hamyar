@@ -40,7 +40,7 @@ export async function loginSyntheticUser(
   });
   expect(response.status(), await response.text()).toBe(200);
   await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
-  await expect(page.getByRole("button", { name: "خروج", exact: true }))
+  await expect(page.locator('summary[aria-label="پروفایل کاربر"]'))
     .toBeVisible({ timeout: 15000 });
 }
 // Logout completes in the browser only after /api/auth/logout resolves and the
@@ -48,7 +48,8 @@ export async function loginSyntheticUser(
 // phone form makes that redirect observable, so callers never race it with a
 // page.goto() (which Playwright reports as "navigation interrupted").
 export async function logoutSyntheticUser(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "خروج", exact: true }).click();
+  await page.locator('summary[aria-label="پروفایل کاربر"]').click();
+  await page.getByRole("button", { name: "خروج از حساب" }).click();
   await expect(page.getByLabel("شماره موبایل", { exact: true }))
     .toBeVisible({ timeout: 15000 });
   await page.waitForLoadState("load");
@@ -64,5 +65,5 @@ export async function useFixtureSession(page: Page, cookie: string) {
     expires: Math.floor(Date.now() / 1000) + 7 * 86400,
   }]);
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expect(page.getByRole("button", { name: "خروج", exact: true })).toBeVisible({ timeout: 15000 });
+  await expect(page.locator('summary[aria-label="پروفایل کاربر"]')).toBeVisible({ timeout: 15000 });
 }
