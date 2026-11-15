@@ -86,6 +86,7 @@ export async function connect(
   await db.collection("publicQuestionSubmissions").createIndex({ status: 1, createdAt: 1 });
   await db.collection("publicQuestionSubmissions").createIndex({ ownerId: 1, createdAt: -1 });
   await db.collection("questionContributions").createIndex({ canonicalVersionId: 1, createdAt: -1 });
+  await db.collection("publicQuestionReports").createIndex({ status: 1, createdAt: 1 });
   await db.collection("pdfDeliveries").createIndex({ teacherId: 1, batchId: 1 });
   await db.collection("pdfDeliveries").createIndex({ studentId: 1, createdAt: -1 });
   await db.collection("pdfDeliveries").createIndex({ pdfId: 1, teacherId: 1 });
