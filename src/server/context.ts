@@ -1,3 +1,4 @@
+import { isIndependentLibraryPractice } from "../lib/independent-practice";
 import { assertLibraryAssignmentAccess } from "./library-access";
 import { assertActiveAssignmentCourse } from "./course-access";
 import { loginIdentifierSchema } from "../lib/phone";
@@ -99,7 +100,7 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
             })),
           })
         : null;
-      if (!row) fail(404, "مأموریت یافت نشد");
+      if (!row || isIndependentLibraryPractice(row)) fail(404, "مأموریت یافت نشد");
       return { u: u!, a: row! };
     }
     const a = await c("assignments").findOne({
@@ -110,7 +111,8 @@ export function createContext(db: Db, hooks: WriteHooks = {}) {
           ? { studentId: u._id }
           : { teacherId: u._id }),
     });
-    if (!a) fail(404, "مأموریت یافت نشد");
+    if (!a || (u.role !== "student" && isIndependentLibraryPractice(a)))
+      fail(404, "مأموریت یافت نشد");
     if (u.role === "student") {
       await assertActiveAssignmentCourse({ c, fail }, a!, u._id);
       await assertLibraryAssignmentAccess({ c, fail }, a!, u._id);
