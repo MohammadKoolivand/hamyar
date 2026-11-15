@@ -209,7 +209,7 @@ export function PublicQuestionBank({
           <BookOpen size={30} strokeWidth={1.6} />
         </span>
       </header>
-      <button
+      {filters.content !== "pdf" && <button
         type="button"
         className="discovery-filter-toggle flex items-center gap-2 rounded-xl border p-3 text-right md:hidden"
         aria-expanded={filtersOpen}
@@ -217,8 +217,8 @@ export function PublicQuestionBank({
       >
         <SlidersHorizontal size={17} aria-hidden />
         فیلتر سؤال‌ها
-      </button>
-      <div
+      </button>}
+      {filters.content !== "pdf" && <div
         className={`discovery-filters ${filtersOpen ? "grid" : "hidden"} gap-4 rounded-2xl border p-4 md:grid md:p-5`}
       >
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -337,7 +337,7 @@ export function PublicQuestionBank({
         <Button variant="outline" onClick={() => change(emptyBankFilters())}>
           پاک‌کردن فیلترها
         </Button>
-      </div>
+      </div>}
       <div className="discovery-toolbar flex flex-wrap items-center justify-between gap-3">
         <div className="discovery-tabs flex gap-1">
           {[
@@ -348,7 +348,7 @@ export function PublicQuestionBank({
             <Button
               key={value}
               variant="outline"
-              onClick={() => change({ ...filters, content: value })}
+              onClick={() => change(value === "pdf" ? { ...emptyBankFilters(), content: "pdf" } : { ...filters, content: value })}
               aria-pressed={filters.content === value}
             >
               {label}
