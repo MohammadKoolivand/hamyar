@@ -26,6 +26,7 @@ import {
   type PublicBankQuestion,
 } from "@/lib/public-bank";
 import { printQuestions } from "@/lib/print-questions";
+import { PdfLibraryPublic } from "./pdf-library-public";
 import { BookOpen, SlidersHorizontal, FileDown } from "lucide-react";
 
 const inputStyle =
@@ -342,6 +343,7 @@ export function PublicQuestionBank({
           {[
             ["questions", "سؤال‌ها"],
             ["exams", "نمونه‌امتحان‌ها"],
+            ["pdf", "فایل‌های PDF"],
           ].map(([value, label]) => (
             <Button
               key={value}
@@ -353,14 +355,14 @@ export function PublicQuestionBank({
             </Button>
           ))}
         </div>
-        <span className="discovery-count text-sm text-slate-500">
+        {filters.content !== "pdf" && <span className="discovery-count text-sm text-slate-500">
           {(filters.content === "exams"
             ? groups.length
             : visible.length
           ).toLocaleString("fa-IR")}{" "}
           نتیجه
-        </span>
-        <Button
+        </span>}
+        {filters.content !== "pdf" && <><Button
           variant="outline"
           disabled={!results.length || results.every((q) => selected.includes(q._id))}
           onClick={() =>
@@ -388,12 +390,12 @@ export function PublicQuestionBank({
           {selected.length
             ? `(${selected.length.toLocaleString("fa-IR")} سؤال)`
             : "نتایج"}
-        </Button>
+        </Button></>}
       </div>
-      <p className="text-xs leading-6 text-slate-400">
+      {filters.content !== "pdf" && <p className="text-xs leading-6 text-slate-400">
         در پنجره‌ی چاپ، مقصد «ذخیره به‌صورت PDF / Save as PDF» را انتخاب کن. بدون
         انتخاب سؤال، تمام نتایج فیلترشده چاپ می‌شوند.
-      </p>
+      </p>}
       {loading && <p role="status">در حال دریافت سؤال‌ها…</p>}
       {error && (
         <div
@@ -409,12 +411,14 @@ export function PublicQuestionBank({
           </Button>
         </div>
       )}
-      {!loading &&
+      {filters.content !== "pdf" && !loading &&
         !error &&
         !(filters.content === "exams" ? groups.length : visible.length) && (
           <p>با این فیلترها موردی یافت نشد.</p>
         )}
-      {filters.content === "questions" ? (
+      {filters.content === "pdf" ? (
+        <PdfLibraryPublic taxonomy={filters} />
+      ) : filters.content === "questions" ? (
         <PagedList items={visible} label="سؤال‌ها">
           {(q) => (
             <article
