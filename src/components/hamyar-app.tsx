@@ -2,21 +2,17 @@
 import { AccessConsole } from "@/features/access/access-console";
 import { AdminSystemOverviewScreen } from "@/features/access/admin-system-overview";
 import { PublicQuestionBank } from "@/features/content/public-question-bank";
-import { clsx } from "clsx";
-
 import React, { useState, useEffect } from "react";
 import {
-  LayoutDashboard,
-  Users,
   Library,
   Target,
   LogOut,
-  BarChart3,
   BookOpenCheck,
-  FileUp,
   UsersRound,
   Settings,
   Database,
+  ChevronDown,
+  UserRound,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Brand } from "./ui/brand";
@@ -396,21 +392,6 @@ export default function HamyarApp() {
       </div>
     );
   }
-  if (
-    (me.role === "super_admin" || me.role === "secretary") &&
-    page === "access"
-  )
-    return (
-      <>
-        <button
-          className="m-4 rounded border p-3"
-          onClick={() => setPage("content")}
-        >
-          بازگشت به بانک سؤال
-        </button>
-        <AccessConsole me={me} onLogout={logout} />
-      </>
-    );
   if (me.role === "parent")
     return (
       <>
@@ -419,206 +400,155 @@ export default function HamyarApp() {
       </>
     );
   const teacher = ["teacher", "super_admin", "secretary"].includes(me.role);
-  const nav =
-    me.role === "secretary"
-      ? ([
-          ["content", "بانک سؤال و محتوا", Library],
-          ["public-bank", "بانک سؤال عمومی", Library],
-          ["exam-import", "ورود آزمون", FileUp],
-          ["resources", "منابع آموزشی", BookOpenCheck],
-          ["access", "دسترسی‌های تفویض‌شده", Settings],
-        ] as const)
-      : teacher
-        ? ([
-            ["dashboard", "نمای کلی", LayoutDashboard],
-            ["students", "دانش‌آموزان", Users],
-            ["courses", "درس‌های من", BookOpenCheck],
-            ["classes", "کلاس‌های گروهی", UsersRound],
-            ["content", "بانک سؤال و محتوا", Library],
-            ["public-bank", "بانک سؤال عمومی", Library],
-            ["exam-import", "ورود آزمون", FileUp],
-            ["resources", "منابع آموزشی", BookOpenCheck],
-            ["missions", "مأموریت‌ها", Target],
-            ["learning", "یادگیری و مرور", BarChart3],
-            ["settings", "تنظیمات", Settings],
-            ...(me.role === "super_admin"
-              ? [
-                  ["admin-overview", "آمار سامانه", Database] as const,
-                  ["access", "مدیریت دسترسی‌ها", Settings] as const,
-                ]
-              : []),
-          ] as const)
-        : ([
-            ["dashboard", "تمرین و نمونه‌سؤال", Library],
-            ["courses", "معلم و درس‌های من", BookOpenCheck],
-          ] as const);
-  const currentTitle =
-    nav.find((n) => n[0] === page)?.[1] ??
-    (page === "exam-import"
-      ? "ورود آزمون"
-      : page === "content-new"
-        ? "افزودن سؤال"
-        : page === "report"
-          ? "گزارش عملکرد"
-          : page === "student-course"
-            ? "صفحه درس"
-            : "محیط تمرین");
+  const educator = ["teacher", "super_admin"].includes(me.role);
+  const pageTitles: Record<string, string> = {
+    dashboard: teacher ? "نمای کلی" : "تمرین و نمونه‌سؤال",
+    "public-bank": "بانک سؤال عمومی",
+    courses: "معلم و درس‌های من",
+    students: "دانش‌آموزان",
+    classes: "کلاس‌های گروهی",
+    content: "بانک سؤال و محتوا",
+    "content-new": "افزودن سؤال",
+    "exam-import": "ورود آزمون",
+    resources: "منابع آموزشی",
+    missions: "مأموریت‌ها",
+    "student-missions": "مأموریت‌های معلم",
+    learning: "یادگیری و مرور",
+    "student-progress": "پیشرفت من",
+    "student-mistakes": "مرور اشتباهات",
+    "student-search": "جست‌وجو",
+    settings: "تنظیمات",
+    "admin-overview": "آمار سامانه",
+    access: "مدیریت دسترسی‌ها",
+    report: "گزارش عملکرد",
+    "student-course": "صفحه درس",
+    practice: "محیط تمرین",
+  };
+  const currentTitle = pageTitles[page] ?? "هدهد";
+  const roleLabel =
+    me.role === "super_admin" ? "مدیر سامانه" :
+    me.role === "secretary" ? "همکار اجرایی" :
+    me.role === "student" ? "دانش‌آموز" : "معلم";
+  function navigateFromMenu(event: React.MouseEvent<HTMLButtonElement>, nextPage: string) {
+    event.currentTarget.closest("details")?.removeAttribute("open");
+    navigatePage(nextPage);
+  }
   return (
-    <div
-      className={clsx(
-        "min-h-screen",
-        !teacher && "hy-student-site",
-        teacher &&
-          "min-[651px]:grid min-[651px]:grid-cols-[max-content_minmax(0,1fr)]",
-      )}
-    >
-      {teacher ? (
-        <aside className="glass-sidebar hide-scrollbar min-w-0 min-[651px]:w-max min-[651px]:min-w-max mx-3 my-3 flex flex-col gap-6 px-4 py-6 min-[651px]:sticky min-[651px]:top-4 min-[651px]:max-h-[calc(100dvh-2rem)] min-[651px]:overflow-y-auto min-[951px]:mx-4 min-[951px]:my-4 min-[951px]:py-7 max-[650px]:gap-3 max-[650px]:p-4 max-[650px]:[&_nav]:flex max-[650px]:[&_nav]:overflow-x-auto max-[650px]:[&_footer]:hidden">
-          <Brand showTagline />
-          <small className="text-xs leading-loose text-slate-500">
-            {teacher ? "فضای کار معلم" : "فضای تمرین دانش‌آموز"}
-          </small>
-          <nav className="grid gap-2 min-[651px]:[&_button]:whitespace-nowrap">
-            {nav.map(([key, title, Icon]) => (
-              <button
-                key={key}
-                onClick={() => navigatePage(key)}
-                data-active={page === key}
-                className={clsx(
-                  "hy-navigation-item flex w-full cursor-pointer items-center gap-3 rounded-[15px] p-2.5 text-right motion-reduce:transition-none max-[650px]:whitespace-nowrap",
-                  page === key && "font-bold",
-                )}
-              >
-                <span
-                  className="hy-icon-container !size-9 !rounded-xl"
-                  data-tone={
-                    key === "missions"
-                      ? "gold"
-                      : key === "students"
-                        ? "teal"
-                        : key === "learning"
-                          ? "purple"
-                          : "blue"
-                  }
-                >
-                  <Icon size={18} aria-hidden />
-                </span>
-                {title}
-              </button>
-            ))}
-          </nav>
-          <Button
-            variant="outline"
-            onClick={() =>
-              run(async () => {
-                await logout();
-              })
-            }
+    <div className="hy-student-site min-h-screen" dir="rtl">
+      <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 lg:px-8">
+          <button
+            type="button"
+            onClick={() => navigatePage("dashboard")}
+            className="shrink-0 cursor-pointer"
+            aria-label="رفتن به خانه هدهد"
           >
-            <LogOut size={16} />
-            خروج
-          </Button>
-        </aside>
-      ) : (
-        <header className="hy-student-site-header sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-4 px-5 py-3 md:flex-nowrap lg:px-8">
+            <Brand />
+          </button>
+          <nav aria-label="بخش‌های اصلی" className="order-3 flex min-w-0 w-full flex-1 items-center gap-1 overflow-x-auto border-t border-slate-100 pt-2 md:order-none md:w-auto md:flex-wrap md:overflow-visible md:border-0 md:pt-0">
             <button
               type="button"
-              onClick={() => navigatePage("dashboard")}
-              className="shrink-0 cursor-pointer"
-              aria-label="رفتن به خانه هدهد"
+              onClick={() => navigatePage(teacher ? "public-bank" : "dashboard")}
+              data-active={page === (teacher ? "public-bank" : "dashboard")}
+              className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
             >
-              <Brand />
+              <Library size={17} aria-hidden />
+              تمرین و نمونه‌سؤال
             </button>
-            <nav className="order-3 flex w-full gap-1 overflow-x-auto border-t border-slate-100 pt-2 md:order-none md:w-auto md:flex-1 md:border-0 md:pt-0">
-              {nav.slice(0, 5).map(([key, title, Icon]) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => navigatePage(key)}
-                  data-active={page === key}
-                  className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
-                >
-                  <Icon size={17} aria-hidden />
-                  {title}
-                </button>
-              ))}
-            </nav>
-            <div className="ms-auto flex shrink-0 items-center gap-2">
-              <button
-                type="button"
-                className="hidden cursor-pointer rounded-xl px-3 py-2 text-right sm:block"
-                onClick={() => navigatePage("student-progress")}
-              >
-                <span className="block text-sm font-bold">{me.name}</span>
-                <span className="block text-xs text-slate-500">دانش‌آموز</span>
-              </button>
-              <Button
-                variant="outline"
-                aria-label="خروج"
-                onClick={() =>
-                  run(async () => {
-                    await logout();
-                  })
-                }
-              >
-                <LogOut size={16} aria-hidden />
-                <span className="hidden sm:inline">خروج</span>
-              </Button>
-            </div>
-          </div>
-        </header>
-      )}
-      <main
-        className={clsx(
-          "relative grid w-full min-w-0 content-start gap-[18px]",
-          teacher
-            ? "px-8 py-7 max-[950px]:p-6 max-[650px]:p-[18px]"
-            : "mx-auto max-w-[1440px] px-5 py-6 lg:px-8 lg:py-9",
-        )}
-      >
-        {teacher ? (
-          <header className="glass-header mb-2 flex h-fit self-start items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-2.5 max-[650px]:mb-2 max-[650px]:[&_h1]:text-[22px]">
-            <div>
-              <small className="text-xs leading-loose text-slate-500">
-                هدهد / {teacher ? "پنل معلم" : "یادگیری"}
-              </small>
-              <h1 className="text-[28px] font-bold text-[#17305E]">
-                {currentTitle}
-              </h1>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <span
-                className="hy-icon-container !size-[46px]"
-                data-tone="purple"
-              >
-                <img
-                  src="/app-icon.svg"
-                  alt=""
-                  width={44}
-                  height={44}
-                  className="h-11 w-11 object-contain"
-                />
+            {me.role !== "secretary" && <button
+              type="button"
+              onClick={() => navigatePage("courses")}
+              data-active={page === "courses" || page === "student-course"}
+              className="hy-student-nav-link flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600"
+            >
+              <BookOpenCheck size={17} aria-hidden />
+              معلم و درس‌های من
+            </button>}
+            {teacher && (
+              <>
+                {educator && <details className="hy-header-menu relative shrink-0">
+                  <summary data-active={["students", "classes"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
+                    <UsersRound size={17} aria-hidden /> کلاس و دانش‌آموزان <ChevronDown size={14} />
+                  </summary>
+                  <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-52 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "students")}>دانش‌آموزان</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "classes")}>کلاس‌های گروهی</button>
+                  </div>
+                </details>}
+                <details className="hy-header-menu relative shrink-0">
+                  <summary data-active={["content", "exam-import", "resources"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
+                    <Library size={17} aria-hidden /> محتوا و منابع <ChevronDown size={14} />
+                  </summary>
+                  <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-56 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "content")}>بانک سؤال و محتوا</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "exam-import")}>ورود آزمون</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "resources")}>منابع آموزشی</button>
+                  </div>
+                </details>
+                {educator && <details className="hy-header-menu relative shrink-0">
+                  <summary data-active={["missions", "learning"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
+                    <Target size={17} aria-hidden /> تمرین و تحلیل <ChevronDown size={14} />
+                  </summary>
+                  <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-52 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "missions")}>مأموریت‌ها</button>
+                    <button type="button" onClick={(event) => navigateFromMenu(event, "learning")}>یادگیری و مرور</button>
+                  </div>
+                </details>}
+              </>
+            )}
+            {!teacher && me.role === "student" && (
+              <details className="hy-header-menu relative shrink-0">
+                <summary data-active={["student-missions", "student-mistakes", "student-progress"].includes(page)} className="hy-student-nav-link flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-600">
+                  <Target size={17} aria-hidden /> فعالیت‌های من <ChevronDown size={14} />
+                </summary>
+                <div className="hy-header-dropdown absolute right-0 top-full z-50 mt-2 grid min-w-52 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-missions")}>مأموریت‌های معلم</button>
+                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-mistakes")}>مرور اشتباهات</button>
+                  <button type="button" onClick={(event) => navigateFromMenu(event, "student-progress")}>پیشرفت من</button>
+                </div>
+              </details>
+            )}
+          </nav>
+          <details className="hy-header-menu relative ms-auto shrink-0">
+            <summary aria-label="پروفایل کاربر" className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 pe-3 shadow-sm hover:bg-slate-50">
+              <span className="flex size-9 items-center justify-center rounded-full bg-[#eaf3f2] text-sm font-bold text-[#147d78]">
+                {me.name.trim().charAt(0) || <UserRound size={18} />}
               </span>
-              <div>
-                <h3 className="text-base font-bold">{me.name}</h3>
-                <small className="text-xs leading-loose text-slate-500">
-                  {teacher ? "معلم" : "دانش‌آموز"}
-                </small>
+              <span className="hidden max-w-28 text-right text-xs font-semibold sm:block">{me.name}</span>
+              <ChevronDown size={15} />
+            </summary>
+            <div className="hy-header-dropdown absolute left-0 top-full z-50 mt-2 grid min-w-56 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+              <div className="border-b border-slate-100 px-3 py-2">
+                <p className="font-bold">{me.name}</p>
+                <p className="text-xs text-slate-500">{roleLabel}</p>
               </div>
+              <button type="button" onClick={(event) => navigateFromMenu(event, "dashboard")}>نمای کلی</button>
+              {educator && <button type="button" onClick={(event) => navigateFromMenu(event, "settings")}><Settings size={15} /> تنظیمات</button>}
+              {me.role === "super_admin" && (
+                <>
+                  <button type="button" onClick={(event) => navigateFromMenu(event, "admin-overview")}><Database size={15} /> آمار سامانه</button>
+                  <button type="button" onClick={(event) => navigateFromMenu(event, "access")}><Settings size={15} /> مدیریت دسترسی‌ها</button>
+                </>
+              )}
+              {me.role === "secretary" && <button type="button" onClick={(event) => navigateFromMenu(event, "access")}><Settings size={15} /> دسترسی‌های تفویض‌شده</button>}
+              <button type="button" className="!text-rose-700" onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); void run(async () => { await logout(); }); }}><LogOut size={15} /> خروج از حساب</button>
             </div>
-          </header>
-        ) : page !== "dashboard" ? (
-          <header className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
+          </details>
+        </div>
+      </header>
+      <main className="relative mx-auto grid w-full max-w-[1440px] min-w-0 content-start gap-[18px] px-5 py-6 lg:px-8 lg:py-9">
+        {(teacher || page !== "dashboard") && (
+          <header className="mb-1 flex items-end justify-between gap-4 border-b border-slate-200/80 pb-4">
             <div>
-              <small className="text-xs text-slate-500">هدهد / یادگیری</small>
-              <h1 className="mt-1 text-2xl font-bold text-[#17305E]">
-                {currentTitle}
-              </h1>
+              <small className="text-xs text-slate-500">هدهد / {roleLabel}</small>
+              <h1 className="mt-1 text-2xl font-bold text-[#17305E]">{currentTitle}</h1>
             </div>
           </header>
-        ) : null}
+        )}
         {feedback}
+        {(me.role === "super_admin" || me.role === "secretary") && page === "access" && (
+          <AccessConsole me={me} onLogout={logout} />
+        )}
         {me.role === "super_admin" && page === "admin-overview" && (
           <AdminSystemOverviewScreen />
         )}

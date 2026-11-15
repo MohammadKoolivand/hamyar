@@ -4,12 +4,13 @@ import { readFileSync } from "node:fs";
 
 const file = (path: string) => readFileSync(path, "utf8");
 
-test("sidebar scrolling is invisible and slogan panel is removed", () => {
+test("signed-in teacher pages use the shared site header without a separate sidebar", () => {
   const app = file("src/components/hamyar-app.tsx");
   const css = file("src/app/globals.css");
-  assert.match(app, /glass-sidebar hide-scrollbar/);
+  assert.match(app, /hy-student-site-header/);
+  assert.doesNotMatch(app, /glass-sidebar/);
   assert.doesNotMatch(app, /معلم آموزش می‌دهد/);
-  assert.match(css, /hide-scrollbar::-webkit-scrollbar/);
+  assert.match(css, /hy-header-dropdown/);
 });
 
 test("new questions default to public, but private is still a selectable choice", () => {

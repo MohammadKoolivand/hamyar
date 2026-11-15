@@ -106,30 +106,23 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
     page.getByRole("heading", { name: "نمای کلی", exact: true }),
   ).toBeVisible();
   const measured = await page.evaluate(() => {
-    const header = document.querySelector<HTMLElement>("main > header");
-    const aside = document.querySelector<HTMLElement>("aside");
-    const first = document.querySelector<HTMLElement>("aside nav button");
-    if (!header || !aside || !first) throw new Error("App shell not rendered");
+    const header = document.querySelector<HTMLElement>("header.hy-student-site-header");
+    const first = document.querySelector<HTMLElement>('nav[aria-label="بخش‌های اصلی"] button');
+    if (!header || !first) throw new Error("Unified site header not rendered");
     return {
       headerHeight: header.getBoundingClientRect().height,
-      headerPaddingTop: parseFloat(getComputedStyle(header).paddingTop),
-      headerPaddingBottom: parseFloat(getComputedStyle(header).paddingBottom),
-      sidebarWidth: aside.getBoundingClientRect().width,
-      sidebarItemWidth: Math.max(
-        ...Array.from(
-          document.querySelectorAll<HTMLElement>("aside nav button"),
-        ).map((el) => el.scrollWidth),
-      ),
+      hasSidebar: !!document.querySelector("aside"),
+      firstNavWidth: first.getBoundingClientRect().width,
       desktop: window.innerWidth,
     };
   });
-  expect(measured.headerHeight).toBeLessThan(100);
-  expect(measured.headerPaddingTop).toBe(10);
-  expect(measured.headerPaddingBottom).toBe(10);
-  expect(measured.sidebarWidth).toBeGreaterThanOrEqual(
-    measured.sidebarItemWidth,
-  );
+  expect(measured.headerHeight).toBeLessThan(120);
+  expect(measured.hasSidebar).toBe(false);
+  expect(measured.firstNavWidth).toBeGreaterThan(0);
+  await expect(page.getByRole("button", { name: "پروفایل کاربر" })).toBeVisible();
+  await expect(page.getByText("محتوا و منابع", { exact: true })).toBeVisible();
 
+  await page.getByText("محتوا و منابع", { exact: true }).click();
   await page
     .getByRole("button", { name: "بانک سؤال و محتوا", exact: true })
     .click();
@@ -138,6 +131,7 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
     page.getByRole("heading", { name: "بانک سؤال‌های شما" }),
   ).toBeVisible();
 
+  await page.getByText("تمرین و تحلیل", { exact: true }).click();
   await page.getByRole("button", { name: "مأموریت‌ها", exact: true }).click();
   await expect(page).toHaveURL(/\/homeworks$/);
   await expect(
@@ -161,6 +155,11 @@ test("logged-in teacher navigation supports deep links, refresh, Back and Forwar
   await expect(
     page.getByRole("heading", { name: "طراحی مأموریت تمرینی" }),
   ).toBeVisible();
+
+  await page.getByRole("button", { name: "پروفایل کاربر" }).click();
+  await expect(page.getByRole("button", { name: "تنظیمات", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "تنظیمات", exact: true }).click();
+  await expect(page).toHaveURL(/\/settings$/);
 
   await page.setViewportSize({ width: 390, height: 844 });
   expect(
