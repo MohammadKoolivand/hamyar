@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     "هدهد، راهنمای هوشمند تمرین و تحلیل پیشرفت یادگیری تحت هدایت معلم",
   manifest: "/manifest.webmanifest",
 };
-export const viewport: Viewport = { themeColor: "#F8FBFF" };
+export const viewport: Viewport = { themeColor: "#F7F9FC" };
 export default function RootLayout({
   children,
 }: {
@@ -57,7 +57,7 @@ export default function RootLayout({
       dir="rtl"
       className={`${poppins.variable} ${persian.variable} ${questionText.variable} ${questionRegular.variable} ${questionMath.variable}`}
     >
-      <body className="hamyar-ambient min-h-screen text-[#17305E] [font-family:var(--font-persian),Tahoma,sans-serif] [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
+      <body className="hamyar-ambient min-h-screen [&_*]:motion-reduce:animate-none [&_*]:motion-reduce:transition-none">
         {children}
       </body>
     </html>
