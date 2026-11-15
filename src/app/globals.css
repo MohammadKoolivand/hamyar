@@ -782,3 +782,134 @@
 @media (prefers-reduced-motion:reduce) {
   .hy-mobile-bottom-icon { transition: none; }
 }
+
+/* Warm yet quiet teaching environment: color signals hierarchy, not decoration. */
+body.hamyar-ambient,
+.hy-site-shell {
+  background-color: var(--hy-background);
+  background-image:
+    radial-gradient(ellipse 390px 260px at 96% 75px, rgba(190, 233, 225, .33), transparent 85%),
+    radial-gradient(ellipse 360px 250px at 2% 300px, rgba(255, 223, 179, .2), transparent 86%);
+  background-repeat: no-repeat;
+}
+.hy-site-shell .hy-student-site-header {
+  border-bottom-color: #dbe7ef;
+  background: rgba(255,255,255,.97);
+}
+.hy-site-main .glass-panel {
+  border-color: #dbe6ee;
+}
+.hy-site-main .glass-note {
+  border-color: #c5e9e1;
+  background: #eef9f5;
+  color: #145c57;
+}
+.hy-site-main .glass-stat:nth-child(4n+1) { background: #f1f9f7; }
+.hy-site-main .glass-stat:nth-child(4n+2) { background: #f4f5ff; }
+.hy-site-main .glass-stat:nth-child(4n+3) { background: #fff8eb; }
+.hy-site-main .glass-stat:nth-child(4n+4) { background: #fff3f6; }
+.hy-site-main .glass-hero { background: #eef8f5; border-color: #d4e9e0; }
+.hy-discovery .discovery-hero {
+  background: linear-gradient(125deg, #fff9eb 0%, #f7f9f1 58%, #eaf9f3 100%);
+  border-color: #f0dfbd;
+}
+.hy-discovery .discovery-hero-icon {
+  color: #117f77;
+  background: #dff4ea;
+}
+.hy-discovery .discovery-tabs button[aria-pressed=true] {
+  background: #e1f3ec;
+  color: #0b7169;
+}
+.hy-discovery .discovery-filter-toggle {
+  background: #f1f8f6;
+  border-color: #cfe7dd;
+  color: #16796e;
+}
+.hy-discovery .discovery-question:has(input:checked) {
+  border-color: #91d0c0;
+  background: #fafeff;
+}
+
+/* One readable font family, with independent Persian and Latin glyph subsets.
+   Question-specific MathML/KaTeX typography remains isolated. */
+body.hamyar-ambient .hy-question-text {
+  font-family: "Hodhod UI", var(--font-question-text), serif;
+}
+body.hamyar-ambient .hy-question-option .hy-question-text {
+  font-family: "Hodhod UI", var(--font-question-regular), serif;
+}
+
+/* All functional glyph icons come from lucide-react; soft tile colors make
+   categories recognizable without increasing visual clutter. */
+.hy-header-menu .hy-header-dropdown svg { flex: none; color: #168278; }
+.hy-site-shell .hy-nav-illustrated > svg:first-child {
+  box-sizing: content-box;
+  width: 18px;
+  height: 18px;
+  padding: 6px;
+  border-radius: 11px;
+  background: #e6f4ed;
+  color: #187b6b;
+  stroke-width: 2.1;
+  transition: transform .18s ease;
+}
+.hy-site-shell .hy-header-menu:nth-of-type(2n) .hy-nav-illustrated > svg:first-child {
+  background: #edf0ff;
+  color: #5c64b7;
+}
+.hy-site-shell .hy-header-menu:nth-of-type(3n) .hy-nav-illustrated > svg:first-child {
+  background: #fff1df;
+  color: #b8752b;
+}
+.hy-site-shell .hy-student-nav-link:hover > svg:first-child { transform: rotate(-6deg); }
+.hy-header-menu[open] .hy-nav-illustrated > svg:first-child { transform: rotate(-6deg); }
+.hy-header-dropdown {
+  border-color: #dbe6ed;
+  box-shadow: 0 14px 32px rgba(31,63,97,.11);
+}
+
+/* Four gentle category tones in the mobile bar; Home is always centered. */
+.hy-mobile-bottom-item[data-tone="sky"] .hy-mobile-bottom-icon {
+  background: #eaf1ff; color: #3d66a8;
+}
+.hy-mobile-bottom-item[data-tone="peach"] .hy-mobile-bottom-icon {
+  background: #fff1e3; color: #bd7540;
+}
+.hy-mobile-bottom-item[data-tone="violet"] .hy-mobile-bottom-icon {
+  background: #f0ebff; color: #765cb5;
+}
+.hy-mobile-bottom-item[data-tone="yellow"] .hy-mobile-bottom-icon {
+  background: #fff7dc; color: #a77c27;
+}
+.hy-mobile-bottom-item[data-tone="mint"] .hy-mobile-bottom-icon {
+  background: #e0f4ea; color: #0b796c;
+}
+.hy-mobile-bottom-item[data-active="true"]:not([data-home="true"]) {
+  color: #176f68;
+  font-weight: 800;
+}
+.hy-mobile-bottom-item[data-active="true"] .hy-mobile-bottom-icon {
+  outline: 1px solid rgba(21,126,103,.22);
+}
+.hy-mobile-bottom-item[data-home="true"] {
+  color: #126f67;
+  font-weight: 800;
+}
+.hy-mobile-bottom-item[data-home="true"] .hy-mobile-bottom-icon {
+  width: 51px;
+  height: 39px;
+  border: 1px solid #bfe5d7;
+  background: linear-gradient(145deg,#d3f2e1,#edf9e7);
+  color: #076f66;
+  box-shadow: 0 2px 5px rgba(13,110,94,.10);
+}
+.hy-mobile-bottom-item[data-home="true"][data-active="true"] .hy-mobile-bottom-icon {
+  background: #16877b;
+  border-color: #16877b;
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hy-site-shell .hy-nav-illustrated > svg:first-child { transition: none; }
+  .hy-site-shell .hy-student-nav-link:hover > svg:first-child { transform: none; }
+}
