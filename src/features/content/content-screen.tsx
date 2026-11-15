@@ -14,6 +14,7 @@ import { CurriculumCatalog } from "./curriculum-catalog";
 import { AppLink as Link } from "@/components/app-link";
 import { QuestionBank } from "./question-bank";
 import { PdfLibraryTeacher } from "./pdf-library-teacher";
+import { AdminPublicReview, TeacherPublicProposals } from "./public-question-review";
 import { curriculumSkills } from "@/lib/curriculum";
 import { TopicSelector } from "./topic-selector";
 import { NodeSelector } from "./node-selector";
@@ -130,7 +131,7 @@ export function ContentScreen({
   })).filter(({ text }) => text.length > 0);
   const [nodeSearch, setNodeSearch] = useState("");
   const [entryMode, setEntryMode] = useState("topic");
-  const [visibility, setVisibility] = useState<"private" | "public">("public");
+  const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [source, setSource] = useState<QuestionSource>();
   const [difficulty, setDifficulty] = useState("");
   const [year, setYear] = useState("");
@@ -143,12 +144,15 @@ export function ContentScreen({
   return (
     <>
       {view === "bank" && (
-        <QuestionBank
-          nodes={nodes}
-          questions={questions}
-          courses={courses}
-          onSaved={refresh}
-        />
+        <>
+          <QuestionBank
+            nodes={nodes}
+            questions={questions}
+            courses={courses}
+            onSaved={refresh}
+          />
+          {superAdmin ? <AdminPublicReview /> : <TeacherPublicProposals questions={questions} />}
+        </>
       )}
       {view !== "bank" && (
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -452,7 +456,7 @@ export function ContentScreen({
                     setVisibility(e.target.value as "private" | "public")
                   }
                 >
-                  <option value="public">عمومی برای همه‌ی دانش‌آموزان</option>
+                  <option value="public" disabled>عمومی — فقط پس از تأیید مدیر بانک</option>
                   <option value="private">خصوصی</option>
                 </select>
               </label>
