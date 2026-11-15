@@ -37,8 +37,13 @@ test("private PDF is sent to one enrolled learner without OCR; learner can downl
       description: "سؤال‌ها را در دفتر حل کنید",
       dueAt: "2027-02-01T10:00:00.000Z",
     };
-    const assignment = await f.post("/api/pdf-deliveries", input, f.teacher);
+    const firstSend = await f.request("/api/pdf-deliveries", input, f.teacher, "pdf-delivery-replay");
+    const secondSend = await f.request("/api/pdf-deliveries", input, f.teacher, "pdf-delivery-replay");
+    assert.equal(firstSend.statusCode, 200, firstSend.body);
+    assert.equal(secondSend.statusCode, 200, secondSend.body);
+    const assignment = firstSend.json();
     assert.equal(assignment.count, 1);
+    assert.equal(secondSend.json().batchId, assignment.batchId);
     assert.equal(await f.c("questionVersions").countDocuments({ statement: "Private teacher homework" }), 0);
 
     const teacherRows = (await f.request("/api/pdf-deliveries", undefined, f.teacher)).json();
@@ -48,6 +53,15 @@ test("private PDF is sent to one enrolled learner without OCR; learner can downl
     assert.equal(studentRows[0].title, input.title);
     assert.equal(studentRows[0].dueAt, input.dueAt);
     const fileUrl = `/api/pdf-deliveries/${studentRows[0]._id}/file`;
+    await f.post("/api/auth/register", {
+      email: "pdf-outsider@test.dev", password: "StrongPass123!",
+      name: "Other Student", role: "student",
+    });
+    const outsiderLogin = await f.request("/api/auth/login", {
+      email: "pdf-outsider@test.dev", password: "StrongPass123!",
+    });
+    const outsiderCookie = "session=" + outsiderLogin.cookies[0].value;
+    assert.equal((await f.request(fileUrl, undefined, outsiderCookie)).statusCode, 404);
     assert.equal((await f.request(fileUrl)).statusCode, 401);
     assert.equal((await f.request(fileUrl, undefined, f.teacher)).statusCode, 404);
     assert.deepEqual((await f.request(fileUrl, undefined, f.student)).rawPayload, bytes);
