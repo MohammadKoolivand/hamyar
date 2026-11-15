@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import {
   BookOpenCheck, ChartNoAxesCombined, Database, FilePlus2,
-  FileUp, House, Library, ListChecks, LogIn, Menu, Settings, UsersRound, X, GraduationCap, NotebookPen,
+  FileUp, House, Library, ListChecks, LogIn, Menu, Settings, UsersRound, X, GraduationCap, NotebookPen, UserRound,
 } from "lucide-react";
 import type { User } from "@/lib/types";
 
@@ -49,11 +49,11 @@ export function mobileDestinations(role: NavigationRole): {
   if (role === "student") {
     return {
       primary: [
-        { page: "courses", label: "درس‌ها", icon: GraduationCap, tone: "sky", aliases: ["student-course"] },
+        { page: "student-practice", label: "تمرین‌ها", icon: BookOpenCheck, tone: "sky" },
         { page: "student-missions", label: "تکلیف‌ها", icon: NotebookPen, tone: "peach", aliases: ["practice", "report"] },
         home,
         { page: "student-progress", label: "پیشرفت", icon: ChartNoAxesCombined, tone: "violet" },
-        { page: "more", label: "بیشتر", icon: Menu, tone: "yellow" },
+        { page: "account", label: "حساب", icon: UserRound, tone: "yellow" },
       ],
       additional: [
         { page: "dashboard", label: "نمای کلی یادگیری", icon: ChartNoAxesCombined, tone: "sky" },
@@ -77,11 +77,11 @@ export function mobileDestinations(role: NavigationRole): {
   }
   return {
     primary: [
-      { page: "dashboard", label: "نمای کلی", icon: ChartNoAxesCombined, tone: "sky" },
-      { page: "content", label: "بانک من", icon: Library, tone: "peach", aliases: ["content-new"] },
+      { page: "classes", label: "کلاس‌ها", icon: UsersRound, tone: "sky" },
+      { page: "missions", label: "تکلیف‌ها", icon: NotebookPen, tone: "peach", aliases: ["practice", "report"] },
       home,
-      { page: "missions", label: "مأموریت‌ها", icon: NotebookPen, tone: "violet", aliases: ["practice", "report"] },
-      { page: "more", label: "بیشتر", icon: Menu, tone: "yellow" },
+      { page: "content", label: "سؤال و PDF", icon: Library, tone: "violet", aliases: ["content-new", "resources"] },
+      { page: "account", label: "حساب", icon: UserRound, tone: "yellow" },
     ],
     additional: [
       { page: "content-new", label: "افزودن سؤال", icon: FilePlus2 },
