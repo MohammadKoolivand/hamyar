@@ -289,6 +289,8 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
   app.delete("/api/pdf-library/:pid", async (r) => {
     const { u, pdf } = await teacherPdf(r);
     await ctx.transaction(async (session) => {
+      const assigned = await c("pdfDeliveries").findOne({ pdfId: pdf._id, teacherId: u._id }, { session });
+      if (assigned) fail(409, "این PDF سابقه ارسال به دانش‌آموز دارد؛ برای حفظ سوابق قابل حذف نیست");
       await c("pdfLibrary").updateOne(
         { _id: pdf._id, ownerId: u._id }, { $set: { archivedAt: now() } },
         { session },
