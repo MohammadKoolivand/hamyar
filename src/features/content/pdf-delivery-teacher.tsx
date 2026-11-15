@@ -71,12 +71,13 @@ export function PdfDeliveryTeacher({
   const chosenGroup = groups.find((group) => group._id === groupId && group.courseId === courseId);
   const recipients = groupId ? (chosenGroup?.studentIds ?? []) : selected;
   const activeRecipients = recipients.filter((sid) => members.includes(sid));
+  const invalidGroup = Boolean(groupId && (!chosenGroup || activeRecipients.length !== chosenGroup.studentIds.length));
   const batches = [...new Map(deliveries.map((row) => [row.batchId, row])).values()];
   const selectedPdf = available.find((pdf) => pdf._id === pdfId);
 
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!pdfId || !courseId || !activeRecipients.length) return;
+    if (!pdfId || !courseId || !activeRecipients.length || invalidGroup) return;
     setBusy(true);
     setError("");
     setNotice("");
@@ -170,6 +171,7 @@ export function PdfDeliveryTeacher({
         )}
         {groupId && <p className="text-sm text-slate-600">
           {activeRecipients.length.toLocaleString("fa-IR")} عضو فعال این کلاس PDF را دریافت می‌کنند.
+          {invalidGroup && <span className="block text-rose-700">برخی اعضا دیگر عضو فعال درس نیستند؛ ابتدا فهرست کلاس را اصلاح کن.</span>}
         </p>}
         <label className="grid gap-1 text-sm">عنوان تکلیف
           <input required minLength={3} maxLength={150}
@@ -184,7 +186,7 @@ export function PdfDeliveryTeacher({
           <input type="datetime-local" className="min-h-11 rounded-lg border bg-white p-2"
             value={dueAt} onChange={(e) => setDueAt(e.target.value)} />
         </label>
-        <button type="submit" disabled={busy || !pdfId || !courseId || !activeRecipients.length || !title.trim()}
+        <button type="submit" disabled={busy || !pdfId || !courseId || !activeRecipients.length || invalidGroup || !title.trim()}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 text-sm font-medium text-white disabled:opacity-50">
           <FileUp size={17} aria-hidden /> ارسال PDF به {activeRecipients.length.toLocaleString("fa-IR")} دانش‌آموز
         </button>
