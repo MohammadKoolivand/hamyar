@@ -610,3 +610,43 @@
 .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .hide-scrollbar::-webkit-scrollbar,
 .hide-scrollbar nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+
+/* Unified site navigation: compact dropdowns shared by public and signed-in views. */
+.hy-header-menu > summary {
+  list-style: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.hy-header-menu > summary::-webkit-details-marker { display: none; }
+.hy-header-menu[open] > summary {
+  color: var(--hy-primary);
+  background: #edf3ff;
+  border-color: #dce7fa;
+}
+.hy-header-dropdown > button {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  width: 100%;
+  min-height: 2.65rem;
+  padding: .65rem .8rem;
+  border-radius: .75rem;
+  color: #344766;
+  text-align: right;
+  font-size: .84rem;
+  white-space: nowrap;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.hy-header-dropdown > button:hover,
+.hy-header-dropdown > button:focus-visible {
+  color: var(--hy-primary);
+  background: #f1f5fc;
+  outline: none;
+}
+.hy-header-menu > summary:focus-visible {
+  outline: 2px solid #7aa7dc;
+  outline-offset: 2px;
+}
+@media (max-width: 767px) {
+  .hy-header-dropdown { position: fixed; top: auto; right: .75rem; left: .75rem; width: auto; min-width: 0; }
+}
