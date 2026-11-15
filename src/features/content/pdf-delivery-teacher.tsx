@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { FileUp, Send, Ban } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Course, Enrollment, User } from "@/lib/types";
@@ -74,7 +74,7 @@ export function PdfDeliveryTeacher({
   const batches = [...new Map(deliveries.map((row) => [row.batchId, row])).values()];
   const selectedPdf = available.find((pdf) => pdf._id === pdfId);
 
-  async function send(event: React.FormEvent<HTMLFormElement>) {
+  async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!pdfId || !courseId || !activeRecipients.length) return;
     setBusy(true);
