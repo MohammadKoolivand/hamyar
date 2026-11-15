@@ -724,6 +724,8 @@ export default function HamyarApp() {
         )}
         {["content", "content-new", "resources"].includes(page) && teacher && (
           <ContentScreen
+            currentUserId={me._id}
+            superAdmin={me.role === "super_admin"}
             key={page}
             view={
               page === "resources"
