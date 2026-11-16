@@ -708,6 +708,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
             grade: e.grade ?? null,
             track: e.track ?? null,
             year: e.year ?? null,
+            categoryIds: e.categoryIds ?? [],
             source: e.source,
           },
           origin: "exam_import_reviewed",
