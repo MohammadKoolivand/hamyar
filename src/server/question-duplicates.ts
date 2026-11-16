@@ -82,7 +82,7 @@ export async function findPublicQuestionMatches(
   excludeQuestionId?: string,
 ): Promise<SimilarQuestion[]> {
   const fingerprint = questionFingerprint(input);
-  const rows = await ctx.c("questions").aggregate([
+  const rows = await ctx.c("questions").aggregate<Row>([
     { $lookup: {
       from: "questionVersions",
       localField: "currentVersionId",
