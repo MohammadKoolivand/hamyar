@@ -13,6 +13,14 @@ test("public MVP home contains only filtering, selected questions and PDF export
   assert.match(screen, /printQuestions\(/);
   assert.match(screen, /type="checkbox"/);
   assert.match(screen, /sourceCategory\(/);
+  assert.match(screen, /aria-controls="hodhod-exam-catalog"/);
+  assert.match(screen, /aria-expanded=\{catalogOpen\}/);
+  assert.match(screen, /examCatalogSections\.map/);
+  assert.match(screen, /catalogStatuses\(questions, coverage\)/);
+  assert.match(screen, /setCatalogFilter\(item\.id\)/);
+  assert.match(screen, /publicQuestionCatalogIds\(q\)/);
+  assert.match(screen, /document\.addEventListener\("pointerdown"/);
+  assert.match(screen, /event\.key === "Escape"/);
   assert.doesNotMatch(screen, /\/auth\/me|AuthScreen|\/auth\/login|\/student\/library/);
 });
 
