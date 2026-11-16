@@ -328,8 +328,8 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
         { _id: tid, teacherId: teacher._id }, { session },
       );
       if (!task) fail(404, "مأموریت گروهی یافت نشد");
-      if (task.state === "cancelled") return { ok: true };
-      if (task.state !== "draft" && task.state !== "published")
+      if (task!.state === "cancelled") return { ok: true };
+      if (task!.state !== "draft" && task!.state !== "published")
         fail(409, "وضعیت مأموریت قابل لغو نیست");
 
       const scope = { groupTaskId: tid, teacherId: teacher._id };
@@ -344,7 +344,7 @@ export function registerClassGroups(app: FastifyInstance, ctx: Context) {
         { session },
       );
       await c("groupTasks").updateOne(
-        { _id: tid, teacherId: teacher._id, state: task.state },
+        { _id: tid, teacherId: teacher._id, state: task!.state },
         { $set: { state: "cancelled", cancelledAt: now() } },
         { session },
       );
