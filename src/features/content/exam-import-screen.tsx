@@ -23,6 +23,7 @@ import {
   type ExamImportItem,
 } from "@/lib/exam-import";
 import type { QuestionSource } from "@/lib/question-source";
+import { examCatalog, examCatalogEntry, examCatalogSections } from "@/lib/exam-catalog";
 import type { Node } from "@/lib/types";
 const style = "glass-field min-h-11 w-full min-w-0 p-3";
 type Detail = ExamImport & {
@@ -51,6 +52,7 @@ export function ExamImportScreen({
     [grade, setGrade] = useState(""),
     [track, setTrack] = useState(""),
     [year, setYear] = useState("");
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [source, setSource] = useState<QuestionSource | undefined>({
     family: "school",
     administration: "final",
@@ -241,6 +243,7 @@ export function ExamImportScreen({
                   ...(showTrack && track ? { track } : {}),
                   ...(year ? { year: Number(year) } : {}),
                   source,
+                  categoryIds,
                   ocrLanguage,
                 });
                 await load(row._id);
@@ -367,6 +370,69 @@ export function ExamImportScreen({
                 </Field>
               </div>
             </details>
+            <fieldset className="grid gap-3 rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4">
+              <legend className="px-2 font-bold text-indigo-900">فهرست آزمون‌ها · انتخاب موردی</legend>
+              <p className="text-xs leading-6 text-slate-600">
+                هر آزمون را از دسته‌های آماده تیک بزنید. برای یک آزمون مشخص،
+                برچسب‌های مرتبط را انتخاب کنید؛ این تیک‌ها همراه اطلاعات آزمون در بانک ذخیره می‌شوند.
+                فقط متوسطه اول و رشته‌های ریاضی و تجربی متوسطه دوم در این نسخه هستند.
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {examCatalogSections.map((section) => (
+                  <details key={section.id} className="rounded-xl border border-slate-200 bg-white p-3" open={section.id === "konkur" ? true : undefined}>
+                    <summary className="cursor-pointer font-semibold text-slate-800">
+                      {section.label}
+                      <span className="mr-2 text-xs text-slate-500">
+                        ({examCatalog.filter((item) => item.section === section.id).length.toLocaleString("fa-IR")})
+                      </span>
+                    </summary>
+                    <div className="mt-3 grid max-h-64 gap-2 overflow-y-auto">
+                      {examCatalog.filter((item) => item.section === section.id).map((item) => (
+                        <label key={item.id} className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-100 p-2 text-sm hover:bg-indigo-50">
+                          <input
+                            type="checkbox"
+                            className="size-4 accent-indigo-700"
+                            checked={categoryIds.includes(item.id)}
+                            disabled={busy || (categoryIds.length >= 8 && !categoryIds.includes(item.id))}
+                            onChange={(event) => {
+                              setCategoryIds((previous) =>
+                                event.target.checked ? [...previous, item.id] : previous.filter((id) => id !== item.id),
+                              );
+                              if (event.target.checked) {
+                                if (item.year) setYear(String(item.year));
+                                if (item.grade) setGrade(item.grade);
+                                if (item.track) setTrack(item.track === "mathematics" ? "ریاضی و فیزیک" : "علوم تجربی");
+                                if (item.section === "konkur") {
+                                  setSource({ family: "konkur", group: item.track, location: item.stage === "international" ? "international" : "domestic", ...(item.stage === "first" || item.stage === "second" ? { session: item.stage === "first" ? "نوبت اول" : "نوبت دوم" } : {}) });
+                                } else if (item.section === "school") {
+                                  const administration = item.id.startsWith("final-") ? "final" : item.id.startsWith("coordinated-") ? "district" : "internal";
+                                  setSource({ family: "school", administration, ...(administration === "internal" && item.stage && ["continuous", "chapter", "mid_first", "end_first", "mid_second", "end_second", "remedial"].includes(item.stage) ? { schoolStage: item.stage as "continuous" | "chapter" | "mid_first" | "end_first" | "mid_second" | "end_second" | "remedial" } : {}) });
+                                } else if (item.section === "admission") {
+                                  setSource({ family: "admission", admission: item.id.includes("sampad-7") ? "sampad7" : item.id.includes("sampad-10") ? "sampad10" : "nemune10" });
+                                } else if (item.section === "mock") setSource({ family: "mock" });
+                                else if (item.section === "olympiad") setSource({ family: "olympiad" });
+                                else setSource({ family: "practice", practice: "teacher" });
+                              }
+                            }}
+                          />
+                          <span>{item.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </details>
+                ))}
+              </div>
+              {categoryIds.length > 0 && (
+                <div className="flex flex-wrap gap-2" aria-live="polite">
+                  {categoryIds.map((id) => (
+                    <span key={id} className="rounded-full bg-indigo-100 px-3 py-1 text-xs text-indigo-900">
+                      {examCatalogEntry(id)?.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-slate-500">تا ۸ برچسب مرتبط قابل انتخاب است. اگر آزمون شما در فهرست نیست، از مشخصات منبع برای ثبت دقیق آن استفاده کنید.</p>
+            </fieldset>
             <SourceEditor
               compact
               hideQuestionNumber
@@ -398,7 +464,7 @@ export function ExamImportScreen({
                     onClick={() => void run(() => load(e._id))}
                     className="flex flex-1 flex-wrap justify-between gap-2 p-2 text-right"
                   >
-                    <span>{e.title}{superAdmin && <span className="mr-2 text-xs text-teal-800">· ثبت‌کننده: {e.ownerName ?? "نامشخص"}</span>}</span>
+                    <span>{e.title}{e.categoryIds?.length ? <span className="mr-2 text-xs text-indigo-700">· {e.categoryIds.map((id) => examCatalogEntry(id)?.label ?? id).join("، ")}</span> : null}{superAdmin && <span className="mr-2 text-xs text-teal-800">· ثبت‌کننده: {e.ownerName ?? "نامشخص"}</span>}</span>
                     <span className="text-xs text-slate-500">
                       {e.state === "review"
                         ? "آماده بازبینی"
