@@ -23,7 +23,7 @@ import {
   type ExamImportItem,
 } from "@/lib/exam-import";
 import type { QuestionSource } from "@/lib/question-source";
-import { examCatalog, examCatalogEntry, examCatalogSections } from "@/lib/exam-catalog";
+import { examCatalog, examCatalogEntry, examCatalogSections, examCatalogValidIds } from "@/lib/exam-catalog";
 import type { Node } from "@/lib/types";
 const style = "glass-field min-h-11 w-full min-w-0 p-3";
 type Detail = ExamImport & {
@@ -53,6 +53,7 @@ export function ExamImportScreen({
     [track, setTrack] = useState(""),
     [year, setYear] = useState("");
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [listCategoryFilter, setListCategoryFilter] = useState("");
   const [source, setSource] = useState<QuestionSource | undefined>({
     family: "school",
     administration: "final",
@@ -396,7 +397,9 @@ export function ExamImportScreen({
                             disabled={busy || (categoryIds.length >= 8 && !categoryIds.includes(item.id))}
                             onChange={(event) => {
                               setCategoryIds((previous) =>
-                                event.target.checked ? [...previous, item.id] : previous.filter((id) => id !== item.id),
+                                event.target.checked
+                                  ? examCatalogValidIds([...previous, item.id]) ? [...previous, item.id] : [item.id]
+                                  : previous.filter((id) => id !== item.id),
                               );
                               if (event.target.checked) {
                                 if (item.year) setYear(String(item.year));
@@ -431,7 +434,7 @@ export function ExamImportScreen({
                   ))}
                 </div>
               )}
-              <p className="text-xs text-slate-500">تا ۸ برچسب مرتبط قابل انتخاب است. اگر آزمون شما در فهرست نیست، از مشخصات منبع برای ثبت دقیق آن استفاده کنید.</p>
+              <p className="text-xs text-slate-500">تا ۸ برچسب مرتبط قابل انتخاب است. انتخاب یک دسته ناسازگار، برچسب‌های قبلی را جایگزین می‌کند. اگر آزمون شما در فهرست نیست، از مشخصات منبع برای ثبت دقیق آن استفاده کنید.</p>
             </fieldset>
             <SourceEditor
               compact
@@ -451,7 +454,20 @@ export function ExamImportScreen({
                 هنوز آزمونی ثبت نشده است.
               </p>
             )}
-            <PagedList items={list} label="آزمون‌های واردشده">
+            <label className="grid gap-2 text-sm text-slate-700">
+              فیلتر آزمون‌های ثبت‌شده بر اساس دسته
+              <select className={style} value={listCategoryFilter} onChange={(e) => setListCategoryFilter(e.target.value)}>
+                <option value="">تمام آزمون‌ها</option>
+                {examCatalogSections.map((section) => (
+                  <optgroup key={section.id} label={section.label}>
+                    {examCatalog.filter((item) => item.section === section.id).map((item) => (
+                      <option key={item.id} value={item.id}>{item.label}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+            <PagedList items={list.filter((item) => !listCategoryFilter || item.categoryIds?.includes(listCategoryFilter))} label="آزمون‌های واردشده">
               {(e) => (
                 <div
                   key={e._id}
