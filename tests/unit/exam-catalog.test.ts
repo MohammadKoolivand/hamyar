@@ -35,4 +35,7 @@ test("server accepts tagged exam imports but rejects unknown and duplicate categ
   assert.equal(examImportSchema.safeParse({ ...valid, categoryIds: ["konkur-1405-humanities-general"] }).success, false);
   assert.equal(examImportSchema.safeParse({ ...valid, categoryIds: [...valid.categoryIds, ...valid.categoryIds] }).success, false);
   assert.equal(examCatalogValidIds(new Array(9).fill("school-7-end_first")), false);
+  assert.equal(examCatalogValidIds(["konkur-1404-mathematics-general", "konkur-1405-mathematics-general"]), false);
+  assert.equal(examCatalogValidIds(["school-10-end_first", "school-10-mathematics"]), true);
+  assert.equal(examCatalogValidIds(["school-10-end_first", "school-11-end_first"]), false);
 });
