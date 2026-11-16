@@ -131,13 +131,22 @@ jobs:
             echo "DEPLOY_ENTRYPOINT_EXISTS_BUT_NEEDS_ROOT_REVIEW" >&2
             exit 1
           fi
-          ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "mkdir -p /var/lib/hodhod/incoming/$SHA"
-          scp "${SSH_ARGS[@]}" -P "$PORT" ops/deploy-staging.sh "$USER@$HOST:/var/lib/hodhod/incoming/$SHA/deploy-staging.sh"
-          ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sudo -n /usr/bin/install -o root -g root -m 0755 /var/lib/hodhod/incoming/$SHA/deploy-staging.sh /usr/local/sbin/hodhod-deploy" || { echo "DEPLOY_ENTRYPOINT_INSTALL_NEEDS_ADMIN" >&2; exit 1; }
-          installed_deploy_bytes=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "stat -c %s /usr/local/sbin/hodhod-deploy")
-          expected_deploy_bytes=$(wc -c < ops/deploy-staging.sh)
-          [[ "$installed_deploy_bytes" == "$expected_deploy_bytes" ]]
-          echo "DEPLOY_ENTRYPOINT_UPDATED"
+          expected_deploy_sha=$(sha256sum ops/deploy-staging.sh | awk '{print $1}')
+          if [[ "$deploy_target" == VALID ]]; then
+            installed_deploy_sha=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sha256sum /usr/local/sbin/hodhod-deploy | awk '{print \\$1}'")
+          else
+            installed_deploy_sha=""
+          fi
+          if [[ "$installed_deploy_sha" == "$expected_deploy_sha" ]]; then
+            echo "DEPLOY_ENTRYPOINT_ALREADY_CURRENT"
+          else
+            ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "mkdir -p /var/lib/hodhod/incoming/$SHA"
+            scp "${SSH_ARGS[@]}" -P "$PORT" ops/deploy-staging.sh "$USER@$HOST:/var/lib/hodhod/incoming/$SHA/deploy-staging.sh"
+            ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sudo -n /usr/bin/install -o root -g root -m 0755 /var/lib/hodhod/incoming/$SHA/deploy-staging.sh /usr/local/sbin/hodhod-deploy" || { echo "DEPLOY_ENTRYPOINT_INSTALL_NEEDS_ADMIN" >&2; exit 1; }
+            installed_deploy_sha=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sha256sum /usr/local/sbin/hodhod-deploy | awk '{print \\$1}'")
+            [[ "$installed_deploy_sha" == "$expected_deploy_sha" ]]
+            echo "DEPLOY_ENTRYPOINT_UPDATED"
+          fi
       - name: Upload and prepare or activate
         env:
           SHA: ${{ steps.source.outputs.sha }}
