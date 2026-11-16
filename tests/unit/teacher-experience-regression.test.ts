@@ -13,12 +13,16 @@ test("signed-in teacher pages use the shared site header without a separate side
   assert.match(css, /hy-header-dropdown/);
 });
 
-test("new questions default to public, but private is still a selectable choice", () => {
+test("new questions are private by default and require public-bank moderation", () => {
   const content = file("src/features/content/content-screen.tsx");
   const authoring = file("src/server/modules/authoring.ts");
-  assert.match(content, /useState<"private" \| "public">\("public"\)/);
-  assert.match(authoring, /visibility: b.visibility \?\? "public"/);
+  const review = file("src/server/modules/public-question-review.ts");
+  assert.match(content, /useState<"private" \| "public">\("private"\)/);
   assert.match(content, /<option value="private">خصوصی<\/option>/);
+  assert.match(content, /<option value="public" disabled>/);
+  assert.match(authoring, /visibilityForAuthoredQuestion\(b\.visibility\)/);
+  assert.match(review, /propose-public/);
+  assert.match(review, /verifiedBy: admin\._id/);
 });
 
 test("bank removes global difficulty bulk action and preserves current page when editing", () => {
