@@ -16,22 +16,14 @@ release=/opt/hodhod/releases/$sha
 [[ ! -e "$release" ]]
 install -d -o hodhod -g hodhod "$release"
 tar -tzf "$incoming/release.tar.gz" | grep -x './.next/BUILD_ID' > /dev/null
-tar -tzf "$incoming/release.tar.gz" | grep -x './node_modules/next/package.json' > /dev/null
 if tar -tzf "$incoming/release.tar.gz" | grep -E '^\./(\.env|\.private)(/|$)' > /dev/null; then
   echo 'Release archive contains forbidden environment or private files' >&2
   exit 1
 fi
 tar -xzf "$incoming/release.tar.gz" -C "$release" --no-same-owner
-# Abort before switching the live symlink if the packaged Next.js runtime is incomplete.
-# A package.json alone does not guarantee the CLI's internal modules survived tar exclusions.
-[[ -f "$release/node_modules/next/dist/build/output/log.js" ]] || {
-  echo "Release missing Next.js runtime: dist/build/output/log.js" >&2
-  exit 1
-}
-[[ -f "$release/node_modules/next/dist/bin/next" ]] || {
-  echo "Release missing Next.js CLI" >&2
-  exit 1
-}
+# The release contains source/build output and a lockfile, never node_modules.
+[[ -f "$release/package.json" && -f "$release/package-lock.json" ]]
+[[ ! -e "$release/node_modules" ]]
 [[ ! -e "$release/.env" && ! -e "$release/.private" ]]
 ln -s /etc/hodhod/staging.env "$release/.env"
 ln -s /var/lib/hodhod/private "$release/.private"
@@ -43,8 +35,13 @@ chown -R hodhod:hodhod "$release"
 install -d -o hodhod -g hodhod -m 0700 -- "$release/.next/cache"
 install -d -o hodhod -g hodhod -m 0700 -- "$release/.next/server/route-cache"
 cd "$release"
-# The runtime bundle was built and verified in CI. Never install or build on
-# the server: deployment only activates the exact checked artifact.
+# Install exactly the production dependency graph from the committed lockfile.
+# This keeps node_modules out of the transferred artifact and prevents version drift.
+echo "Installing locked production dependencies on staging host"
+runuser -u hodhod -- npm ci --omit=dev --no-audit --no-fund
+[[ -x "$release/node_modules/.bin/next" ]]
+[[ -f "$release/node_modules/next/dist/bin/next" ]]
+# The application build itself was produced and verified in CI; do not rebuild on host.
 runuser -u hodhod -- npm run ops:preflight -- web
 runuser -u hodhod -- npm run ops:preflight -- exams
 if [[ "$activate" == false ]]; then
