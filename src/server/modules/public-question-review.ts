@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { Context } from "../context";
-import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
+import { duplicateInputFromStoredQuestion, findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
 
 const uuid = z.string().uuid();
 const licenseBasis = z.enum(["original", "licensed", "public_domain"]);
@@ -176,7 +176,8 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
       // checked records explicitly non-null for the full moderation transaction.
       const approvedSubmission = submission!;
       const sourceVersion = prior!;
-      const matches = await findPublicQuestionMatches(ctx, sourceVersion, session, qid);
+      const duplicateInput = duplicateInputFromStoredQuestion(sourceVersion);
+      const matches = await findPublicQuestionMatches(ctx, duplicateInput, session, qid);
       const duplicate = matches.find((item) => item.kind === "exact");
       if (input.decision === "approve" && duplicate)
         fail(409, "سؤال دقیقاً در بانک موجود است؛ از گزینه استفاده از سؤال موجود استفاده کنید");
@@ -187,7 +188,7 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
       let publishedVersionId: string | undefined;
       if (input.decision === "approve") {
         const fingerprint = await reservePublicQuestionFingerprint(
-          ctx, sourceVersion, qid, approvedSubmission.ownerId, session,
+          ctx, duplicateInput, qid, approvedSubmission.ownerId, session,
         );
         const nextVersionId = id();
         const updated = await c("questions").updateOne({
