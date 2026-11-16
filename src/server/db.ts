@@ -82,6 +82,7 @@ export async function connect(
   await db
     .collection("courseRequests")
     .createIndex({ studentId: 1, updatedAt: -1 });
+  await db.collection("examImports").createIndex({ ownerId: 1, categoryIds: 1, createdAt: -1 });
   await db.collection("classGroups").createIndex({ teacherId: 1, courseId: 1 });
   await db.collection("publicQuestionSubmissions").createIndex({ status: 1, createdAt: 1 });
   await db.collection("publicQuestionSubmissions").createIndex({ ownerId: 1, createdAt: -1 });
