@@ -133,7 +133,7 @@ jobs:
           fi
           expected_deploy_sha=$(sha256sum ops/deploy-staging.sh | awk '{print $1}')
           if [[ "$deploy_target" == VALID ]]; then
-            installed_deploy_sha=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sha256sum /usr/local/sbin/hodhod-deploy | awk '{print \\$1}'")
+            installed_deploy_sha=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sha256sum /usr/local/sbin/hodhod-deploy | cut -d ' ' -f1")
           else
             installed_deploy_sha=""
           fi
@@ -143,7 +143,7 @@ jobs:
             ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "mkdir -p /var/lib/hodhod/incoming/$SHA"
             scp "${SSH_ARGS[@]}" -P "$PORT" ops/deploy-staging.sh "$USER@$HOST:/var/lib/hodhod/incoming/$SHA/deploy-staging.sh"
             ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sudo -n /usr/bin/install -o root -g root -m 0755 /var/lib/hodhod/incoming/$SHA/deploy-staging.sh /usr/local/sbin/hodhod-deploy" || { echo "DEPLOY_ENTRYPOINT_INSTALL_NEEDS_ADMIN" >&2; exit 1; }
-            installed_deploy_sha=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sha256sum /usr/local/sbin/hodhod-deploy | awk '{print \\$1}'")
+            installed_deploy_sha=$(ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sha256sum /usr/local/sbin/hodhod-deploy | cut -d ' ' -f1")
             [[ "$installed_deploy_sha" == "$expected_deploy_sha" ]]
             echo "DEPLOY_ENTRYPOINT_UPDATED"
           fi
