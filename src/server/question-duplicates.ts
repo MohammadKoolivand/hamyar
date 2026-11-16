@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import type { ClientSession } from "mongodb";
-import type { Context } from "../context";
+import type { Context } from "./context";
+import type { Row } from "./db";
+import { z } from "zod";
 
 export const QUESTION_FINGERPRINT_VERSION = 1;
 
@@ -18,6 +20,19 @@ export type DuplicateInput = {
   visuals?: unknown[];
   optionImages?: unknown[];
 };
+
+/** Validate the fields used for fingerprinting when loading untyped MongoDB records. */
+const storedDuplicateInput = z.object({
+  statement: z.string(),
+  type: z.string(),
+  options: z.array(z.string()).optional(),
+  visuals: z.array(z.unknown()).optional(),
+  optionImages: z.array(z.unknown()).optional(),
+});
+
+export function duplicateInputFromStoredQuestion(row: Row): DuplicateInput {
+  return storedDuplicateInput.parse(row);
+}
 
 /** Leave mathematical operators, units, signs, exponent syntax, and image references intact. */
 export function normalizeDuplicateText(value: string): string {
@@ -95,7 +110,7 @@ export async function findPublicQuestionMatches(
     } },
   ], { session }).toArray();
   const normalizedText = normalizeDuplicateText(input.statement);
-  return rows.flatMap((row) => {
+  return rows.flatMap((row: Row): SimilarQuestion[] => {
     const candidate = row as { _id: string; statement: string; type: string;
       options?: string[]; visuals?: unknown[]; optionImages?: unknown[];
       storedFingerprint?: string };
@@ -109,7 +124,7 @@ export async function findPublicQuestionMatches(
       kind: isExact ? "exact" as const : "similar" as const,
       score: Math.round(score * 100) / 100,
     }];
-  }).sort((a, b) => b.score - a.score).slice(0, 10);
+  }).sort((a: SimilarQuestion, b: SimilarQuestion) => b.score - a.score).slice(0, 10);
 }
 
 /** Transactional unique claim prevents two concurrent new public questions from
