@@ -20,8 +20,10 @@ const assignInput = z.object({
  */
 export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
   const { c, id, now, user, fail } = ctx;
-  const active = (assignment: { state?: unknown; cancelledAt?: unknown }) =>
-    assignment.state !== "cancelled" && !assignment.cancelledAt;
+  const active = (assignment: object) => {
+    const candidate = assignment as { state?: unknown; cancelledAt?: unknown };
+    return candidate.state !== "cancelled" && !candidate.cancelledAt;
+  };
 
   app.post("/api/pdf-deliveries", async (r) => {
     const teacher = await user(r, "teacher");
@@ -41,8 +43,8 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
           _id: input.groupId, teacherId: teacher._id, courseId: input.courseId,
         }, { session });
         if (!group) fail(404, "کلاس یافت نشد");
-        if (group.studentIds.length !== input.studentIds.length ||
-          input.studentIds.some((sid) => !group.studentIds.includes(sid)))
+        if (group!.studentIds.length !== input.studentIds.length ||
+          input.studentIds.some((sid) => !group!.studentIds.includes(sid)))
           fail(409, "برای ارسال به کلاس باید تمام اعضای آن انتخاب شوند؛ فهرست کلاس را به‌روزرسانی کنید");
       }
       const enrollments = await c("enrollments").find({
@@ -117,14 +119,14 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
     if (!row || !active(row)) fail(404, "تکلیف PDF یافت نشد");
     if (current.role !== "student") fail(403, "دسترسی مجاز نیست");
     const enrollment = await c("enrollments").findOne({
-      _id: row.enrollmentId, courseId: row.courseId, teacherId: row.teacherId,
+      _id: row!.enrollmentId, courseId: row!.courseId, teacherId: row!.teacherId,
       studentId: current._id, status: "active",
     });
     const course = await c("courses").findOne({
-      _id: row.courseId, teacherId: row.teacherId, status: "active",
+      _id: row!.courseId, teacherId: row!.teacherId, status: "active",
     });
     if (!enrollment || !course) fail(404, "دسترسی به این تکلیف لغو شده است");
-    return { row, current };
+    return { row: row!, current };
   }
 
   app.get("/api/pdf-deliveries/:aid/file", async (r, reply) => {
