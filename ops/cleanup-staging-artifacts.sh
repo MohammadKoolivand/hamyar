@@ -53,11 +53,10 @@ if [[ -e "$target" || -L "$target" ]]; then
     echo "TARGET_RELEASE_RETRY_CLEANUP_INCOMPLETE" >&2; exit 1;
   }
 fi
-# npm's download cache is reproducible and never stores site/application data.
-if [[ "$HOME" == /var/lib/hodhod && -d "$HOME/.npm/_cacache" && ! -L "$HOME/.npm/_cacache" ]]; then
-  echo "Removing disposable npm download cache"
-  rm -rf -- "$HOME/.npm/_cacache"
-fi
+# Preserve the npm content-addressed download cache across deployments.
+# npm verifies downloaded packages against integrity hashes from package-lock.json.
+# Clearing it on every release forces costly network downloads and caused stalls.
+# Cache maintenance is a separate, explicitly authorized operator action.
 # This exact SHA failed before activation with ENOSPC. Never delete a running release.
 failed="$releases/853389f6b11357ffc211999c7f4acc7ee2dd4804"
 if [[ "$failed" != "$active" && "$failed" != "$releases/$sha" && -d "$failed" && ! -L "$failed" ]]; then
