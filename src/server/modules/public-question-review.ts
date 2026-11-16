@@ -43,17 +43,17 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
         _id: vid, ownerId: actor._id, visibility: "private",
       }, { session });
       const current = question ? await c("questions").findOne({
-        _id: question.questionId, ownerId: actor._id, currentVersionId: vid,
+        _id: question!.questionId, ownerId: actor._id, currentVersionId: vid,
       }, { session }) : null;
       if (!question || !current) fail(404, "فقط نسخه خصوصی و فعلی سؤال خودتان قابل پیشنهاد است");
       const previous = await c("publicQuestionSubmissions").findOne({
-        _id: question.questionId, ownerId: actor._id,
+        _id: question!.questionId, ownerId: actor._id,
       }, { session });
       if (previous?.status === "pending" && previous.versionId === vid)
-        return { questionId: question.questionId, status: "pending" };
+        return { questionId: question!.questionId, status: "pending" };
       // Revisions create a new version; stale moderation requests cannot be approved.
       await c("publicQuestionSubmissions").updateOne(
-        { _id: question.questionId },
+        { _id: question!.questionId },
         {
           $set: {
             ownerId: actor._id, versionId: vid, status: "pending",
@@ -66,15 +66,15 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
         { upsert: true, session },
       );
       await c("publicQuestionSubmissionEvents").insertOne({
-        _id: id(), questionId: question.questionId, versionId: vid,
+        _id: id(), questionId: question!.questionId, versionId: vid,
         actorId: actor._id, event: "submitted", sourceReference: input.sourceReference,
         licenseBasis: input.licenseBasis, rightsNote: input.rightsNote, at: now(),
       }, { session });
       await c("auditLogs").insertOne({
-        _id: id(), actorId: actor._id, resourceId: question.questionId,
+        _id: id(), actorId: actor._id, resourceId: question!.questionId,
         action: "propose_public_question", createdAt: now(),
       }, { session });
-      return { questionId: question.questionId, status: "pending" };
+      return { questionId: question!.questionId, status: "pending" };
     });
   });
 
@@ -99,7 +99,7 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
     if (!version || !question) fail(404, "سؤال عمومی فعلی یافت نشد");
     return ctx.atomic(r, actor._id, "report-public-question:" + vid, input, async (session) => {
       const row = {
-        _id: id(), versionId: vid, questionId: question._id, reporterId: actor._id,
+        _id: id(), versionId: vid, questionId: question!._id, reporterId: actor._id,
         category: input.category, description: input.description,
         status: "pending", createdAt: now(),
       };
@@ -166,10 +166,10 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
       }, { session });
       if (!submission) fail(409, "این درخواست قبلاً رسیدگی شده یا وجود ندارد");
       const prior = await c("questionVersions").findOne({
-        _id: submission.versionId, ownerId: submission.ownerId, visibility: "private",
+        _id: submission!.versionId, ownerId: submission!.ownerId, visibility: "private",
       }, { session });
       const current = prior ? await c("questions").findOne({
-        _id: qid, ownerId: submission.ownerId, currentVersionId: prior._id,
+        _id: qid, ownerId: submission!.ownerId, currentVersionId: prior._id,
       }, { session }) : null;
       if (!prior || !current) fail(409, "نسخه سؤال تغییر کرده است؛ معلم باید دوباره درخواست ثبت کند");
       const matches = await findPublicQuestionMatches(ctx, prior, session, qid);
@@ -183,7 +183,7 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
       let publishedVersionId: string | undefined;
       if (input.decision === "approve") {
         const fingerprint = await reservePublicQuestionFingerprint(
-          ctx, prior, qid, submission.ownerId, session,
+          ctx, prior, qid, submission!.ownerId, session,
         );
         const nextVersionId = id();
         const updated = await c("questions").updateOne({
