@@ -22,6 +22,7 @@ export default function SimpleQuestionHome() {
   const [grade, setGrade] = useState("");
   const [book, setBook] = useState("");
   const [category, setCategory] = useState("");
+  const [track, setTrack] = useState("");
   const [year, setYear] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
@@ -50,9 +51,10 @@ export default function SimpleQuestionHome() {
       (!grade || q.taxonomy?.grade === grade) &&
       (!book || q.taxonomy?.book === book) &&
       (!category || sourceCategory(q.source) === category) &&
+      (!track || q.source?.group === track || q.source?.track === (track === "mathematics" ? "ریاضی و فیزیک" : "علوم تجربی")) &&
       (!year || String(q.year ?? q.source?.academicYear ?? "") === year) &&
       (!difficulty || q.difficulty === difficulty);
-  }), [questions, search, grade, book, category, year, difficulty]);
+  }), [questions, search, grade, book, category, track, year, difficulty]);
 
   const chosen = selected.length
     ? visible.filter((q) => selected.includes(q._id))
@@ -125,6 +127,13 @@ export default function SimpleQuestionHome() {
                 {sourceCategories.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
               </select>
             </label>
+            <label className="text-sm">رشته / گروه کنکور
+              <select className={fieldClass} value={track} onChange={(e) => setTrack(e.target.value)}>
+                <option value="">همه رشته‌ها</option>
+                <option value="mathematics">ریاضی</option>
+                <option value="experimental">تجربی</option>
+              </select>
+            </label>
             <label className="text-sm">سال آزمون
               <select className={fieldClass} value={year} onChange={(e) => setYear(e.target.value)}>
                 <option value="">همه سال‌ها</option>
@@ -141,7 +150,7 @@ export default function SimpleQuestionHome() {
             </label>
           </div>
           <button type="button" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm hover:bg-slate-50"
-            onClick={() => { setSearch(""); setGrade(""); setBook(""); setCategory(""); setYear(""); setDifficulty(""); setSelected([]); }}>
+            onClick={() => { setSearch(""); setGrade(""); setBook(""); setCategory(""); setTrack(""); setYear(""); setDifficulty(""); setSelected([]); }}>
             <RotateCcw size={16} aria-hidden /> پاک کردن فیلترها
           </button>
         </section>
