@@ -144,7 +144,7 @@ export function registerPdfDeliveries(app: FastifyInstance, ctx: Context) {
         ? Buffer.from(chunk.data.value())
         : Buffer.from(chunk.data),
     ));
-    if (createHash("sha256").update(data).digest("hex") !== pdf.file?.sha256)
+    if (createHash("sha256").update(data).digest("hex") !== pdf!.file?.sha256)
       fail(503, "صحت فایل PDF تأیید نشد");
     // Record only successful requests for file bytes, not learning completion.
     const accessed = await c("pdfDeliveries").updateOne({
