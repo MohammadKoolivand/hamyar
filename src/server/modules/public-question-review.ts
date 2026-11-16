@@ -172,7 +172,11 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
         _id: qid, ownerId: submission!.ownerId, currentVersionId: prior._id,
       }, { session }) : null;
       if (!prior || !current) fail(409, "نسخه سؤال تغییر کرده است؛ معلم باید دوباره درخواست ثبت کند");
-      const matches = await findPublicQuestionMatches(ctx, prior, session, qid);
+      // ctx.fail is a throwing guard but is not typed as `never`; keep the
+      // checked records explicitly non-null for the full moderation transaction.
+      const approvedSubmission = submission!;
+      const sourceVersion = prior!;
+      const matches = await findPublicQuestionMatches(ctx, sourceVersion, session, qid);
       const duplicate = matches.find((item) => item.kind === "exact");
       if (input.decision === "approve" && duplicate)
         fail(409, "سؤال دقیقاً در بانک موجود است؛ از گزینه استفاده از سؤال موجود استفاده کنید");
@@ -183,28 +187,28 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
       let publishedVersionId: string | undefined;
       if (input.decision === "approve") {
         const fingerprint = await reservePublicQuestionFingerprint(
-          ctx, prior, qid, submission!.ownerId, session,
+          ctx, sourceVersion, qid, approvedSubmission.ownerId, session,
         );
         const nextVersionId = id();
         const updated = await c("questions").updateOne({
-          _id: qid, ownerId: submission.ownerId, currentVersionId: prior._id,
+          _id: qid, ownerId: approvedSubmission.ownerId, currentVersionId: sourceVersion._id,
         }, { $set: { currentVersionId: nextVersionId } }, { session });
         if (!updated.modifiedCount) fail(409, "نسخه سؤال در حین بررسی تغییر کرد");
         await c("questionVersions").insertOne({
-          ...prior, _id: nextVersionId, version: (prior.version ?? 1) + 1,
+          ...sourceVersion, _id: nextVersionId, version: (sourceVersion.version ?? 1) + 1,
           visibility: "public", verifiedBy: admin._id, verifiedAt: now(),
-          revisedFromVersionId: prior._id,
+          revisedFromVersionId: sourceVersion._id,
           publicFingerprint: fingerprint, fingerprintVersion: 1,
           publicReview: { reviewerId: admin._id, reason: input.reason,
-            licenseBasis: submission.licenseBasis,
-            sourceReference: submission.sourceReference, at: now() },
+            licenseBasis: approvedSubmission.licenseBasis,
+            sourceReference: approvedSubmission.sourceReference, at: now() },
         }, { session });
         publishedVersionId = nextVersionId;
       }
       const status = input.decision === "approve"
         ? "approved" : input.decision === "reject" ? "rejected" : "linked_existing";
       const updated = await c("publicQuestionSubmissions").updateOne({
-        _id: qid, versionId: prior._id, status: "pending",
+        _id: qid, versionId: sourceVersion._id, status: "pending",
       }, {
         $set: {
           status, decidedAt: now(), decidedBy: admin._id, decidedReason: input.reason,
@@ -217,15 +221,15 @@ export function registerPublicQuestionReview(app: FastifyInstance, ctx: Context)
         await c("questionContributions").updateOne({
           _id: qid + ":" + input.existingVersionId,
         }, { $setOnInsert: {
-          ownerId: submission.ownerId, questionId: qid,
+          ownerId: approvedSubmission.ownerId, questionId: qid,
           canonicalVersionId: input.existingVersionId,
-          sourceReference: submission.sourceReference,
-          licenseBasis: submission.licenseBasis,
+          sourceReference: approvedSubmission.sourceReference,
+          licenseBasis: approvedSubmission.licenseBasis,
           createdAt: now(),
         } }, { upsert: true, session });
       }
       await c("publicQuestionSubmissionEvents").insertOne({
-        _id: id(), questionId: qid, versionId: prior._id,
+        _id: id(), questionId: qid, versionId: sourceVersion._id,
         actorId: admin._id, event: status, reason: input.reason,
         ...(publishedVersionId ? { publishedVersionId } : {}),
         ...(input.decision === "use_existing" ? { existingVersionId: input.existingVersionId } : {}),
