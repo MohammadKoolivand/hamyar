@@ -81,5 +81,12 @@ export const examCatalog: readonly ExamCatalogEntry[] = [
 const registry = new Map(examCatalog.map((item) => [item.id, item]));
 export function examCatalogEntry(id: string) { return registry.get(id); }
 export function examCatalogValidIds(ids: readonly string[]): boolean {
-  return ids.length <= 8 && new Set(ids).size === ids.length && ids.every((id) => registry.has(id));
+  if (ids.length > 8 || new Set(ids).size !== ids.length) return false;
+  const entries = ids.map((id) => registry.get(id));
+  if (entries.some((entry) => !entry)) return false;
+  const scoped = entries.filter((entry): entry is ExamCatalogEntry => Boolean(entry));
+  if (!scoped.length) return true;
+  const sameValue = (field: "section" | "grade" | "year" | "track") =>
+    new Set(scoped.map((entry) => entry[field]).filter((value) => value !== undefined)).size <= 1;
+  return (["section", "grade", "year", "track"] as const).every(sameValue);
 }
