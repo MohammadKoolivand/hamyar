@@ -11,7 +11,11 @@ test("mobile destinations are small, stable and appropriate for each user role",
     assert.equal(new Set(primary.map((item) => item.page)).size, primary.length, role);
     assert.ok(primary.every((item) => item.label.length > 0), role);
     assert.ok(primary.every((item) => item.icon), role);
-    assert.equal(primary.some((item) => item.page === "more"), additional.length > 0, role);
+    // MVP uses an Account hub for student/teacher secondary screens;
+    // the secretary still uses a dedicated More drawer.
+    if (additional.length > 0) {
+      assert.ok(primary.some((item) => ["more", "account"].includes(item.page)), role);
+    }
   }
   assert.deepEqual(mobileDestinations("guest").primary.map((item) => item.page), ["courses", "home", "login"]);
   assert.deepEqual(mobileDestinations("parent").primary.map((item) => item.page), ["dashboard", "home", "public-bank"]);
