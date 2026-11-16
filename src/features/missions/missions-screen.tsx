@@ -97,9 +97,9 @@ export function MissionsScreen({
           refresh={refresh}
         />
       )}
+      {!teacher && <PdfDeliveriesStudent />}
       {teacher && (
-        {!teacher && <PdfDeliveriesStudent />}
-      <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
+        <section className="glass-panel p-[26px] max-[650px]:p-5 grid gap-[18px]">
           <h2 className="text-[19px] font-bold">طراحی مأموریت تمرینی</h2>
           <form
             onSubmit={(e) => {
