@@ -31,7 +31,7 @@ export const examCatalogSections = [
 export const examCatalog: readonly ExamCatalogEntry[] = [
   ...([1404, 1405] as const).flatMap((year) =>
     tracks.flatMap((track) =>
-      (["general", "first", "second", "domestic", "international"] as const).map((session) => ({
+      (year === 1404 ? ["general", "first", "second", "domestic", "international"] as const : ["general", "domestic", "international"] as const).map((session) => ({
         id: `konkur-${year}-${track}-${session}`,
         section: "konkur" as const,
         label: `کنکور ${year} ${groupNames[track]} · ${({ general: "بدون تفکیک نوبت", first: "نوبت اول", second: "نوبت دوم", domestic: "داخل کشور", international: "خارج کشور" })[session]}`,
