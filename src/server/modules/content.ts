@@ -23,8 +23,40 @@ import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
 import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
 import { visibilityForAuthoredQuestion } from "../publication-policy";
+import { examCatalogEntry } from "../../lib/exam-catalog";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
+  // A completion badge is only issued after a super-admin certifies the
+  // expected count; the public UI separately checks currently published rows.
+  app.get("/api/exam-catalog/coverage", async () => {
+    const records = await c("examCatalogCoverage")
+      .find({}, { projection: { _id: 1, expectedQuestionCount: 1 } })
+      .toArray();
+    return records
+      .filter((row) => examCatalogEntry(row._id) && Number.isSafeInteger(row.expectedQuestionCount) && row.expectedQuestionCount > 0)
+      .map((row) => ({ categoryId: row._id, expectedQuestionCount: row.expectedQuestionCount }));
+  });
+  app.post("/api/admin/exam-catalog/coverage", async (r) => {
+    const admin = await user(r, "super_admin");
+    const input = z.object({
+      categoryId: z.string().max(100),
+      expectedQuestionCount: z.number().int().min(1).max(5000),
+      reviewNote: z.string().trim().min(10).max(500),
+    }).strict().parse(r.body);
+    if (!examCatalogEntry(input.categoryId))
+      return ctx.fail(400, "دسته آزمون معتبر نیست");
+    await c("examCatalogCoverage").updateOne(
+      { _id: input.categoryId },
+      { $set: { expectedQuestionCount: input.expectedQuestionCount,
+        reviewNote: input.reviewNote, reviewerId: admin._id, reviewedAt: ctx.now() } },
+      { upsert: true },
+    );
+    await c("auditLogs").insertOne({
+      _id: id(), actorId: admin._id, action: "certify_public_exam_catalog",
+      resourceId: input.categoryId, createdAt: ctx.now(),
+    });
+    return { categoryId: input.categoryId, expectedQuestionCount: input.expectedQuestionCount };
+  });
   app.get("/api/questions/public", async (r) => {
     void r; // Public catalog never includes answers, hints or private versions.
     const rows = await c("questions")
@@ -56,6 +88,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
             visuals: 1,
             visualLayout: 1,
             source: 1,
+            "sourceExamMetadata.categoryIds": 1,
             year: 1,
             difficultyScore: 1,
             difficulty: 1,
@@ -97,10 +130,18 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       }
       taxonomy.grade ||= row.source?.grade ?? "";
       taxonomy.book ||= row.source?.subject ?? "";
-      const { ownerId: _owner, topicId: _topic, ...publicRow } = row;
+      const { ownerId: _owner, topicId: _topic,
+        sourceExamMetadata: _metadata, ...publicRow } = row;
       void _owner;
       void _topic;
-      return { ...publicRow, taxonomy };
+      // Only export validated catalog ids from already moderated public rows.
+      // Never expose private import metadata, evidence or answer keys.
+      const catalogIds = Array.isArray(_metadata?.categoryIds)
+        ? [...new Set((_metadata.categoryIds as unknown[]).filter(
+          (value): value is string => typeof value === "string" && Boolean(examCatalogEntry(value)),
+        ))]
+        : [];
+      return { ...publicRow, catalogIds, taxonomy };
     });
   });
   app.post(
