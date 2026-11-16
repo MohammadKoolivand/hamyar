@@ -30,7 +30,6 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
   GET: [
     "/api/discovery-filters",
     "/api/admin/discovery-filters",
-    "/api/admin/exam-catalog/coverage",
     "/api/questions/public",
     "/api/exam-catalog/coverage",
     "/api/questions/publication-requests",
@@ -91,6 +90,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
   ],
   POST: [
     "/api/admin/discovery-filters",
+    "/api/admin/exam-catalog/coverage",
     "/api/auth/email-verification/request",
     "/api/auth/email-verification/confirm",
     "/api/auth/email/change",
