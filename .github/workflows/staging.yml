@@ -31,7 +31,7 @@ jobs:
       github.event_name == 'workflow_dispatch'
     environment: staging
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - name: Validate successful CI provenance
         id: source
@@ -133,11 +133,25 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$HOST" =~ ^[a-zA-Z0-9.-]+$ && "$USER" =~ ^[a-z_][a-z0-9_-]*$ && "$PORT" =~ ^[0-9]+$ ]]
-          SSH_ARGS=(-i "$HOME/.ssh/staging_key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15)
-          # Inspect storage and remove only known disposable deploy artifacts.
+          SSH_ARGS=(-i "$HOME/.ssh/staging_key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 -o ServerAliveInterval=30 -o ServerAliveCountMax=10)
+          echo "[$(date -u +%FT%TZ)] Starting safe remote cleanup"
           ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "bash -s -- $SHA" < ops/cleanup-staging-artifacts.sh
+          echo "[$(date -u +%FT%TZ)] Remote cleanup complete; preparing upload directory"
           ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "mkdir -p /var/lib/hodhod/incoming/$SHA"
-          scp "${SSH_ARGS[@]}" -P "$PORT" release/* "$USER@$HOST:/var/lib/hodhod/incoming/$SHA/"
+          echo "[$(date -u +%FT%TZ)] Starting release artifact upload"
+          scp -v "${SSH_ARGS[@]}" -P "$PORT" release/* "$USER@$HOST:/var/lib/hodhod/incoming/$SHA/"
+          echo "[$(date -u +%FT%TZ)] Release artifact upload complete"
+      - name: Diagnose remote release and activate
+        env:
+          SHA: ${{ steps.source.outputs.sha }}
+          ACTIVATE: ${{ github.event_name == 'workflow_run' && 'true' || inputs.activate }}
+          HOST: ${{ vars.STAGING_HOST }}
+          USER: ${{ vars.STAGING_USER }}
+          PORT: ${{ vars.STAGING_PORT }}
+        run: |
+          set -euo pipefail
+          SSH_ARGS=(-i "$HOME/.ssh/staging_key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 -o ServerAliveInterval=30 -o ServerAliveCountMax=10)
+          echo "[$(date -u +%FT%TZ)] Inspecting remote release activation gates"
           # Diagnose activation gates without printing environment variables or secrets.
           ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "bash -s -- $SHA" <<'DIAGNOSTICS'
           set -euo pipefail
@@ -152,7 +166,9 @@ jobs:
             if [[ "$(stat -c %u /etc/hodhod/backup-before-release)" == 0 ]]; then echo "BACKUP_HOOK_ROOT_OWNED"; else echo "BACKUP_HOOK_OWNER_INVALID"; fi
           fi
           DIAGNOSTICS
+          echo "[$(date -u +%FT%TZ)] Starting verified server deployment"
           ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" "sudo -n /usr/local/sbin/hodhod-deploy $SHA $ACTIVATE"
+          echo "[$(date -u +%FT%TZ)] Verified server deployment command completed"
       - name: Remove SSH material
         if: always()
         run: rm -f ~/.ssh/staging_key ~/.ssh/known_hosts
