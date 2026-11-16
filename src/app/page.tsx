@@ -1,4 +1,7 @@
-import HamyarApp from "@/components/hamyar-app";
+// The original multipage experience is intentionally retained but disabled for this MVP.
+// import HamyarApp from "@/components/hamyar-app";
+import SimpleQuestionHome from "@/features/content/simple-question-home";
+
 export default function Page() {
-  return <HamyarApp />;
+  return <SimpleQuestionHome />;
 }
