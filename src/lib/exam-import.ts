@@ -2,6 +2,7 @@ import { normalizePersianQuestionText } from "./persian-question-text";
 import { questionVisualsSchema } from "./question-visuals";
 import { z } from "zod";
 import { questionSourceSchema } from "./question-source";
+import { examCatalogValidIds } from "./exam-catalog";
 export const MAX_PDF_BYTES = 20 * 1024 * 1024;
 export const examImportSchema = z.object({
   title: z.string().trim().min(3).max(150),
@@ -10,6 +11,7 @@ export const examImportSchema = z.object({
   track: z.string().trim().max(100).optional(),
   year: z.number().int().min(1300).max(1500).optional(),
   source: questionSourceSchema,
+  categoryIds: z.array(z.string()).max(8).default([]).refine(examCatalogValidIds, "دسته‌های آزمون معتبر نیستند"),
   ocrLanguage: z.enum(["fas", "eng", "fas+eng"]).default("fas"),
 });
 export const examDraftSchema = z.object({
