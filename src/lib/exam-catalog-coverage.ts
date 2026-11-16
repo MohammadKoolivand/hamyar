@@ -103,7 +103,7 @@ export function catalogStatuses(
     }
   }
   const certified = new Map(certifications.map((row) => [row.categoryId, row.expectedQuestionCount]));
-  return new Map(examCatalog.map((entry) => {
+  return new Map<string, CatalogStatus>(examCatalog.map((entry): [string, CatalogStatus] => {
     const count = byCategory.get(entry.id)?.size ?? 0;
     const target = certified.get(entry.id);
     const status: CatalogAvailability = count === 0
