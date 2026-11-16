@@ -17,7 +17,10 @@ release=/opt/hodhod/releases/$sha
 install -d -o hodhod -g hodhod "$release"
 tar -tzf "$incoming/release.tar.gz" | grep -x './.next/BUILD_ID' > /dev/null
 tar -tzf "$incoming/release.tar.gz" | grep -x './node_modules/next/package.json' > /dev/null
-! tar -tzf "$incoming/release.tar.gz" | grep -E '^\./(\.env|\.private)(/|$)' > /dev/null
+if tar -tzf "$incoming/release.tar.gz" | grep -Eq '^\./(\.env|\.private)(/|$)'; then
+  echo 'Release archive contains forbidden environment or private files' >&2
+  exit 1
+fi
 tar -xzf "$incoming/release.tar.gz" -C "$release" --no-same-owner
 # Abort before switching the live symlink if the packaged Next.js runtime is incomplete.
 # A package.json alone does not guarantee the CLI's internal modules survived tar exclusions.
