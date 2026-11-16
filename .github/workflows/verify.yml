@@ -47,7 +47,7 @@ jobs:
             --exclude=./.env.* \
             --exclude=./.private \
             --exclude=./.next/cache \
-            --exclude=./node_modules/.cache \
+            --exclude=./node_modules \
             --exclude=./tests \
             --exclude=./docs \
             --exclude=./output \
@@ -56,10 +56,15 @@ jobs:
             --exclude=./playwright-report \
             --exclude=./coverage \
             -czf /tmp/hodhod-release/release.tar.gz .
-          # Check the actual archive, not just the workspace build.
-          tar -tzf /tmp/hodhod-release/release.tar.gz | grep -Fx './node_modules/next/dist/build/output/log.js'
-          tar -tzf /tmp/hodhod-release/release.tar.gz | grep -Fx './node_modules/next/dist/bin/next'
+          # Ship the verified build and source, but install production dependencies on the target host.
+          tar -tzf /tmp/hodhod-release/release.tar.gz | grep -Fx './package.json'
+          tar -tzf /tmp/hodhod-release/release.tar.gz | grep -Fx './package-lock.json'
           tar -tzf /tmp/hodhod-release/release.tar.gz | grep -Fx './.next/BUILD_ID'
+          if tar -tzf /tmp/hodhod-release/release.tar.gz | grep -q '^./node_modules/'; then
+            echo "Release archive must not contain node_modules" >&2
+            exit 1
+          fi
+          du -h /tmp/hodhod-release/release.tar.gz
           cd /tmp/hodhod-release
           sha256sum release.tar.gz > SHA256SUMS
           printf '%s\n' "$GITHUB_SHA" > COMMIT
