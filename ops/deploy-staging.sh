@@ -17,7 +17,7 @@ release=/opt/hodhod/releases/$sha
 install -d -o hodhod -g hodhod "$release"
 tar -tzf "$incoming/release.tar.gz" | grep -x './.next/BUILD_ID' > /dev/null
 tar -tzf "$incoming/release.tar.gz" | grep -x './node_modules/next/package.json' > /dev/null
-if tar -tzf "$incoming/release.tar.gz" | grep -Eq '^\./(\.env|\.private)(/|$)'; then
+if tar -tzf "$incoming/release.tar.gz" | grep -E '^\./(\.env|\.private)(/|$)' > /dev/null; then
   echo 'Release archive contains forbidden environment or private files' >&2
   exit 1
 fi
