@@ -1,8 +1,9 @@
-import { notFound } from "next/navigation";
-import HamyarApp from "@/components/hamyar-app";
+import { notFound, redirect } from "next/navigation";
+// All original pages and their implementations are preserved for reactivation.
+// import HamyarApp from "@/components/hamyar-app";
 import { routeSegments } from "@/lib/app-routes";
 
-// Give every tab a real Next.js route (deep links and hard refresh work).
+// Keep known deep links recognized, but temporarily show only the public home.
 export function generateStaticParams() {
   return routeSegments.map((section) => ({ section }));
 }
@@ -14,5 +15,5 @@ export default async function SectionPage({
 }) {
   const { section } = await params;
   if (!routeSegments.some((segment) => segment === section)) notFound();
-  return <HamyarApp />;
+  redirect("/");
 }
