@@ -60,7 +60,7 @@ export function questionFingerprint(input: DuplicateInput) {
 
 function tokens(text: string): Set<string> {
   return new Set(normalizeDuplicateText(text).toLowerCase()
-    .split(/[^\p{L}\p{N}+*\/^=−-]+/u)
+    .split(new RegExp(String.raw`[^\p{L}\p{N}+*/^=−-]+`, "u"))
     .filter((v) => v.length > 1));
 }
 
