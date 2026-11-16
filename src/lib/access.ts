@@ -71,6 +71,8 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/class-groups",
     "/api/group-tasks",
     "/api/group-tasks/:tid/report",
+    "/api/pdf-deliveries",
+    "/api/pdf-deliveries/:aid/file",
     "/api/question-assets/:assetId",
     "/api/questions/library-publications",
     "/api/curriculum/catalog",
@@ -131,6 +133,10 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/class-groups/:gid/members",
     "/api/group-tasks",
     "/api/group-tasks/:tid/publish",
+    "/api/group-tasks/:tid/cancel",
+    "/api/pdf-deliveries",
+    "/api/pdf-deliveries/:aid/complete",
+    "/api/pdf-deliveries/:batchId/cancel",
     "/api/questions/:qid/library",
     "/api/curriculum/catalog/import",
     "/api/curriculum/:nodeId/remove",
@@ -278,6 +284,16 @@ function baseRouteRoles(method: string, route: string): Role[] | null {
     route.startsWith("/api/student/")
   )
     return ["student"];
+  if (route === "/api/pdf-deliveries" && method === "GET")
+    return ["teacher", "student"];
+  if (route === "/api/pdf-deliveries/:aid/file" ||
+      route === "/api/pdf-deliveries/:aid/complete")
+    return ["student"];
+  if (route === "/api/pdf-deliveries" && method === "POST")
+    return ["teacher"];
+  if (route === "/api/pdf-deliveries/:batchId/cancel" ||
+      route === "/api/group-tasks/:tid/cancel")
+    return ["teacher"];
   if (route === "/api/questions/:vid/report") return ["teacher", "student", "parent"];
   if (route === "/api/question-assets") return ["teacher"];
   if (route.startsWith("/api/question-assets/"))
