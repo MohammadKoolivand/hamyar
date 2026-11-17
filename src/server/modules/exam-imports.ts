@@ -1,4 +1,5 @@
 import { imageToPdf } from "../imports/image-pdf";
+import { suggestMathLatex, mathOcrReady } from "../imports/math-ocr";
 import type { FastifyInstance } from "fastify";
 import { Binary } from "mongodb";
 import { createHash } from "node:crypto";
@@ -391,6 +392,49 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         files[kind] = { id: row._id };
       }
     return { published: true, files };
+  });
+  // Math OCR is an explicit suggestion, never an approved question edit.
+  app.get("/api/exam-imports/:eid/math-ocr/status", async (r) => {
+    await getExam(r);
+    return { enabled: await mathOcrReady(), provider: "pix2tex", reviewRequired: true };
+  });
+  app.post("/api/exam-imports/:eid/items/:iid/math-ocr", {
+    config: { rateLimit: { max: 3, timeWindow: "1 minute" } },
+  }, async (r) => {
+    const { u, e } = await getExam(r);
+    const iid = await itemIdentifier((r.params as { iid: string }).iid, e._id, u._id);
+    const body = z.object({
+      page: z.number().int().min(1).max(100),
+      crop: z.object({
+        x: z.number().min(0).max(100),
+        y: z.number().min(0).max(100),
+        width: z.number().min(3).max(100),
+        height: z.number().min(2).max(100),
+      }).strict(),
+    }).strict().parse(r.body);
+    const item = await c("examImportItems").findOne({
+      _id: iid, examId: e._id, ownerId: u._id, state: "pending",
+    });
+    if (!item || e.state !== "review")
+      return fail(409, "تشخیص فرمول فقط برای پیش‌نویس در انتظار بازبینی فعال است");
+    if (!await mathOcrReady())
+      return fail(503, "مدل تخصصی Math OCR روی سرور پیکربندی نشده است");
+    const source = await c("examImportPages").findOne({
+      examId: e._id, ownerId: u._id, kind: "question",
+      page: body.page, expiresAt: { $gt: new Date() },
+    });
+    if (!source) return fail(410, "تصویر صفحه منقضی شده است؛ فایل را مجدداً بارگذاری کنید");
+    try {
+      const raw = source.data instanceof Binary
+        ? Buffer.from(source.data.value())
+        : Buffer.from(source.data);
+      return await suggestMathLatex(raw, body.crop);
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : "تشخیص فرمول ممکن نشد";
+      if (message.includes("ناحیه") || message.includes("برش"))
+        return fail(400, message);
+      return fail(422, "تشخیص فرمول ناموفق یا نامطمئن بود؛ تصویر اصلی را حفظ و LaTeX را دستی اصلاح کنید");
+    }
   });
   app.post("/api/exam-imports/:eid/items/:iid/source-image", async (r) => {
     const { u, e } = await getExam(r);
