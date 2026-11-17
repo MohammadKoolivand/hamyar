@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { BookOpen, Check, Minus, Search, Square, ArrowRight, BadgeCheck } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
+import { HistoricalExamSources } from "./historical-exam-sources";
 import {
   detailedExamCatalog,
   examCatalogSections,
@@ -264,6 +265,17 @@ export default function ExamCatalogPage() {
           </div>
         </section>
 
+        <details className="rounded-2xl border border-slate-200 bg-white">
+          <summary className="cursor-pointer p-5 font-semibold text-indigo-900">
+            آرشیو PDF سؤال و کلید آزمون‌های سال‌های گذشته
+          </summary>
+          <div className="p-3">
+            <HistoricalExamSources />
+            <p className="mt-3 text-xs leading-6 text-slate-600">
+              این ارجاع‌های تاریخی مستقل از موجودی سؤال‌های تأییدشدهٔ بانک‌اند و نشانگر تکمیل بانک را تغییر نمی‌دهند.
+            </p>
+          </div>
+        </details>
         <section aria-label="دسته‌بندی آزمون‌ها" className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
           <nav aria-label="نوع آزمون" className="flex flex-wrap gap-2">
             {examCatalogSections.map((item) => (

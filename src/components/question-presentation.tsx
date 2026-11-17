@@ -39,6 +39,17 @@ export function MathFormula({
     );
   }
 }
+/** Keep Latin numbers/units and their own parentheses in visual LTR order in RTL prose. */
+function MixedDirectionText({ text }: { text: string }) {
+  // Do not reverse source characters: the Unicode bidi algorithm owns direction.
+  // Isolate only Latin numeric and scientific tokens, including (30cm) and 30 cm.
+  const tokens = text.split(/((?:\([+-]?[0-9۰-۹٠-٩]+(?:[.,٫][0-9۰-۹٠-٩]+)?\)|[+-]?[0-9۰-۹٠-٩]+(?:[.,٫][0-9۰-۹٠-٩]+)?)(?:\s?(?:cm|mm|km|mg|kg|ml|mL|mol|Hz|N|Pa|J|W|V|m|g|s|L|°C)(?:\^?[23])?)|\([A-Za-z0-9][A-Za-z0-9\s+*/.=-]*\)|[A-Za-z]+[0-9]+|[0-9۰-۹٠-٩]+[A-Za-z]+)/g);
+  return <>{tokens.map((part, index) =>
+    index % 2 === 1 ? <bdi key={index} dir="ltr" className="inline-block unicode-bidi-isolate">{part}</bdi>
+      : <span key={index}>{part}</span>,
+  )}</>;
+}
+
 export function MathText({ text }: { text: string }) {
   const pieces = text.split(
     /(<u>[\s\S]{1,5000}?<\/u>|\$\$[\s\S]{1,1000}?\$\$|\$[^$\n]{1,1000}\$|\\\([\s\S]{1,1000}?\\\))/g,
@@ -57,7 +68,7 @@ export function MathText({ text }: { text: string }) {
         ) : s.startsWith("\\(") ? (
           <MathFormula key={i} latex={s.slice(2, -2)} inline />
         ) : (
-          <span key={i}>{questionDisplayText(s)}</span>
+          <MixedDirectionText key={i} text={questionDisplayText(s)} />
         ),
       )}
     </span>
