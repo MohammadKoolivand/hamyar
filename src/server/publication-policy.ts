@@ -4,7 +4,7 @@
 export function visibilityForAuthoredQuestion(
   _requested: "private" | "public" | undefined,
   _previous: "private" | "public" = "public",
-  _environment = process.env.NODE_ENV,
+  _environment: string = process.env.NODE_ENV ?? "test",
 ): "public" {
   return "public";
 }
