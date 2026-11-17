@@ -43,7 +43,7 @@ export function MathFormula({
 function MixedDirectionText({ text }: { text: string }) {
   // Do not reverse source characters: the Unicode bidi algorithm owns direction.
   // Isolate only Latin numeric and scientific tokens, including (30cm) and 30 cm.
-  const tokens = text.split(/((?:\\([+-]?[0-9۰-۹٠-٩]+(?:[.,٫][0-9۰-۹٠-٩]+)?\\)|[+-]?[0-9۰-۹٠-٩]+(?:[.,٫][0-9۰-۹٠-٩]+)?)(?:\\s?(?:cm|mm|km|mg|kg|ml|mL|mol|Hz|N|Pa|J|W|V|m|g|s|L|°C)(?:\\^?[23])?)|\\([A-Za-z0-9][A-Za-z0-9\\s+*/.=-]*\\)|[A-Za-z]+[0-9]+|[0-9۰-۹٠-٩]+[A-Za-z]+)/g);
+  const tokens = text.split(/((?:\([+-]?[0-9۰-۹٠-٩]+(?:[.,٫][0-9۰-۹٠-٩]+)?\)|[+-]?[0-9۰-۹٠-٩]+(?:[.,٫][0-9۰-۹٠-٩]+)?)(?:\s?(?:cm|mm|km|mg|kg|ml|mL|mol|Hz|N|Pa|J|W|V|m|g|s|L|°C)(?:\^?[23])?)|\([A-Za-z0-9][A-Za-z0-9\s+*/.=-]*\)|[A-Za-z]+[0-9]+|[0-9۰-۹٠-٩]+[A-Za-z]+)/g);
   return <>{tokens.map((part, index) =>
     index % 2 === 1 ? <bdi key={index} dir="ltr" className="inline-block unicode-bidi-isolate">{part}</bdi>
       : <span key={index}>{part}</span>,
