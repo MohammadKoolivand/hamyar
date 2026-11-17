@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { AppLink } from "@/components/app-link";
 import { api } from "@/lib/api";
+import { calculateExamProgress, countUniqueApprovedQuestions, estimateLegacyQuestionCount } from "@/lib/exam-import-progress";
 import { fa } from "@/lib/presentation";
 import { SourceEditor } from "./source-editor";
 import { TopicSelector } from "./topic-selector";
@@ -60,6 +61,28 @@ export function ExamImportScreen({
     administration: "final",
   });
   const showTrack = Number(grade) >= 10 || source?.family === "konkur";
+  const progressEvidence = exam?.statistics
+    ? exam.statistics.expectedCountConfidence
+      ? {
+          expectedQuestionCount: exam.statistics.expectedQuestionCount ?? null,
+          expectedCountConfidence: exam.statistics.expectedCountConfidence,
+        }
+      : estimateLegacyQuestionCount({
+          keyEntries: exam.statistics.keys,
+          hasAnswerFile: Boolean(exam.files?.answer),
+          failedAnswerPages: exam.statistics.failedPages?.filter((page) => page.kind === "answer").length ?? 0,
+        })
+    : { expectedQuestionCount: null, expectedCountConfidence: "unknown" as const };
+  const importProgress = calculateExamProgress({
+    ...progressEvidence,
+    approved: countUniqueApprovedQuestions((exam?.items ?? []).map((item) => ({
+      _id: item._id, state: item.state,
+      originalNumber: item.originalNumber,
+      detectedNumber: item.extraction?.detectedNumber,
+      questionVersionId: item.questionVersionId,
+    }))),
+    extracted: exam?.items.length ?? 0,
+  });
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
@@ -739,6 +762,32 @@ export function ExamImportScreen({
                   ادامه با ورود دستی
                 </Button>
               </div>
+            )}
+            {exam.statistics && (
+              <section className="grid gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4" aria-label="پیشرفت خودکار ورود سؤال‌های آزمون">
+                <p className="text-sm font-bold text-sky-950">
+                  {importProgress.expectedQuestionCount === null
+                    ? `${fa(importProgress.approved)} سؤال واردشده · تعداد کل هنوز مشخص نیست`
+                    : `${fa(importProgress.approved)} از ${fa(importProgress.expectedQuestionCount)} سؤال واردشده (${fa(importProgress.percent ?? 0)}٪)`}
+                </p>
+                {importProgress.expectedQuestionCount !== null && (
+                  <div role="progressbar" aria-label="درصد سؤال‌های واردشده" aria-valuemin={0}
+                    aria-valuemax={importProgress.expectedQuestionCount}
+                    aria-valuenow={Math.min(importProgress.approved, importProgress.expectedQuestionCount)}
+                    className="h-2.5 overflow-hidden rounded-full bg-white">
+                    <div className={`h-full rounded-full ${importProgress.status === "complete" ? "bg-emerald-600" : "bg-sky-700"}`}
+                      style={{ width: `${importProgress.percent ?? 0}%` }} />
+                  </div>
+                )}
+                <p className="text-xs leading-6 text-slate-600">
+                  شمار سؤال‌های واردشده بر اساس سؤال‌های یکتای تأییدشده در بانک است، نه OCR.
+                  {importProgress.expectedCountConfidence === "key_complete"
+                    ? " تعداد کل از کلید شماره‌دار پاسخ‌نامه به‌صورت خودکار محاسبه شده است."
+                    : importProgress.expectedCountConfidence === "numbering_estimate"
+                      ? " تعداد کل از شماره‌گذاری یا آرشیو پاسخ‌ها برآورد شده؛ تیک کامل قطعی صادر نمی‌شود."
+                      : " برای تشخیص تعداد کل، دفترچه کامل و ترجیحاً پاسخ‌نامه شماره‌دار لازم است."}
+                </p>
+              </section>
             )}
             {exam.statistics && (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
