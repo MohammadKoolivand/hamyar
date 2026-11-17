@@ -48,8 +48,8 @@ export async function persistQuestion(
     vid = ctx.id();
   const examImported =
     (provenance as { origin?: string }).origin === "exam_import_reviewed";
-  // In production, new questions remain private until an independent administrator approves publication.
-  const questionFields = { ...b, visibility: visibilityForAuthoredQuestion(b.visibility) };
+  // Every accepted question is public; answer references remain private in the API projection.
+  const questionFields = { ...b, visibility: "public" as const };
   const publicFingerprint = questionFields.visibility === "public"
     ? await reservePublicQuestionFingerprint(ctx, b, qid, ownerId, session)
     : undefined;
