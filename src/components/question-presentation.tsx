@@ -15,12 +15,15 @@ export function MathFormula({
   inline?: boolean;
 }) {
   try {
+    const isMatrix = /\\begin\s*\{(?:[pbBvV]?matrix|array|cases)\}/.test(latex);
     return (
       <span
         dir="ltr"
         className={
           inline
-            ? "inline-block max-w-full align-middle"
+            ? isMatrix
+              ? "hy-matrix-formula inline-block max-w-full overflow-x-auto px-2 py-2 align-middle"
+              : "inline-block max-w-full align-middle"
             : "block max-w-full overflow-x-auto py-3 text-center text-xl"
         }
         dangerouslySetInnerHTML={{
