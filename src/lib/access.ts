@@ -33,6 +33,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/admin/discovery-filters",
     "/api/questions/public",
     "/api/exam-catalog/coverage",
+    "/api/exam-catalog/public-progress",
     "/api/questions/publication-requests",
     "/api/admin/public-question-submissions",
     "/api/admin/public-question-reports",
@@ -216,6 +217,8 @@ function baseRouteRoles(method: string, route: string): Role[] | null {
   if (method.toUpperCase() === "GET" && route === "/api/pdf-library/:pid/file")
     return null; // PDF file handler verifies publication or current owner.
   if (method.toUpperCase() === "GET" && route === "/api/exam-catalog/coverage")
+    return null;
+  if (method.toUpperCase() === "GET" && route === "/api/exam-catalog/public-progress")
     return null;
   if (method.toUpperCase() === "GET" && route === "/api/discovery-filters")
     return null;
