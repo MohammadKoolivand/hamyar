@@ -1,4 +1,4 @@
-import { randomInt } from "node:crypto";
+import { createHash, randomInt } from "node:crypto";
 import sharp from "sharp";
 import { difficultySchema } from "../../lib/difficulty";
 import {
@@ -24,6 +24,7 @@ import { addDiscoveryPath } from "../discovery-settings";
 import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
 import { visibilityForAuthoredQuestion } from "../publication-policy";
 import { examCatalogEntry, validExamCoverageId } from "../../lib/exam-catalog";
+import { calculateExamProgress, estimateLegacyQuestionCount } from "../../lib/exam-import-progress";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
   // A completion badge is only issued after a super-admin certifies the
@@ -35,6 +36,73 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
     return records
       .filter((row) => validExamCoverageId(row._id) && Number.isSafeInteger(row.expectedQuestionCount) && row.expectedQuestionCount > 0)
       .map((row) => ({ categoryId: row._id, expectedQuestionCount: row.expectedQuestionCount }));
+  });
+  // Public progress is calculated exclusively from current, verified, PUBLIC
+  // question versions. Never expose unpublished imports or private OCR drafts.
+  app.get("/api/exam-catalog/public-progress", async () => {
+    const published = await c("questions").aggregate([
+      { $lookup: {
+        from: "questionVersions", localField: "currentVersionId",
+        foreignField: "_id", as: "current",
+      } },
+      { $unwind: "$current" },
+      { $match: {
+        "current.visibility": "public",
+        "current.verifiedAt": { $exists: true },
+        "current.sourceExamId": { $type: "string" },
+        $expr: { $eq: ["$ownerId", "$current.ownerId"] },
+      } },
+      { $project: {
+        examId: "$current.sourceExamId",
+        questionId: "$current._id",
+        questionNumber: "$current.source.questionNumber",
+        categoryIds: "$current.sourceExamMetadata.categoryIds",
+      } },
+    ]).toArray();
+    if (!published.length) return [];
+    const byExam = new Map<string, {
+      questions: Set<string>; categoryIds: Set<string>;
+    }>();
+    for (const row of published) {
+      if (typeof row.examId !== "string" || !row.examId) continue;
+      const group = byExam.get(row.examId) ?? {
+        questions: new Set<string>(), categoryIds: new Set<string>(),
+      };
+      const numbered = Number.isSafeInteger(row.questionNumber) &&
+        row.questionNumber >= 1 && row.questionNumber <= 500;
+      group.questions.add(numbered ? `n:${row.questionNumber}` : `i:${row.questionId}`);
+      if (Array.isArray(row.categoryIds))
+        for (const id of row.categoryIds)
+          if (typeof id === "string" && examCatalogEntry(id)) group.categoryIds.add(id);
+      byExam.set(row.examId, group);
+    }
+    const sources = await c("examImports").find(
+      { _id: { $in: [...byExam.keys()] }, archivedAt: { $exists: false } },
+      { projection: { _id: 1, title: 1, statistics: 1, files: 1 } },
+    ).toArray();
+    return sources.flatMap((source) => {
+      const data = byExam.get(source._id);
+      if (!data?.questions.size || !data.categoryIds.size) return [];
+      const previous = estimateLegacyQuestionCount({
+        keyEntries: source.statistics?.keys ?? 0,
+        hasAnswerFile: Boolean(source.files?.answer),
+        failedAnswerPages: source.statistics?.failedPages?.filter(
+          (page: { kind: string }) => page.kind === "answer",
+        ).length ?? 0,
+      });
+      const progress = calculateExamProgress({
+        approved: data.questions.size,
+        extracted: data.questions.size,
+        expectedQuestionCount: source.statistics?.expectedQuestionCount ?? previous.expectedQuestionCount,
+        expectedCountConfidence: source.statistics?.expectedCountConfidence ?? previous.expectedCountConfidence,
+      });
+      return [{
+        id: createHash("sha256").update(source._id).digest("hex").slice(0, 16),
+        title: String(source.title ?? "آزمون").slice(0, 150),
+        categoryIds: [...data.categoryIds],
+        ...progress,
+      }];
+    });
   });
   app.post("/api/admin/exam-catalog/coverage", async (r) => {
     const admin = await user(r, "super_admin");
