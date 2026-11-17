@@ -125,6 +125,12 @@ export const detailedExamCatalog: readonly ExamCatalogEntry[] = [
 ];
 const registry = new Map([...examCatalog, ...detailedExamCatalog].map((item) => [item.id, item]));
 export function examCatalogEntry(id: string) { return registry.get(id); }
+/** Individual completed import events can also be certified by an administrator. */
+export function validExamCoverageId(id: string): boolean {
+  if (registry.has(id)) return true;
+  const match = /^event-(mock-[a-z0-9]+-14\d{2}-(?:10|11|12)-(?:mathematics|experimental))-[a-f0-9]{8}$/.exec(id);
+  return Boolean(match && registry.get(match[1]));
+}
 export function examCatalogValidIds(ids: readonly string[]): boolean {
   if (ids.length > 8 || new Set(ids).size !== ids.length) return false;
   const entries = ids.map((id) => registry.get(id));
