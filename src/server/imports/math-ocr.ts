@@ -7,6 +7,7 @@ import sharp from "sharp";
 import { mathMarkup } from "../../lib/math-render";
 
 const exec = promisify(execFile);
+let modelInFlight = false;
 export interface MathCrop { x: number; y: number; width: number; height: number }
 export interface MathOcrSuggestion {
   latex: string;
@@ -70,12 +71,15 @@ export async function suggestMathLatex(
   crop: MathCrop,
 ): Promise<MathOcrSuggestion> {
   if (!(await mathOcrReady())) throw new Error("مدل Math OCR روی سرور نصب یا فعال نشده است");
+  if (modelInFlight) throw new Error("مدل در حال پردازش درخواست دیگری است؛ دوباره تلاش کنید");
   if (pagePng.byteLength > 25 * 1024 * 1024) throw new Error("تصویر صفحه بیش‌ازحد بزرگ است");
   const metadata = await sharp(pagePng, { limitInputPixels: 16_000_000 }).metadata();
   if (!metadata.width || !metadata.height) throw new Error("ابعاد تصویر نامعتبر است");
   const rectangle = mathCropPixels(crop, metadata.width, metadata.height);
-  const dir = await mkdtemp(join(tmpdir(), "hodhod-math-ocr-"));
+  modelInFlight = true;
+  let dir: string | undefined;
   try {
+    dir = await mkdtemp(join(tmpdir(), "hodhod-math-ocr-"));
     const image = await sharp(pagePng, { limitInputPixels: 16_000_000 })
       .extract(rectangle).flatten({ background: "#ffffff" }).png().toBuffer();
     const file = join(dir, "formula.png");
@@ -109,6 +113,7 @@ export async function suggestMathLatex(
       crop,
     };
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    if (dir) await rm(dir, { recursive: true, force: true });
+    modelInFlight = false;
   }
 }
