@@ -34,7 +34,7 @@ export function homeBookName(value: string): string {
   const name = value.trim();
   // Delimited titles: «فیزیک - علوم تجربی» or «حسابان (ریاضی فیزیک)».
   const delimited = name.replace(
-    /\s*(?:[-–—/|]\s*|[\[(（]\s*)(?:رشته\s*)?(?:ریاضی(?:\s*(?:و\s*)?فیزیک)?|علوم\s*تجربی|تجربی)\s*[)）\]]?\s*$/u,
+    /\s*(?:[-–—/|]\s*|[[(（]\s*)(?:رشته\s*)?(?:ریاضی(?:\s*(?:و\s*)?فیزیک)?|علوم\s*تجربی|تجربی)\s*[)）\]]?\s*$/u,
     "",
   ).trim();
   if (delimited && delimited !== name) return delimited;
