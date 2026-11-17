@@ -106,3 +106,20 @@ test("explicit historic tags preserve aggregate categories without guessing a co
   assert.ok(ids.includes("konkur-azad-1390-mathematics-afternoon"));
   assert.ok(!ids.includes("konkur-1390-mathematics-general"));
 });
+
+test("separate student-teacher entrance exam editions exist only 1403–1405", () => {
+  for (const year of konkurYears) for (const track of ["mathematics", "experimental"]) {
+    const annual = examCatalogEntry(`konkur-farhangian-${year}-${track}-general`);
+    const booklet = examCatalogEntry(`konkur-farhangian-${year}-${track}-booklet`);
+    assert.equal(Boolean(annual), year >= 1403);
+    assert.equal(Boolean(booklet), year >= 1403);
+  }
+  const teacher = question("t1", 1404, {
+    family: "konkur", group: "experimental",
+    organizer: "سازمان سنجش (فرهنگیان)", bookletCode: "دفترچه اختصاصی فرهنگیان",
+  });
+  const ids = publicQuestionCatalogIds(teacher);
+  assert.ok(ids.includes("konkur-farhangian-1404-experimental-general"));
+  assert.ok(ids.includes("konkur-farhangian-1404-experimental-booklet"));
+  assert.ok(!ids.includes("konkur-1404-experimental-general"));
+});
