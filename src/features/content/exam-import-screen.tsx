@@ -240,13 +240,25 @@ export function ExamImportScreen({
             const match = asset.examId.match(/-(\d{4})-/);
             if (match) setYear(match[1]);
             if (asset.examId.startsWith("konkur-")) {
-              setSource({ family: "konkur", organizer: "سازمان سنجش", ...(match ? { academicYear: match[1] } : {}) });
+              setSource({
+                family: "konkur",
+                organizer: "سازمان سنجش",
+                ...(match ? { academicYear: match[1] } : {}),
+                ...(asset.sourceUrl ? { sourcePageUrl: asset.sourceUrl } : {}),
+                ...(asset.examId.includes("-first-") ? { session: "نوبت اول" }
+                  : asset.examId.includes("-second-") ? { session: "نوبت دوم" } : {}),
+                ...(asset.examId.endsWith("-math") ? { group: "mathematics" as const }
+                  : asset.examId.endsWith("-experimental") ? { group: "experimental" as const }
+                  : asset.examId.endsWith("-humanities") ? { group: "humanities" as const }
+                  : asset.examId.endsWith("-art") ? { group: "art" as const }
+                  : asset.examId.endsWith("-languages") ? { group: "languages" as const } : {}),
+              });
               if (asset.examId.endsWith("-math")) setTrack("ریاضی و فیزیک");
               else if (asset.examId.endsWith("-experimental")) setTrack("علوم تجربی");
               else setTrack("");
               setGrade("12");
             } else {
-              setSource({ family: "school", administration: "final" });
+              setSource({ family: "school", administration: "final", session: "خرداد", ...(asset.sourceUrl ? { sourcePageUrl: asset.sourceUrl } : {}) });
               setGrade("12");
               setTrack("");
             }
