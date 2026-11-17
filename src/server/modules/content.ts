@@ -100,7 +100,8 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         answer?: { id: string };
         categoryIds: Set<string>;
       } = filesByExam.get(file.sourceExamId) ?? { categoryIds: new Set<string>() };
-      group[file.sourceKind] = { id: file._id };
+      const kind = file.sourceKind as "question" | "answer";
+      group[kind] = { id: file._id };
       if (Array.isArray(file.examCatalogIds))
         for (const categoryId of file.examCatalogIds)
           if (typeof categoryId === "string" && validExamCoverageId(categoryId))
