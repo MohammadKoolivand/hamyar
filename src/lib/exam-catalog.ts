@@ -98,7 +98,7 @@ export const mockExamProviders = [
   { id: "zistaz", name: "زیستاز" },
   { id: "apex", name: "اپکس" },
 ] as const;
-export const examYears = [1405, 1404, 1403, 1402] as const;
+export const examYears = [1405, 1404, 1403, 1402, 1401, 1400, 1399, 1398] as const;
 const yearLabel = (year: number) => year.toLocaleString("fa-IR", { useGrouping: false });
 /** All new rows, including school/admissions, carry an explicit Jalali year. */
 export const detailedExamCatalog: readonly ExamCatalogEntry[] = [
@@ -128,7 +128,7 @@ export function examCatalogEntry(id: string) { return registry.get(id); }
 /** Individual completed import events can also be certified by an administrator. */
 export function validExamCoverageId(id: string): boolean {
   if (registry.has(id)) return true;
-  const match = /^event-(mock-[a-z0-9]+-14\d{2}-(?:10|11|12)-(?:mathematics|experimental))-[a-f0-9]{8}$/.exec(id);
+  const match = /^event-(mock-[a-z0-9]+-1[34]\d{2}-(?:10|11|12)-(?:mathematics|experimental))-[a-f0-9]{8}$/.exec(id);
   return Boolean(match && registry.get(match[1]));
 }
 export function examCatalogValidIds(ids: readonly string[]): boolean {
