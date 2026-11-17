@@ -97,6 +97,13 @@ export const mockExamProviders = [
   { id: "tamland", name: "تاملند" },
   { id: "zistaz", name: "زیستاز" },
   { id: "apex", name: "اپکس" },
+  { id: "mazdoping", name: "دوپینگ ماز" },
+  { id: "mazpremium", name: "پرمیوم ماز" },
+  { id: "mazzoodbist", name: "زودبیست ماز" },
+  { id: "mazshabhenahayi", name: "شبه‌نهایی ماز" },
+  { id: "alpha", name: "آلفا" },
+  { id: "zistpishrafte", name: "زیست پیشرفته" },
+  { id: "azma", name: "آزما" },
 ] as const;
 export const examYears = [1405, 1404, 1403, 1402, 1401, 1400, 1399, 1398] as const;
 const yearLabel = (year: number) => year.toLocaleString("fa-IR", { useGrouping: false });
@@ -112,7 +119,9 @@ export const detailedExamCatalog: readonly ExamCatalogEntry[] = [
   ...mockExamProviders.flatMap((provider) =>
     examYears.flatMap((year) =>
       [10, 11, 12].flatMap((grade) =>
-        tracks.map((track) => ({
+        tracks.filter((track) =>
+          !["zistaz", "zistpishrafte"].includes(provider.id) || track === "experimental",
+        ).map((track) => ({
           id: `mock-${provider.id}-${year}-${grade}-${track}`,
           section: "mock" as const,
           label: `${provider.name} · ${yearLabel(year)}–${yearLabel(year + 1)} · ${gradeNames[grade]} · ${groupNames[track]}`,
