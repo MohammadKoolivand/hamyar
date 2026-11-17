@@ -94,6 +94,7 @@ export async function suggestMathLatex(
         maxBuffer: 64 * 1024,
         cwd: resolve("."),
         env: {
+          NODE_ENV: process.env.NODE_ENV ?? "production",
           PATH: process.env.PATH,
           HOME: process.env.HOME,
           VIRTUAL_ENV: process.env.VIRTUAL_ENV,
