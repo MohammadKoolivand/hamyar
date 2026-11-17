@@ -25,6 +25,7 @@ export function MathOcrReview({
   const [crop, setCrop] = useState<Crop>(initialCrop);
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [latex, setLatex] = useState("");
+  const [manualOpen, setManualOpen] = useState(false);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [reviewed, setReviewed] = useState(false);
@@ -141,11 +142,15 @@ export function MathOcrReview({
           {pending ? "در حال تشخیص…" : "پیشنهاد LaTeX از ناحیه انتخابی"}
         </button>
         {error && <p role="alert" className="text-xs text-rose-700">{error}</p>}
-        {latex && <>
+        <button type="button" className="w-fit rounded-lg border border-slate-400 px-3 py-2 text-xs text-slate-800"
+          onClick={() => { setManualOpen((old) => !old); setReviewed(false); }}>
+          {manualOpen ? "بستن ویرایش دستی" : "نوشتن/اصلاح LaTeX به‌صورت دستی"}
+        </button>
+        {(latex || manualOpen) && <>
           <p className="text-xs font-bold text-amber-900">پیش‌نویس ماشینی؛ صحت علمی و تطبیق با تصویر تأیید نشده است.</p>
           <textarea dir="ltr" aria-label="ویرایش LaTeX پیشنهادی" className="glass-field min-h-20 w-full p-2 font-mono text-sm"
             value={latex} onChange={(event) => { setLatex(event.target.value); setReviewed(false); }} />
-          <div className="overflow-x-auto rounded-lg bg-white p-2"><MathFormula latex={latex} inline /></div>
+          {latex.trim() && <div className="overflow-x-auto rounded-lg bg-white p-2"><MathFormula latex={latex} inline /></div>}
           <label className="flex items-start gap-2 text-xs">
             <input type="checkbox" checked={reviewed} onChange={(event) => setReviewed(event.target.checked)} />
             فرمول را با تصویر اصلی مقایسه و در صورت لزوم اصلاح کرده‌ام.
