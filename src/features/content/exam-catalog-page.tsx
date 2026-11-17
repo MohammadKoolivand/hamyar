@@ -44,6 +44,14 @@ type AdminImportedExam = {
   categoryIds: string[];
   examDate?: string;
   stage?: string;
+  state: "collecting" | "processing" | "failed" | "review";
+  hasQuestionFile: boolean;
+  hasAnswerFile: boolean;
+  sourceDeletedAt: boolean;
+  publicFiles?: {
+    question?: { id: string };
+    answer?: { id: string };
+  };
   total: number;
   approved: number;
   extracted: number;
@@ -192,6 +200,33 @@ export default function ExamCatalogPage() {
       setCoverage((current) => [...current.filter((row) => row.categoryId !== id), { categoryId: id, expectedQuestionCount: expected }]);
     } catch (cause) { setError(cause instanceof Error ? cause.message : "خطا در ثبت وضعیت"); }
     finally { setSaving(""); }
+  }
+
+  async function toggleImportedFiles(entry: AdminImportedExam) {
+    if (!admin || saving) return;
+    const hasPublicFiles = Boolean(entry.publicFiles?.question || entry.publicFiles?.answer);
+    const published = !hasPublicFiles;
+    const canPublish = entry.state === "review" && entry.hasQuestionFile &&
+      entry.categoryIds.length > 0 && !entry.sourceDeletedAt;
+    if (published && !canPublish) return;
+    if (published && !window.confirm(
+      "دفترچه و در صورت بارگذاری، کلید پاسخ به‌صورت عمومی کنار آزمون قرار می‌گیرند و همه کاربران می‌توانند آن‌ها را مشاهده یا دانلود کنند. فقط در صورت داشتن مجوز انتشار فایل‌ها ادامه دهید.",
+    )) return;
+    setSaving(entry._id);
+    setError("");
+    try {
+      await api(`/admin/exam-imports/${entry._id}/public-files`, { published });
+      const [nextImports, nextPublicFiles] = await Promise.all([
+        api<AdminImportedExam[]>("/admin/exam-catalog/imports"),
+        api<PublicImportedExam[]>("/exam-catalog/public-progress"),
+      ]);
+      setImports(nextImports);
+      setPublishedImports(nextPublicFiles);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "انتشار فایل‌های آزمون انجام نشد");
+    } finally {
+      setSaving("");
+    }
   }
 
   function statusOf(id: string, count: number): CatalogAvailability {
@@ -361,12 +396,15 @@ export default function ExamCatalogPage() {
                         const progressLabel = denominator === null
                           ? `${faNumber(entry.approved)} سؤال واردشده · تعداد کل نامشخص`
                           : `${faNumber(entry.approved)} از ${faNumber(denominator)} سؤال`;
+                        const hasPublicFiles = Boolean(entry.publicFiles?.question || entry.publicFiles?.answer);
+                        const canPublishFiles = entry.state === "review" && entry.hasQuestionFile &&
+                          entry.categoryIds.length > 0 && !entry.sourceDeletedAt;
                         return (
                           <div key={entry._id} className="mr-7 mt-3 grid gap-2 rounded-lg border border-teal-100 bg-teal-50/50 p-3">
                             <div className="flex flex-wrap items-center gap-2">
                               <StatusIcon status={entry.status} />
                               <span className="min-w-0 flex-1 text-xs leading-6 text-slate-700">
-                                <strong>ورود خصوصی: {entry.title}</strong>
+                                <strong>ورود آزمون: {entry.title}</strong>
                                 {entry.examDate ? ` · ${entry.examDate}` : ""}
                                 {entry.stage ? ` · ${entry.stage}` : ""}
                               </span>
@@ -391,6 +429,26 @@ export default function ExamCatalogPage() {
                                   : `تعداد کل از کلید شماره‌دار پاسخ‌نامه تشخیص داده شده؛ ${entry.percent ?? 0}٪ وارد شده.`}
                               {" "}تعداد پیش‌نویس‌های استخراج‌شده: {faNumber(entry.extracted)}.
                             </p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <button type="button" disabled={Boolean(saving) || (!hasPublicFiles && !canPublishFiles)}
+                                onClick={() => void toggleImportedFiles(entry)}
+                                className={`min-h-9 rounded-lg border px-3 text-xs font-semibold disabled:opacity-50 ${hasPublicFiles
+                                  ? "border-amber-300 bg-white text-amber-900"
+                                  : "border-teal-300 bg-white text-teal-900"}`}>
+                                {hasPublicFiles ? "برداشتن انتشار عمومی فایل‌ها" : "انتشار عمومی فایل‌های موجود"}
+                              </button>
+                              <span className="text-xs text-slate-600">
+                                {hasPublicFiles
+                                  ? `منتشرشده: ${[entry.publicFiles?.question && "دفترچه", entry.publicFiles?.answer && "کلید پاسخ"].filter(Boolean).join(" و ")}`
+                                  : !entry.hasQuestionFile
+                                    ? "PDF دفترچه هنوز بارگذاری نشده است."
+                                    : entry.state !== "review"
+                                      ? "انتشار پس از پایان بازبینی فعال می‌شود."
+                                      : entry.sourceDeletedAt
+                                        ? "فایل موقت حذف شده؛ برای انتشار دوباره باید منبع بارگذاری شود."
+                                        : "فایل‌ها هنوز عمومی نیستند."}
+                              </span>
+                            </div>
                           </div>
                         );
                       })}
