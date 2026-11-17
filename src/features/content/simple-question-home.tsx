@@ -160,9 +160,6 @@ export default function SimpleQuestionHome() {
             {([
               ["level", "مقطع", "همه مقاطع", Layers3, "text-violet-500"],
               ["grade", "پایه", "همه پایه‌ها", GraduationCap, "text-pink-500"],
-              ["book", "درس", "همه درس‌ها", BookMarked, "text-emerald-500"],
-              ["chapter", "فصل", "همه فصل‌ها", ListTree, "text-amber-500"],
-              ["topic", "مبحث", "همه مباحث", Target, "text-sky-500"],
             ] as const).map(([key, title, placeholder, Icon, iconColor]) => (
               <label key={key} className="text-base font-semibold text-slate-700">
                 <span className="flex items-center gap-2"><Icon size={17} className={iconColor} aria-hidden /> {title}</span>
@@ -180,6 +177,19 @@ export default function SimpleQuestionHome() {
                 {trackOptions.map((track) => <option key={track} value={track}>{track}</option>)}
               </select>
             </label>
+            {([
+              ["book", "درس", "همه درس‌ها", BookMarked, "text-emerald-500"],
+              ["chapter", "فصل", "همه فصل‌ها", ListTree, "text-amber-500"],
+              ["topic", "مبحث", "همه مباحث", Target, "text-sky-500"],
+            ] as const).map(([key, title, placeholder, Icon, iconColor]) => (
+              <label key={key} className="text-base font-semibold text-slate-700">
+                <span className="flex items-center gap-2"><Icon size={17} className={iconColor} aria-hidden /> {title}</span>
+                <select className={fieldClass} value={filters[key]} onChange={(e) => setTaxonomy(key, e.target.value)}>
+                  <option value="">{placeholder}</option>
+                  {taxonomyOptions(key).map((value) => <option key={value} value={value}>{value}</option>)}
+                </select>
+              </label>
+            ))}
             <label className="text-base font-semibold text-slate-700">
               <span className="flex items-center gap-2"><ClipboardList size={17} className="text-orange-500" aria-hidden /> نوع سؤال</span>
               <select className={fieldClass} value={filters.category} onChange={(e) => setFilters((old) => ({ ...old, category: e.target.value }))}>
