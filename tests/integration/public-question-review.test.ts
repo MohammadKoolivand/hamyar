@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fixture } from "../helpers/fixture";
@@ -7,6 +8,24 @@ const privateQuestion = {
   statement: "مساحت مستطیل با ضلع های ۳ و ۴ چقدر است؟",
   type: "short", reference: "۱۲",
 };
+
+async function legacyPrivateQuestion(
+  f: Awaited<ReturnType<typeof fixture>>,
+  email = "t@test.dev",
+  overrides: Record<string, unknown> = {},
+) {
+  const owner = await f.c("users").findOne({ email });
+  assert.ok(owner, "legacy question owner exists");
+  const questionId = randomUUID(), versionId = randomUUID();
+  await f.c("questions").insertOne({ _id: questionId, ownerId: owner!._id, currentVersionId: versionId });
+  await f.c("questionVersions").insertOne({
+    ...privateQuestion, ...overrides, _id: versionId, questionId,
+    ownerId: owner!._id, version: 1, verifiedBy: owner!._id,
+    verifiedAt: new Date(), visibility: "private", origin: "human",
+  });
+  return { _id: versionId, questionId };
+}
+
 const proposal = (versionId: string) => ({
   versionId, licenseBasis: "original", sourceReference: "تألیف خود معلم",
   rightsNote: "صورت سؤال توسط مؤلف ثبت شده است",
@@ -29,7 +48,7 @@ test("teacher submission remains private until a super-admin approves a NEW immu
   const f = await fixture();
   try {
     const admin = await adminCookie(f);
-    const q = await f.post("/api/questions", privateQuestion, f.teacher);
+    const q = await legacyPrivateQuestion(f);
     assert.equal((await f.request("/api/questions/public")).json().length, 1,
       "The fixture already creates one unrelated public question");
     const denyStudent = await f.request(`/api/questions/${q._id}/propose-public`, proposal(q._id), f.student);
@@ -75,7 +94,7 @@ test("exact public duplicate can be linked without exposing or replacing private
   const f = await fixture();
   try {
     const admin = await adminCookie(f);
-    const first = await f.post("/api/questions", privateQuestion, f.teacher);
+    const first = await legacyPrivateQuestion(f);
     await f.post(`/api/questions/${first._id}/propose-public`, proposal(first._id), f.teacher);
     const firstApproved = await f.post(
       `/api/admin/public-question-submissions/${first.questionId}/review`,
@@ -88,7 +107,7 @@ test("exact public duplicate can be linked without exposing or replacing private
       email: "bank-second@test.dev", password: "StrongPass123!",
     });
     const teacher2 = "session=" + login.cookies[0].value;
-    const second = await f.post("/api/questions", privateQuestion, teacher2);
+    const second = await legacyPrivateQuestion(f, "bank-second@test.dev");
     await f.post(`/api/questions/${second._id}/propose-public`, proposal(second._id), teacher2);
     const cannotApprove = await f.request(
       `/api/admin/public-question-submissions/${second.questionId}/review`,
@@ -111,7 +130,7 @@ test("a stale public proposal cannot publish an older revised private version", 
   const f = await fixture();
   try {
     const admin = await adminCookie(f);
-    const q = await f.post("/api/questions", privateQuestion, f.teacher);
+    const q = await legacyPrivateQuestion(f);
     await f.post(`/api/questions/${q._id}/propose-public`, proposal(q._id), f.teacher);
     await f.post(`/api/questions/${q._id}/revise`, {
       ...privateQuestion, statement: "مساحت مستطیل با ضلع های ۵ و ۴ چقدر است؟",
@@ -128,7 +147,7 @@ test("users may report only current published questions; manager resolves withou
   const f = await fixture();
   try {
     const admin = await adminCookie(f);
-    const q = await f.post("/api/questions", privateQuestion, f.teacher);
+    const q = await legacyPrivateQuestion(f);
     const privateReport = await f.request(`/api/questions/${q._id}/report`, {
       category: "wrong_answer", description: "پاسخ این سؤال به بررسی نیاز دارد",
     }, f.student);
@@ -161,7 +180,7 @@ test("rejection preserves private question and an append-only decision trail", a
   const f = await fixture();
   try {
     const admin = await adminCookie(f);
-    const q = await f.post("/api/questions", privateQuestion, f.teacher);
+    const q = await legacyPrivateQuestion(f);
     await f.post(`/api/questions/${q._id}/propose-public`, proposal(q._id), f.teacher);
     const rejected = await f.post(
       `/api/admin/public-question-submissions/${q.questionId}/review`,
@@ -172,5 +191,25 @@ test("rejection preserves private question and an append-only decision trail", a
     assert.equal(await f.c("publicQuestionSubmissionEvents").countDocuments({ questionId: q.questionId }), 2);
     assert.equal((await f.c("publicQuestionSubmissions").findOne({ _id: q.questionId }))?.status, "rejected");
     assert.equal((await f.request("/api/admin/public-question-submissions", undefined, f.teacher)).statusCode, 403);
+  } finally { await f.close(); }
+});
+
+test("teacher can publish every verified current question in their own bank in one operation", async () => {
+  const f = await fixture();
+  try {
+    const first = await legacyPrivateQuestion(f, "t@test.dev", { statement: "سؤال قدیمی اول برای انتشار عمومی؟" });
+    const second = await legacyPrivateQuestion(f, "t@test.dev", { statement: "سؤال قدیمی دوم برای انتشار عمومی؟" });
+    const response = await f.post("/api/questions/publish-all", {}, f.teacher);
+    assert.equal(response.published, 2);
+    assert.equal(response.skippedUnverified, 0);
+    assert.equal(response.publicTotal, 3, "the fixture question was already public");
+    for (const versionId of [first._id, second._id])
+      assert.equal((await f.c("questionVersions").findOne({ _id: versionId }))?.visibility, "public");
+    const publicRows = (await f.request("/api/questions/public")).json();
+    assert.ok(publicRows.some((row: { _id: string }) => row._id === first._id));
+    assert.ok(publicRows.some((row: { _id: string }) => row._id === second._id));
+    assert.equal(publicRows.find((row: { _id: string }) => row._id === first._id)?.reference, undefined,
+      "public output must never expose the answer reference");
+    assert.equal((await f.request("/api/questions/publish-all", {}, f.student)).statusCode, 403);
   } finally { await f.close(); }
 });
