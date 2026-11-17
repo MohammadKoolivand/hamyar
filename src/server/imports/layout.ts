@@ -125,7 +125,7 @@ export function parseQuestions(
     // for review; reconstructed formulas and option order still require approval.
     current.statement = normalizePersianQuestionText(current.statement.trim()).slice(0, 5000);
     current.options = current.options.map((option) => normalizePersianQuestionText(option.trim()));
-    if (/[^\\]\\b(?:[a-zA-Z]\\s*[=+−×÷^]|[a-zA-Z][²³]|[0-9۰-۹]+\\s*[/]\\s*[0-9۰-۹]+)\\b/.test(current.statement)) {
+    if (/(?:[A-Za-z]\s*[=+^]|[A-Za-z][²³]|[0-9۰-۹]+\s*\/\s*[0-9۰-۹]+)/.test(current.statement)) {
       current.warnings.push("نماد ریاضی/توان/کسر را با PDF تطبیق دهید؛ تبدیل LaTeX هنوز تأیید نشده است");
     }
     result.push(current);
