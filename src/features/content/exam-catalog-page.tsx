@@ -34,6 +34,19 @@ function StatusIcon({ status }: { status: CatalogAvailability }) {
     </span>
   );
 }
+type AdminImportedExam = {
+  _id: string;
+  title: string;
+  year?: number;
+  grade?: string;
+  track?: string;
+  categoryIds: string[];
+  examDate?: string;
+  stage?: string;
+  total: number;
+  approved: number;
+  complete: boolean;
+};
 type CatalogGroup = { key: string; title: string; rows: ExamCatalogEntry[] };
 function groupRows(items: readonly ExamCatalogEntry[]): CatalogGroup[] {
   const groups = new Map<string, CatalogGroup>();
@@ -57,6 +70,7 @@ export default function ExamCatalogPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [admin, setAdmin] = useState(false);
+  const [imports, setImports] = useState<AdminImportedExam[]>([]);
   const [saving, setSaving] = useState("");
   const [section, setSection] = useState<(typeof examCatalogSections)[number]["id"]>("mock");
   const [provider, setProvider] = useState("");
@@ -74,7 +88,12 @@ export default function ExamCatalogPage() {
       .catch((cause: unknown) => { if (mounted) setError(cause instanceof Error ? cause.message : "دریافت اطلاعات آزمون‌ها ممکن نشد"); })
       .finally(() => { if (mounted) setLoading(false); });
     api<{ role: string }>("/auth/me").then((me) => {
-      if (mounted && me.role === "super_admin") setAdmin(true);
+      if (mounted && me.role === "super_admin") {
+        setAdmin(true);
+        api<AdminImportedExam[]>("/admin/exam-catalog/imports")
+          .then((rows) => { if (mounted) setImports(rows); })
+          .catch(() => { /* Only authorized private imports are visible. */ });
+      }
     }).catch(() => { /* Public catalog never requires authentication. */ });
     return () => { mounted = false; };
   }, []);
@@ -96,6 +115,27 @@ export default function ExamCatalogPage() {
     (!search.trim() || item.label.includes(search.trim()))
   ), [section, provider, year, grade, track, search]);
   const groups = useMemo(() => groupRows(filtered), [filtered]);
+
+  async function toggleImportedExam(item: AdminImportedExam) {
+    if (!admin || saving) return;
+    if (!item.complete && (!item.total || item.approved !== item.total)) {
+      setError("برای تیک کامل باید تمام سؤال‌های این فایل در بخش ورود آزمون بررسی و تأیید شده باشند.");
+      return;
+    }
+    if (!window.confirm(item.complete
+      ? "تیک تکمیل ورود این آزمون برداشته شود؟"
+      : "تأیید می‌کنی تمام سؤال‌های این آزمون وارد و بررسی شده‌اند؟")) return;
+    setSaving(item._id); setError("");
+    try {
+      const result = await api<{ complete: boolean }>(
+        `/admin/exam-catalog/imports/${item._id}/completion`,
+        { complete: !item.complete },
+      );
+      setImports((current) => current.map((entry) =>
+        entry._id === item._id ? { ...entry, complete: result.complete } : entry));
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "وضعیت ورود آزمون ذخیره نشد"); }
+    finally { setSaving(""); }
+  }
 
   async function review(id: string, count: number, complete: boolean) {
     if (!admin || saving) return;
@@ -243,6 +283,26 @@ export default function ExamCatalogPage() {
                             {status.status === "complete" ? "لغو تأیید" : "تأیید تکمیل ✓"}
                           </button>}
                       </div>
+                      {admin && imports.filter((entry) => entry.categoryIds.includes(item.id)).map((entry) => {
+                        const importedStatus: CatalogAvailability = entry.complete ? "complete" : entry.approved > 0 ? "partial" : "empty";
+                        return (
+                          <div key={entry._id} className="mr-7 mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-teal-100 bg-teal-50/50 p-3">
+                            <StatusIcon status={importedStatus} />
+                            <span className="min-w-0 flex-1 text-xs leading-6 text-slate-700">
+                              <strong>ورود خصوصی: {entry.title}</strong>
+                              <span className="mr-2">· {faNumber(entry.approved)} از {faNumber(entry.total)} سؤال بازبینی شده
+                                {entry.examDate ? ` · ${entry.examDate}` : ""}
+                                {entry.stage ? ` · ${entry.stage}` : ""}
+                              </span>
+                            </span>
+                            <button type="button" disabled={Boolean(saving)}
+                              className="min-h-9 rounded-lg border border-teal-300 bg-white px-3 text-xs text-teal-900 disabled:opacity-50"
+                              onClick={() => void toggleImportedExam(entry)}>
+                              {entry.complete ? "برداشتن تیک" : "تیک پایان ورود"}
+                            </button>
+                          </div>
+                        );
+                      })}
                       {childEvents.length > 0 && <div className="mr-7 mt-3 grid gap-2 border-r-2 border-sky-100 pr-3">
                         {childEvents.map((event) => {
                           const eventStatus = statusOf(event.id, event.questionIds.length);
