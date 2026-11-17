@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { homeQuestionYear, initialHomeFilters, matchesHomeQuestion, sortHomeQuestions } from "../../src/lib/home-question-filters";
+import { homeBookName, homeQuestionYear, initialHomeFilters, matchesHomeQuestion, sortHomeQuestions } from "../../src/lib/home-question-filters";
 import type { CatalogPublicQuestion } from "../../src/lib/exam-catalog-coverage";
 
 function question(id: string, extra: Partial<CatalogPublicQuestion> = {}): CatalogPublicQuestion {
@@ -40,4 +40,18 @@ test("home sorting uses actual publication time, difficulty and recommendation v
   assert.deepEqual(sortHomeQuestions(entries, "hardest").map((q) => q._id), ["one", "two", "three"]);
   assert.deepEqual(sortHomeQuestions(entries, "recommended").map((q) => q._id), ["two", "one", "three"]);
   assert.deepEqual(entries.map((q) => q._id), ["one", "two", "three"]);
+});
+
+test("lesson labels exclude redundant track names without removing actual lessons", () => {
+  assert.equal(homeBookName("فیزیک - علوم تجربی"), "فیزیک");
+  assert.equal(homeBookName("شیمی (علوم تجربی)"), "شیمی");
+  assert.equal(homeBookName("حسابان (ریاضی فیزیک)"), "حسابان");
+  assert.equal(homeBookName("فیزیک ریاضی"), "فیزیک");
+  assert.equal(homeBookName("زیست‌شناسی علوم تجربی"), "زیست‌شناسی");
+  assert.equal(homeBookName("ریاضی"), "ریاضی");
+  assert.equal(homeBookName("علوم تجربی"), "علوم تجربی");
+  assert.equal(matchesHomeQuestion(question("legacy", {
+    taxonomy: { level: "متوسطه دوم", grade: "دوازدهم", book: "فیزیک - علوم تجربی", chapter: "حرکت", topic: "سرعت" },
+    source: { family: "konkur", group: "experimental" },
+  }), { ...initialHomeFilters(), track: "تجربی", book: "فیزیک" }), true);
 });
