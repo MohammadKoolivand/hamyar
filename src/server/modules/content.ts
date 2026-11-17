@@ -221,6 +221,8 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
             year: 1,
             difficultyScore: 1,
             difficulty: 1,
+            verifiedAt: 1,
+            questionId: 1,
             topicId: 1,
             ownerId: 1,
           },
@@ -228,6 +230,12 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         { $sort: { _id: 1 } },
       ])
       .toArray();
+    // Recommendations represent actual one-per-account votes, not fabricated scores.
+    const recommendations = rows.length ? await c("questionRecommendations").aggregate([
+      { $match: { questionId: { $in: rows.map((row) => row.questionId) } } },
+      { $group: { _id: "$questionId", count: { $sum: 1 } } },
+    ]).toArray() : [];
+    const recommendationCounts = new Map(recommendations.map((row) => [row._id, row.count]));
     const nodes = rows.length
       ? await c("curriculum")
           .find({
@@ -259,8 +267,8 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       }
       taxonomy.grade ||= row.source?.grade ?? "";
       taxonomy.book ||= row.source?.subject ?? "";
-      const { ownerId: _owner, topicId: _topic,
-        sourceExamMetadata: _metadata, ...publicRow } = row;
+      const { ownerId: _owner, topicId: _topic, questionId: _questionId,
+        verifiedAt: _verifiedAt, sourceExamMetadata: _metadata, ...publicRow } = row;
       void _owner;
       void _topic;
       // Only export validated catalog ids from already moderated public rows.
@@ -270,8 +278,36 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           (value): value is string => typeof value === "string" && Boolean(examCatalogEntry(value)),
         ))]
         : [];
-      return { ...publicRow, catalogIds, taxonomy };
+      return { ...publicRow, catalogIds, taxonomy,
+        publishedAt: _verifiedAt ?? null,
+        recommendationCount: recommendationCounts.get(_questionId) ?? 0,
+      };
     });
+  });
+  app.post("/api/questions/:vid/recommend", {
+    config: { rateLimit: { max: 30, timeWindow: "1 hour" } },
+  }, async (r) => {
+    const actor = await user(r);
+    if (!["student", "teacher", "parent", "super_admin", "secretary"].includes(actor.role))
+      ctx.fail(403, "برای پیشنهاد سؤال وارد حساب کاربری شوید");
+    const { vid } = z.object({ vid: z.string().uuid() }).parse(r.params);
+    const version = await c("questionVersions").findOne({
+      _id: vid, visibility: "public", verifiedAt: { $exists: true },
+    });
+    const current = version ? await c("questions").findOne({
+      _id: version.questionId, currentVersionId: vid, ownerId: version.ownerId,
+    }) : null;
+    if (!current) ctx.fail(404, "سؤال عمومی پیدا نشد");
+    // One durable recommendation per account and question across revisions.
+    await c("questionRecommendations").updateOne({
+      _id: ctx.hash(JSON.stringify([actor._id, current!._id])),
+    }, { $setOnInsert: {
+      userId: actor._id, questionId: current!._id, createdAt: ctx.now(),
+    } }, { upsert: true });
+    const recommendationCount = await c("questionRecommendations").countDocuments({
+      questionId: current!._id,
+    });
+    return { recommendationCount };
   });
   app.post(
     "/api/question-assets",
