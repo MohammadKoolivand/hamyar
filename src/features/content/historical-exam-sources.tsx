@@ -36,13 +36,15 @@ export function HistoricalExamSources({
   }), [year, kind, query]);
   const verifiedPairCount = historicalExamAssets.filter((a) =>
     Boolean(a.questionUrl && a.answerUrl)).length;
+  const questionOnlyCount = historicalExamAssets.filter((a) => a.questionUrl && !a.answerUrl).length;
+  const keyOnlyCount = historicalExamAssets.filter((a) => !a.questionUrl && a.answerUrl).length;
   return (
     <section aria-label="آرشیو منابع آزمون‌های سال‌های گذشته" dir="rtl" className="glass-panel grid gap-4 p-4 sm:p-6">
       <div className="space-y-2">
         <h3 className="text-lg font-bold text-[#17305E]">آرشیو دفترچه و کلید آزمون‌ها</h3>
         <p className="text-sm leading-7 text-slate-600">
           {verifiedPairCount.toLocaleString("fa-IR")} ردیف دارای نشانی سؤال و کلید و
-          {historicalExamAssets.length - verifiedPairCount} ردیف دارای ارجاع کلید بدون فایل سؤال.
+          {keyOnlyCount.toLocaleString("fa-IR")} ارجاع فقط کلید و {questionOnlyCount.toLocaleString("fa-IR")} ارجاع فقط سؤال.
           این‌ها منابع بیرونی‌اند؛ هنوز OCR، بازبینی و تأیید ورود به بانک انجام نشده است.
         </p>
       </div>
@@ -83,7 +85,9 @@ export function HistoricalExamSources({
             </div>
             <p className="text-xs leading-6 text-amber-800">
               {asset.verification === "official_key_url_reported_not_accessible"
-                ? "آدرس کلید در خبر رسمی نقل شده، اما PDF از این محیط قابل دریافت و تأیید نبوده است."
+                ? "آدرس کلید در خبر منتشر شده، اما PDF از این محیط قابل دریافت و تأیید نبوده است."
+                : asset.verification === "official_question_url_reported_not_accessible"
+                  ? "آدرس سؤال در خبر منتشر شده، اما دریافت فایل و کلید آن هنوز تأیید نشده است."
                 : asset.warning.includes("watermarked") ? "پاسخنامه دارای نشان غیرقابل استناد است؛ تأیید انسانی ضروری است."
                 : "پیش از استفاده، صحت کلید، حقوق استفاده و مطابقت فایل با نوبت آزمون بررسی شود."}
             </p>
