@@ -125,7 +125,7 @@ export function ExamImportScreen({
   async function setPublicFiles(published: boolean) {
     if (!exam || !superAdmin) return;
     if (published && !window.confirm(
-      "دفترچه و کلید پاسخ به‌صورت عمومی کنار آزمون قرار می‌گیرند و همه کاربران می‌توانند آن‌ها را مشاهده یا دانلود کنند. فقط در صورت داشتن مجوز انتشار فایل‌ها ادامه دهید.",
+      "دفترچه و در صورت بارگذاری، کلید پاسخ به‌صورت عمومی کنار آزمون قرار می‌گیرند و همه کاربران می‌توانند آن‌ها را مشاهده یا دانلود کنند. فقط در صورت داشتن مجوز انتشار فایل‌ها ادامه دهید.",
     )) return;
     await run(async () => {
       await api(`/admin/exam-imports/${exam._id}/public-files`, { published });
@@ -621,7 +621,7 @@ export function ExamImportScreen({
                 <Button type="button" disabled={busy || (!hasPublicFiles && !canPublishPublicFiles)}
                   variant={hasPublicFiles ? "outline" : "default"}
                   onClick={() => void setPublicFiles(!hasPublicFiles)}>
-                  {hasPublicFiles ? "برداشتن انتشار عمومی فایل‌ها" : "انتشار عمومی PDF و کلید"}
+                  {hasPublicFiles ? "برداشتن انتشار عمومی فایل‌ها" : "انتشار عمومی فایل‌های موجود"}
                 </Button>
                 {!hasPublicFiles && !canPublishPublicFiles && (
                   <span className="text-xs text-slate-600">
