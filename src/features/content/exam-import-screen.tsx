@@ -1,5 +1,7 @@
 "use client";
 import { normalizeQuestionTextFields } from "@/lib/persian-question-text";
+import { HistoricalExamSources, historicalExamLabel } from "./historical-exam-sources";
+import type { HistoricalExamAsset } from "@/lib/historical-exam-sources";
 import { QuestionTextInput } from "@/components/question-text-input";
 import { PagedList } from "@/components/ui/paged-list";
 import { useEffect, useState } from "react";
@@ -227,6 +229,31 @@ export function ExamImportScreen({
           </AppLink>
         )}
       </div>
+      <details className="rounded-2xl border border-slate-200 bg-white">
+        <summary className="cursor-pointer p-4 font-semibold text-indigo-900">
+          انتخاب از آرشیو آزمون‌های سال‌های گذشته (PDF سؤال و کلید)
+        </summary>
+        <div className="p-3">
+          <HistoricalExamSources onChoose={(asset: HistoricalExamAsset) => {
+            setTitle(historicalExamLabel(asset));
+            setSubject(asset.subject.slice(0, 100));
+            const match = asset.examId.match(/-(\\d{4})-/);
+            if (match) setYear(match[1]);
+            if (asset.examId.startsWith("konkur-")) {
+              setSource({ family: "konkur", organizer: "سازمان سنجش", academicYear: match?.[1] });
+              if (asset.examId.endsWith("-math")) setTrack("ریاضی و فیزیک");
+              else if (asset.examId.endsWith("-experimental")) setTrack("علوم تجربی");
+              else setTrack("");
+              setGrade("12");
+            } else {
+              setSource({ family: "school", administration: "final" });
+              setGrade("12");
+              setTrack("");
+            }
+            setNotice("مشخصات اولیه از آرشیو انتخاب شد. PDF را پس از بررسی مجوز و عنوان، دستی بارگذاری کنید.");
+          }} />
+        </div>
+      </details>
       {error && (
         <p
           role="alert"
