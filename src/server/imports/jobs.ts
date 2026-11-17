@@ -8,6 +8,7 @@ import sharp from "sharp";
 import type { Context } from "../context";
 import type { DocumentPage } from "./document-engine";
 import { parseQuestions, parseAnswerKey, matchKey } from "./layout";
+import { inferExpectedQuestionCount } from "../../lib/exam-import-progress";
 const exec = promisify(execFile);
 export const retentionDays = () =>
   Math.min(
@@ -294,6 +295,11 @@ async function runLeasedExamJob(ctx: Context) {
     const key = docs.answer
       ? parseAnswerKey(docs.answer.flatMap((p) => p.lines))
       : { entries: [], warnings: ["پاسخ‌نامه بارگذاری نشده است"] };
+    const expectedCount = inferExpectedQuestionCount({
+      questions: questions.map((question) => ({ number: question.number })),
+      answerEntries: key.entries.map((entry) => ({ number: entry.number, option: entry.option })),
+      failedAnswerPages: failedPages.filter((failure) => failure.kind === "answer").length,
+    });
     const expiresAt = new Date(
       exam.sourceExpiresAt ?? Date.now() + retentionDays() * 86400000,
     );
@@ -480,6 +486,7 @@ async function runLeasedExamJob(ctx: Context) {
               partialNotice ||
               "استخراج محلی انجام شد؛ هیچ سؤال بدون تأیید معلم وارد بانک نمی‌شود. تصاویر اصل منبع را با متن، گزینه و کلید تطبیق دهید.",
             statistics: {
+              ...expectedCount,
               failedPages,
               pages: pages.length,
               answerPages: docs.answer?.length ?? 0,
