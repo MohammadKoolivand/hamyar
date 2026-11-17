@@ -4,7 +4,6 @@ import { difficultyMetadata } from "../../lib/difficulty";
 import { visualKind } from "../../lib/question-visuals";
 import { addDiscoveryPath } from "../discovery-settings";
 import { reservePublicQuestionFingerprint } from "../question-duplicates";
-import { visibilityForAuthoredQuestion } from "../publication-policy";
 import type { AvalaiClient } from "../ai/avalai";
 import type { FastifyInstance } from "fastify";
 import type { ClientSession } from "mongodb";
