@@ -1,3 +1,4 @@
+import { normalizePersianQuestionText } from "../../lib/persian-question-text";
 export interface TextLine {
   text: string;
   page: number;
@@ -120,7 +121,13 @@ export function parseQuestions(
       : null;
     if (current.confidence !== null && current.confidence < 80)
       current.warnings.push("اطمینان OCR کمتر از ۸۰ است");
-    current.statement = current.statement.trim().slice(0, 5000);
+    // Correct deterministic OCR orthography only. Preserve original page regions
+    // for review; reconstructed formulas and option order still require approval.
+    current.statement = normalizePersianQuestionText(current.statement.trim()).slice(0, 5000);
+    current.options = current.options.map((option) => normalizePersianQuestionText(option.trim()));
+    if (/[^\\]\\b(?:[a-zA-Z]\\s*[=+−×÷^]|[a-zA-Z][²³]|[0-9۰-۹]+\\s*[/]\\s*[0-9۰-۹]+)\\b/.test(current.statement)) {
+      current.warnings.push("نماد ریاضی/توان/کسر را با PDF تطبیق دهید؛ تبدیل LaTeX هنوز تأیید نشده است");
+    }
     result.push(current);
     current = undefined;
     collected = [];
