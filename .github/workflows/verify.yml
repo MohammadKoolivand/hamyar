@@ -105,4 +105,4 @@ jobs:
           docker compose logs mongo
           exit 1
       - name: Verify full PDF transfer and exam-import handoff
-        run: node --import tsx --test --test-concurrency=1 --test-timeout=120000 tests/integration/pdf-library.test.ts
+        run: node --import tsx --test --test-concurrency=1 --test-timeout=120000 tests/integration/pdf-library.test.ts tests/integration/exam-public-files.test.ts
