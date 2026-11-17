@@ -29,9 +29,18 @@ export function homeQuestionYear(q: CatalogPublicQuestion): number | null {
   return null;
 }
 
-/** Convert book titles such as "حسابان (ریاضی)" to the subject alone. */
+/** Show the lesson alone; the selected track is already a separate filter. */
 export function homeBookName(value: string): string {
-  return value.replace(/\s*[-–—(（[]\s*(?:رشته\s*)?(?:ریاضی(?:\s*فیزیک)?|علوم\s*تجربی|تجربی)\s*[)）\]]?\s*$/u, "").trim();
+  const name = value.trim();
+  // Delimited titles: «فیزیک - علوم تجربی» or «حسابان (ریاضی فیزیک)».
+  const delimited = name.replace(
+    /\s*(?:[-–—/|]\s*|[\[(（]\s*)(?:رشته\s*)?(?:ریاضی(?:\s*(?:و\s*)?فیزیک)?|علوم\s*تجربی|تجربی)\s*[)）\]]?\s*$/u,
+    "",
+  ).trim();
+  if (delimited && delimited !== name) return delimited;
+  // Older records sometimes have a bare suffix: «فیزیک علوم تجربی».
+  const bare = name.replace(/\s+(?:رشته\s*)?(?:علوم\s*تجربی|ریاضی\s*(?:و\s*)?فیزیک)\s*$/u, "").trim();
+  return bare || name;
 }
 
 export function homeQuestionTrack(q: CatalogPublicQuestion): string {
