@@ -46,6 +46,11 @@ type AdminImportedExam = {
   stage?: string;
   total: number;
   approved: number;
+  extracted: number;
+  expectedQuestionCount: number | null;
+  expectedCountConfidence: "key_complete" | "numbering_estimate" | "unknown";
+  percent: number | null;
+  status: CatalogAvailability;
   complete: boolean;
 };
 type CatalogGroup = { key: string; title: string; rows: ExamCatalogEntry[] };
@@ -85,6 +90,8 @@ export default function ExamCatalogPage() {
 
   useEffect(() => {
     let mounted = true;
+    let poll: ReturnType<typeof setInterval> | undefined;
+    let unsubscribeFocus: (() => void) | undefined;
     Promise.all([
       api<CatalogPublicQuestion[]>("/questions/public"),
       api<CatalogCoverageRecord[]>("/exam-catalog/coverage"),
@@ -94,12 +101,18 @@ export default function ExamCatalogPage() {
     api<{ role: string }>("/auth/me").then((me) => {
       if (mounted && me.role === "super_admin") {
         setAdmin(true);
-        api<AdminImportedExam[]>("/admin/exam-catalog/imports")
-          .then((rows) => { if (mounted) setImports(rows); })
-          .catch(() => { /* Only authorized private imports are visible. */ });
+        const updateImports = () => {
+          void api<AdminImportedExam[]>("/admin/exam-catalog/imports")
+            .then((rows) => { if (mounted) setImports(rows); })
+            .catch(() => { /* Only authorized private imports are visible. */ });
+        };
+        updateImports();
+        poll = setInterval(updateImports, 30000);
+        window.addEventListener("focus", updateImports);
+        unsubscribeFocus = () => window.removeEventListener("focus", updateImports);
       }
     }).catch(() => { /* Public catalog never requires authentication. */ });
-    return () => { mounted = false; };
+    return () => { mounted = false; if (poll) clearInterval(poll); unsubscribeFocus?.(); };
   }, []);
 
   const statuses = useMemo(() => catalogStatuses(questions, coverage), [questions, coverage]);
@@ -119,27 +132,6 @@ export default function ExamCatalogPage() {
     (!search.trim() || item.label.includes(search.trim()))
   ), [section, provider, year, grade, track, search]);
   const groups = useMemo(() => groupRows(filtered), [filtered]);
-
-  async function toggleImportedExam(item: AdminImportedExam) {
-    if (!admin || saving) return;
-    if (!item.complete && (!item.total || item.approved !== item.total)) {
-      setError("برای تیک کامل باید تمام سؤال‌های این فایل در بخش ورود آزمون بررسی و تأیید شده باشند.");
-      return;
-    }
-    if (!window.confirm(item.complete
-      ? "تیک تکمیل ورود این آزمون برداشته شود؟"
-      : "تأیید می‌کنی تمام سؤال‌های این آزمون وارد و بررسی شده‌اند؟")) return;
-    setSaving(item._id); setError("");
-    try {
-      const result = await api<{ complete: boolean }>(
-        `/admin/exam-catalog/imports/${item._id}/completion`,
-        { complete: !item.complete },
-      );
-      setImports((current) => current.map((entry) =>
-        entry._id === item._id ? { ...entry, complete: result.complete } : entry));
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "وضعیت ورود آزمون ذخیره نشد"); }
-    finally { setSaving(""); }
-  }
 
   async function review(id: string, count: number, complete: boolean) {
     if (!admin || saving) return;
@@ -290,22 +282,40 @@ export default function ExamCatalogPage() {
                           </button>}
                       </div>
                       {admin && imports.filter((entry) => entry.categoryIds.includes(item.id)).map((entry) => {
-                        const importedStatus: CatalogAvailability = entry.complete ? "complete" : entry.approved > 0 ? "partial" : "empty";
+                        const denominator = entry.expectedQuestionCount;
+                        const progressLabel = denominator === null
+                          ? `${faNumber(entry.approved)} سؤال واردشده · تعداد کل نامشخص`
+                          : `${faNumber(entry.approved)} از ${faNumber(denominator)} سؤال`;
                         return (
-                          <div key={entry._id} className="mr-7 mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-teal-100 bg-teal-50/50 p-3">
-                            <StatusIcon status={importedStatus} />
-                            <span className="min-w-0 flex-1 text-xs leading-6 text-slate-700">
-                              <strong>ورود خصوصی: {entry.title}</strong>
-                              <span className="mr-2">· {faNumber(entry.approved)} از {faNumber(entry.total)} سؤال بازبینی شده
+                          <div key={entry._id} className="mr-7 mt-3 grid gap-2 rounded-lg border border-teal-100 bg-teal-50/50 p-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <StatusIcon status={entry.status} />
+                              <span className="min-w-0 flex-1 text-xs leading-6 text-slate-700">
+                                <strong>ورود خصوصی: {entry.title}</strong>
                                 {entry.examDate ? ` · ${entry.examDate}` : ""}
                                 {entry.stage ? ` · ${entry.stage}` : ""}
                               </span>
-                            </span>
-                            <button type="button" disabled={Boolean(saving)}
-                              className="min-h-9 rounded-lg border border-teal-300 bg-white px-3 text-xs text-teal-900 disabled:opacity-50"
-                              onClick={() => void toggleImportedExam(entry)}>
-                              {entry.complete ? "برداشتن تیک" : "تیک پایان ورود"}
-                            </button>
+                              <span className="text-xs font-bold tabular-nums text-teal-900">
+                                {progressLabel}
+                              </span>
+                            </div>
+                            {denominator !== null && (
+                              <div role="progressbar" aria-label={`پیشرفت ورود ${entry.title}`}
+                                aria-valuemin={0} aria-valuemax={denominator}
+                                aria-valuenow={Math.min(entry.approved, denominator)}
+                                className="h-2.5 overflow-hidden rounded-full bg-slate-200">
+                                <div className={`h-full rounded-full ${entry.status === "complete" ? "bg-emerald-600" : "bg-sky-600"}`}
+                                  style={{ width: `${entry.percent ?? 0}%` }} />
+                              </div>
+                            )}
+                            <p className="text-xs leading-6 text-slate-600">
+                              {denominator === null
+                                ? "تعداد واقعی سؤال‌ها از فایل اصلی با اطمینان تشخیص داده نشد؛ پیشرفت کامل اعلام نمی‌شود."
+                                : entry.expectedCountConfidence === "numbering_estimate"
+                                  ? `تعداد کل برآوردی از شماره‌های PDF است. ${entry.percent ?? 0}٪ ثبت شده؛ تکمیل قطعی اعلام نمی‌شود.`
+                                  : `تعداد کل از کلید شماره‌دار پاسخ‌نامه تشخیص داده شده؛ ${entry.percent ?? 0}٪ وارد شده.`}
+                              {" "}تعداد پیش‌نویس‌های استخراج‌شده: {faNumber(entry.extracted)}.
+                            </p>
                           </div>
                         );
                       })}
