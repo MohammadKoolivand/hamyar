@@ -121,7 +121,8 @@ export function registerDuplicateManagement(app: FastifyInstance, ctx: Context) 
     // and removes duplicates from active public discovery.
     return ctx.atomic(request, admin._id, "resolve-duplicate-questions", input, async (session) => {
       const ids = [...input.duplicateIds, ...(input.survivorId ? [input.survivorId] : [])];
-      const candidates = (await listCandidates(ctx, session)).filter((row) => ids.includes(row.questionId));
+      const allCandidates = await listCandidates(ctx, session);
+      const candidates = allCandidates.filter((row) => ids.includes(row.questionId));
       if (candidates.length !== ids.length) ctx.fail(409, "یکی از سؤال‌ها تغییر کرده یا عمومی نیست");
       for (const row of candidates) {
         if (input.expectedVersionIds[row.questionId] !== row.versionId)
@@ -146,7 +147,7 @@ export function registerDuplicateManagement(app: FastifyInstance, ctx: Context) 
         if (updated.modifiedCount !== 1) ctx.fail(409, "سؤال در حین عملیات تغییر کرد");
         // If an archived row owns the uniqueness claim, move it to a
         // remaining active identical question instead of freeing the hash.
-        const replacement = candidates.find((row) =>
+        const replacement = allCandidates.find((row) =>
           row.fingerprint === duplicate.fingerprint &&
           !input.duplicateIds.includes(row.questionId));
         if (replacement) {
