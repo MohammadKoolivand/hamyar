@@ -203,6 +203,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           $match: {
             "version.visibility": "public",
             "version.verifiedAt": { $exists: true },
+            archivedAt: { $exists: false },
             $expr: { $eq: ["$ownerId", "$version.ownerId"] },
           },
         },
