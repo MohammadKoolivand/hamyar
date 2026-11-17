@@ -13,14 +13,10 @@ test("public MVP home contains only filtering, selected questions and PDF export
   assert.match(screen, /printQuestions\(/);
   assert.match(screen, /type="checkbox"/);
   assert.match(screen, /sourceCategory\(/);
-  assert.match(screen, /aria-controls="hodhod-exam-catalog"/);
-  assert.match(screen, /aria-expanded=\{catalogOpen\}/);
-  assert.match(screen, /examCatalogSections\.map/);
-  assert.match(screen, /catalogStatuses\(questions, coverage\)/);
-  assert.match(screen, /setCatalogFilter\(item\.id\)/);
+  assert.match(screen, /href="\/exam-catalog"/);
+  assert.doesNotMatch(screen, /catalogOpen|hodhod-exam-catalog/);
+  assert.match(screen, /new URLSearchParams\(window.location.search\).get\("exam"\)/);
   assert.match(screen, /publicQuestionCatalogIds\(q\)/);
-  assert.match(screen, /document\.addEventListener\("pointerdown"/);
-  assert.match(screen, /event\.key === "Escape"/);
   assert.doesNotMatch(screen, /\/auth\/me|AuthScreen|\/auth\/login|\/student\/library/);
 });
 
@@ -32,4 +28,16 @@ test("all previous deep-link routes redirect to public home without deleting imp
   assert.match(legacy, /AuthScreen/);
   assert.match(legacy, /MissionsScreen/);
   assert.match(legacy, /ContentScreen/);
+});
+
+
+test("dedicated exam catalog is a real standalone page with year-specific categorized items", () => {
+  const page = read("src/app/exam-catalog/page.tsx");
+  const catalog = read("src/features/content/exam-catalog-page.tsx");
+  assert.match(page, /ExamCatalogPage/);
+  assert.match(catalog, /detailedExamCatalog/);
+  assert.match(catalog, /examYears/);
+  assert.match(catalog, /mockExamProviders/);
+  assert.match(catalog, /publicExamEvents/);
+  assert.match(catalog, /aria-label="راهنمای وضعیت موجودی"/);
 });
