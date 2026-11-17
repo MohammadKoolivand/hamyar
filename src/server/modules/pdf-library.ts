@@ -57,7 +57,10 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
 
   app.get("/api/pdf-library/public", async () => {
     return c("pdfLibrary")
-      .find({ visibility: "public", state: "ready", archivedAt: { $exists: false } })
+      .find({
+        visibility: "public", state: "ready", archivedAt: { $exists: false },
+        sourceExamId: { $exists: false },
+      })
       .project({ ownerId: 0, topicId: 0 })
       .sort({ createdAt: -1 }).limit(200).toArray();
   });
@@ -67,6 +70,7 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
     const rows = await c("pdfLibrary").find({
       ...(u.role === "super_admin" ? {} : { ownerId: u._id }),
       archivedAt: { $exists: false },
+      sourceExamId: { $exists: false },
     }).sort({ createdAt: -1 }).limit(u.role === "super_admin" ? 1000 : 100).toArray();
     if (u.role !== "super_admin") return rows;
     const owners = await c("users").find({ _id: { $in: [...new Set(rows.map((row) => row.ownerId))] } })
@@ -236,6 +240,12 @@ export function registerPdfLibrary(app: FastifyInstance, ctx: Context) {
     if (pdf.visibility !== "public") {
       const u = await user(r, "teacher");
       if (pdf.ownerId !== u._id && u.role !== "super_admin") fail(404, "PDF یافت نشد");
+    }
+    if (pdf.sourceExamId) {
+      const sourceExam = await c("examImports").findOne({
+        _id: pdf.sourceExamId, archivedAt: { $exists: false },
+      }, { projection: { _id: 1 } });
+      if (!sourceExam) fail(404, "PDF یافت نشد");
     }
     const file = await bytes(ctx, pid);
     if (createHash("sha256").update(file).digest("hex") !== pdf.file?.sha256)
