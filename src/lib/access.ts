@@ -310,6 +310,7 @@ function baseRouteRoles(method: string, route: string): Role[] | null {
       route === "/api/group-tasks/:tid/cancel")
     return ["teacher"];
   if (route === "/api/questions/:vid/report") return ["teacher", "student", "parent"];
+  if (route === "/api/questions/:vid/recommend") return ["teacher", "student", "parent"];
   if (route === "/api/question-assets") return ["teacher"];
   if (route.startsWith("/api/question-assets/"))
     return ["teacher", "student", "parent"];
