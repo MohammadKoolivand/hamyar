@@ -146,21 +146,9 @@ export function QuestionEditor({
             }}
           >
             <fieldset disabled={busy} className="grid min-w-0 gap-5">
-              <Field title="دسترسی سؤال">
-                <select
-                  className={style}
-                  value={value.visibility ?? "public"}
-                  onChange={(event) =>
-                    change({
-                      ...value,
-                      visibility: event.target.value as "private" | "public",
-                    })
-                  }
-                >
-                  <option value="private">خصوصی</option>
-                  <option value="public">عمومی — برای همه‌ی دانش‌آموزان</option>
-                </select>
-              </Field>
+              <p className="rounded-xl border border-teal-100 bg-teal-50 p-3 text-sm text-teal-900">
+                همه سؤال‌های بانک به‌صورت عمومی منتشر می‌شوند؛ پاسخ مرجع و کلید تصحیح همچنان محرمانه می‌مانند.
+              </p>
               <Field title="متن سؤال">
                 <QuestionTextInput
                   required
