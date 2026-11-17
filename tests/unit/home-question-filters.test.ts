@@ -55,3 +55,47 @@ test("lesson labels exclude redundant track names without removing actual lesson
     source: { family: "konkur", group: "experimental" },
   }), { ...initialHomeFilters(), track: "تجربی", book: "فیزیک" }), true);
 });
+
+test("source order groups exams, sorts original numbers numerically, and isolates finals", () => {
+  const source = { family: "konkur" as const, group: "experimental" as const,
+    academicYear: "۱۴۰۵", sourceTitle: "کنکور سراسری ۱۴۰۵", session: "نوبت اول" };
+  const finalSource = { family: "school" as const, administration: "final" as const,
+    sourceTitle: "امتحان نهایی ۱۴۰۵", academicYear: "۱۴۰۵", subject: "فیزیک" };
+  const rows = [
+    question("e10", { source: { ...source, questionNumber: 10 }, publishedAt: "2026-01-01" }),
+    question("final2", { source: { ...finalSource, questionNumber: 2 }, publishedAt: "2025-01-01" }),
+    question("e2", { source: { ...source, subject: "شیمی", questionNumber: 2 }, publishedAt: "2026-01-01" }),
+    question("final1", { source: { ...finalSource, questionNumber: 1 }, publishedAt: "2025-01-01" }),
+    question("eMissing", { source: { ...source }, publishedAt: "2026-01-01" }),
+    question("e1", { source: { ...source, subject: "زیست‌شناسی", questionNumber: 1 }, publishedAt: "2026-01-01" }),
+  ];
+  const result = sortHomeQuestions(rows, "source_order");
+  assert.deepEqual(result.map((q) => q._id),
+    ["e1", "e2", "e10", "eMissing", "final1", "final2"]);
+  assert.deepEqual(rows.map((q) => q._id),
+    ["e10", "final2", "e2", "final1", "eMissing", "e1"]);
+});
+
+test("different exam sessions and final subjects are never interleaved", () => {
+  const base = { family: "konkur" as const, group: "mathematics" as const,
+    sourceTitle: "کنکور سراسری ۱۴۰۵", academicYear: "۱۴۰۵" };
+  const rows = [
+    question("first10", { source: { ...base, session: "اول", questionNumber: 10 }, publishedAt: "2026-04-01" }),
+    question("second2", { source: { ...base, session: "دوم", questionNumber: 2 }, publishedAt: "2026-05-01" }),
+    question("first2", { source: { ...base, session: "اول", questionNumber: 2 }, publishedAt: "2026-04-01" }),
+    question("second1", { source: { ...base, session: "دوم", questionNumber: 1 }, publishedAt: "2026-05-01" }),
+  ];
+  assert.deepEqual(sortHomeQuestions(rows, "source_order").map((q) => q._id),
+    ["second1", "second2", "first2", "first10"]);
+  const finals = [
+    question("chem2", { source: { family: "school", administration: "final",
+      sourceTitle: "نهایی خرداد", subject: "شیمی", academicYear: "۱۴۰۵", questionNumber: 2 } }),
+    question("physics1", { source: { family: "school", administration: "final",
+      sourceTitle: "نهایی خرداد", subject: "فیزیک", academicYear: "۱۴۰۵", questionNumber: 1 } }),
+    question("chem1", { source: { family: "school", administration: "final",
+      sourceTitle: "نهایی خرداد", subject: "شیمی", academicYear: "۱۴۰۵", questionNumber: 1 } }),
+  ];
+  const sorted = sortHomeQuestions(finals, "source_order").map((q) => q._id);
+  assert.equal(Math.abs(sorted.indexOf("chem1") - sorted.indexOf("chem2")), 1);
+  assert.ok(sorted.indexOf("chem1") < sorted.indexOf("chem2"));
+});
