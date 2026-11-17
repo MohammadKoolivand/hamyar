@@ -719,6 +719,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
           );
           return { state: "rejected" };
         }
+        const approvedOriginalNumber = b.originalNumber ?? item!.originalNumber ?? item!.extraction?.detectedNumber ?? null;
         const source = {
           ...e.source,
           sourceTitle: e.title,
@@ -729,7 +730,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         if (item!.extraction?.regions?.[0])
           source.sourcePage = item!.extraction.regions[0].page;
         delete source.questionNumber;
-        if (b.originalNumber) source.questionNumber = b.originalNumber;
+        if (approvedOriginalNumber) source.questionNumber = approvedOriginalNumber;
         const q = questionSchema.parse({
           ...b.question,
           source,
@@ -802,7 +803,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
               state: "approved",
               question: q,
               questionVersionId: row._id,
-              originalNumber: b.originalNumber ?? null,
+              originalNumber: approvedOriginalNumber,
               reviewedAt: now(),
             },
           },
