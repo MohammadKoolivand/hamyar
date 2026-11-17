@@ -23,7 +23,7 @@ import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
 import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
 import { visibilityForAuthoredQuestion } from "../publication-policy";
-import { examCatalogEntry } from "../../lib/exam-catalog";
+import { validExamCoverageId } from "../../lib/exam-catalog";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
   // A completion badge is only issued after a super-admin certifies the
@@ -33,7 +33,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       .find({}, { projection: { _id: 1, expectedQuestionCount: 1 } })
       .toArray();
     return records
-      .filter((row) => examCatalogEntry(row._id) && Number.isSafeInteger(row.expectedQuestionCount) && row.expectedQuestionCount > 0)
+      .filter((row) => validExamCoverageId(row._id) && Number.isSafeInteger(row.expectedQuestionCount) && row.expectedQuestionCount > 0)
       .map((row) => ({ categoryId: row._id, expectedQuestionCount: row.expectedQuestionCount }));
   });
   app.post("/api/admin/exam-catalog/coverage", async (r) => {
@@ -43,7 +43,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       expectedQuestionCount: z.number().int().min(1).max(5000),
       reviewNote: z.string().trim().min(10).max(500),
     }).strict().parse(r.body);
-    if (!examCatalogEntry(input.categoryId))
+    if (!validExamCoverageId(input.categoryId))
       return ctx.fail(400, "دسته آزمون معتبر نیست");
     await c("examCatalogCoverage").updateOne(
       { _id: input.categoryId },
@@ -57,7 +57,18 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
     });
     return { categoryId: input.categoryId, expectedQuestionCount: input.expectedQuestionCount };
   });
-  app.get("/api/questions/public", async (r) => {
+  app.delete("/api/admin/exam-catalog/coverage/:categoryId", async (r) => {
+    const admin = await user(r, "super_admin");
+    const input = z.object({ categoryId: z.string().max(140) }).parse(r.params);
+    if (!validExamCoverageId(input.categoryId)) return ctx.fail(400, "دسته آزمون معتبر نیست");
+    const result = await c("examCatalogCoverage").deleteOne({ _id: input.categoryId });
+    await c("auditLogs").insertOne({
+      _id: id(), actorId: admin._id, action: "revoke_public_exam_completion",
+      resourceId: input.categoryId, createdAt: ctx.now(),
+    });
+    return { revoked: result.deletedCount > 0 };
+  });
+    app.get("/api/questions/public", async (r) => {
     void r; // Public catalog never includes answers, hints or private versions.
     const rows = await c("questions")
       .aggregate([
