@@ -48,12 +48,19 @@ export function mockProviderId(organizer: string): string | undefined {
   if (/اپکس|apex/.test(name)) return "apex";
   if (/سنجش|sanjesh/.test(name)) return "sanjesh";
   if (/گاج|gaj/.test(name)) return "gaj";
+  if (/دوپینگ.?ماز|maz.?doping/.test(name)) return "mazdoping";
+  if (/پرمیوم.?ماز|maz.?premium/.test(name)) return "mazpremium";
+  if (/زود.?بیست.?ماز|maz.?zoodbist/.test(name)) return "mazzoodbist";
+  if (/شبه.?نهایی.?ماز|maz.?shabhe/.test(name)) return "mazshabhenahayi";
+  if (/زیست.?پیشرفته/.test(name)) return "zistpishrafte";
+  if (/آلفا|alpha/.test(name)) return "alpha";
+  if (/آزما|azma/.test(name)) return "azma";
   if (/ماز|maz/.test(name)) return "maz";
   return mockExamProviders.find((provider) => name === normalizeSource(provider.name))?.id;
 }
 function declaredYear(q: CatalogPublicQuestion): number | undefined {
   const year = normalizedNumber(q.source?.academicYear ?? q.year);
-  return Number.isInteger(year) && year >= 1402 && year <= 1405 ? year : undefined;
+  return Number.isInteger(year) && year >= 1398 && year <= 1405 ? year : undefined;
 }
 function mockYearlyId(q: CatalogPublicQuestion) {
   const source = q.source;
