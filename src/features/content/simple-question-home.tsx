@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BookOpen, FileDown, Search, RotateCcw, X } from "lucide-react";
+import { BookOpen, FileDown, Search, RotateCcw, X, Layers3, GraduationCap, BookMarked, ListTree, Target, ClipboardList, Gauge, CalendarRange, ArrowDownWideNarrow, ThumbsUp } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
 import { QuestionPresentation, MathText, QuestionVisualView } from "@/components/question-presentation";
 import { api } from "@/lib/api";
-import { sourceCategories, sourceCategory, sourceSummary } from "@/lib/question-source";
+import { sourceCategories, sourceSummary } from "@/lib/question-source";
 import { validExamCoverageId } from "@/lib/exam-catalog";
 import { publicQuestionCatalogIds, publicExamEvents, type CatalogPublicQuestion } from "@/lib/exam-catalog-coverage";
 import { printQuestions } from "@/lib/print-questions";
+import { homeQuestionTaxonomy, homeQuestionYear, initialHomeFilters, matchesHomeQuestion, sortHomeQuestions, type HomeFilterKey, type HomeSort } from "@/lib/home-question-filters";
 
 /**
  * Public, single-page MVP. The original login, dashboards, teacher tools,
@@ -21,13 +22,10 @@ export default function SimpleQuestionHome() {
   const resultsRef = useRef<HTMLElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
-  const [grade, setGrade] = useState("");
-  const [book, setBook] = useState("");
-  const [category, setCategory] = useState("");
-  const [track, setTrack] = useState("");
-  const [year, setYear] = useState("");
-  const [difficulty, setDifficulty] = useState("");
+  const [filters, setFilters] = useState(initialHomeFilters);
+  const [sortBy, setSortBy] = useState<HomeSort>("newest");
+  const [recommending, setRecommending] = useState("");
+  const [recommendationMessage, setRecommendationMessage] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const [printing, setPrinting] = useState(false);
   const printable = useRef<HTMLDivElement>(null);
@@ -49,28 +47,52 @@ export default function SimpleQuestionHome() {
     return () => { active = false; };
   }, []);
 
-  const options = (key: "grade" | "book") =>
-    [...new Set(questions.map((q) => q.taxonomy?.[key] ?? "").filter(Boolean))]
+  const taxonomyOrder: HomeFilterKey[] = ["level", "grade", "book", "chapter", "topic"];
+  function setTaxonomy(key: HomeFilterKey, value: string) {
+    setFilters((previous) => {
+      const next = { ...previous, [key]: value };
+      for (const child of taxonomyOrder.slice(taxonomyOrder.indexOf(key) + 1)) next[child] = "";
+      return next;
+    });
+    setSelected([]);
+  }
+  const taxonomyOptions = (key: HomeFilterKey) => {
+    const parents = taxonomyOrder.slice(0, taxonomyOrder.indexOf(key));
+    return [...new Set(questions.filter((q) =>
+      parents.every((parent) => !filters[parent] || homeQuestionTaxonomy(q, parent) === filters[parent]))
+      .map((q) => homeQuestionTaxonomy(q, key)).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, "fa"));
-  const years = [...new Set(questions.map((q) => String(q.year ?? q.source?.academicYear ?? "")).filter(Boolean))]
-    .sort((a, b) => b.localeCompare(a, "fa"));
-  const visible = useMemo(() => questions.filter((q) => {
-    const searchable = [q.statement, q.taxonomy?.topic, q.taxonomy?.chapter, q.taxonomy?.book, q.source?.sourceTitle].join(" ");
-    return (!search.trim() || searchable.includes(search.trim())) &&
-      (!grade || q.taxonomy?.grade === grade) &&
-      (!book || q.taxonomy?.book === book) &&
-      (!category || sourceCategory(q.source) === category) &&
-      (!track || q.source?.group === track || q.source?.track === (track === "mathematics" ? "ریاضی و فیزیک" : "علوم تجربی")) &&
-      (!year || String(q.year ?? q.source?.academicYear ?? "") === year) &&
-      (!difficulty || q.difficulty === difficulty) &&
-      (!catalogFilter || (catalogFilter.startsWith("event-")
-        ? publicExamEvents([q]).some((item) => item.id === catalogFilter)
-        : publicQuestionCatalogIds(q).includes(catalogFilter)));
-  }), [questions, search, grade, book, category, track, year, difficulty, catalogFilter]);
+  };
+  const years = [...new Set(questions.map(homeQuestionYear).filter((year): year is number => year !== null))]
+    .sort((a, b) => a - b);
+
+  const visible = useMemo(() => sortHomeQuestions(questions.filter((q) =>
+    matchesHomeQuestion(q, filters) &&
+    (!catalogFilter || (catalogFilter.startsWith("event-")
+      ? publicExamEvents([q]).some((item) => item.id === catalogFilter)
+      : publicQuestionCatalogIds(q).includes(catalogFilter)))
+  ), sortBy), [questions, filters, catalogFilter, sortBy]);
 
   const chosen = selected.length
     ? visible.filter((q) => selected.includes(q._id))
     : visible;
+
+  async function recommendQuestion(questionId: string) {
+    setRecommending(questionId);
+    setRecommendationMessage("");
+    try {
+      const response = await api<{ recommendationCount: number }>("/questions/" + questionId + "/recommend", {});
+      setQuestions((previous) => previous.map((q) =>
+        q._id === questionId ? { ...q, recommendationCount: response.recommendationCount } : q));
+      setRecommendationMessage("پیشنهاد شما ثبت شد.");
+    } catch (cause) {
+      setRecommendationMessage(cause instanceof Error
+        ? "برای پیشنهاد سؤال، ابتدا وارد حساب کاربری شوید. " + cause.message
+        : "ثبت پیشنهاد انجام نشد.");
+    } finally {
+      setRecommending("");
+    }
+  }
 
   async function downloadPdf() {
     if (!printable.current || !chosen.length) return;
@@ -109,76 +131,100 @@ export default function SimpleQuestionHome() {
         </div>
       </header>
       <main className="mx-auto grid max-w-6xl gap-6 px-4 py-7 sm:px-6 sm:py-10">
-        <section className="rounded-3xl border border-sky-100 bg-white p-5 shadow-sm sm:p-8">
-          <div className="flex items-center gap-3 text-blue-900">
-            <BookOpen size={26} aria-hidden />
-            <h1 className="text-2xl font-bold sm:text-3xl">نمونه‌سؤال‌های هدهد</h1>
+        <section aria-label="فیلتر سؤال‌ها" className="rounded-3xl border border-sky-100 bg-white p-5 shadow-sm sm:p-8">
+          <div className="flex flex-wrap items-center gap-3 text-blue-900">
+            <span className="rounded-2xl bg-blue-50 p-3"><BookOpen size={26} aria-hidden /></span>
+            <div>
+              <h1 className="text-2xl font-bold sm:text-3xl">نمونه‌سؤال‌های هدهد</h1>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                سؤال دلخواهت را با فیلترهای دقیق پیدا کن، مرتب کن و خروجی PDF بگیر.
+              </p>
+            </div>
           </div>
-          <p className="mt-3 text-sm leading-8 text-slate-600">
-            پایه، درس یا نوع آزمون را انتخاب کن، سؤال‌های دلخواهت را علامت بزن و خروجی PDF بگیر.
-            فقط سؤال‌های عمومی و تأییدشده نمایش داده می‌شوند.
-          </p>
-        </section>
-
-        <section aria-label="فیلتر سؤال‌ها" className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-          <div className="mb-4 flex items-center gap-2 font-bold">
-            <Search size={19} aria-hidden /> پیدا کردن سؤال
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <label className="text-sm">جست‌وجوی متن یا مبحث
-              <input className={fieldClass} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="مثلاً تابع، هندسه، زیست..." />
+          <div className="my-6 border-t border-slate-100" />
+          <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-slate-800">
+            <Search size={19} className="text-blue-600" aria-hidden /> پیدا کردن سؤال
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <label className="text-sm font-medium text-slate-700">
+              <span className="flex items-center gap-2"><Search size={17} className="text-blue-500" aria-hidden /> جست‌وجوی متن</span>
+              <input className={fieldClass} value={filters.search}
+                onChange={(e) => setFilters((old) => ({ ...old, search: e.target.value }))}
+                placeholder="مثلاً تابع، هندسه، زیست..." />
             </label>
-            <label className="text-sm">پایه
-              <select className={fieldClass} value={grade} onChange={(e) => { setGrade(e.target.value); setBook(""); }}>
-                <option value="">همه پایه‌ها</option>
-                {options("grade").map((v) => <option key={v} value={v}>{v}</option>)}
-              </select>
-            </label>
-            <label className="text-sm">درس
-              <select className={fieldClass} value={book} onChange={(e) => setBook(e.target.value)}>
-                <option value="">همه درس‌ها</option>
-                {[...new Set(questions.filter((q) => !grade || q.taxonomy?.grade === grade).map((q) => q.taxonomy?.book ?? "").filter(Boolean))]
-                  .sort((a, b) => a.localeCompare(b, "fa")).map((v) => <option key={v} value={v}>{v}</option>)}
-              </select>
-            </label>
-            <label className="text-sm">نوع آزمون
-              <select className={fieldClass} value={category} onChange={(e) => setCategory(e.target.value)}>
+            {([
+              ["level", "مقطع", "همه مقاطع", Layers3, "text-violet-500"],
+              ["grade", "پایه", "همه پایه‌ها", GraduationCap, "text-pink-500"],
+              ["book", "درس", "همه درس‌ها", BookMarked, "text-emerald-500"],
+              ["chapter", "فصل", "همه فصل‌ها", ListTree, "text-amber-500"],
+              ["topic", "مبحث", "همه مباحث", Target, "text-sky-500"],
+            ] as const).map(([key, title, placeholder, Icon, iconColor]) => (
+              <label key={key} className="text-sm font-medium text-slate-700">
+                <span className="flex items-center gap-2"><Icon size={17} className={iconColor} aria-hidden /> {title}</span>
+                <select className={fieldClass} value={filters[key]} onChange={(e) => setTaxonomy(key, e.target.value)}>
+                  <option value="">{placeholder}</option>
+                  {taxonomyOptions(key).map((value) => <option key={value} value={value}>{value}</option>)}
+                </select>
+              </label>
+            ))}
+            <label className="text-sm font-medium text-slate-700">
+              <span className="flex items-center gap-2"><ClipboardList size={17} className="text-orange-500" aria-hidden /> نوع سؤال</span>
+              <select className={fieldClass} value={filters.category} onChange={(e) => setFilters((old) => ({ ...old, category: e.target.value }))}>
                 <option value="">همه انواع</option>
-                {sourceCategories.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+                {sourceCategories.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
               </select>
             </label>
-            <label className="text-sm">رشته / گروه کنکور
-              <select className={fieldClass} value={track} onChange={(e) => setTrack(e.target.value)}>
-                <option value="">همه رشته‌ها</option>
-                <option value="mathematics">ریاضی</option>
-                <option value="experimental">تجربی</option>
-              </select>
-            </label>
-            <label className="text-sm">سال آزمون
-              <select className={fieldClass} value={year} onChange={(e) => setYear(e.target.value)}>
-                <option value="">همه سال‌ها</option>
-                {years.map((v) => <option key={v} value={v}>{v}</option>)}
-              </select>
-            </label>
-            <label className="text-sm">درجه سختی
-              <select className={fieldClass} value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+            <label className="text-sm font-medium text-slate-700">
+              <span className="flex items-center gap-2"><Gauge size={17} className="text-rose-500" aria-hidden /> درجه سختی</span>
+              <select className={fieldClass} value={filters.difficulty} onChange={(e) => setFilters((old) => ({ ...old, difficulty: e.target.value }))}>
                 <option value="">همه سطوح</option>
                 <option value="easy">آسان</option>
                 <option value="medium">متوسط</option>
                 <option value="hard">سخت</option>
               </select>
             </label>
+            <fieldset className="text-sm font-medium text-slate-700">
+              <legend className="flex items-center gap-2"><CalendarRange size={17} className="text-indigo-500" aria-hidden /> بازه سال</legend>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="sr-only" htmlFor="home-year-from">از سال</label>
+                <select id="home-year-from" aria-label="از سال" className={fieldClass} value={filters.yearFrom}
+                  onChange={(e) => setFilters((old) => ({ ...old, yearFrom: e.target.value }))}>
+                  <option value="">از سال</option>
+                  {years.map((year) => <option key={year} value={year}>{year.toLocaleString("fa-IR")}</option>)}
+                </select>
+                <label className="sr-only" htmlFor="home-year-to">تا سال</label>
+                <select id="home-year-to" aria-label="تا سال" className={fieldClass} value={filters.yearTo}
+                  onChange={(e) => setFilters((old) => ({ ...old, yearTo: e.target.value }))}>
+                  <option value="">تا سال</option>
+                  {years.map((year) => <option key={year} value={year}>{year.toLocaleString("fa-IR")}</option>)}
+                </select>
+              </div>
+            </fieldset>
           </div>
-          <button type="button" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm hover:bg-slate-50"
-            onClick={() => { setSearch(""); setGrade(""); setBook(""); setCategory(""); setTrack(""); setYear(""); setDifficulty(""); setCatalogFilter(""); setSelected([]); }}>
-            <RotateCcw size={16} aria-hidden /> پاک کردن فیلترها
-          </button>
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs text-slate-500">فیلترهای مقطع تا مبحث به‌صورت مرحله‌ای به هم وابسته‌اند.</p>
+            <button type="button" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm hover:bg-slate-50"
+              onClick={() => { setFilters(initialHomeFilters()); setSortBy("newest"); setCatalogFilter(""); setSelected([]); }}>
+              <RotateCcw size={16} aria-hidden /> پاک کردن فیلترها
+            </button>
+          </div>
         </section>
 
         <section ref={resultsRef} aria-label="نتایج سؤال" className="grid scroll-mt-4 gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-sm font-semibold">{visible.length.toLocaleString("fa-IR")} سؤال پیدا شد</p>
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <ArrowDownWideNarrow size={18} className="text-indigo-500" aria-hidden />
+                مرتب‌سازی
+                <select aria-label="مرتب‌سازی نتایج" className="min-h-10 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+                  value={sortBy} onChange={(e) => setSortBy(e.target.value as HomeSort)}>
+                  <option value="newest">جدیدترین</option>
+                  <option value="easiest">ساده‌ترین</option>
+                  <option value="hardest">سخت‌ترین</option>
+                  <option value="recommended">پیشنهاد کاربران</option>
+                </select>
+              </label>
               {catalogFilter && (
                 <button type="button" onClick={() => { setCatalogFilter(""); setSelected([]); }}
                   className="inline-flex min-h-9 items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 text-xs text-blue-900">
@@ -205,6 +251,7 @@ export default function SimpleQuestionHome() {
           </div>
           {loading && <p role="status" className="rounded-2xl bg-white p-5">در حال بارگذاری سؤال‌ها…</p>}
           {error && <p role="alert" className="rounded-2xl bg-rose-50 p-5 text-rose-800">{error}</p>}
+          {recommendationMessage && <p role="status" className="rounded-xl bg-blue-50 p-3 text-sm text-blue-900">{recommendationMessage} <a className="underline" href="/login">ورود به حساب</a></p>
           {!loading && !error && !visible.length &&
             <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
               برای این فیلترها هنوز سؤال عمومیِ تأییدشده‌ای ثبت نشده است.
@@ -219,6 +266,14 @@ export default function SimpleQuestionHome() {
               <QuestionPresentation statement={q.statement} options={q.type === "choice" ? q.options : undefined}
                 optionImages={q.optionImages} visuals={q.visuals} visualLayout={q.visualLayout} />
               <p className="mt-3 text-xs text-slate-500">{sourceSummary(q.source)}</p>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
+                <span className="text-xs text-slate-500">{q.recommendationCount ?? 0} پیشنهاد کاربران</span>
+                <button type="button" disabled={recommending === q._id} onClick={() => void recommendQuestion(q._id)}
+                  className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-800 hover:bg-teal-100 disabled:opacity-50">
+                  <ThumbsUp size={15} aria-hidden />
+                  {recommending === q._id ? "در حال ثبت…" : "پیشنهاد این سؤال"}
+                </button>
+              </div>
             </article>
           ))}
         </section>
