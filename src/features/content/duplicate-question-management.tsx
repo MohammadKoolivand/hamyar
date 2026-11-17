@@ -108,7 +108,7 @@ export default function DuplicateQuestionManagement() {
   const filtered = useMemo(() => (data?.groups ?? []).filter((g) =>
     (kind === "all" || g.kind === kind) &&
     (!query.trim() || g.questions.some((q) => [q.statement, q.source?.sourceTitle, q.source?.organizer].some((t) =>
-      String(t ?? "").toLocaleLowerCase("fa").includes(query.trim().toLocaleLowerCase("fa"))))
+      String(t ?? "").toLocaleLowerCase("fa").includes(query.trim().toLocaleLowerCase("fa")))))
   ), [data, kind, query]);
   return <main className="mx-auto max-w-6xl space-y-5 px-4 py-8 text-slate-800" dir="rtl">
     <div className="flex flex-wrap items-center justify-between gap-3">
