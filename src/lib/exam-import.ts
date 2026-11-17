@@ -68,6 +68,8 @@ export interface ExamImport extends ExamMetadata {
     errorMessage?: string;
   };
   statistics?: {
+    expectedQuestionCount?: number | null;
+    expectedCountConfidence?: "key_complete" | "numbering_estimate" | "unknown";
     failedPages?: { kind: string; page: number; totalPages: number }[];
     pages: number;
     answerPages: number;
