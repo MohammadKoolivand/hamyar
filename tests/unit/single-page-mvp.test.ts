@@ -20,11 +20,13 @@ test("public MVP home contains only filtering, selected questions and PDF export
   assert.doesNotMatch(screen, /\/auth\/me|AuthScreen|\/auth\/login|\/student\/library/);
 });
 
-test("all previous deep-link routes redirect to public home without deleting implementation", () => {
+test("only educator login and exam import routes are restored; remaining deep links redirect", () => {
   const route = read("src/app/[section]/page.tsx");
   const legacy = read("src/components/hamyar-app.tsx");
   assert.match(route, /redirect\("\/"\)/);
-  assert.match(route, /\/\/ import HamyarApp/);
+  assert.match(route, /import HamyarApp/);
+  assert.match(route, /educatorEntries = new Set\(\["exam-import", "login"\]\)/);
+  assert.match(route, /if \(educatorEntries\.has\(section\)\) return <HamyarApp\s*\/>/);
   assert.match(legacy, /AuthScreen/);
   assert.match(legacy, /MissionsScreen/);
   assert.match(legacy, /ContentScreen/);
