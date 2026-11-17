@@ -106,7 +106,7 @@ export default function SimpleQuestionHome() {
       setPrinting(false);
     }
   }
-  const fieldClass = "mt-2 min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-offset-2 focus:border-blue-500";
+  const fieldClass = "mt-2 min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base leading-6 outline-offset-2 focus:border-blue-500";
   return (
     <div className="min-h-screen bg-[#f7f9fc] text-slate-800" dir="rtl">
       <header className="border-b border-slate-200 bg-white">
@@ -146,7 +146,7 @@ export default function SimpleQuestionHome() {
             <Search size={19} className="text-blue-600" aria-hidden /> پیدا کردن سؤال
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <label className="text-sm font-medium text-slate-700">
+            <label className="text-base font-semibold text-slate-700">
               <span className="flex items-center gap-2"><Search size={17} className="text-blue-500" aria-hidden /> جست‌وجوی متن</span>
               <input className={fieldClass} value={filters.search}
                 onChange={(e) => setFilters((old) => ({ ...old, search: e.target.value }))}
@@ -159,7 +159,7 @@ export default function SimpleQuestionHome() {
               ["chapter", "فصل", "همه فصل‌ها", ListTree, "text-amber-500"],
               ["topic", "مبحث", "همه مباحث", Target, "text-sky-500"],
             ] as const).map(([key, title, placeholder, Icon, iconColor]) => (
-              <label key={key} className="text-sm font-medium text-slate-700">
+              <label key={key} className="text-base font-semibold text-slate-700">
                 <span className="flex items-center gap-2"><Icon size={17} className={iconColor} aria-hidden /> {title}</span>
                 <select className={fieldClass} value={filters[key]} onChange={(e) => setTaxonomy(key, e.target.value)}>
                   <option value="">{placeholder}</option>
@@ -167,7 +167,7 @@ export default function SimpleQuestionHome() {
                 </select>
               </label>
             ))}
-            <label className="text-sm font-medium text-slate-700">
+            <label className="text-base font-semibold text-slate-700">
               <span className="flex items-center gap-2"><ClipboardList size={17} className="text-orange-500" aria-hidden /> نوع سؤال</span>
               <select className={fieldClass} value={filters.category} onChange={(e) => setFilters((old) => ({ ...old, category: e.target.value }))}>
                 <option value="">همه انواع</option>
@@ -175,7 +175,7 @@ export default function SimpleQuestionHome() {
                 <option value="konkur-azad">کنکور آزاد</option>
               </select>
             </label>
-            <label className="text-sm font-medium text-slate-700">
+            <label className="text-base font-semibold text-slate-700">
               <span className="flex items-center gap-2"><Gauge size={17} className="text-rose-500" aria-hidden /> درجه سختی</span>
               <select className={fieldClass} value={filters.difficulty} onChange={(e) => setFilters((old) => ({ ...old, difficulty: e.target.value }))}>
                 <option value="">همه سطوح</option>
@@ -184,7 +184,7 @@ export default function SimpleQuestionHome() {
                 <option value="hard">سخت</option>
               </select>
             </label>
-            <fieldset className="text-sm font-medium text-slate-700">
+            <fieldset className="text-base font-semibold text-slate-700">
               <legend className="flex items-center gap-2"><CalendarRange size={17} className="text-indigo-500" aria-hidden /> بازه سال</legend>
               <div className="grid grid-cols-2 gap-2">
                 <label className="sr-only" htmlFor="home-year-from">از سال</label>
@@ -214,11 +214,11 @@ export default function SimpleQuestionHome() {
         <section ref={resultsRef} aria-label="نتایج سؤال" className="grid scroll-mt-4 gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
-              <p className="text-sm font-semibold">{visible.length.toLocaleString("fa-IR")} سؤال پیدا شد</p>
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <p className="text-base font-semibold">{visible.length.toLocaleString("fa-IR")} سؤال پیدا شد</p>
+              <label className="flex items-center gap-2 text-base font-semibold text-slate-700">
                 <ArrowDownWideNarrow size={18} className="text-indigo-500" aria-hidden />
                 مرتب‌سازی
-                <select aria-label="مرتب‌سازی نتایج" className="min-h-10 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+                <select aria-label="مرتب‌سازی نتایج" className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-base"
                   value={sortBy} onChange={(e) => setSortBy(e.target.value as HomeSort)}>
                   <option value="newest">جدیدترین</option>
                   <option value="easiest">ساده‌ترین</option>
@@ -252,14 +252,14 @@ export default function SimpleQuestionHome() {
           </div>
           {loading && <p role="status" className="rounded-2xl bg-white p-5">در حال بارگذاری سؤال‌ها…</p>}
           {error && <p role="alert" className="rounded-2xl bg-rose-50 p-5 text-rose-800">{error}</p>}
-          {recommendationMessage && <p role="status" className="rounded-xl bg-blue-50 p-3 text-sm text-blue-900">{recommendationMessage} {recommendationMessage.includes("وارد حساب") && <a className="underline" href="/login">ورود به حساب</a>}</p>
+          {recommendationMessage && <p role="status" className="rounded-xl bg-blue-50 p-3 text-sm text-blue-900">{recommendationMessage} {recommendationMessage.includes("وارد حساب") && <a className="underline" href="/login">ورود به حساب</a>}</p>}
           {!loading && !error && !visible.length &&
             <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
               برای این فیلترها هنوز سؤال عمومیِ تأییدشده‌ای ثبت نشده است.
             </p>}
           {visible.map((q, i) => (
             <article key={q._id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-              <label className="mb-3 flex cursor-pointer items-center gap-3 text-sm font-semibold text-blue-900">
+              <label className="mb-3 flex cursor-pointer items-center gap-3 text-base font-semibold text-blue-900">
                 <input type="checkbox" className="size-5" checked={selected.includes(q._id)}
                   onChange={(e) => setSelected((prev) => e.target.checked ? [...new Set([...prev, q._id])] : prev.filter((id) => id !== q._id))} />
                 انتخاب سؤال {(i + 1).toLocaleString("fa-IR")}
