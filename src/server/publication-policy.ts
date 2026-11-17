@@ -6,5 +6,7 @@ export function visibilityForAuthoredQuestion(
   _previous: "private" | "public" = "public",
   _environment: string = process.env.NODE_ENV ?? "test",
 ): "public" {
+  void _previous;
+  void _environment;
   return "public";
 }
