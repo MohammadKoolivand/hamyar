@@ -60,7 +60,7 @@ export function groupDuplicateQuestions(rows: Candidate[]): Group[] {
   // Inverted index avoids testing every pair across unrelated subjects.
   const tokensById = new Map(rows.map((r) => [
     r.questionId,
-    new Set(normalizeDuplicateText(r.statement).toLowerCase().split(/[^\\p{L}\\p{N}+*\\/^=−-]+/u).filter((t) => t.length > 1)),
+    new Set(normalizeDuplicateText(r.statement).toLowerCase().split(new RegExp(String.raw`[^\p{L}\p{N}+*/^=−-]+`, "u")).filter((t) => t.length > 1)),
   ]));
   const postings = new Map<string, Candidate[]>();
   const evaluated = new Set<string>();
