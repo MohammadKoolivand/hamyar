@@ -90,7 +90,8 @@ test("super admin can publish durable exam booklet and answer key beside the pub
       401,
     );
 
-    await f.post(publishPath, { published: true }, admin);
+    const republished = await f.post(publishPath, { published: true }, admin);
+    assert.deepEqual(republished.files, result.files);
     assert.ok((await f.request("/api/exam-catalog/public-progress")).json().length);
     await f.request(root, undefined, f.teacher);
     const archived = await f.app.inject({
