@@ -92,6 +92,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
   ],
   POST: [
     "/api/admin/exam-catalog/imports/:eid/completion",
+    "/api/admin/exam-imports/:eid/public-files",
     "/api/admin/discovery-filters",
     "/api/admin/exam-catalog/coverage",
     "/api/auth/email-verification/request",
