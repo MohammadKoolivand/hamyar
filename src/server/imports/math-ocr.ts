@@ -46,7 +46,7 @@ export function parseMathOcrOutput(output: string): string {
   const json: unknown = JSON.parse(line.slice("MATH_OCR_RESULT:".length));
   if (typeof json !== "string") throw new Error("خروجی مدل متنی نیست");
   const latex = json.trim().replace(/^\$\$(.*)\$\$/s, "$1").replace(/^\$(.*)\$$/s, "$1").trim();
-  if (!latex || latex.length > 700 || /[\u0000-\u001f]/.test(latex))
+  if (!latex || latex.length > 700 || [...latex].some((char) => char.charCodeAt(0) < 32))
     throw new Error("فرمول پیشنهادی معتبر نیست");
   // Parses and rejects dangerous/unrecognized macros. This is syntax validation,
   // NOT evidence of mathematical equivalence to the source image.
