@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   inferExpectedQuestionCount, countUniqueApprovedQuestions,
-  calculateExamProgress,
+  calculateExamProgress, estimateLegacyQuestionCount,
 } from "../../src/lib/exam-import-progress";
 
 const numbers = (length: number) =>
@@ -68,4 +68,16 @@ test("duplicated OCR answer numbers or failed key pages cannot establish a confi
 test("a source with more numbered questions than the answer key is not falsely complete", () => {
   const total = inferExpectedQuestionCount({ questions: numbers(150), answerEntries: key(130) });
   assert.deepEqual(total, { expectedQuestionCount: 150, expectedCountConfidence: "numbering_estimate" });
+});
+
+test("old exam imports automatically recover a conservative estimated denominator from saved key count", () => {
+  assert.deepEqual(estimateLegacyQuestionCount({
+    keyEntries: 150, hasAnswerFile: true, failedAnswerPages: 0,
+  }), { expectedQuestionCount: 150, expectedCountConfidence: "numbering_estimate" });
+  assert.equal(estimateLegacyQuestionCount({
+    keyEntries: 150, hasAnswerFile: false,
+  }).expectedQuestionCount, null);
+  assert.equal(estimateLegacyQuestionCount({
+    keyEntries: 150, hasAnswerFile: true, failedAnswerPages: 1,
+  }).expectedQuestionCount, null);
 });
