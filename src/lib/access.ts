@@ -89,6 +89,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/exam-imports/:eid",
     "/api/exam-imports/:eid/files/:kind",
     "/api/exam-imports/:eid/pages/:kind/:page",
+    "/api/exam-imports/:eid/math-ocr/status",
   ],
   POST: [
     "/api/admin/exam-catalog/imports/:eid/completion",
@@ -170,6 +171,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/pdf-library/:pid/file",
     "/api/pdf-library/:pid/send-to-import",
     "/api/exam-imports/:eid/items/:iid/source-image",
+    "/api/exam-imports/:eid/items/:iid/math-ocr",
     "/api/exam-imports/:eid/files/:kind",
     "/api/exam-imports/:eid/extract",
     "/api/exam-imports/:eid/manual-review",
