@@ -237,10 +237,10 @@ export function ExamImportScreen({
           <HistoricalExamSources onChoose={(asset: HistoricalExamAsset) => {
             setTitle(historicalExamLabel(asset));
             setSubject(asset.subject.slice(0, 100));
-            const match = asset.examId.match(/-(\\d{4})-/);
+            const match = asset.examId.match(/-(\d{4})-/);
             if (match) setYear(match[1]);
             if (asset.examId.startsWith("konkur-")) {
-              setSource({ family: "konkur", organizer: "سازمان سنجش", academicYear: match?.[1] });
+              setSource({ family: "konkur", organizer: "سازمان سنجش", ...(match ? { academicYear: match[1] } : {}) });
               if (asset.examId.endsWith("-math")) setTrack("ریاضی و فیزیک");
               else if (asset.examId.endsWith("-experimental")) setTrack("علوم تجربی");
               else setTrack("");
