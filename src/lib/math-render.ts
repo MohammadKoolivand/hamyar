@@ -22,7 +22,8 @@ export function mathMarkup(latex: string, displayMode = true) {
   const markup = katex.renderToString(
     needsFullSize && !displayMode ? "\\displaystyle " + parsable : parsable,
     {
-      // KaTeX HTML gives matrices predictable row and column spacing across browsers.\n      output: "htmlAndMathml",
+      // KaTeX HTML gives matrices predictable row and column spacing across browsers.
+      output: "htmlAndMathml",
       displayMode,
       throwOnError: true,
       trust: false,
