@@ -171,7 +171,8 @@ export default function SimpleQuestionHome() {
               <span className="flex items-center gap-2"><ClipboardList size={17} className="text-orange-500" aria-hidden /> نوع سؤال</span>
               <select className={fieldClass} value={filters.category} onChange={(e) => setFilters((old) => ({ ...old, category: e.target.value }))}>
                 <option value="">همه انواع</option>
-                {sourceCategories.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                {sourceCategories.map((item) => <option key={item.id} value={item.id}>{item.id === "konkur" ? "کنکور سراسری" : item.label}</option>)}
+                <option value="konkur-azad">کنکور آزاد</option>
               </select>
             </label>
             <label className="text-sm font-medium text-slate-700">
