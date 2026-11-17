@@ -23,7 +23,7 @@ import {
   type ExamImportItem,
 } from "@/lib/exam-import";
 import type { QuestionSource } from "@/lib/question-source";
-import { examCatalog, examCatalogEntry, examCatalogSections, examCatalogValidIds } from "@/lib/exam-catalog";
+import { detailedExamCatalog, mockExamProviders, examCatalogEntry, examCatalogSections, examCatalogValidIds } from "@/lib/exam-catalog";
 import type { Node } from "@/lib/types";
 const style = "glass-field min-h-11 w-full min-w-0 p-3";
 type Detail = ExamImport & {
@@ -53,6 +53,7 @@ export function ExamImportScreen({
     [track, setTrack] = useState(""),
     [year, setYear] = useState("");
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [catalogSearch, setCatalogSearch] = useState("");
   const [listCategoryFilter, setListCategoryFilter] = useState("");
   const [source, setSource] = useState<QuestionSource | undefined>({
     family: "school",
@@ -311,7 +312,7 @@ export function ExamImportScreen({
                   }}
                 >
                   <option value="">چندپایه / تعیین نشده</option>
-                  {Array.from({ length: 12 }, (_, i) => String(i + 1)).map(
+                  {Array.from({ length: 6 }, (_, i) => String(i + 7)).map(
                     (g) => (
                       <option key={g} value={g}>
                         پایه {fa(Number(g))}
@@ -331,10 +332,7 @@ export function ExamImportScreen({
                     {[
                       "ریاضی و فیزیک",
                       "علوم تجربی",
-                      "علوم انسانی",
-                      "معارف اسلامی",
-                      "هنر",
-                      "زبان",
+
                     ].map((t) => (
                       <option key={t} value={t}>
                         {t}
@@ -378,17 +376,22 @@ export function ExamImportScreen({
                 برچسب‌های مرتبط را انتخاب کنید؛ این تیک‌ها همراه اطلاعات آزمون در بانک ذخیره می‌شوند.
                 فقط متوسطه اول و رشته‌های ریاضی و تجربی متوسطه دوم در این نسخه هستند.
               </p>
+              <label className="grid gap-2 text-sm">
+                جست‌وجوی سال، برگزارکننده یا پایه
+                <input className={style} value={catalogSearch} onChange={(e) => setCatalogSearch(e.target.value)}
+                  placeholder="مثلاً ماز، ۱۴۰۴، دوازدهم یا ریاضی" />
+              </label>
               <div className="grid gap-2 sm:grid-cols-2">
                 {examCatalogSections.map((section) => (
                   <details key={section.id} className="rounded-xl border border-slate-200 bg-white p-3" open={section.id === "konkur" ? true : undefined}>
                     <summary className="cursor-pointer font-semibold text-slate-800">
                       {section.label}
                       <span className="mr-2 text-xs text-slate-500">
-                        ({examCatalog.filter((item) => item.section === section.id).length.toLocaleString("fa-IR")})
+                        ({detailedExamCatalog.filter((item) => item.section === section.id).length.toLocaleString("fa-IR")})
                       </span>
                     </summary>
                     <div className="mt-3 grid max-h-64 gap-2 overflow-y-auto">
-                      {examCatalog.filter((item) => item.section === section.id).map((item) => (
+                      {detailedExamCatalog.filter((item) => item.section === section.id && (!catalogSearch.trim() || item.label.includes(catalogSearch.trim()))).map((item) => (
                         <label key={item.id} className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-100 p-2 text-sm hover:bg-indigo-50">
                           <input
                             type="checkbox"
@@ -412,7 +415,11 @@ export function ExamImportScreen({
                                   setSource({ family: "school", administration, ...(administration === "internal" && item.stage && ["continuous", "chapter", "mid_first", "end_first", "mid_second", "end_second", "remedial"].includes(item.stage) ? { schoolStage: item.stage as "continuous" | "chapter" | "mid_first" | "end_first" | "mid_second" | "end_second" | "remedial" } : {}) });
                                 } else if (item.section === "admission") {
                                   setSource({ family: "admission", admission: item.id.includes("sampad-7") ? "sampad7" : item.id.includes("sampad-10") ? "sampad10" : "nemune10" });
-                                } else if (item.section === "mock") setSource({ family: "mock" });
+                                } else if (item.section === "mock") setSource({
+                                  family: "mock",
+                                  ...(item.provider ? { organizer: mockExamProviders.find((provider) => provider.id === item.provider)?.name ?? item.provider } : {}),
+                                  ...(item.year ? { academicYear: `${item.year}–${item.year + 1}` } : {}),
+                                });
                                 else if (item.section === "olympiad") setSource({ family: "olympiad" });
                                 else setSource({ family: "practice", practice: "teacher" });
                               }
@@ -460,7 +467,7 @@ export function ExamImportScreen({
                 <option value="">تمام آزمون‌ها</option>
                 {examCatalogSections.map((section) => (
                   <optgroup key={section.id} label={section.label}>
-                    {examCatalog.filter((item) => item.section === section.id).map((item) => (
+                    {detailedExamCatalog.filter((item) => item.section === section.id).map((item) => (
                       <option key={item.id} value={item.id}>{item.label}</option>
                     ))}
                   </optgroup>
