@@ -150,6 +150,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/curriculum/:nodeId/update",
     "/api/curriculum",
     "/api/questions/publish-all",
+    "/api/questions/:vid/recommend",
     "/api/questions/select",
     "/api/questions/difficulty-batch",
     "/api/questions/:vid/revise",
