@@ -409,7 +409,27 @@ export function ExamImportScreen({
                                 if (item.grade) setGrade(item.grade);
                                 if (item.track) setTrack(item.track === "mathematics" ? "ریاضی و فیزیک" : "علوم تجربی");
                                 if (item.section === "konkur") {
-                                  setSource({ family: "konkur", group: item.track, location: item.stage === "international" ? "international" : "domestic", ...(item.stage === "first" || item.stage === "second" ? { session: item.stage === "first" ? "نوبت اول" : "نوبت دوم" } : {}) });
+                                  const kind = item.stage ?? "";
+                                  const location = kind.includes("international") ? "international" :
+                                    kind.includes("domestic") ? "domestic" : undefined;
+                                  const session = kind.startsWith("first") ? "نوبت اول" :
+                                    kind.startsWith("second") ? "نوبت دوم" :
+                                    kind === "morning" ? "صبح" : kind === "afternoon" ? "عصر" : undefined;
+                                  const system = kind.includes("old") ? "نظام قدیم" :
+                                    kind.includes("new") ? "نظام جدید" : undefined;
+                                  const booklet = kind === "booklet-general" ? "دفترچه عمومی" :
+                                    kind === "booklet-specific" ? "دفترچه اختصاصی" : undefined;
+                                  setSource({
+                                    family: "konkur", group: item.track,
+                                    ...(location ? { location } : {}),
+                                    ...(session ? { session } : {}),
+                                    ...(system ? { stage: system } : {}),
+                                    ...(booklet ? { bookletCode: booklet } : {}),
+                                    ...(item.year ? { academicYear: String(item.year) } : {}),
+                                    ...(item.provider ? { organizer: item.provider === "azad"
+                                      ? "دانشگاه آزاد" : item.provider === "azad-shared"
+                                        ? "سازمان سنجش (پذیرش دانشگاه آزاد)" : "سازمان سنجش" } : {}),
+                                  });
                                 } else if (item.section === "school") {
                                   const administration = item.id.startsWith("final-") ? "final" : item.id.startsWith("coordinated-") ? "district" : "internal";
                                   setSource({ family: "school", administration, ...(administration === "internal" && item.stage && ["continuous", "chapter", "mid_first", "end_first", "mid_second", "end_second", "remedial"].includes(item.stage) ? { schoolStage: item.stage as "continuous" | "chapter" | "mid_first" | "end_first" | "mid_second" | "end_second" | "remedial" } : {}) });
