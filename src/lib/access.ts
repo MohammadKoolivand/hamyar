@@ -28,6 +28,7 @@ export const staffPermissionLabels: Record<StaffPermission, string> = {
 
 const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
   GET: [
+    "/api/admin/exam-catalog/imports",
     "/api/discovery-filters",
     "/api/admin/discovery-filters",
     "/api/questions/public",
@@ -89,6 +90,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/exam-imports/:eid/pages/:kind/:page",
   ],
   POST: [
+    "/api/admin/exam-catalog/imports/:eid/completion",
     "/api/admin/discovery-filters",
     "/api/admin/exam-catalog/coverage",
     "/api/auth/email-verification/request",
