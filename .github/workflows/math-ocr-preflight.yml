@@ -1,12 +1,10 @@
 name: Math OCR staging preflight (read only)
 on:
   workflow_dispatch:
-  push:
+  workflow_run:
+    workflows: ["Verify HodHod MVP"]
     branches: [staging]
-    paths:
-      - ".github/workflows/math-ocr-preflight.yml"
-      - "src/server/imports/math-ocr.ts"
-      - "scripts/math-ocr-pix2tex.py"
+    types: [completed]
 permissions:
   contents: read
 concurrency:
@@ -14,6 +12,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   preflight:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'staging')
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     environment: staging
