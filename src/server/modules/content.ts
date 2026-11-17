@@ -23,7 +23,7 @@ import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
 import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
 import { visibilityForAuthoredQuestion } from "../publication-policy";
-import { validExamCoverageId } from "../../lib/exam-catalog";
+import { examCatalogEntry, validExamCoverageId } from "../../lib/exam-catalog";
 export function registerContent(app: FastifyInstance, ctx: Context) {
   const { c, user, owned, id } = ctx;
   // A completion badge is only issued after a super-admin certifies the
