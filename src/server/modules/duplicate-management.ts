@@ -144,10 +144,20 @@ export function registerDuplicateManagement(app: FastifyInstance, ctx: Context) 
           ...(survivor ? { mergedIntoQuestionId: survivor.questionId } : {}),
         } }, { session });
         if (updated.modifiedCount !== 1) ctx.fail(409, "سؤال در حین عملیات تغییر کرد");
-        // Release the exact fingerprint claim only if owned by the archived row.
-        await ctx.c("publicQuestionFingerprints").deleteOne({
-          _id: duplicate.fingerprint, questionId: duplicate.questionId,
-        }, { session });
+        // If an archived row owns the uniqueness claim, move it to a
+        // remaining active identical question instead of freeing the hash.
+        const replacement = candidates.find((row) =>
+          row.fingerprint === duplicate.fingerprint &&
+          !input.duplicateIds.includes(row.questionId));
+        if (replacement) {
+          await ctx.c("publicQuestionFingerprints").updateOne({
+            _id: duplicate.fingerprint, questionId: duplicate.questionId,
+          }, { $set: { questionId: replacement.questionId, ownerId: replacement.ownerId } }, { session });
+        } else {
+          await ctx.c("publicQuestionFingerprints").deleteOne({
+            _id: duplicate.fingerprint, questionId: duplicate.questionId,
+          }, { session });
+        }
         await ctx.c("auditLogs").insertOne({
           _id: ctx.id(), actorId: admin._id, action: input.action === "merge" ? "archive_duplicate_merge" : "archive_duplicate_delete",
           resourceId: duplicate.questionId, survivorId: survivor?.questionId,
