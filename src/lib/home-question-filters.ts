@@ -39,7 +39,7 @@ export function homeBookName(value: string): string {
   ).trim();
   if (delimited && delimited !== name) return delimited;
   // Older records sometimes have a bare suffix: «فیزیک علوم تجربی».
-  const bare = name.replace(/\s+(?:رشته\s*)?(?:علوم\s*تجربی|ریاضی\s*(?:و\s*)?فیزیک)\s*$/u, "").trim();
+  const bare = name.replace(/\s+(?:رشته\s*)?(?:علوم\s*تجربی|ریاضی\s*(?:و\s*)?فیزیک|ریاضی)\s*$/u, "").trim();
   return bare || name;
 }
 
