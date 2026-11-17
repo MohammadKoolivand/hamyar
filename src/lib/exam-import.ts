@@ -44,6 +44,13 @@ export interface ExamFile {
   size: number;
   sha256: string;
 }
+export interface ExamPublicFile {
+  id: string;
+}
+export interface ExamPublicFiles {
+  question?: ExamPublicFile;
+  answer?: ExamPublicFile;
+}
 export interface ExamImport extends ExamMetadata {
   _id: string;
   ownerId: string;
@@ -52,6 +59,7 @@ export interface ExamImport extends ExamMetadata {
   revision: number;
   createdAt: string;
   files?: { question?: ExamFile; answer?: ExamFile };
+  publicFiles?: ExamPublicFiles;
   questionText?: string;
   answerText?: string;
   extractionNotice?: string;
