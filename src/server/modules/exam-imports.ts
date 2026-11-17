@@ -298,8 +298,14 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
       const current = await c("examImports").findOne({
         _id: eid, archivedAt: { $exists: false }, state: "review",
       }, { session });
+      const currentCategoryIds = Array.isArray(current?.categoryIds)
+        ? current.categoryIds.filter((value: unknown): value is string =>
+            typeof value === "string" && validExamCoverageId(value))
+        : [];
       if (!current || current.sourceDeletedAt ||
-        current.files?.question?.sha256 !== exam.files.question.sha256)
+        current.files?.question?.sha256 !== exam.files.question.sha256 ||
+        currentCategoryIds.length !== categoryIds.length ||
+        categoryIds.some((categoryId) => !currentCategoryIds.includes(categoryId)))
         fail(409, "وضعیت آزمون هنگام انتشار تغییر کرده است؛ دوباره تلاش کنید");
       for (const copy of copies) {
         if (current.files?.[copy.kind]?.sha256 !== copy.sha256)
