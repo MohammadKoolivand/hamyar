@@ -11,13 +11,17 @@ import { createHash } from "node:crypto";
 import { mathOcrReady, suggestMathLatex, type MathCrop } from "../src/server/imports/math-ocr";
 
 const exec = promisify(execFile);
-interface Sample { id: string; pdf: string; page: number; crop: MathCrop; referenceLatex: string; sourceUrl?: string }
+interface Sample { id: string; pdf: string; page: number; crop: MathCrop; referenceLatex: string; sourceUrl?: string; referenceReviewed: boolean }
 async function main() {
   const manifest = process.argv[2];
   if (!manifest) throw new Error("Provide a JSON manifest of labeled real exam crops");
   const samples: Sample[] = JSON.parse(await readFile(resolve(manifest), "utf8"));
   if (!Array.isArray(samples) || samples.length < 1 || samples.length > 50)
     throw new Error("Provide 1 to 50 labeled samples");
+  // Prevent visual guesses from being reported as quantitative model accuracy.
+  // Two-pass annotation: inspect source image, independently verify formula and crop.
+  if (samples.some((sample) => sample.referenceReviewed !== true))
+    throw new Error("Benchmark NOT RUN: at least one source crop/LaTeX reference has not been independently reviewed");
   if (!(await mathOcrReady())) throw new Error("Math OCR model disabled or checkpoint missing; benchmark NOT RUN");
   const dir = await mkdtemp(join(tmpdir(), "hodhod-math-benchmark-"));
   const results: { id: string; sha256: string; page: number; predicted?: string; expected?: string; exact?: boolean; error?: string }[] = [];
