@@ -18,11 +18,12 @@ export function mathMarkup(latex: string, displayMode = true) {
   const parsable = latex.replace(/[۰-۹]/g, (digit) =>
     String(digit.charCodeAt(0) - 0x06f0),
   );
-  const svgRoots = /\\sqrt\b/.test(parsable);
+  const needsFullSize = /\\(?:sqrt|begin\s*\{(?:[pbBvV]?matrix|array|cases|aligned|gathered)\})/.test(parsable);
   const markup = katex.renderToString(
-    svgRoots && !displayMode ? "\\displaystyle " + parsable : parsable,
+    needsFullSize && !displayMode ? "\\displaystyle " + parsable : parsable,
     {
-      output: svgRoots ? "htmlAndMathml" : "mathml",
+      // KaTeX HTML gives matrices predictable row and column spacing across browsers.
+      output: "htmlAndMathml",
       displayMode,
       throwOnError: true,
       trust: false,
@@ -43,7 +44,7 @@ export function mathMarkup(latex: string, displayMode = true) {
           close,
       )
     : markup;
-  if (!svgRoots || !/[۰-۹]/.test(latex)) return localized;
+  if (!/[۰-۹]/.test(latex)) return localized;
   // Localize only HTML text nodes: SVG path coordinates must remain untouched.
   return localized.replace(
     /(<span\b[^>]*>)([0-9.]+)(<\/span>)/g,

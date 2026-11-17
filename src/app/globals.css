@@ -469,6 +469,16 @@
   font-weight: 700;
 }
 
+/* Render multi-row matrices with KaTeX's full box metrics, not cramped
+   native MathML cells. Keep wide matrices readable on narrow cards. */
+.hy-question-text .hy-matrix-formula .katex {
+  font-size: 1.15em;
+  line-height: 1.5;
+}
+.hy-question-text .hy-matrix-formula .katex-html {
+  white-space: nowrap;
+}
+
 /* Main question stems are bold. Answer choices must remain regular across
    public library, teacher bank, practice, and custom option renderers. */
 .hy-question-statement .hy-question-text {
