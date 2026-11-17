@@ -57,11 +57,16 @@ type PublicImportedExam = {
   id: string;
   title: string;
   categoryIds: string[];
+  hasPublicQuestions: boolean;
   approved: number;
   expectedQuestionCount: number | null;
   expectedCountConfidence: "key_complete" | "numbering_estimate" | "unknown";
   percent: number | null;
   status: CatalogAvailability;
+  files?: {
+    question?: { id: string };
+    answer?: { id: string };
+  };
 };
 type CatalogGroup = { key: string; title: string; rows: ExamCatalogEntry[] };
 function groupRows(items: readonly ExamCatalogEntry[]): CatalogGroup[] {
@@ -305,17 +310,19 @@ export default function ExamCatalogPage() {
                       {(publishedByCategory.get(item.id) ?? []).map((entry) => (
                         <div key={entry.id} className="mr-7 mt-3 grid gap-2 rounded-lg border border-sky-100 bg-sky-50/50 p-3">
                           <div className="flex flex-wrap items-center gap-2">
-                            <StatusIcon status={entry.status} />
+                            {entry.hasPublicQuestions && <StatusIcon status={entry.status} />}
                             <strong className="min-w-0 flex-1 text-xs leading-6 text-slate-700">
-                              آزمون منتشرشده: {entry.title}
+                              آزمون: {entry.title}
                             </strong>
-                            <span className="text-xs font-semibold tabular-nums text-blue-900">
-                              {entry.expectedQuestionCount === null
-                                ? `${faNumber(entry.approved)} سؤال موجود · تعداد کل نامشخص`
-                                : `${faNumber(entry.approved)} از ${faNumber(entry.expectedQuestionCount)} سؤال (${faNumber(entry.percent ?? 0)}٪)`}
-                            </span>
+                            {entry.hasPublicQuestions && (
+                              <span className="text-xs font-semibold tabular-nums text-blue-900">
+                                {entry.expectedQuestionCount === null
+                                  ? `${faNumber(entry.approved)} سؤال عمومی · تعداد کل نامشخص`
+                                  : `${faNumber(entry.approved)} از ${faNumber(entry.expectedQuestionCount)} سؤال (${faNumber(entry.percent ?? 0)}٪)`}
+                              </span>
+                            )}
                           </div>
-                          {entry.expectedQuestionCount !== null && (
+                          {entry.hasPublicQuestions && entry.expectedQuestionCount !== null && (
                             <div role="progressbar" aria-label={`موجودی سؤال‌های عمومی ${entry.title}`}
                               aria-valuemin={0} aria-valuemax={entry.expectedQuestionCount}
                               aria-valuenow={Math.min(entry.approved, entry.expectedQuestionCount)}
@@ -324,10 +331,28 @@ export default function ExamCatalogPage() {
                                 style={{ width: `${entry.percent ?? 0}%` }} />
                             </div>
                           )}
-                          {entry.expectedCountConfidence === "numbering_estimate" && (
+                          {entry.hasPublicQuestions && entry.expectedCountConfidence === "numbering_estimate" && (
                             <p className="text-xs text-amber-800">
                               تعداد کل برآوردی است و تیک کامل قطعی صادر نمی‌شود.
                             </p>
+                          )}
+                          {(entry.files?.question || entry.files?.answer) && (
+                            <div className="flex flex-wrap gap-2 pt-1">
+                              {entry.files?.question && (
+                                <a href={`/api/pdf-library/${entry.files.question.id}/file`}
+                                  target="_blank" rel="noopener noreferrer"
+                                  className="inline-flex min-h-9 items-center rounded-lg border border-blue-200 bg-white px-3 text-xs font-semibold text-blue-900 hover:bg-blue-50">
+                                  دفترچه PDF
+                                </a>
+                              )}
+                              {entry.files?.answer && (
+                                <a href={`/api/pdf-library/${entry.files.answer.id}/file`}
+                                  target="_blank" rel="noopener noreferrer"
+                                  className="inline-flex min-h-9 items-center rounded-lg border border-emerald-200 bg-white px-3 text-xs font-semibold text-emerald-900 hover:bg-emerald-50">
+                                  کلید پاسخ
+                                </a>
+                              )}
+                            </div>
                           )}
                         </div>
                       ))}
