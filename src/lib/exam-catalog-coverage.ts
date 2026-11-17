@@ -78,6 +78,8 @@ function mockYearlyId(q: CatalogPublicQuestion) {
 function expandKonkurTags(ids: readonly string[]): string[] {
   const result = new Set(ids);
   for (const id of ids) {
+    const farhangian = /^konkur-farhangian-(14\d{2})-(mathematics|experimental)-(.+)$/.exec(id);
+    if (farhangian) result.add(`konkur-farhangian-${farhangian[1]}-${farhangian[2]}-general`);
     const national = /^konkur-(1[34]\d{2})-(mathematics|experimental)-(.+)$/.exec(id);
     if (national) {
       const year = Number(national[1]), track = national[2], scope = national[3];
@@ -112,6 +114,15 @@ function historicalKonkurIds(question: CatalogPublicQuestion): string[] {
   const year = normalizedNumber(question.year ?? source.academicYear);
   const track = questionTrack(question);
   if (year < 1390 || year > 1405 || !track) return [];
+  const reference = [source.organizer, source.sourceTitle].join(" ");
+  if (year >= 1403 && /فرهنگیان|دانشجو\s*معلم|تربیت\s*معلم|شهید\s*رجایی/i.test(reference)) {
+    const base = `konkur-farhangian-${year}-${track}`;
+    const values = [`${base}-general`];
+    if (/دفترچه\s*اختصاصی|دفترچه\s*فرهنگیان|تربیت\s*معلم/i.test(
+      [source.sourceTitle, source.bookletCode].join(" ")))
+      values.push(`${base}-booklet`);
+    return expandKonkurTags(values);
+  }
   if (azadIndependent(source, year)) {
     const base = `konkur-azad-${year}-${track}`;
     const output = [`${base}-general`];
