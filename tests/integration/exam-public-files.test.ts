@@ -65,6 +65,11 @@ test("super admin can publish durable exam booklet and answer key beside the pub
     const detail = (await f.request(root, undefined, admin)).json();
     assert.equal(detail.publicFiles.question.id, result.files.question.id);
     assert.equal(detail.publicFiles.answer.id, result.files.answer.id);
+    const adminImports = (await f.request("/api/admin/exam-catalog/imports", undefined, admin)).json();
+    const adminEntry = adminImports.find((row: { _id: string }) => row._id === exam._id);
+    assert.equal(adminEntry.hasQuestionFile, true);
+    assert.equal(adminEntry.hasAnswerFile, true);
+    assert.deepEqual(adminEntry.publicFiles, result.files);
 
     const catalog = (await f.request("/api/exam-catalog/public-progress")).json();
     const entry = catalog.find((row: { title: string }) => row.title === exam.title);
