@@ -7,6 +7,7 @@ import {
   detailedExamCatalog,
   examCatalogSections,
   examYears,
+  konkurYears,
   mockExamProviders,
   type ExamCatalogEntry,
 } from "@/lib/exam-catalog";
@@ -53,6 +54,9 @@ function groupRows(items: readonly ExamCatalogEntry[]): CatalogGroup[] {
   for (const item of items) {
     const title = item.section === "mock"
       ? `${mockExamProviders.find((p) => p.id === item.provider)?.name ?? "آزمایشی"} · سال تحصیلی ${faNumber(item.year ?? 0)}–${faNumber((item.year ?? 0) + 1)}`
+      : item.section === "konkur"
+        ? `${item.provider === "azad" ? "کنکور مستقل دانشگاه آزاد"
+          : item.provider === "azad-shared" ? "آزاد (پذیرش با آزمون مشترک سراسری)" : "کنکور سراسری"} · ${faNumber(item.year ?? 0)}`
       : item.section === "school" || item.section === "practice"
         ? `سال ${faNumber(item.year ?? 0)} · ${gradeLabels[item.grade ?? ""] ?? "چندپایه"}`
         : `سال ${faNumber(item.year ?? 0)}`;
@@ -72,7 +76,7 @@ export default function ExamCatalogPage() {
   const [admin, setAdmin] = useState(false);
   const [imports, setImports] = useState<AdminImportedExam[]>([]);
   const [saving, setSaving] = useState("");
-  const [section, setSection] = useState<(typeof examCatalogSections)[number]["id"]>("mock");
+  const [section, setSection] = useState<(typeof examCatalogSections)[number]["id"]>("konkur");
   const [provider, setProvider] = useState("");
   const [year, setYear] = useState("");
   const [grade, setGrade] = useState("");
@@ -195,8 +199,9 @@ export default function ExamCatalogPage() {
             <BookOpen aria-hidden /> فهرست موردی آزمون‌ها
           </h1>
           <p className="mt-3 text-sm leading-8 text-slate-600">
-            هر برگزارکننده، سال، پایه و رشته ردیف مستقلی دارد.
-            آزمون‌هایی که تاریخ یا مرحله آن‌ها از سؤال‌های تأییدشده ثبت شده باشد، به‌صورت موردی زیر همان ردیف نمایش داده می‌شوند.
+            کنکورهای سراسری از ۱۳۹۰ تا ۱۴۰۵، آزاد مستقل ۱۳۹۰ و ۱۳۹۱،
+            و پذیرش آزاد با دفترچه مشترک سراسری از ۱۳۹۲ به بعد جدا و موردی فهرست شده‌اند.
+            نوبت‌های ۱۴۰۲ تا ۱۴۰۴، نظام قدیم و جدید ۱۳۹۸ و ۱۳۹۹ و دفترچه‌های عمومی و اختصاصی هم تفکیک شده‌اند.
           </p>
           <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-600" aria-label="راهنمای وضعیت موجودی">
             <span className="inline-flex items-center gap-2"><StatusIcon status="complete" /> کامل و تأییدشده</span>
@@ -210,7 +215,7 @@ export default function ExamCatalogPage() {
             {examCatalogSections.map((item) => (
               <button key={item.id} type="button" aria-pressed={section === item.id}
                 className={`min-h-11 rounded-xl border px-4 text-sm ${section === item.id ? "border-blue-700 bg-blue-800 text-white" : "border-slate-200 bg-white text-slate-700 hover:bg-blue-50"}`}
-                onClick={() => { setSection(item.id); setProvider(""); setGrade(""); setTrack(""); setSearch(""); }}>
+                onClick={() => { setSection(item.id); setProvider(""); setYear(""); setGrade(""); setTrack(""); setSearch(""); }}>
                 {item.label}
               </button>
             ))}
@@ -225,7 +230,7 @@ export default function ExamCatalogPage() {
             <label className="grid gap-1 text-sm">سال
               <select className={selectClass} value={year} onChange={(e) => setYear(e.target.value)}>
                 <option value="">تمام سال‌ها</option>
-                {examYears.map((item) => <option key={item} value={item}>{faNumber(item)}</option>)}
+                {(section === "konkur" ? konkurYears : examYears).map((item) => <option key={item} value={item}>{faNumber(item)}</option>)}
               </select>
             </label>
             <label className="grid gap-1 text-sm">پایه
@@ -271,13 +276,13 @@ export default function ExamCatalogPage() {
                   return (
                     <div key={item.id} className="rounded-xl border border-slate-100 p-3">
                       <div className="flex flex-wrap items-center justify-between gap-3">
-                        <a href={`/?exam=${encodeURIComponent(item.id)}`}
+                        <a href={`/?exam=${encodeURIComponent(item.linkedCatalogId ?? item.id)}`}
                           className="inline-flex min-h-10 min-w-0 flex-1 items-center gap-2 text-right text-sm hover:text-blue-700">
                           <StatusIcon status={status.status} />
                           <span className="min-w-0">{item.label}</span>
                           <span className="shrink-0 text-xs text-slate-400">{status.count ? `${faNumber(status.count)} سؤال` : ""}</span>
                         </a>
-                        {admin && status.count > 0 &&
+                        {admin && !item.linkedCatalogId && status.count > 0 &&
                           <button disabled={Boolean(saving)} type="button" onClick={() => void review(item.id, status.count, status.status === "complete")}
                             className="min-h-9 rounded-lg border border-blue-200 px-3 text-xs text-blue-800 disabled:opacity-50">
                             {status.status === "complete" ? "لغو تأیید" : "تأیید تکمیل ✓"}
@@ -328,7 +333,8 @@ export default function ExamCatalogPage() {
           );
         })}
         <p className="text-xs leading-7 text-slate-500">
-          ردیف‌های سالانه، جایگاه ثبت آزمون‌ها هستند و به معنی تأیید برگزاری تمام آزمون‌ها در همه سال‌ها نیستند.
+          «دانشگاه آزاد ـ آزمون مشترک» از سال ۱۳۹۲ به بعد به همان دفترچه سراسری مرتبط است و آزمون مستقل جدیدی نیست.
+          ردیف‌های آرشیوی محل ثبت و پیگیری‌اند و تا بارگذاری سؤال تأییدشده، نشانگر خالی می‌مانند.
           علامت کامل صرفاً برای سؤال‌های عمومیِ بازبینی‌شده پس از تأیید مدیر ثبت می‌شود؛
           آزمون‌های خصوصی و فایل‌هایی که هنوز تأیید انتشار نگرفته‌اند در شمارش عمومی نیستند.
         </p>
