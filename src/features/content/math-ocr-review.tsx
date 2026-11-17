@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { MathFormula } from "@/components/question-presentation";
 import { api } from "@/lib/api";
 
@@ -81,8 +82,7 @@ export function MathOcrReview({
             </label>)}
         </div>
         <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-lg border bg-white">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt="اصل صفحه آزمون برای تعیین محدوده فرمول" className="block h-auto w-full"
+          <Image unoptimized width={800} height={1120} alt="اصل صفحه آزمون برای تعیین محدوده فرمول" className="block h-auto w-full"
             src={`/api/exam-imports/${examId}/pages/question/${page}`} />
           <div aria-label="محدوده انتخاب شده برای تشخیص فرمول" className="pointer-events-none absolute border-2 border-red-500 bg-red-500/10"
             style={{ left: `${crop.x}%`, top: `${crop.y}%`, width: `${crop.width}%`, height: `${crop.height}%` }} />
