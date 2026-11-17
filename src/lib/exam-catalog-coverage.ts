@@ -73,6 +73,81 @@ function mockYearlyId(q: CatalogPublicQuestion) {
   const id = `mock-${provider}-${year}-${grade}-${track}`;
   return catalogIds.has(id) ? id : undefined;
 }
+/** Treat detailed labels as parts of their parent exam so aggregate status
+ * and the two university-admissions views count the same published questions. */
+function expandKonkurTags(ids: readonly string[]): string[] {
+  const result = new Set(ids);
+  for (const id of ids) {
+    const national = /^konkur-(1[34]\d{2})-(mathematics|experimental)-(.+)$/.exec(id);
+    if (national) {
+      const year = Number(national[1]), track = national[2], scope = national[3];
+      const base = `konkur-${year}-${track}`;
+      result.add(`${base}-general`);
+      if (year >= 1392) result.add(`konkur-azad-${year}-${track}-shared`);
+      for (const stage of ["first", "second", "old", "new"]) {
+        if (scope === stage || scope.startsWith(`${stage}-`))
+          result.add(`${base}-${stage}`);
+      }
+      if (scope === "domestic" || scope.endsWith("-domestic"))
+        result.add(`${base}-domestic`);
+      if (scope === "international" || scope.endsWith("-international"))
+        result.add(`${base}-international`);
+    }
+    const azad = /^konkur-azad-(1[34]\d{2})-(mathematics|experimental)-(.+)$/.exec(id);
+    if (azad) {
+      if (azad[3] === "shared") result.add(`konkur-${azad[1]}-${azad[2]}-general`);
+      else result.add(`konkur-azad-${azad[1]}-${azad[2]}-general`);
+    }
+  }
+  return [...result].filter((id) => catalogIds.has(id));
+}
+function azadIndependent(source: NonNullable<CatalogPublicQuestion["source"]>, year: number) {
+  if (year > 1391) return false;
+  const text = [source.organizer, source.sourceTitle].join(" ");
+  return /دانشگاه\s*آزاد|کنکور\s*آزاد|azad/i.test(text);
+}
+function historicalKonkurIds(question: CatalogPublicQuestion): string[] {
+  const source = question.source;
+  if (source?.family !== "konkur") return [];
+  const year = normalizedNumber(question.year ?? source.academicYear);
+  const track = questionTrack(question);
+  if (year < 1390 || year > 1405 || !track) return [];
+  if (azadIndependent(source, year)) {
+    const base = `konkur-azad-${year}-${track}`;
+    const output = [`${base}-general`];
+    if (/صبح|morning/i.test(source.session ?? "")) output.push(`${base}-morning`);
+    if (/عصر|afternoon/i.test(source.session ?? "")) output.push(`${base}-afternoon`);
+    return expandKonkurTags(output);
+  }
+  const base = `konkur-${year}-${track}`;
+  const output = [`${base}-general`];
+  if (source.location === "domestic" || source.location === "international")
+    output.push(`${base}-${source.location}`);
+  const session = source.session ?? "";
+  const phase = year >= 1402 && year <= 1404
+    ? /نوبت\s*اول|first|دی\s*۱۴۰۱|اردیبهشت/i.test(session) ? "first"
+      : /نوبت\s*دوم|second|تیر/i.test(session) ? "second" : ""
+    : "";
+  if (phase) {
+    output.push(`${base}-${phase}`);
+    if (source.location) output.push(`${base}-${phase}-${source.location}`);
+  }
+  if (year === 1398 || year === 1399) {
+    const system = [source.stage, source.session, source.sourceTitle].join(" ");
+    const edition = /نظام\s*قدیم|old\s*system/i.test(system) ? "old"
+      : /نظام\s*جدید|new\s*system/i.test(system) ? "new" : "";
+    if (edition) {
+      output.push(`${base}-${edition}`);
+      if (source.location) output.push(`${base}-${edition}-${source.location}`);
+    }
+  }
+  const booklet = [source.sourceTitle, source.bookletCode].join(" ");
+  if (year <= 1401 && /دفترچه\s*عمومی|general\s*booklet/i.test(booklet))
+    output.push(`${base}-booklet-general`);
+  if (/دفترچه\s*اختصاصی|specific\s*booklet/i.test(booklet))
+    output.push(`${base}-booklet-specific`);
+  return expandKonkurTags(output);
+}
 function knownIds(ids: string[]) {
   return [...new Set(ids.filter((id) => catalogIds.has(id)))];
 }
@@ -84,23 +159,16 @@ function knownIds(ids: string[]) {
 export function publicQuestionCatalogIds(q: CatalogPublicQuestion): string[] {
   const tags = knownIds(q.catalogIds ?? []);
   const source = q.source;
+  const nationalTags = source?.family === "konkur" ? historicalKonkurIds(q) : [];
   const yearlyMock = mockYearlyId(q);
   if (yearlyMock && !tags.includes(yearlyMock)) tags.push(yearlyMock);
-  if (q.catalogIds?.length) return tags;
-  if (!source) return [];
+  if (q.catalogIds?.length) return [...new Set(expandKonkurTags([...tags, ...nationalTags]))];
+  if (!source) return tags;
   const grade = questionGrade(q);
   const track = questionTrack(q);
   const ids: string[] = [];
   if (source.family === "konkur") {
-    const year = normalizedNumber(q.year ?? source.academicYear);
-    if ((year === 1404 || year === 1405) && source.group && track) {
-      ids.push(`konkur-${year}-${track}-general`);
-      if (year === 1404) {
-        if (/اول|first|اردیبهشت/i.test(source.session ?? "")) ids.push(`konkur-${year}-${track}-first`);
-        if (/دوم|second|تیر/i.test(source.session ?? "")) ids.push(`konkur-${year}-${track}-second`);
-      }
-      if (source.location) ids.push(`konkur-${year}-${track}-${source.location}`);
-    }
+    ids.push(...nationalTags);
   } else if (source.family === "school" && grade) {
     if (source.administration === "internal" && source.schoolStage)
       ids.push(`school-${grade}-${source.schoolStage}`);
