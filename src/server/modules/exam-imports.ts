@@ -61,7 +61,8 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     const rows = await c("examImports").find(
       { archivedAt: { $exists: false } },
       { projection: { _id: 1, title: 1, year: 1, grade: 1, track: 1,
-        categoryIds: 1, source: 1, state: 1, statistics: 1, files: 1, createdAt: 1 } },
+        categoryIds: 1, source: 1, state: 1, statistics: 1, files: 1,
+        sourceDeletedAt: 1, createdAt: 1 } },
     ).sort({ createdAt: -1 }).limit(500).toArray();
     if (!rows.length) return [];
     // Distinct source question numbers prevent double counting duplicate
@@ -88,6 +89,21 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         },
       } },
     ]).toArray();
+    const publicFileRows = await c("pdfLibrary").find({
+      sourceExamId: { $in: rows.map((row) => row._id) },
+      visibility: "public", state: "ready", archivedAt: { $exists: false },
+    }).project({ _id: 1, sourceExamId: 1, sourceKind: 1 }).toArray();
+    const publicFilesByExam = new Map<string, {
+      question?: { id: string }; answer?: { id: string };
+    }>();
+    for (const file of publicFileRows) {
+      if (typeof file.sourceExamId !== "string" ||
+        (file.sourceKind !== "question" && file.sourceKind !== "answer")) continue;
+      const files = publicFilesByExam.get(file.sourceExamId) ?? {};
+      const kind = file.sourceKind as "question" | "answer";
+      files[kind] = { id: file._id };
+      publicFilesByExam.set(file.sourceExamId, files);
+    }
     const byId = new Map(counts.map((row) => [row._id, row]));
     return rows.map((row) => {
       const count = byId.get(row._id);
@@ -111,6 +127,10 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         track: row.track, categoryIds: row.categoryIds ?? [],
         examDate: row.source?.examDate, stage: row.source?.stage,
         state: row.state,
+        hasQuestionFile: Boolean(row.files?.question),
+        hasAnswerFile: Boolean(row.files?.answer),
+        sourceDeletedAt: Boolean(row.sourceDeletedAt),
+        publicFiles: publicFilesByExam.get(row._id) ?? {},
         ...progress,
         // Legacy fields retained for earlier UI clients.
         total, complete: progress.status === "complete",
