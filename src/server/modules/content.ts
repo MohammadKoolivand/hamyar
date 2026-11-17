@@ -59,7 +59,6 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         categoryIds: "$current.sourceExamMetadata.categoryIds",
       } },
     ]).toArray();
-    if (!published.length) return [];
     const byExam = new Map<string, {
       questions: Set<string>; categoryIds: Set<string>;
     }>();
@@ -73,16 +72,58 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       group.questions.add(numbered ? `n:${row.questionNumber}` : `i:${row.questionId}`);
       if (Array.isArray(row.categoryIds))
         for (const id of row.categoryIds)
-          if (typeof id === "string" && examCatalogEntry(id)) group.categoryIds.add(id);
+          if (typeof id === "string" && validExamCoverageId(id)) group.categoryIds.add(id);
       byExam.set(row.examId, group);
     }
+
+    // Publicly linked source files are separate, durable copies. They are
+    // included only after a super-admin explicitly publishes them.
+    const fileRows = await c("pdfLibrary").find({
+      sourceExamId: { $type: "string" },
+      sourceKind: { $in: ["question", "answer"] },
+      visibility: "public",
+      state: "ready",
+      archivedAt: { $exists: false },
+    }).project({
+      _id: 1, sourceExamId: 1, sourceKind: 1, examCatalogIds: 1,
+    }).toArray();
+    const filesByExam = new Map<string, {
+      question?: { id: string };
+      answer?: { id: string };
+      categoryIds: Set<string>;
+    }>();
+    for (const file of fileRows) {
+      if (typeof file.sourceExamId !== "string" ||
+        (file.sourceKind !== "question" && file.sourceKind !== "answer")) continue;
+      const group = filesByExam.get(file.sourceExamId) ?? { categoryIds: new Set<string>() };
+      group[file.sourceKind] = { id: file._id };
+      if (Array.isArray(file.examCatalogIds))
+        for (const categoryId of file.examCatalogIds)
+          if (typeof categoryId === "string" && validExamCoverageId(categoryId))
+            group.categoryIds.add(categoryId);
+      filesByExam.set(file.sourceExamId, group);
+    }
+
+    const examIds = [...new Set([...byExam.keys(), ...filesByExam.keys()])];
+    if (!examIds.length) return [];
     const sources = await c("examImports").find(
-      { _id: { $in: [...byExam.keys()] }, archivedAt: { $exists: false } },
-      { projection: { _id: 1, title: 1, statistics: 1, files: 1 } },
+      { _id: { $in: examIds }, archivedAt: { $exists: false } },
+      { projection: {
+        _id: 1, title: 1, statistics: 1, files: 1, categoryIds: 1,
+      } },
     ).toArray();
     return sources.flatMap((source) => {
       const data = byExam.get(source._id);
-      if (!data?.questions.size || !data.categoryIds.size) return [];
+      const publicFiles = filesByExam.get(source._id);
+      const categoryIds = [...new Set([
+        ...(Array.isArray(source.categoryIds) ? source.categoryIds : []),
+        ...(data ? [...data.categoryIds] : []),
+        ...(publicFiles ? [...publicFiles.categoryIds] : []),
+      ])].filter((value): value is string =>
+        typeof value === "string" && validExamCoverageId(value));
+      if (!categoryIds.length ||
+        (!data?.questions.size && !publicFiles?.question && !publicFiles?.answer))
+        return [];
       const previous = estimateLegacyQuestionCount({
         keyEntries: source.statistics?.keys ?? 0,
         hasAnswerFile: Boolean(source.files?.answer),
@@ -91,16 +132,21 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
         ).length ?? 0,
       });
       const progress = calculateExamProgress({
-        approved: data.questions.size,
-        extracted: data.questions.size,
+        approved: data?.questions.size ?? 0,
+        extracted: data?.questions.size ?? 0,
         expectedQuestionCount: source.statistics?.expectedQuestionCount ?? previous.expectedQuestionCount,
         expectedCountConfidence: source.statistics?.expectedCountConfidence ?? previous.expectedCountConfidence,
       });
       return [{
         id: createHash("sha256").update(source._id).digest("hex").slice(0, 16),
         title: String(source.title ?? "آزمون").slice(0, 150),
-        categoryIds: [...data.categoryIds],
+        categoryIds,
+        hasPublicQuestions: Boolean(data?.questions.size),
         ...progress,
+        files: {
+          ...(publicFiles?.question ? { question: publicFiles.question } : {}),
+          ...(publicFiles?.answer ? { answer: publicFiles.answer } : {}),
+        },
       }];
     });
   });
