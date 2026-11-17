@@ -12,6 +12,7 @@ import {
 import { enqueueExam, retentionDays, sourceBytes } from "../imports/jobs";
 import { normalized } from "../imports/layout";
 import { calculateExamProgress, estimateLegacyQuestionCount } from "../../lib/exam-import-progress";
+import { validExamCoverageId } from "../../lib/exam-catalog";
 import { questionSchema } from "../domain";
 import { persistQuestion, validateQuestion } from "./authoring";
 const params = z.object({ eid: z.string().uuid() });
@@ -185,6 +186,10 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     );
     if (!result.modifiedCount)
       fail(409, "ابتدا منتظر پایان پردازش آزمون بمانید");
+    await c("pdfLibrary").updateMany(
+      { sourceExamId: e._id },
+      { $set: { visibility: "private", archivedAt: now(), updatedAt: now() } },
+    );
     return { deleted: true };
   });
   app.get("/api/exam-imports/:eid", async (r) => {
@@ -193,6 +198,17 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     return {
       ...e,
       ownerName: owner?.name || owner?.email || "کاربر",
+      publicFiles: await (async () => {
+        const rows = await c("pdfLibrary").find({
+          sourceExamId: e._id, visibility: "public", state: "ready",
+          archivedAt: { $exists: false },
+        }).project({ _id: 1, sourceKind: 1 }).toArray();
+        const files: { question?: { id: string }; answer?: { id: string } } = {};
+        for (const row of rows)
+          if (row.sourceKind === "question" || row.sourceKind === "answer")
+            files[row.sourceKind] = { id: row._id };
+        return files;
+      })(),
       job: e.jobId
         ? await c("examImportJobs").findOne(
             { _id: e.jobId, ownerId: e.ownerId },
@@ -216,6 +232,134 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         .sort({ createdAt: 1, _id: 1 })
         .toArray(),
     };
+  });
+  app.post("/api/admin/exam-imports/:eid/public-files", async (r) => {
+    const admin = await user(r, "super_admin");
+    const { eid } = params.parse(r.params);
+    const { published } = z.object({ published: z.boolean() }).strict().parse(r.body);
+    const exam = await c("examImports").findOne({
+      _id: eid, archivedAt: { $exists: false },
+    });
+    if (!exam) fail(404, "آزمون یافت نشد");
+
+    if (!published) {
+      await ctx.transaction(async (session) => {
+        await c("pdfLibrary").updateMany(
+          { sourceExamId: eid, sourceKind: { $in: ["question", "answer"] } },
+          { $set: { visibility: "private", updatedAt: now() } },
+          { session },
+        );
+        await c("auditLogs").insertOne({
+          _id: id(), actorId: admin._id,
+          action: "exam_import_public_files_unpublish",
+          resourceId: eid, createdAt: now(),
+        }, { session });
+      });
+      return { published: false, files: {} };
+    }
+
+    if (exam.state !== "review")
+      fail(409, "ابتدا پردازش و بازبینی آزمون را به پایان برسانید");
+    if (exam.sourceDeletedAt)
+      fail(410, "فایل‌های اصلی حذف شده‌اند؛ برای انتشار دوباره آن‌ها را بارگذاری کنید");
+    const categoryIds = Array.isArray(exam.categoryIds)
+      ? exam.categoryIds.filter((value: unknown): value is string =>
+          typeof value === "string" && validExamCoverageId(value))
+      : [];
+    if (!categoryIds.length || categoryIds.length !== (exam.categoryIds ?? []).length)
+      fail(400, "ابتدا آزمون را به یک مورد معتبر از فهرست آزمون‌ها متصل کنید");
+    if (!exam.files?.question)
+      fail(409, "برای انتشار عمومی، ابتدا PDF دفترچه سؤال را بارگذاری کنید");
+
+    const copies: Array<{
+      kind: "question" | "answer";
+      file: { name: string; size: number; sha256: string };
+      data: Buffer;
+      sha256: string;
+    }> = [];
+    for (const kind of ["question", "answer"] as const) {
+      const file = exam.files?.[kind];
+      if (!file) continue;
+      let data: Buffer;
+      try {
+        data = await sourceBytes(ctx, eid, kind);
+      } catch {
+        fail(410, `فایل ${kind === "question" ? "دفترچه" : "کلید پاسخ"} منقضی یا حذف شده است؛ دوباره آن را بارگذاری کنید`);
+      }
+      const sha256 = createHash("sha256").update(data!).digest("hex");
+      if (data!.length !== file.size || sha256 !== file.sha256 ||
+        data!.subarray(0, 5).toString() !== "%PDF-" ||
+        !data!.subarray(-2048).includes(Buffer.from("%%EOF")))
+        fail(503, "صحت فایل منبع تأیید نشد؛ انتشار انجام نشد");
+      copies.push({ kind, file, data: data!, sha256 });
+    }
+
+    await ctx.transaction(async (session) => {
+      const current = await c("examImports").findOne({
+        _id: eid, archivedAt: { $exists: false }, state: "review",
+      }, { session });
+      if (!current || current.sourceDeletedAt ||
+        current.files?.question?.sha256 !== exam.files.question.sha256)
+        fail(409, "وضعیت آزمون هنگام انتشار تغییر کرده است؛ دوباره تلاش کنید");
+      for (const copy of copies) {
+        if (current.files?.[copy.kind]?.sha256 !== copy.sha256)
+          fail(409, "فایل منبع هنگام انتشار تغییر کرده است");
+        const suffix = copy.kind === "question" ? "دفترچه سؤال" : "کلید پاسخ";
+        await c("pdfLibrary").updateOne(
+          { sourceExamId: eid, sourceKind: copy.kind },
+          {
+            $set: {
+              ownerId: admin._id,
+              title: `${current.title} — ${suffix}`.slice(0, 150),
+              description: `فایل ${suffix} آزمون ${current.title}`.slice(0, 700),
+              taxonomy: {
+                level: "", grade: current.grade ?? "", book: current.subject ?? "",
+                chapter: "", topic: "",
+              },
+              visibility: "public",
+              state: "ready",
+              examCatalogIds: categoryIds,
+              file: { name: copy.file.name, size: copy.data.length, sha256: copy.sha256 },
+              updatedAt: now(),
+            },
+            $setOnInsert: {
+              _id: id(), sourceExamId: eid, sourceKind: copy.kind, createdAt: now(),
+            },
+            $unset: { archivedAt: "", uploadSession: "" },
+          },
+          { upsert: true, session },
+        );
+        const publishedFile = await c("pdfLibrary").findOne(
+          { sourceExamId: eid, sourceKind: copy.kind },
+          { session },
+        );
+        if (!publishedFile) fail(500, "ثبت فایل عمومی انجام نشد");
+        await c("pdfLibraryChunks").deleteMany(
+          { pdfId: publishedFile._id },
+          { session },
+        );
+        for (let offset = 0, position = 0; offset < copy.data.length; offset += 256 * 1024, position++)
+          await c("pdfLibraryChunks").insertOne({
+            _id: id(), pdfId: publishedFile._id, ownerId: admin._id,
+            position, data: new Binary(copy.data.subarray(offset, offset + 256 * 1024)),
+          }, { session });
+      }
+      await c("auditLogs").insertOne({
+        _id: id(), actorId: admin._id,
+        action: "exam_import_public_files_publish",
+        resourceId: eid, createdAt: now(),
+      }, { session });
+    });
+
+    const rows = await c("pdfLibrary").find({
+      sourceExamId: eid, sourceKind: { $in: ["question", "answer"] },
+      visibility: "public", state: "ready", archivedAt: { $exists: false },
+    }).project({ _id: 1, sourceKind: 1 }).toArray();
+    const files: { question?: { id: string }; answer?: { id: string } } = {};
+    for (const row of rows)
+      if (row.sourceKind === "question" || row.sourceKind === "answer")
+        files[row.sourceKind] = { id: row._id };
+    return { published: true, files };
   });
   app.post("/api/exam-imports/:eid/items/:iid/source-image", async (r) => {
     const { u, e } = await getExam(r);
