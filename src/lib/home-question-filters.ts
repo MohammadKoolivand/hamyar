@@ -4,6 +4,7 @@ import { sourceCategory } from "./question-source";
 export type HomeFilterKey = "level" | "grade" | "book" | "chapter" | "topic";
 export type HomeFilters = Record<HomeFilterKey, string> & {
   search: string;
+  track: string;
   category: string;
   difficulty: string;
   yearFrom: string;
@@ -12,7 +13,7 @@ export type HomeFilters = Record<HomeFilterKey, string> & {
 export type HomeSort = "newest" | "easiest" | "hardest" | "recommended";
 
 export const initialHomeFilters = (): HomeFilters => ({
-  search: "", level: "", grade: "", book: "", chapter: "", topic: "",
+  search: "", track: "", level: "", grade: "", book: "", chapter: "", topic: "",
   category: "", difficulty: "", yearFrom: "", yearTo: "",
 });
 
@@ -28,9 +29,26 @@ export function homeQuestionYear(q: CatalogPublicQuestion): number | null {
   return null;
 }
 
+/** Convert book titles such as "حسابان (ریاضی)" to the subject alone. */
+export function homeBookName(value: string): string {
+  return value.replace(/\s*[-–—(（[]\s*(?:رشته\s*)?(?:ریاضی(?:\s*فیزیک)?|علوم\s*تجربی|تجربی)\s*[)）\]]?\s*$/u, "").trim();
+}
+
+export function homeQuestionTrack(q: CatalogPublicQuestion): string {
+  const text = [q.source?.track, q.taxonomy?.book, q.source?.subject].filter(Boolean).join(" ");
+  if (q.source?.group === "mathematics" || /ریاضی(?:\s*فیزیک)?/.test(text)) return "ریاضی";
+  if (q.source?.group === "experimental" || /تجربی/.test(text)) return "تجربی";
+  return "";
+}
+
 export function homeQuestionTaxonomy(q: CatalogPublicQuestion, key: HomeFilterKey): string {
   if (key === "grade") return q.taxonomy?.grade || q.source?.grade || "";
-  if (key === "book") return q.taxonomy?.book || q.source?.subject || "";
+  if (key === "level") {
+    const level = q.taxonomy?.level || "";
+    const grade = homeQuestionTaxonomy(q, "grade");
+    return level || (/(?:دهم|یازدهم|دوازدهم|۱۰|۱۱|۱۲|10|11|12)/.test(grade) ? "متوسطه دوم" : "");
+  }
+  if (key === "book") return homeBookName(q.taxonomy?.book || q.source?.subject || "");
   return q.taxonomy?.[key] || "";
 }
 
@@ -56,6 +74,7 @@ export function matchesHomeQuestion(q: CatalogPublicQuestion, f: HomeFilters): b
     q.source?.sourceTitle, q.source?.organizer,
   ].join(" ").toLocaleLowerCase("fa");
   if (f.search.trim() && !searchable.includes(f.search.trim().toLocaleLowerCase("fa"))) return false;
+  if (f.track && homeQuestionTrack(q) !== f.track) return false;
   if ((["level", "grade", "book", "chapter", "topic"] as const).some(
     (key) => f[key] && homeQuestionTaxonomy(q, key) !== f[key],
   )) return false;
@@ -69,7 +88,8 @@ export function matchesHomeQuestion(q: CatalogPublicQuestion, f: HomeFilters): b
     if (sourceCategory(q.source) !== "konkur" ||
       /دانشگاه\s*آزاد|کنکور\s*آزاد|azad/i.test(sourceText)) return false;
   } else if (f.category && sourceCategory(q.source) !== f.category) return false;
-  if (f.difficulty && homeDifficulty(q) !== f.difficulty) return false;
+  if (f.difficulty === "unset" && homeDifficulty(q) !== "") return false;
+  if (f.difficulty && f.difficulty !== "unset" && homeDifficulty(q) !== f.difficulty) return false;
   const year = homeQuestionYear(q);
   if (f.yearFrom && (year === null || year < Number(f.yearFrom))) return false;
   if (f.yearTo && (year === null || year > Number(f.yearTo))) return false;

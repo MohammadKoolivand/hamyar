@@ -3,13 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BookOpen, FileDown, Search, RotateCcw, X, Layers3, GraduationCap, BookMarked, ListTree, Target, ClipboardList, Gauge, CalendarRange, ArrowDownWideNarrow, ThumbsUp } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
+import { PagedList } from "@/components/ui/paged-list";
 import { QuestionPresentation, MathText, QuestionVisualView } from "@/components/question-presentation";
 import { api } from "@/lib/api";
 import { sourceCategories, sourceSummary } from "@/lib/question-source";
 import { validExamCoverageId } from "@/lib/exam-catalog";
 import { publicQuestionCatalogIds, publicExamEvents, type CatalogPublicQuestion } from "@/lib/exam-catalog-coverage";
 import { printQuestions } from "@/lib/print-questions";
-import { homeQuestionTaxonomy, homeQuestionYear, initialHomeFilters, matchesHomeQuestion, sortHomeQuestions, type HomeFilterKey, type HomeSort } from "@/lib/home-question-filters";
+import { homeQuestionTaxonomy, homeQuestionTrack, homeQuestionYear, initialHomeFilters, matchesHomeQuestion, sortHomeQuestions, type HomeFilterKey, type HomeSort } from "@/lib/home-question-filters";
 
 /**
  * Public, single-page MVP. The original login, dashboards, teacher tools,
@@ -19,7 +20,6 @@ import { homeQuestionTaxonomy, homeQuestionYear, initialHomeFilters, matchesHome
 export default function SimpleQuestionHome() {
   const [questions, setQuestions] = useState<CatalogPublicQuestion[]>([]);
   const [catalogFilter, setCatalogFilter] = useState("");
-  const resultsRef = useRef<HTMLElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filters, setFilters] = useState(initialHomeFilters);
@@ -59,10 +59,12 @@ export default function SimpleQuestionHome() {
   const taxonomyOptions = (key: HomeFilterKey) => {
     const parents = taxonomyOrder.slice(0, taxonomyOrder.indexOf(key));
     return [...new Set(questions.filter((q) =>
-      parents.every((parent) => !filters[parent] || homeQuestionTaxonomy(q, parent) === filters[parent]))
+      parents.every((parent) => !filters[parent] || homeQuestionTaxonomy(q, parent) === filters[parent]) &&
+      (key === "level" || key === "grade" || !filters.track || homeQuestionTrack(q) === filters.track))
       .map((q) => homeQuestionTaxonomy(q, key)).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, "fa"));
   };
+  const trackOptions = ["ریاضی", "تجربی"];
   const years = [...new Set(questions.map(homeQuestionYear).filter((year): year is number => year !== null))]
     .sort((a, b) => a - b);
 
@@ -110,7 +112,7 @@ export default function SimpleQuestionHome() {
   return (
     <div className="min-h-screen bg-[#f7f9fc] text-slate-800" dir="rtl">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-4 sm:px-6">
           <Brand />
           <div className="flex flex-wrap items-center justify-end gap-2">
             <a href="/exam-import"
@@ -123,6 +125,13 @@ export default function SimpleQuestionHome() {
             <BookOpen size={16} aria-hidden />
           </a>
           </div>
+          <label className="relative min-w-[180px] flex-1 sm:mr-auto sm:max-w-xs">
+            <span className="sr-only">جست‌وجوی متن سؤال</span>
+            <Search size={18} aria-hidden className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-blue-500" />
+            <input type="search" className="min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-3 pr-10 text-sm focus:border-blue-500"
+              value={filters.search} onChange={(e) => setFilters((old) => ({ ...old, search: e.target.value }))}
+              placeholder="جست‌وجوی متن سؤال…" />
+          </label>
           {/*
             ورود/ثبت‌نام، منوی پنل معلم، داشبوردها و سایر مسیرها
             برای نسخه تک‌صفحه‌ای فعلاً در رابط غیرفعال‌اند؛
@@ -142,16 +151,7 @@ export default function SimpleQuestionHome() {
             </div>
           </div>
           <div className="my-6 border-t border-slate-100" />
-          <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-slate-800">
-            <Search size={19} className="text-blue-600" aria-hidden /> پیدا کردن سؤال
-          </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <label className="text-base font-semibold text-slate-700">
-              <span className="flex items-center gap-2"><Search size={17} className="text-blue-500" aria-hidden /> جست‌وجوی متن</span>
-              <input className={fieldClass} value={filters.search}
-                onChange={(e) => setFilters((old) => ({ ...old, search: e.target.value }))}
-                placeholder="مثلاً تابع، هندسه، زیست..." />
-            </label>
             {([
               ["level", "مقطع", "همه مقاطع", Layers3, "text-violet-500"],
               ["grade", "پایه", "همه پایه‌ها", GraduationCap, "text-pink-500"],
@@ -168,6 +168,14 @@ export default function SimpleQuestionHome() {
               </label>
             ))}
             <label className="text-base font-semibold text-slate-700">
+              <span className="flex items-center gap-2"><GraduationCap size={17} className="text-fuchsia-500" aria-hidden /> رشته</span>
+              <select className={fieldClass} value={filters.track}
+                onChange={(e) => setFilters((old) => ({ ...old, track: e.target.value, book: "", chapter: "", topic: "" }))}>
+                <option value="">همه رشته‌ها</option>
+                {trackOptions.map((track) => <option key={track} value={track}>{track}</option>)}
+              </select>
+            </label>
+            <label className="text-base font-semibold text-slate-700">
               <span className="flex items-center gap-2"><ClipboardList size={17} className="text-orange-500" aria-hidden /> نوع سؤال</span>
               <select className={fieldClass} value={filters.category} onChange={(e) => setFilters((old) => ({ ...old, category: e.target.value }))}>
                 <option value="">همه انواع</option>
@@ -179,6 +187,7 @@ export default function SimpleQuestionHome() {
               <span className="flex items-center gap-2"><Gauge size={17} className="text-rose-500" aria-hidden /> درجه سختی</span>
               <select className={fieldClass} value={filters.difficulty} onChange={(e) => setFilters((old) => ({ ...old, difficulty: e.target.value }))}>
                 <option value="">همه سطوح</option>
+                <option value="unset">تعیین نشده</option>
                 <option value="easy">آسان</option>
                 <option value="medium">متوسط</option>
                 <option value="hard">سخت</option>
@@ -191,7 +200,7 @@ export default function SimpleQuestionHome() {
                 <select id="home-year-from" aria-label="از سال" className={fieldClass} value={filters.yearFrom}
                   onChange={(e) => setFilters((old) => ({ ...old, yearFrom: e.target.value }))}>
                   <option value="">از سال</option>
-                  {years.map((year) => <option key={year} value={year}>{year.toLocaleString("fa-IR")}</option>)}
+                  {years.map((year) => <option key={year} value={year}>{year.toLocaleString("fa-IR", { useGrouping: false })}</option>)}
                 </select>
                 <label className="sr-only" htmlFor="home-year-to">تا سال</label>
                 <select id="home-year-to" aria-label="تا سال" className={fieldClass} value={filters.yearTo}
@@ -211,7 +220,7 @@ export default function SimpleQuestionHome() {
           </div>
         </section>
 
-        <section ref={resultsRef} aria-label="نتایج سؤال" className="grid scroll-mt-4 gap-4">
+        <section aria-label="نتایج سؤال" className="grid scroll-mt-4 gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-base font-semibold">{visible.length.toLocaleString("fa-IR")} سؤال پیدا شد</p>
@@ -237,7 +246,7 @@ export default function SimpleQuestionHome() {
             <div className="flex flex-wrap gap-2">
               <button type="button" className="min-h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm"
                 disabled={!visible.length} onClick={() => setSelected(visible.map((q) => q._id))}>
-                انتخاب همه
+                انتخاب همه نتایج
               </button>
               <button type="button" className="min-h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm"
                 disabled={!selected.length} onClick={() => setSelected([])}>
@@ -257,7 +266,8 @@ export default function SimpleQuestionHome() {
             <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
               برای این فیلترها هنوز سؤال عمومیِ تأییدشده‌ای ثبت نشده است.
             </p>}
-          {visible.map((q, i) => (
+          <PagedList items={visible} label="سؤال‌ها" pageSize={20} className="grid gap-4">
+          {(q, i) => (
             <article key={q._id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 [&_.hy-question-statement]:text-[17px] [&_.hy-question-option]:text-base">
               <label className="mb-3 flex cursor-pointer items-center gap-3 text-base font-semibold text-blue-900">
                 <input type="checkbox" className="size-5" checked={selected.includes(q._id)}
@@ -276,7 +286,8 @@ export default function SimpleQuestionHome() {
                 </button>
               </div>
             </article>
-          ))}
+          )}
+          </PagedList>
         </section>
         <div className="hidden" aria-hidden="true">
           <div ref={printable} dir="rtl">
