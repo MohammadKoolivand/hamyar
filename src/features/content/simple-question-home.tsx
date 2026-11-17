@@ -124,6 +124,11 @@ export default function SimpleQuestionHome() {
             بانک سؤال رایگان
             <BookOpen size={16} aria-hidden />
           </a>
+          <a href="/duplicate-questions"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-900 hover:bg-amber-100">
+            سؤالات تکراری
+            <Layers3 size={16} aria-hidden />
+          </a>
           </div>
           <label className="relative min-w-[180px] flex-1 sm:mr-auto sm:max-w-xs">
             <span className="sr-only">جست‌وجوی متن سؤال</span>

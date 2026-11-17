@@ -26,6 +26,7 @@ import { registerPdfLibrary } from "./modules/pdf-library";
 import { registerPdfDeliveries } from "./modules/pdf-deliveries";
 import { registerContent } from "./modules/content";
 import { registerPublicQuestionReview } from "./modules/public-question-review";
+import { registerDuplicateManagement } from "./modules/duplicate-management";
 import { registerDiscoverySettings } from "./modules/discovery-settings";
 import { registerMissions } from "./modules/missions";
 import { registerRemediation } from "./modules/remediation";
@@ -226,6 +227,7 @@ export async function buildApp(
   registerLibrary(app, ctx);
   registerContent(app, ctx);
   registerPublicQuestionReview(app, ctx);
+  registerDuplicateManagement(app, ctx);
   registerDiscoverySettings(app, ctx);
   registerExamImports(app, ctx);
   registerPdfLibrary(app, ctx);
