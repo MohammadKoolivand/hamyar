@@ -20,6 +20,10 @@ test("home cascaded taxonomy filters and inclusive Persian year ranges", () => {
   assert.equal(matchesHomeQuestion(q, { ...filters, yearTo: "1402" }), false);
   assert.equal(matchesHomeQuestion(q, { ...filters, topic: "مشتق" }), false);
   assert.equal(matchesHomeQuestion(q, { ...filters, category: "mock" }), false);
+  const azad = question("azad", { source: { family: "konkur", sourceTitle: "کنکور دانشگاه آزاد" } });
+  assert.equal(matchesHomeQuestion(azad, { ...initialHomeFilters(), category: "konkur-azad" }), true);
+  assert.equal(matchesHomeQuestion(azad, { ...initialHomeFilters(), category: "konkur" }), false);
+  assert.equal(matchesHomeQuestion(q, { ...initialHomeFilters(), category: "konkur" }), true);
   assert.equal(homeQuestionYear(question("persian", { year: undefined,
     source: { family: "mock", academicYear: "۱۴۰۲–۱۴۰۳" } })), 1402);
   assert.equal(matchesHomeQuestion(question("unknown", { year: undefined }), filters), false);
