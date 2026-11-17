@@ -83,6 +83,11 @@ export function ExamImportScreen({
     }))),
     extracted: exam?.items.length ?? 0,
   });
+  const hasPublicFiles = Boolean(exam?.publicFiles?.question || exam?.publicFiles?.answer);
+  const canPublishPublicFiles = Boolean(
+    exam?.state === "review" && exam.files?.question &&
+    exam.categoryIds?.length && !exam.sourceDeletedAt,
+  );
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
@@ -116,6 +121,20 @@ export function ExamImportScreen({
     } finally {
       setBusy(false);
     }
+  }
+  async function setPublicFiles(published: boolean) {
+    if (!exam || !superAdmin) return;
+    if (published && !window.confirm(
+      "دفترچه و کلید پاسخ به‌صورت عمومی کنار آزمون قرار می‌گیرند و همه کاربران می‌توانند آن‌ها را مشاهده یا دانلود کنند. فقط در صورت داشتن مجوز انتشار فایل‌ها ادامه دهید.",
+    )) return;
+    await run(async () => {
+      await api(`/admin/exam-imports/${exam._id}/public-files`, { published });
+      await load(exam._id);
+      await loadList();
+      setNotice(published
+        ? "فایل‌های انتخاب‌شده در کنار آزمون منتشر شدند."
+        : "انتشار عمومی فایل‌های آزمون برداشته شد.");
+    });
   }
   useEffect(() => {
     let alive = true;
@@ -582,6 +601,36 @@ export function ExamImportScreen({
             {exam.files?.question && <a className="rounded-xl border p-3 text-sm" href={`/api/exam-imports/${exam._id}/files/question`} target="_blank" rel="noopener noreferrer">مشاهده فایل سؤال</a>}
             {exam.files?.answer && <a className="rounded-xl border p-3 text-sm" href={`/api/exam-imports/${exam._id}/files/answer`} target="_blank" rel="noopener noreferrer">مشاهده فایل پاسخ‌نامه</a>}
           </div>
+          {superAdmin && (
+            <section className="grid gap-3 rounded-xl border border-sky-200 bg-sky-50/60 p-4">
+              <div>
+                <h4 className="text-sm font-bold text-sky-950">فایل‌های عمومی کنار آزمون</h4>
+                <p className="mt-1 text-xs leading-6 text-slate-600">
+                  فایل‌های منتشرشده در فهرست آزمون‌ها برای همه کاربران قابل مشاهده و دانلود هستند.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                {exam.publicFiles?.question
+                  ? <a className="rounded-lg border bg-white px-3 py-2 text-blue-900 underline" href={`/api/pdf-library/${exam.publicFiles.question.id}/file`} target="_blank" rel="noopener noreferrer">دفترچه PDF منتشرشده</a>
+                  : <span className="rounded-lg bg-white px-3 py-2 text-slate-500">دفترچه منتشر نشده</span>}
+                {exam.publicFiles?.answer
+                  ? <a className="rounded-lg border bg-white px-3 py-2 text-emerald-900 underline" href={`/api/pdf-library/${exam.publicFiles.answer.id}/file`} target="_blank" rel="noopener noreferrer">کلید پاسخ منتشرشده</a>
+                  : <span className="rounded-lg bg-white px-3 py-2 text-slate-500">کلید پاسخ منتشر نشده</span>}
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button type="button" disabled={busy || (!hasPublicFiles && !canPublishPublicFiles)}
+                  variant={hasPublicFiles ? "outline" : "default"}
+                  onClick={() => void setPublicFiles(!hasPublicFiles)}>
+                  {hasPublicFiles ? "برداشتن انتشار عمومی فایل‌ها" : "انتشار عمومی PDF و کلید"}
+                </Button>
+                {!hasPublicFiles && !canPublishPublicFiles && (
+                  <span className="text-xs text-slate-600">
+                    برای انتشار، آزمون باید بازبینی شده باشد، دسته‌بندی داشته باشد و PDF دفترچه هنوز موجود باشد.
+                  </span>
+                )}
+              </div>
+            </section>
+          )}
           <p className="text-sm">تعداد سؤال‌های استخراج‌شده: {fa(exam.items.length)}</p>
           {exam.items.map((item) => <article key={item._id} className="rounded-xl border p-4">
             <p className="text-xs text-slate-500">{item.state === "approved" ? "تأییدشده" : item.state === "pending" ? "در انتظار تأیید" : "ردشده"}</p>
@@ -679,6 +728,36 @@ export function ExamImportScreen({
                 </div>
               ))}
             </div>
+            {superAdmin && (
+            <section className="grid gap-3 rounded-xl border border-sky-200 bg-sky-50/60 p-4">
+              <div>
+                <h4 className="text-sm font-bold text-sky-950">فایل‌های عمومی کنار آزمون</h4>
+                <p className="mt-1 text-xs leading-6 text-slate-600">
+                  فایل‌های منتشرشده در فهرست آزمون‌ها برای همه کاربران قابل مشاهده و دانلود هستند.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                {exam.publicFiles?.question
+                  ? <a className="rounded-lg border bg-white px-3 py-2 text-blue-900 underline" href={`/api/pdf-library/${exam.publicFiles.question.id}/file`} target="_blank" rel="noopener noreferrer">دفترچه PDF منتشرشده</a>
+                  : <span className="rounded-lg bg-white px-3 py-2 text-slate-500">دفترچه منتشر نشده</span>}
+                {exam.publicFiles?.answer
+                  ? <a className="rounded-lg border bg-white px-3 py-2 text-emerald-900 underline" href={`/api/pdf-library/${exam.publicFiles.answer.id}/file`} target="_blank" rel="noopener noreferrer">کلید پاسخ منتشرشده</a>
+                  : <span className="rounded-lg bg-white px-3 py-2 text-slate-500">کلید پاسخ منتشر نشده</span>}
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button type="button" disabled={busy || (!hasPublicFiles && !canPublishPublicFiles)}
+                  variant={hasPublicFiles ? "outline" : "default"}
+                  onClick={() => void setPublicFiles(!hasPublicFiles)}>
+                  {hasPublicFiles ? "برداشتن انتشار عمومی فایل‌ها" : "انتشار عمومی PDF و کلید"}
+                </Button>
+                {!hasPublicFiles && !canPublishPublicFiles && (
+                  <span className="text-xs text-slate-600">
+                    برای انتشار، آزمون باید بازبینی شده باشد، دسته‌بندی داشته باشد و PDF دفترچه هنوز موجود باشد.
+                  </span>
+                )}
+              </div>
+            </section>
+          )}
             {exam.state === "collecting" && (
               <Button
                 disabled={busy || !exam.files?.question}
