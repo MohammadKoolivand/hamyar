@@ -251,7 +251,7 @@ export default function SimpleQuestionHome() {
           </div>
           {loading && <p role="status" className="rounded-2xl bg-white p-5">در حال بارگذاری سؤال‌ها…</p>}
           {error && <p role="alert" className="rounded-2xl bg-rose-50 p-5 text-rose-800">{error}</p>}
-          {recommendationMessage && <p role="status" className="rounded-xl bg-blue-50 p-3 text-sm text-blue-900">{recommendationMessage} <a className="underline" href="/login">ورود به حساب</a></p>
+          {recommendationMessage && <p role="status" className="rounded-xl bg-blue-50 p-3 text-sm text-blue-900">{recommendationMessage} {recommendationMessage.includes("وارد حساب") && <a className="underline" href="/login">ورود به حساب</a>}</p>
           {!loading && !error && !visible.length &&
             <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
               برای این فیلترها هنوز سؤال عمومیِ تأییدشده‌ای ثبت نشده است.
