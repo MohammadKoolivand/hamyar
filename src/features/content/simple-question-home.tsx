@@ -90,11 +90,17 @@ export default function SimpleQuestionHome() {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <Brand />
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <a href="/exam-import"
+              className="inline-flex min-h-11 items-center rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-xs font-semibold text-blue-900 hover:bg-blue-100">
+              ورود آزمون و OCR (ویژه معلم)
+            </a>
           <a href="/exam-catalog"
             className="inline-flex min-h-11 items-center gap-2 rounded-full border border-teal-100 bg-teal-50 px-4 py-2 text-xs font-semibold text-teal-800 hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
             بانک سؤال رایگان
             <BookOpen size={16} aria-hidden />
           </a>
+          </div>
           {/*
             ورود/ثبت‌نام، منوی پنل معلم، داشبوردها و سایر مسیرها
             برای نسخه تک‌صفحه‌ای فعلاً در رابط غیرفعال‌اند؛
