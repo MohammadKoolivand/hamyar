@@ -10,6 +10,9 @@ export interface ExamCatalogEntry {
   grade?: string;
   track?: "mathematics" | "experimental";
   stage?: string;
+  provider?: string;
+  parentId?: string;
+  catalogKind?: "year" | "event";
 }
 const gradeNames: Record<number, string> = {
   7: "هفتم", 8: "هشتم", 9: "نهم",
@@ -78,7 +81,49 @@ export const examCatalog: readonly ExamCatalogEntry[] = [
     grade: String(grade), stage: kind,
   }))),
 ];
-const registry = new Map(examCatalog.map((item) => [item.id, item]));
+/** Iranian exam series registry: catalog rows are upload slots, not claims of
+ * actual exam occurrence. Named organizers are based on published schedules
+ * and archives; event dates are only created from verified uploaded metadata. */
+export const mockExamProviders = [
+  { id: "ghalamchi", name: "قلم‌چی (کانون)" },
+  { id: "maz", name: "ماز" },
+  { id: "gozine2", name: "گزینه دو" },
+  { id: "gaj", name: "گاج" },
+  { id: "sanjesh", name: "سنجش (آزمایشی)" },
+  { id: "kheylisabz", name: "خیلی سبز" },
+  { id: "arman", name: "آرمان" },
+  { id: "marathon", name: "ماراتون" },
+  { id: "madaresbartar", name: "مدارس برتر" },
+  { id: "tamland", name: "تاملند" },
+  { id: "zistaz", name: "زیستاز" },
+  { id: "apex", name: "اپکس" },
+] as const;
+export const examYears = [1405, 1404, 1403, 1402] as const;
+const yearLabel = (year: number) => year.toLocaleString("fa-IR", { useGrouping: false });
+/** All new rows, including school/admissions, carry an explicit Jalali year. */
+export const detailedExamCatalog: readonly ExamCatalogEntry[] = [
+  ...examCatalog.filter((item) => item.year !== undefined),
+  ...examCatalog.filter((item) => item.year === undefined && item.section !== "mock")
+    .flatMap((item) => examYears.map((year) => ({
+      ...item, id: `${item.id}-${year}`, year, parentId: item.id,
+      catalogKind: "year" as const,
+      label: `${item.label} · سال ${yearLabel(year)}`,
+    }))),
+  ...mockExamProviders.flatMap((provider) =>
+    examYears.flatMap((year) =>
+      [10, 11, 12].flatMap((grade) =>
+        tracks.map((track) => ({
+          id: `mock-${provider.id}-${year}-${grade}-${track}`,
+          section: "mock" as const,
+          label: `${provider.name} · ${yearLabel(year)}–${yearLabel(year + 1)} · ${gradeNames[grade]} · ${groupNames[track]}`,
+          year, grade: String(grade), track, provider: provider.id,
+          catalogKind: "year" as const,
+        })),
+      ),
+    ),
+  ),
+];
+const registry = new Map([...examCatalog, ...detailedExamCatalog].map((item) => [item.id, item]));
 export function examCatalogEntry(id: string) { return registry.get(id); }
 export function examCatalogValidIds(ids: readonly string[]): boolean {
   if (ids.length > 8 || new Set(ids).size !== ids.length) return false;
