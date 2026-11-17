@@ -59,7 +59,16 @@ export function matchesHomeQuestion(q: CatalogPublicQuestion, f: HomeFilters): b
   if ((["level", "grade", "book", "chapter", "topic"] as const).some(
     (key) => f[key] && homeQuestionTaxonomy(q, key) !== f[key],
   )) return false;
-  if (f.category && sourceCategory(q.source) !== f.category) return false;
+  if (f.category === "konkur-azad") {
+    const sourceText = [q.source?.organizer, q.source?.sourceTitle].join(" ");
+    const explicitlyAzad = /دانشگاه\s*آزاد|کنکور\s*آزاد|azad/i.test(sourceText) ||
+      (q.catalogIds ?? []).some((id) => /^konkur-azad-/.test(id));
+    if (q.source?.family !== "konkur" || !explicitlyAzad) return false;
+  } else if (f.category === "konkur") {
+    const sourceText = [q.source?.organizer, q.source?.sourceTitle].join(" ");
+    if (sourceCategory(q.source) !== "konkur" ||
+      /دانشگاه\s*آزاد|کنکور\s*آزاد|azad/i.test(sourceText)) return false;
+  } else if (f.category && sourceCategory(q.source) !== f.category) return false;
   if (f.difficulty && homeDifficulty(q) !== f.difficulty) return false;
   const year = homeQuestionYear(q);
   if (f.yearFrom && (year === null || year < Number(f.yearFrom))) return false;
