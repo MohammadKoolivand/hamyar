@@ -21,7 +21,7 @@ test("Persian yeh and final heh normalize while valid ezafe, mathematics and URL
   );
   assert.equal(
     normalizePersianQuestionText("<u>كدام جملة صحيح است</u>"),
-    "<u>كدام جمله صحیح است</u>",
+    "<u>کدام جمله صحیح است</u>",
   );
 });
 
@@ -39,7 +39,7 @@ test("bank and review persistence normalize matching options and answer together
     examDraftSchema.parse(input),
     normalizeQuestionTextFields(input),
   ]) {
-    assert.equal(result.statement, "كدام جمله صحیح است؟");
+    assert.equal(result.statement, "کدام جمله صحیح است؟");
     assert.deepEqual(result.options, ["اولی", "دومی"]);
     assert.equal(result.reference, "دومی");
   }
