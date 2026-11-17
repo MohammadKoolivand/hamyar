@@ -22,11 +22,14 @@ function publicMock(id: string): CatalogPublicQuestion {
 
 test("all mock organizers have separate year, grade and track upload records", () => {
   const mock = detailedExamCatalog.filter((entry) => entry.section === "mock");
-  assert.equal(mock.length, mockExamProviders.length * examYears.length * 3 * 2);
+  const combinationsPerYear = mockExamProviders.reduce((total, provider) =>
+    total + (["zistaz", "zistpishrafte"].includes(provider.id) ? 1 : 2), 0);
+  assert.equal(mock.length, combinationsPerYear * examYears.length * 3);
   assert.equal(new Set(mock.map((entry) => entry.id)).size, mock.length);
   assert.ok(mock.every((entry) => entry.year && entry.grade && entry.track && entry.provider));
   for (const provider of mockExamProviders) for (const year of examYears) {
     for (const grade of [10, 11, 12]) for (const track of ["experimental", "mathematics"]) {
+      if (["zistaz", "zistpishrafte"].includes(provider.id) && track === "mathematics") continue;
       const item = mock.find((entry) => entry.id === `mock-${provider.id}-${year}-${grade}-${track}`);
       assert.ok(item);
       assert.equal(examCatalogValidIds([item.id]), true);
