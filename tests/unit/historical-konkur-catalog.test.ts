@@ -123,3 +123,21 @@ test("separate student-teacher entrance exam editions exist only 1403–1405", (
   assert.ok(ids.includes("konkur-farhangian-1404-experimental-booklet"));
   assert.ok(!ids.includes("konkur-1404-experimental-general"));
 });
+
+test("import checklist rejects mixing incompatible Konkur sittings, systems and places", () => {
+  assert.equal(examCatalogValidIds([
+    "konkur-1403-mathematics-first", "konkur-1403-mathematics-second",
+  ]), false);
+  assert.equal(examCatalogValidIds([
+    "konkur-1398-experimental-old", "konkur-1398-experimental-new",
+  ]), false);
+  assert.equal(examCatalogValidIds([
+    "konkur-1402-experimental-first-domestic",
+    "konkur-1402-experimental-first-international",
+  ]), false);
+  assert.equal(examCatalogValidIds([
+    "konkur-1402-experimental-general",
+    "konkur-1402-experimental-first",
+    "konkur-1402-experimental-first-domestic",
+  ]), true);
+});
