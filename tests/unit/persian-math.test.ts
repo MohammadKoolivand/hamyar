@@ -57,7 +57,7 @@ test("matrix expressions have KaTeX HTML geometry and MathML accessibility", () 
   assert.match(markup, /class="katex-html" aria-hidden="true"/);
   assert.match(markup, /<math\b/);
   assert.match(markup, /class="(?:mord|mopen|mclose)[^"]*"/);
-  assert.match(markup, /class="base"/);
+  assert.match(markup, /class="katex-base"/);
 });
 
 test("ordinary fractions also render KaTeX HTML rather than relying on cramped native MathML", () => {
