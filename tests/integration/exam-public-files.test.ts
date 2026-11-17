@@ -2,8 +2,6 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { fixture } from "../helpers/fixture";
 import { textPdf } from "../helpers/pdf";
-import { runNextExamJob } from "../../src/server/imports/jobs";
-import { createContext } from "../../src/server/context";
 
 test("super admin can publish durable exam booklet and answer key beside the public catalog row", async () => {
   const f = await fixture();
@@ -35,8 +33,11 @@ test("super admin can publish durable exam booklet and answer key beside the pub
       });
       assert.equal(uploaded.statusCode, 200, uploaded.body);
     }
-    await f.post(root + "/extract", {}, f.teacher);
-    await runNextExamJob(createContext(f.db));
+    // This integration test isolates the publication workflow; the import
+    // review pipeline has its own PDF/OCR integration coverage.
+    await f.c("examImports").updateOne(
+      { _id: exam._id }, { $set: { state: "review" } },
+    );
     assert.equal((await f.request(root, undefined, f.teacher)).json().state, "review");
 
     await f.post("/api/auth/register", {
