@@ -67,3 +67,11 @@ test("formatting differences never turn a correct short answer into an incorrect
   assert.equal(evaluate(q, "یاخته ها").result, "correct");
   assert.equal(evaluate(q, "هسته").result, "incorrect");
 });
+
+
+test("OCR spacing restores common Persian verb prefixes without touching units or LaTeX", () => {
+  const original = "دانش آموزان می روند و نمی توانند. کتاب ها و 30cm و (30cm) و $x^{2}$";
+  const normalized = normalizePersianQuestionText(original);
+  assert.equal(normalized, "دانش آموزان می‌روند و نمی‌توانند. کتاب‌ها و 30cm و (30cm) و $x^{2}$");
+  assert.equal(normalizePersianQuestionText(normalized), normalized);
+});
