@@ -100,6 +100,7 @@ export interface ExamImportItem {
     visualLayout?: "below" | "beside";
   };
   extraction?: {
+    detectedNumber?: number | null;
     regions: {
       page: number;
       x: number;
