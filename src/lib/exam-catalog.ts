@@ -221,5 +221,16 @@ export function examCatalogValidIds(ids: readonly string[]): boolean {
   if (!scoped.length) return true;
   const sameValue = (field: "section" | "grade" | "year" | "track" | "provider") =>
     new Set(scoped.map((entry) => entry[field]).filter((value) => value !== undefined)).size <= 1;
-  return (["section", "grade", "year", "track", "provider"] as const).every(sameValue);
+  if (!(["section", "grade", "year", "track", "provider"] as const).every(sameValue)) return false;
+  if (scoped[0]?.section !== "konkur") return true;
+  const stages = scoped.map((item) => item.stage ?? "");
+  const exclusive = (left: string, right: string) =>
+    !stages.some((value) => value === left || value.startsWith(`${left}-`)) ||
+    !stages.some((value) => value === right || value.startsWith(`${right}-`));
+  return exclusive("first", "second") &&
+    exclusive("old", "new") &&
+    exclusive("morning", "afternoon") &&
+    !((stages.some((value) => value === "domestic" || value.endsWith("-domestic"))) &&
+      stages.some((value) => value === "international" || value.endsWith("-international")));
+
 }
