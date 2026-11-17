@@ -93,6 +93,7 @@ export async function findPublicQuestionMatches(
     { $match: {
       "version.visibility": "public",
       "version.verifiedAt": { $exists: true },
+      archivedAt: { $exists: false },
       $expr: { $eq: ["$ownerId", "$version.ownerId"] },
       ...(excludeQuestionId ? { _id: { $ne: excludeQuestionId } } : {}),
     } },
