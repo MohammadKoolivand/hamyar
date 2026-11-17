@@ -162,7 +162,7 @@ export function publicQuestionCatalogIds(q: CatalogPublicQuestion): string[] {
   const nationalTags = source?.family === "konkur" ? historicalKonkurIds(q) : [];
   const yearlyMock = mockYearlyId(q);
   if (yearlyMock && !tags.includes(yearlyMock)) tags.push(yearlyMock);
-  if (q.catalogIds?.length) return [...new Set(expandKonkurTags([...tags, ...nationalTags]))];
+  if (q.catalogIds?.length) return expandKonkurTags(tags);
   if (!source) return tags;
   const grade = questionGrade(q);
   const track = questionTrack(q);
