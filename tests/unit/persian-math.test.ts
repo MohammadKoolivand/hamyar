@@ -52,16 +52,16 @@ test("final heh ezafe stays readable next to a mathematical identifier", async (
 });
 
 test("matrix expressions have KaTeX HTML geometry and MathML accessibility", () => {
-  const matrix = String.raw`\\begin{bmatrix}1 & -1 & 1 & -1 \\\\ -1 & 20 & x & -1\\end{bmatrix}\\begin{bmatrix}2 & 3 \\\\ -2 & 4 \\\\ -3 & y \\\\ 3 & 4\\end{bmatrix}`;
+  const matrix = String.raw`\begin{bmatrix}1 & -1 & 1 & -1 \\ -1 & 20 & x & -1\end{bmatrix}\begin{bmatrix}2 & 3 \\ -2 & 4 \\ -3 & y \\ 3 & 4\end{bmatrix}`;
   const markup = mathMarkup(matrix, false);
   assert.match(markup, /class="katex-html" aria-hidden="true"/);
-  assert.match(markup, /<math\\b/);
+  assert.match(markup, /<math\b/);
   assert.match(markup, /class="(?:mord|mopen|mclose)[^"]*"/);
-  assert.match(markup, /\\displaystyle|class="base"/);
+  assert.match(markup, /class="base"/);
 });
 
 test("ordinary fractions also render KaTeX HTML rather than relying on cramped native MathML", () => {
-  const markup = mathMarkup(String.raw`\\frac{x}{y}`, false);
+  const markup = mathMarkup(String.raw`\frac{x}{y}`, false);
   assert.match(markup, /class="katex-html" aria-hidden="true"/);
   assert.match(markup, /<mfrac>/);
 });
