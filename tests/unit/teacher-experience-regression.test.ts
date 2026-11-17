@@ -13,16 +13,17 @@ test("signed-in teacher pages use the shared site header without a separate side
   assert.match(css, /hy-header-dropdown/);
 });
 
-test("new questions are private by default and require public-bank moderation", () => {
+test("question authoring is public-only and bulk publication is available", () => {
   const content = file("src/features/content/content-screen.tsx");
+  const editor = file("src/features/content/question-editor.tsx");
   const authoring = file("src/server/modules/authoring.ts");
-  const review = file("src/server/modules/public-question-review.ts");
-  assert.match(content, /useState<"private" \| "public">\("private"\)/);
-  assert.match(content, /<option value="private">خصوصی<\/option>/);
-  assert.match(content, /<option value="public" disabled>/);
-  assert.match(authoring, /visibilityForAuthoredQuestion\(b\.visibility\)/);
-  assert.match(review, /propose-public/);
-  assert.match(review, /verifiedBy: admin\._id/);
+  const bank = file("src/features/content/question-bank.tsx");
+  const api = file("src/server/modules/content.ts");
+  assert.doesNotMatch(content, /setVisibility|<option value="private">خصوصی/);
+  assert.doesNotMatch(editor, /<option value="private">خصوصی/);
+  assert.match(authoring, /visibility: "public" as const/);
+  assert.match(bank, /عمومی‌سازی همه سؤال‌ها/);
+  assert.match(api, /\/api\/questions\/publish-all/);
 });
 
 test("bank removes global difficulty bulk action and preserves current page when editing", () => {
