@@ -11,6 +11,7 @@ import {
 } from "../../lib/exam-import";
 import { enqueueExam, retentionDays, sourceBytes } from "../imports/jobs";
 import { normalized } from "../imports/layout";
+import { calculateExamProgress } from "../../lib/exam-import-progress";
 import { questionSchema } from "../domain";
 import { persistQuestion, validateQuestion } from "./authoring";
 const params = z.object({ eid: z.string().uuid() });
@@ -59,25 +60,52 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     const rows = await c("examImports").find(
       { archivedAt: { $exists: false } },
       { projection: { _id: 1, title: 1, year: 1, grade: 1, track: 1,
-        categoryIds: 1, source: 1, state: 1, reviewedCompleteAt: 1, createdAt: 1 } },
+        categoryIds: 1, source: 1, state: 1, statistics: 1, createdAt: 1 } },
     ).sort({ createdAt: -1 }).limit(500).toArray();
     if (!rows.length) return [];
+    // Distinct source question numbers prevent double counting duplicate
+    // OCR drafts / re-imported items. An unnumbered verified item counts once.
     const counts = await c("examImportItems").aggregate([
       { $match: { examId: { $in: rows.map((row) => row._id) } } },
-      { $group: { _id: "$examId", total: { $sum: 1 },
-        approved: { $sum: { $cond: [{ $eq: ["$state", "approved"] }, 1, 0] } } } },
+      { $group: {
+        _id: "$examId",
+        total: { $sum: 1 },
+        approvedKeys: {
+          $addToSet: {
+            $cond: [
+              { $and: [
+                { $eq: ["$state", "approved"] },
+                { $eq: [{ $type: "$questionVersionId" }, "string"] },
+              ] },
+              { $ifNull: [
+                "$originalNumber",
+                { $ifNull: ["$extraction.detectedNumber", "$_id"] },
+              ] },
+              null,
+            ],
+          },
+        },
+      } },
     ]).toArray();
     const byId = new Map(counts.map((row) => [row._id, row]));
     return rows.map((row) => {
       const count = byId.get(row._id);
       const total = count?.total ?? 0;
-      const approved = count?.approved ?? 0;
+      const approved = (count?.approvedKeys ?? []).filter((value: unknown) => value !== null).length;
+      const progress = calculateExamProgress({
+        approved,
+        extracted: total,
+        expectedQuestionCount: row.statistics?.expectedQuestionCount ?? null,
+        expectedCountConfidence: row.statistics?.expectedCountConfidence ?? "unknown",
+      });
       return {
         _id: row._id, title: row.title, year: row.year, grade: row.grade,
         track: row.track, categoryIds: row.categoryIds ?? [],
         examDate: row.source?.examDate, stage: row.source?.stage,
-        state: row.state, total, approved,
-        complete: Boolean(row.reviewedCompleteAt && total > 0 && approved === total),
+        state: row.state,
+        ...progress,
+        // Legacy fields retained for earlier UI clients.
+        total, complete: progress.status === "complete",
       };
     });
   });
