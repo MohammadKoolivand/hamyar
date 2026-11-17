@@ -131,8 +131,9 @@ export function registerDuplicateManagement(app: FastifyInstance, ctx: Context) 
       const survivor = candidates.find((row) => row.questionId === input.survivorId);
       const duplicates = candidates.filter((row) => input.duplicateIds.includes(row.questionId));
       if (input.action === "merge") {
-        if (!survivor) ctx.fail(400, "سؤال اصلی معتبر نیست");
-        if (duplicates.some((row) => row.fingerprint !== survivor.fingerprint))
+        const survivorFingerprint = survivor?.fingerprint;
+        if (!survivorFingerprint) ctx.fail(400, "سؤال اصلی معتبر نیست");
+        if (duplicates.some((row) => row.fingerprint !== survivorFingerprint))
           ctx.fail(409, "ادغام فقط برای سؤال‌های کاملاً یکسان مجاز است؛ مشابه‌ها را جداگانه بررسی کنید");
       }
       const at = ctx.now();
