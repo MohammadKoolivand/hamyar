@@ -262,3 +262,25 @@ test("public independent practice is private to the student, not the question au
     await f.close();
   }
 });
+
+test("public question recommendations count unique signed-in users without leaking answers", async () => {
+  const f = await fixture();
+  try {
+    const url = "/api/questions/" + f.question._id + "/recommend";
+    const denied = await f.request(url, {});
+    assert.equal(denied.statusCode, 401);
+    const first = await f.post(url, {}, f.student);
+    const repeat = await f.post(url, {}, f.student);
+    assert.equal(first.recommendationCount, 1);
+    assert.equal(repeat.recommendationCount, 1);
+    const teacherVote = await f.post(url, {}, f.teacher);
+    assert.equal(teacherVote.recommendationCount, 2);
+    const catalog = (await f.request("/api/questions/public")).json();
+    const question = catalog.find((row: { _id: string }) => row._id === f.question._id);
+    assert.equal(question.recommendationCount, 2);
+    assert.equal(question.reference, undefined);
+    assert.equal(question.userId, undefined);
+    assert.ok(question.publishedAt);
+    assert.equal((await f.c("questionRecommendations").countDocuments()), 2);
+  } finally { await f.close(); }
+});

@@ -12,7 +12,7 @@ test("public MVP home contains only filtering, selected questions and PDF export
   assert.match(screen, /\/questions\/public/);
   assert.match(screen, /printQuestions\(/);
   assert.match(screen, /type="checkbox"/);
-  assert.match(screen, /sourceCategory\(/);
+  assert.match(screen, /matchesHomeQuestion\(/);
   assert.match(screen, /href="\/exam-catalog"/);
   assert.doesNotMatch(screen, /catalogOpen|hodhod-exam-catalog/);
   assert.match(screen, /new URLSearchParams\(window.location.search\).get\("exam"\)/);
