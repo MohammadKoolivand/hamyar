@@ -418,7 +418,8 @@ export function ExamImportScreen({
                                   const system = kind.includes("old") ? "نظام قدیم" :
                                     kind.includes("new") ? "نظام جدید" : undefined;
                                   const booklet = kind === "booklet-general" ? "دفترچه عمومی" :
-                                    kind === "booklet-specific" ? "دفترچه اختصاصی" : undefined;
+                                    kind === "booklet-specific" ? "دفترچه اختصاصی" :
+                                    kind === "booklet" && item.provider === "farhangian" ? "دفترچه اختصاصی فرهنگیان" : undefined;
                                   setSource({
                                     family: "konkur", group: item.track,
                                     ...(location ? { location } : {}),
@@ -428,7 +429,8 @@ export function ExamImportScreen({
                                     ...(item.year ? { academicYear: String(item.year) } : {}),
                                     ...(item.provider ? { organizer: item.provider === "azad"
                                       ? "دانشگاه آزاد" : item.provider === "azad-shared"
-                                        ? "سازمان سنجش (پذیرش دانشگاه آزاد)" : "سازمان سنجش" } : {}),
+                                        ? "سازمان سنجش (پذیرش دانشگاه آزاد)" : item.provider === "farhangian"
+                                        ? "سازمان سنجش (فرهنگیان)" : "سازمان سنجش" } : {}),
                                   });
                                 } else if (item.section === "school") {
                                   const administration = item.id.startsWith("final-") ? "final" : item.id.startsWith("coordinated-") ? "district" : "internal";
