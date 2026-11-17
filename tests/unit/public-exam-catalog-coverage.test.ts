@@ -51,3 +51,9 @@ test("public coverage remains anonymous; only super-admin may certify completion
   assert.equal(routeRoles("GET", "/api/exam-catalog/coverage"), null);
   assert.deepEqual(routeRoles("POST", "/api/admin/exam-catalog/coverage"), ["super_admin"]);
 });
+
+test("public exam file links are anonymous while publishing is super-admin-only", () => {
+  assert.equal(routeRoles("GET", "/api/exam-catalog/public-progress"), null);
+  assert.deepEqual(routeRoles("POST", "/api/admin/exam-imports/:eid/public-files"), ["super_admin"]);
+  assert.equal(routeRoles("GET", "/api/pdf-library/:pid/file"), null);
+});
