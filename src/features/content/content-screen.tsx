@@ -131,7 +131,6 @@ export function ContentScreen({
   })).filter(({ text }) => text.length > 0);
   const [nodeSearch, setNodeSearch] = useState("");
   const [entryMode, setEntryMode] = useState("topic");
-  const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [source, setSource] = useState<QuestionSource>();
   const [difficulty, setDifficulty] = useState("");
   const [year, setYear] = useState("");
@@ -171,7 +170,7 @@ export function ContentScreen({
       )}
       {view === "add" && (
         <Link href="/content" className="text-sm text-[#233B8F]">
-          بانک سؤال خصوصی · {fa(questions.length)} سؤال
+          بانک سؤال · {fa(questions.length)} سؤال
         </Link>
       )}
       {view === "add" && (
@@ -381,7 +380,6 @@ export function ContentScreen({
                 e.preventDefault();
                 run(async () => {
                   await api("/questions", {
-                    visibility,
                     ...(entryMode === "free"
                       ? { classification: "free" }
                       : { topicId: topic }),
@@ -447,19 +445,9 @@ export function ContentScreen({
               }}
               className="grid gap-[18px]"
             >
-              <label className="block text-sm">
-                دسترسی سؤال
-                <select
-                  className="w-full rounded-xl border p-3"
-                  value={visibility}
-                  onChange={(e) =>
-                    setVisibility(e.target.value as "private" | "public")
-                  }
-                >
-                  <option value="public" disabled>عمومی — فقط پس از تأیید مدیر بانک</option>
-                  <option value="private">خصوصی</option>
-                </select>
-              </label>
+              <p className="rounded-xl border border-teal-100 bg-teal-50 p-3 text-sm text-teal-900">
+                این سؤال پس از ثبت در بانک عمومی همیار نمایش داده می‌شود؛ پاسخ مرجع برای عموم نمایش داده نمی‌شود.
+              </p>
               {entryMode === "free" ? (
                 <p className="rounded-xl bg-slate-50 p-4 text-sm leading-7 text-slate-600">
                   سؤال آزاد بدون اتصال به کتاب یا مبحث ذخیره می‌شود. درجه سختی و

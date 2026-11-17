@@ -22,7 +22,6 @@ import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
 import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
-import { visibilityForAuthoredQuestion } from "../publication-policy";
 import { examCatalogEntry, validExamCoverageId } from "../../lib/exam-catalog";
 import { calculateExamProgress, estimateLegacyQuestionCount } from "../../lib/exam-import-progress";
 export function registerContent(app: FastifyInstance, ctx: Context) {
@@ -672,6 +671,44 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       };
     });
   });
+  // One-click migration for the signed-in teacher's CURRENT question bank only.
+  // The public catalog projection continues to omit answer references and hints.
+  app.post("/api/questions/publish-all", async (r) => {
+    const actor = await user(r, "teacher");
+    return ctx.atomic(r, actor._id, "publish-all-owned-questions", { scope: "current-owned" }, async (session) => {
+      const current = await c("questions").find({ ownerId: actor._id }, { session })
+        .project({ _id: 1, currentVersionId: 1 }).toArray();
+      const currentIds = current.map((row) => row.currentVersionId)
+        .filter((value): value is string => typeof value === "string");
+      const versions = currentIds.length ? await c("questionVersions").find({
+        _id: { $in: currentIds }, ownerId: actor._id,
+        verifiedAt: { $exists: true },
+      }, { session }).project({ _id: 1, visibility: 1, topicId: 1 }).toArray() : [];
+      const eligibleIds = versions.map((row) => row._id);
+      const updated = eligibleIds.length ? await c("questionVersions").updateMany({
+        _id: { $in: eligibleIds }, ownerId: actor._id,
+        verifiedAt: { $exists: true }, visibility: { $ne: "public" },
+      }, { $set: { visibility: "public" } }, { session }) : { modifiedCount: 0 };
+      const topics = [...new Set(versions.flatMap((row) =>
+        typeof row.topicId === "string" ? [row.topicId] : []))];
+      for (const topicId of topics) await addDiscoveryPath(ctx.db, actor._id, topicId, session);
+      const alreadyPublic = versions.length - updated.modifiedCount;
+      const skippedUnverified = currentIds.length - versions.length;
+      await c("auditLogs").insertOne({
+        _id: id(), actorId: actor._id, action: "publish_all_owned_questions",
+        count: updated.modifiedCount, alreadyPublic, skippedUnverified,
+        createdAt: ctx.now(),
+      }, { session });
+      return {
+        total: currentIds.length,
+        published: updated.modifiedCount,
+        alreadyPublic,
+        skippedUnverified,
+        publicTotal: updated.modifiedCount + alreadyPublic,
+      };
+    });
+  });
+
   app.post("/api/questions/select", async (r) => {
     const u = await user(r, "teacher");
     const quotaSchema = z.object({
@@ -879,9 +916,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           { session },
         );
         if (!previous) ctx.fail(404, "سؤال یافت نشد");
-        const visibility = visibilityForAuthoredQuestion(
-          b.visibility, previous!.visibility ?? "private",
-        );
+        const visibility = "public" as const;
         const publicFingerprint = visibility === "public"
           ? await reservePublicQuestionFingerprint(ctx, b, previous!.questionId, u._id, session)
           : undefined;

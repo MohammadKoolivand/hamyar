@@ -18,6 +18,7 @@ import {
   Search,
   SlidersHorizontal,
   Pencil,
+  Globe,
 } from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { QuestionPresentation } from "@/components/question-presentation";
@@ -53,6 +54,9 @@ export function QuestionBank({
   const [published, setPublished] = useState(new Set<string>());
   const [libraryBusy, setLibraryBusy] = useState("");
   const [libraryError, setLibraryError] = useState("");
+  const [publishBusy, setPublishBusy] = useState(false);
+  const [publishNotice, setPublishNotice] = useState("");
+  const [publishError, setPublishError] = useState("");
   useEffect(() => {
     let cancelled = false;
     api<Array<{ questionVersionId: string; courseId: string }>>("/questions/library-publications")
@@ -75,6 +79,16 @@ export function QuestionBank({
       });
     } catch (error) { setLibraryError((error as Error).message); }
     finally { setLibraryBusy(""); }
+  }
+  async function publishAllQuestions() {
+    if (!window.confirm("انتشار عمومی همه " + questions.length + " سؤال فعلی بانک؟ متن سؤال و گزینه‌ها برای همه قابل مشاهده می‌شوند؛ پاسخ مرجع و راهنماها عمومی نمی‌شوند.")) return;
+    setPublishBusy(true); setPublishError(""); setPublishNotice("");
+    try {
+      const result = await api<{ total: number; published: number; alreadyPublic: number; skippedUnverified: number; publicTotal: number }>("/questions/publish-all", {});
+      setPublishNotice(fa(result.publicTotal) + " سؤال عمومی است؛ " + fa(result.published) + " سؤال تازه منتشر شد." + (result.skippedUnverified ? " " + fa(result.skippedUnverified) + " سؤال به‌دلیل نداشتن تأیید ثبت‌شده منتشر نشد." : ""));
+      await onSaved();
+    } catch (error) { setPublishError((error as Error).message || "انتشار گروهی انجام نشد."); }
+    finally { setPublishBusy(false); }
   }
   const [cropOpen, setCropOpen] = useState(false);
   const [editing, setEditing] = useState<string>();
@@ -206,6 +220,10 @@ export function QuestionBank({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <Button type="button" variant="outline" disabled={publishBusy || !questions.length} onClick={() => void publishAllQuestions()}>
+            <Globe className="ml-2 size-4" />
+            {publishBusy ? "در حال عمومی‌سازی…" : "عمومی‌سازی همه سؤال‌ها"}
+          </Button>
           <Link
             href="/resources"
             className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600"
@@ -227,6 +245,7 @@ export function QuestionBank({
           </Link>
         </div>
       </section>
+      {(publishNotice || publishError) && <p role={publishError ? "alert" : "status"} className={publishError ? "rounded-xl bg-rose-50 p-3 text-sm text-rose-800" : "rounded-xl bg-teal-50 p-3 text-sm text-teal-900"}>{publishError || publishNotice}</p>}
       <section className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 sm:p-5" aria-label="انتشار امن در کتابخانه">
         <h3 className="font-bold text-[#17305e]">اشتراک سؤال‌ها در کتابخانه‌ی درس</h3>
         <p className="mt-1 text-sm text-slate-600">انتشار برای هر درس اختیاری است؛ تنها دانش‌آموزان عضو همان درس می‌توانند سؤال را پیدا و تمرین کنند. پاسخ مرجع در فهرست نمایش داده نمی‌شود.</p>

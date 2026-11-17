@@ -1,10 +1,12 @@
-/** Preserve existing legacy behavior in test/dev, but fail closed in production.
- * Only the admin review transaction may publish a new public version.
+/** The question bank is public-only. Answer references remain server-side and are
+ * never included in the public catalog response.
  */
 export function visibilityForAuthoredQuestion(
-  requested: "private" | "public" | undefined,
-  previous: "private" | "public" = "public",
-  environment = process.env.NODE_ENV,
-): "private" | "public" {
-  return environment === "production" ? "private" : (requested ?? previous);
+  _requested: "private" | "public" | undefined,
+  _previous: "private" | "public" = "public",
+  _environment: string = process.env.NODE_ENV ?? "test",
+): "public" {
+  void _previous;
+  void _environment;
+  return "public";
 }

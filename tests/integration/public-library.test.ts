@@ -56,16 +56,17 @@ test("guests and every role can browse public questions without keys or private 
       },
       f.teacher,
     );
-    assert.deepEqual(
-      (await f.request("/api/questions/public", undefined, f.student)).json(),
-      [],
-    );
+    const revised = (await f.request("/api/questions/public", undefined, f.student)).json();
+    assert.equal(revised.length, 1);
+    assert.notEqual(revised[0]._id, q._id);
+    assert.equal(revised[0].statement, "سؤال عمومی مشترک");
+    assert.equal(revised[0].reference, undefined);
   } finally {
     await f.close();
   }
 });
 
-test("public library allows unenrolled students without exposing keys and private revision revokes practice", async () => {
+test("public library remains public after question revision without exposing keys", async () => {
   const f = await fixture();
   try {
     const image = await sharp({
@@ -136,18 +137,16 @@ test("public library allows unenrolled students without exposing keys and privat
     );
     assert.equal(
       (await f.request(`/api/question-assets/${visual.assetId}`)).statusCode,
-      401,
+      200,
     );
-    assert.equal(
-      (
-        await f.request(
-          `/api/student/library/${q._id}/start`,
-          { courseId: q._id },
-          f.student,
-        )
-      ).statusCode,
-      404,
+    const currentQuestion = await f.c("questions").findOne({ _id: q.questionId });
+    assert.ok(currentQuestion?.currentVersionId);
+    const revisedPractice = await f.post(
+      `/api/student/library/${currentQuestion!.currentVersionId}/start`,
+      { courseId: currentQuestion!.currentVersionId },
+      f.student,
     );
+    assert.equal((await f.request(`/api/assignments/${revisedPractice.assignmentId}`, undefined, f.student)).statusCode, 200);
     assert.equal(
       (
         await f.request(
@@ -166,7 +165,7 @@ test("public library allows unenrolled students without exposing keys and privat
           f.student,
         )
       ).statusCode,
-      404,
+      200,
     );
     assert.equal(
       (
@@ -198,7 +197,7 @@ for (const role of ["super_admin", "secretary"]) {
         },
         f.teacher,
       );
-      assert.equal(q.visibility, "private");
+      assert.equal(q.visibility, "public");
       assert.equal(
         (
           await f.request(
