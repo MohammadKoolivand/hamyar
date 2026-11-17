@@ -22,7 +22,6 @@ import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
 import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
-import { visibilityForAuthoredQuestion } from "../publication-policy";
 import { examCatalogEntry, validExamCoverageId } from "../../lib/exam-catalog";
 import { calculateExamProgress, estimateLegacyQuestionCount } from "../../lib/exam-import-progress";
 export function registerContent(app: FastifyInstance, ctx: Context) {
@@ -879,9 +878,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           { session },
         );
         if (!previous) ctx.fail(404, "سؤال یافت نشد");
-        const visibility = visibilityForAuthoredQuestion(
-          b.visibility, previous!.visibility ?? "private",
-        );
+        const visibility = "public" as const;
         const publicFingerprint = visibility === "public"
           ? await reservePublicQuestionFingerprint(ctx, b, previous!.questionId, u._id, session)
           : undefined;
