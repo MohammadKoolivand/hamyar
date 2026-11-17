@@ -258,7 +258,7 @@ export default function SimpleQuestionHome() {
               برای این فیلترها هنوز سؤال عمومیِ تأییدشده‌ای ثبت نشده است.
             </p>}
           {visible.map((q, i) => (
-            <article key={q._id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+            <article key={q._id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 [&_.hy-question-statement]:text-[17px] [&_.hy-question-option]:text-base">
               <label className="mb-3 flex cursor-pointer items-center gap-3 text-base font-semibold text-blue-900">
                 <input type="checkbox" className="size-5" checked={selected.includes(q._id)}
                   onChange={(e) => setSelected((prev) => e.target.checked ? [...new Set([...prev, q._id])] : prev.filter((id) => id !== q._id))} />
