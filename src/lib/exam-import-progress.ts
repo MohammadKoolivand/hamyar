@@ -18,6 +18,20 @@ export interface NumberedAnswerKey {
   number: number;
   option: number;
 }
+/** Existing imports may predate stored numbering evidence. The previous
+ * extractor saved only a key-entry count; recover it as an estimate, never as
+ * an authoritative denominator or a reason to mark an exam complete. */
+export function estimateLegacyQuestionCount(input: {
+  keyEntries: number;
+  hasAnswerFile: boolean;
+  failedAnswerPages?: number;
+}): ExpectedQuestionCount {
+  if (input.hasAnswerFile && !input.failedAnswerPages &&
+    Number.isSafeInteger(input.keyEntries) && input.keyEntries >= 2 &&
+    input.keyEntries <= 500)
+    return { expectedQuestionCount: input.keyEntries, expectedCountConfidence: "numbering_estimate" };
+  return { expectedQuestionCount: null, expectedCountConfidence: "unknown" };
+}
 export interface ApprovalRow {
   _id: string;
   state: "pending" | "approved" | "rejected";
