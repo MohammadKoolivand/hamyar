@@ -11,6 +11,7 @@ export interface ExamCatalogEntry {
   track?: "mathematics" | "experimental";
   stage?: string;
   provider?: string;
+  linkedCatalogId?: string;
   parentId?: string;
   catalogKind?: "year" | "event";
 }
@@ -31,17 +32,77 @@ export const examCatalogSections = [
   { id: "olympiad", label: "المپیاد" },
   { id: "practice", label: "تمرین، کاربرگ و آزمون معلم" },
 ] as const;
+/**
+ * Historical national entrance-exam editions, 1390–1405.
+ * 1390–1401: one national sitting per year.
+ * 1402–1404: first and second sittings.
+ * 1405: one sitting.
+ * University Azad held a distinct undergraduate entrance exam in 1390–1391;
+ * from 1392 its exam-based undergraduate admissions use the same national paper.
+ * A catalog row is an import slot, never evidence that a PDF is already owned.
+ */
+export const konkurYears: readonly number[] = Array.from({ length: 16 }, (_, index) => 1405 - index);
+export const independentAzadYears = [1390, 1391] as const;
+export const doubleSessionKonkurYears = [1402, 1403, 1404] as const;
+const faYear = (year: number) => year.toLocaleString("fa-IR", { useGrouping: false });
+const editionLabel = (year: number) =>
+  year === 1405 ? "تک‌نوبت" : year >= 1402 ? "تمام نوبت‌ها" : "آزمون سالانه";
+function nationalKonkurRows(year: number, track: "mathematics" | "experimental"): ExamCatalogEntry[] {
+  const name = `کنکور سراسری ${faYear(year)} · ${groupNames[track]}`;
+  const base = `konkur-${year}-${track}`;
+  const row = (part: string, label: string, stage: string): ExamCatalogEntry => ({
+    id: `${base}-${part}`, section: "konkur", year, track, stage,
+    provider: "sarasari", label: `${name} · ${label}`,
+  });
+  const items: ExamCatalogEntry[] = [
+    row("general", editionLabel(year), "general"),
+    row("domestic", "داخل کشور", "domestic"),
+    row("international", "خارج کشور", "international"),
+  ];
+  if (year >= 1402 && year <= 1404) {
+    for (const [session, sessionName] of [["first", "نوبت اول"], ["second", "نوبت دوم"]] as const) {
+      items.push(row(session, sessionName, session));
+      for (const [place, placeName] of [["domestic", "داخل کشور"], ["international", "خارج کشور"]] as const)
+        items.push(row(`${session}-${place}`, `${sessionName} · ${placeName}`, `${session}-${place}`));
+    }
+  }
+  if (year === 1398 || year === 1399) {
+    for (const [system, systemName] of [["old", "نظام قدیم"], ["new", "نظام جدید"]] as const) {
+      items.push(row(system, systemName, system));
+      for (const [place, placeName] of [["domestic", "داخل کشور"], ["international", "خارج کشور"]] as const)
+        items.push(row(`${system}-${place}`, `${systemName} · ${placeName}`, `${system}-${place}`));
+    }
+  }
+  // Booklet rows are parts of the same sitting, not independent admissions.
+  if (year <= 1401) items.push(row("booklet-general", "دفترچه عمومی", "booklet-general"));
+  items.push(row("booklet-specific", "دفترچه اختصاصی", "booklet-specific"));
+  return items;
+}
+function azadKonkurRows(year: number, track: "mathematics" | "experimental"): ExamCatalogEntry[] {
+  const base = `konkur-azad-${year}-${track}`;
+  const prefix = `کنکور دانشگاه آزاد ${faYear(year)} · ${groupNames[track]}`;
+  if (year >= 1392) return [{
+    id: `${base}-shared`, section: "konkur", provider: "azad-shared",
+    year, track, stage: "shared", linkedCatalogId: `konkur-${year}-${track}-general`,
+    label: `${prefix} · آزمون مشترک با سراسری (بدون دفترچه مستقل)`,
+  }];
+  return [
+    { id: `${base}-general`, section: "konkur", provider: "azad",
+      year, track, stage: "general", label: `${prefix} · آزمون مستقل` },
+    // Morning/afternoon are archival sublabels; actual rows are only marked
+    // present when matching approved source records are entered.
+    ...(["morning", "afternoon"] as const).map((stage) => ({
+      id: `${base}-${stage}`, section: "konkur" as const, provider: "azad",
+      year, track, stage,
+      label: `${prefix} · آرشیو شیفت ${stage === "morning" ? "صبح" : "عصر"}`,
+    })),
+  ];
+}
 export const examCatalog: readonly ExamCatalogEntry[] = [
-  ...([1404, 1405] as const).flatMap((year) =>
-    tracks.flatMap((track) =>
-      (year === 1404 ? ["general", "first", "second", "domestic", "international"] as const : ["general", "domestic", "international"] as const).map((session) => ({
-        id: `konkur-${year}-${track}-${session}`,
-        section: "konkur" as const,
-        label: `کنکور ${year} ${groupNames[track]} · ${({ general: "بدون تفکیک نوبت", first: "نوبت اول", second: "نوبت دوم", domestic: "داخل کشور", international: "خارج کشور" })[session]}`,
-        year, track, stage: session,
-      })),
-    ),
-  ),
+  ...konkurYears.flatMap((year) => tracks.flatMap((track) => [
+    ...nationalKonkurRows(year, track),
+    ...azadKonkurRows(year, track),
+  ])),
   ...grades.flatMap((grade) =>
     (Object.entries(sessionNames) as [keyof typeof sessionNames, string][]).map(([stage, label]) => ({
       id: `school-${grade}-${stage}`,
