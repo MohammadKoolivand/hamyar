@@ -19,6 +19,16 @@ function spacePluralSuffixes(text: string) {
     );
 }
 
+/**
+ * Restore only unambiguous ZWNJ patterns. OCR often outputs "می رود" and
+ * "کتاب ها", but a dictionary-free pass must not modify uncertain stems.
+ */
+function spaceVerbPrefixes(text: string) {
+  return text
+    .replace(/(^|[^\p{L}])نمی[ \t]+(?=[\p{Script=Arabic}]{2,})/gu, "$1نمی\u200c")
+    .replace(/(^|[^\p{L}])می[ \t]+(?=[\p{Script=Arabic}]{2,})/gu, "$1می\u200c");
+}
+
 /** Canonical Persian prose; mathematical source and URLs are kept verbatim. */
 export function normalizePersianQuestionText(text: string): string {
   return text
@@ -28,9 +38,9 @@ export function normalizePersianQuestionText(text: string): string {
     .map((part, index) =>
       index % 2
         ? part
-        : spacePluralSuffixes(
-            part.replace(/[يى]/g, "ی").replace(/ة/g, "ه").replace(/ۀ/g, "هٔ"),
-          ),
+        : spaceVerbPrefixes(spacePluralSuffixes(
+            part.replace(/[يى]/g, "ی").replace(/ك/g, "ک").replace(/ة/g, "ه").replace(/ۀ/g, "هٔ"),
+          )),
     )
     .join("");
 }
