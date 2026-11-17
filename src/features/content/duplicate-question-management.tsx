@@ -5,11 +5,12 @@ import { ArrowRight, GitMerge, RefreshCcw, Search, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { PagedList } from "@/components/ui/paged-list";
 import { QuestionPresentation } from "@/components/question-presentation";
+import type { QuestionVisual, QuestionOptionImage } from "@/lib/question-visuals";
 
 type DuplicateQuestion = {
   questionId: string; versionId: string; ownerId: string;
   statement: string; type: string; options: string[];
-  visuals: unknown[]; optionImages: unknown[];
+  visuals: QuestionVisual[]; optionImages: (QuestionOptionImage | null)[];
   source?: { sourceTitle?: string; organizer?: string; academicYear?: string | number };
   fingerprint: string;
 };
@@ -71,7 +72,8 @@ function GroupReview({ group, onResolved }: { group: Group; onResolved: () => vo
             انتخاب برای حذف/ادغام
           </label>
         </div>
-        <QuestionPresentation statement={q.statement} options={q.type === "choice" ? q.options : undefined} />
+        <QuestionPresentation statement={q.statement} options={q.type === "choice" ? q.options : undefined}
+          visuals={q.visuals} optionImages={q.optionImages} />
         <p className="mt-3 text-xs text-slate-500">{q.source?.sourceTitle ?? q.source?.organizer ?? "منبع نامشخص"} · {q.source?.academicYear ?? ""}</p>
         <p className="mt-1 break-all font-mono text-[10px] text-slate-400">{q.questionId}</p>
       </article>)}
