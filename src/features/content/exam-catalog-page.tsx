@@ -56,7 +56,7 @@ function groupRows(items: readonly ExamCatalogEntry[]): CatalogGroup[] {
       ? `${mockExamProviders.find((p) => p.id === item.provider)?.name ?? "آزمایشی"} · سال تحصیلی ${faNumber(item.year ?? 0)}–${faNumber((item.year ?? 0) + 1)}`
       : item.section === "konkur"
         ? `${item.provider === "azad" ? "کنکور مستقل دانشگاه آزاد"
-          : item.provider === "azad-shared" ? "آزاد (پذیرش با آزمون مشترک سراسری)" : "کنکور سراسری"} · ${faNumber(item.year ?? 0)}`
+          : item.provider === "azad-shared" ? "آزاد (پذیرش با آزمون مشترک سراسری)" : item.provider === "farhangian" ? "کنکور اختصاصی فرهنگیان" : "کنکور سراسری"} · ${faNumber(item.year ?? 0)}`
       : item.section === "school" || item.section === "practice"
         ? `سال ${faNumber(item.year ?? 0)} · ${gradeLabels[item.grade ?? ""] ?? "چندپایه"}`
         : `سال ${faNumber(item.year ?? 0)}`;
@@ -199,9 +199,10 @@ export default function ExamCatalogPage() {
             <BookOpen aria-hidden /> فهرست موردی آزمون‌ها
           </h1>
           <p className="mt-3 text-sm leading-8 text-slate-600">
-            کنکورهای سراسری از ۱۳۹۰ تا ۱۴۰۵، آزاد مستقل ۱۳۹۰ و ۱۳۹۱،
-            و پذیرش آزاد با دفترچه مشترک سراسری از ۱۳۹۲ به بعد جدا و موردی فهرست شده‌اند.
-            نوبت‌های ۱۴۰۲ تا ۱۴۰۴، نظام قدیم و جدید ۱۳۹۸ و ۱۳۹۹ و دفترچه‌های عمومی و اختصاصی هم تفکیک شده‌اند.
+            کنکورهای سراسری ۱۳۹۰ تا ۱۴۰۵، آزمون مستقل آزاد ۱۳۹۰ و ۱۳۹۱،
+            پذیرش مشترک آزاد از ۱۳۹۲ به بعد و آزمون اختصاصی فرهنگیان ۱۴۰۳ تا ۱۴۰۵
+            به تفکیک سال و رشته فهرست شده‌اند. نوبت‌ها، محل برگزاری، نظام آموزشی
+            و دفترچه‌های عمومی و اختصاصی هم جدا شده‌اند.
           </p>
           <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-600" aria-label="راهنمای وضعیت موجودی">
             <span className="inline-flex items-center gap-2"><StatusIcon status="complete" /> کامل و تأییدشده</span>
