@@ -205,8 +205,10 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         }).project({ _id: 1, sourceKind: 1 }).toArray();
         const files: { question?: { id: string }; answer?: { id: string } } = {};
         for (const row of rows)
-          if (row.sourceKind === "question" || row.sourceKind === "answer")
-            files[row.sourceKind] = { id: row._id };
+          if (row.sourceKind === "question" || row.sourceKind === "answer") {
+            const kind = row.sourceKind as "question" | "answer";
+            files[kind] = { id: row._id };
+          }
         return files;
       })(),
       job: e.jobId
@@ -240,7 +242,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     const exam = await c("examImports").findOne({
       _id: eid, archivedAt: { $exists: false },
     });
-    if (!exam) fail(404, "آزمون یافت نشد");
+    if (!exam) return fail(404, "آزمون یافت نشد");
 
     if (!published) {
       await ctx.transaction(async (session) => {
@@ -302,11 +304,12 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
         ? current.categoryIds.filter((value: unknown): value is string =>
             typeof value === "string" && validExamCoverageId(value))
         : [];
-      if (!current || current.sourceDeletedAt ||
+      if (!current) return fail(409, "وضعیت آزمون هنگام انتشار تغییر کرده است؛ دوباره تلاش کنید");
+      if (current.sourceDeletedAt ||
         current.files?.question?.sha256 !== exam.files.question.sha256 ||
         currentCategoryIds.length !== categoryIds.length ||
         categoryIds.some((categoryId) => !currentCategoryIds.includes(categoryId)))
-        fail(409, "وضعیت آزمون هنگام انتشار تغییر کرده است؛ دوباره تلاش کنید");
+        return fail(409, "وضعیت آزمون هنگام انتشار تغییر کرده است؛ دوباره تلاش کنید");
       for (const copy of copies) {
         if (current.files?.[copy.kind]?.sha256 !== copy.sha256)
           fail(409, "فایل منبع هنگام انتشار تغییر کرده است");
@@ -339,7 +342,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
           { sourceExamId: eid, sourceKind: copy.kind },
           { session },
         );
-        if (!publishedFile) fail(500, "ثبت فایل عمومی انجام نشد");
+        if (!publishedFile) return fail(500, "ثبت فایل عمومی انجام نشد");
         await c("pdfLibraryChunks").deleteMany(
           { pdfId: publishedFile._id },
           { session },
@@ -363,8 +366,10 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     }).project({ _id: 1, sourceKind: 1 }).toArray();
     const files: { question?: { id: string }; answer?: { id: string } } = {};
     for (const row of rows)
-      if (row.sourceKind === "question" || row.sourceKind === "answer")
-        files[row.sourceKind] = { id: row._id };
+      if (row.sourceKind === "question" || row.sourceKind === "answer") {
+        const kind = row.sourceKind as "question" | "answer";
+        files[kind] = { id: row._id };
+      }
     return { published: true, files };
   });
   app.post("/api/exam-imports/:eid/items/:iid/source-image", async (r) => {
