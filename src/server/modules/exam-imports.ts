@@ -52,6 +52,58 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     if (!item) fail(404, "پیش‌نویس یافت نشد");
     return legacy;
   };
+  // Admin's private intake checklist is separate from the public catalog.
+  // The public catalog only counts questions explicitly approved for publication.
+  app.get("/api/admin/exam-catalog/imports", async (r) => {
+    await user(r, "super_admin");
+    const rows = await c("examImports").find(
+      { archivedAt: { $exists: false } },
+      { projection: { _id: 1, title: 1, year: 1, grade: 1, track: 1,
+        categoryIds: 1, source: 1, state: 1, reviewedCompleteAt: 1, createdAt: 1 } },
+    ).sort({ createdAt: -1 }).limit(500).toArray();
+    if (!rows.length) return [];
+    const counts = await c("examImportItems").aggregate([
+      { $match: { examId: { $in: rows.map((row) => row._id) } } },
+      { $group: { _id: "$examId", total: { $sum: 1 },
+        approved: { $sum: { $cond: [{ $eq: ["$state", "approved"] }, 1, 0] } } } },
+    ]).toArray();
+    const byId = new Map(counts.map((row) => [row._id, row]));
+    return rows.map((row) => {
+      const count = byId.get(row._id);
+      const total = count?.total ?? 0;
+      const approved = count?.approved ?? 0;
+      return {
+        _id: row._id, title: row.title, year: row.year, grade: row.grade,
+        track: row.track, categoryIds: row.categoryIds ?? [],
+        examDate: row.source?.examDate, stage: row.source?.stage,
+        state: row.state, total, approved,
+        complete: Boolean(row.reviewedCompleteAt && total > 0 && approved === total),
+      };
+    });
+  });
+  app.post("/api/admin/exam-catalog/imports/:eid/completion", async (r) => {
+    const admin = await user(r, "super_admin");
+    const { eid } = params.parse(r.params);
+    const input = z.object({ complete: z.boolean() }).strict().parse(r.body);
+    const exam = await c("examImports").findOne({ _id: eid, archivedAt: { $exists: false } });
+    if (!exam) return fail(404, "آزمون یافت نشد");
+    const total = await c("examImportItems").countDocuments({ examId: eid });
+    const approved = await c("examImportItems").countDocuments({ examId: eid, state: "approved" });
+    if (input.complete && (!total || approved !== total))
+      return fail(409, "تا وقتی همه سؤال‌های استخراج‌شده تأیید نشده‌اند، امکان زدن تیک کامل نیست");
+    await c("examImports").updateOne(
+      { _id: eid },
+      input.complete
+        ? { $set: { reviewedCompleteAt: now(), reviewedCompleteBy: admin._id } }
+        : { $unset: { reviewedCompleteAt: "", reviewedCompleteBy: "" } },
+    );
+    await c("auditLogs").insertOne({
+      _id: id(), actorId: admin._id,
+      action: input.complete ? "exam_import_mark_complete" : "exam_import_unmark_complete",
+      resourceId: eid, createdAt: now(),
+    });
+    return { complete: input.complete, total, approved };
+  });
   app.get("/api/exam-imports", async (r) => {
     const u = await user(r, "teacher");
     const rows = await c("examImports")
