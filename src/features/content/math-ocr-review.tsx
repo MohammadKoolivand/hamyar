@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { cropFromDrag, percentPointFromPointer, selectableMathCrop, type PercentPoint } from "@/lib/math-ocr-crop";
 import Image from "next/image";
 import { MathFormula } from "@/components/question-presentation";
 import { api } from "@/lib/api";
@@ -27,6 +28,8 @@ export function MathOcrReview({
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [reviewed, setReviewed] = useState(false);
+  const dragStart = useRef<PercentPoint | null>(null);
+  const [drag, setDrag] = useState<{ start: PercentPoint; end: PercentPoint } | null>(null);
   useEffect(() => {
     let alive = true;
     api<{ enabled: boolean }>(`/exam-imports/${examId}/math-ocr/status`)
@@ -34,6 +37,41 @@ export function MathOcrReview({
       .catch(() => { if (alive) setEnabled(false); });
     return () => { alive = false; };
   }, [examId]);
+  function onCropDown(event: PointerEvent<HTMLDivElement>) {
+    if (!event.isPrimary) return;
+    event.preventDefault();
+    const start = percentPointFromPointer(event.clientX, event.clientY, event.currentTarget.getBoundingClientRect());
+    dragStart.current = start;
+    setDrag({ start, end: start });
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+  function onCropMove(event: PointerEvent<HTMLDivElement>) {
+    if (!dragStart.current || !event.isPrimary) return;
+    const end = percentPointFromPointer(event.clientX, event.clientY, event.currentTarget.getBoundingClientRect());
+    setDrag({ start: dragStart.current, end });
+  }
+  function onCropEnd(event: PointerEvent<HTMLDivElement>) {
+    const start = dragStart.current;
+    if (!start) return;
+    const end = percentPointFromPointer(event.clientX, event.clientY, event.currentTarget.getBoundingClientRect());
+    const chosen = cropFromDrag(start, end);
+    if (selectableMathCrop(chosen)) {
+      setCrop(chosen);
+      setLatex("");
+      setReviewed(false);
+      setError("");
+    } else {
+      setError("محدوده انتخابی مناسب نیست؛ فقط خود فرمول را انتخاب کن (حداقل ۳٪ عرض و ۲٪ ارتفاع).");
+    }
+    dragStart.current = null;
+    setDrag(null);
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
+  }
+  function onCropCancel() {
+    dragStart.current = null;
+    setDrag(null);
+  }
   async function recognize() {
     setPending(true);
     setError("");
@@ -57,7 +95,7 @@ export function MathOcrReview({
       </summary>
       <div className="mt-3 grid gap-3">
         <p className="text-xs leading-6 text-slate-700">
-          فقط ناحیه فرمول را با درصدهای زیر انتخاب کن، نه کل صورت سؤال را.
+          روی تصویر مستقیماً از یک گوشه فرمول تا گوشه مقابل بکش، یا درصدهای زیر را دستی تنظیم کن؛ کل سؤال را انتخاب نکن.
           خروجی مدل پیشنهادی است و پس از تطبیق با PDF می‌توان آن را به متن افزود.
         </p>
         <p role="status" className="text-xs text-slate-700">
@@ -85,11 +123,20 @@ export function MathOcrReview({
           <Image unoptimized width={800} height={1120} alt="اصل صفحه آزمون برای تعیین محدوده فرمول" className="block h-auto w-full"
             src={`/api/exam-imports/${examId}/pages/question/${page}`} />
           <div aria-label="محدوده انتخاب شده برای تشخیص فرمول" className="pointer-events-none absolute border-2 border-red-500 bg-red-500/10"
-            style={{ left: `${crop.x}%`, top: `${crop.y}%`, width: `${crop.width}%`, height: `${crop.height}%` }} />
+            style={{ left: `${drag ? cropFromDrag(drag.start, drag.end).x : crop.x}%`,
+              top: `${drag ? cropFromDrag(drag.start, drag.end).y : crop.y}%`,
+              width: `${drag ? cropFromDrag(drag.start, drag.end).width : crop.width}%`,
+              height: `${drag ? cropFromDrag(drag.start, drag.end).height : crop.height}%` }} />
+          <div role="application" aria-label="با ماوس یا لمس، محدوده فرمول را روی تصویر انتخاب کنید"
+            className="absolute inset-0 cursor-crosshair touch-none"
+            onPointerDown={onCropDown}
+            onPointerMove={onCropMove}
+            onPointerUp={onCropEnd}
+            onPointerCancel={onCropCancel}
+          />
         </div>
         <button type="button" className="min-h-11 rounded-xl bg-blue-800 px-4 text-sm text-white disabled:opacity-50"
-          disabled={!enabled || pending || pages.length === 0 || crop.width * crop.height > 6500 ||
-            crop.x < 0 || crop.y < 0 || crop.x + crop.width > 100 || crop.y + crop.height > 100}
+          disabled={!enabled || pending || pages.length === 0 || !selectableMathCrop(crop)}
           onClick={() => void recognize()}>
           {pending ? "در حال تشخیص…" : "پیشنهاد LaTeX از ناحیه انتخابی"}
         </button>
