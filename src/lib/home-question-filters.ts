@@ -10,7 +10,7 @@ export type HomeFilters = Record<HomeFilterKey, string> & {
   yearFrom: string;
   yearTo: string;
 };
-export type HomeSort = "newest" | "easiest" | "hardest" | "recommended";
+export type HomeSort = "source_order" | "newest" | "easiest" | "hardest" | "recommended";
 
 export const initialHomeFilters = (): HomeFilters => ({
   search: "", track: "", level: "", grade: "", book: "", chapter: "", topic: "",
@@ -110,7 +110,68 @@ const newest = (q: CatalogPublicQuestion) => {
   return Number.isFinite(value) ? value : 0;
 };
 
+/**
+ * The source identity identifies an actual sitting, not a lesson. In particular,
+ * Konkur physics/chemistry questions must share a group with that exam's
+ * mathematics/biology questions. School final exams, however, are per subject.
+ * Ambiguous, unattributed questions stay separate instead of being falsely
+ * treated as belonging to the same exam.
+ */
+export function homeExamGroupKey(q: CatalogPublicQuestion): string {
+  const source = q.source;
+  if (!source) return "unattributed:" + q._id;
+  const category = sourceCategory(source);
+  const year = homeQuestionYear(q);
+  const title = source.sourceTitle?.trim() ?? "";
+  const examDate = source.examDate ?? "";
+  const session = source.session ?? "";
+  const subject = category === "konkur" ? "" : (source.subject ?? homeQuestionTaxonomy(q, "book"));
+  const identifiable = Boolean(
+    title || examDate ||
+    (category === "konkur" && year && (source.group || source.track) && session) ||
+    (category === "final" && year && subject),
+  );
+  if (!identifiable) return "unattributed:" + q._id;
+  return JSON.stringify([
+    category, title, year, source.organizer ?? "", source.group ?? "",
+    source.track ?? "", source.location ?? "", session, examDate,
+    source.administration ?? "", source.schoolStage ?? "",
+    subject, category === "final" ? homeQuestionTaxonomy(q, "grade") : "",
+  ]);
+}
+
+function originalQuestionNumber(q: CatalogPublicQuestion): number | null {
+  const number = q.source?.questionNumber;
+  return typeof number === "number" && Number.isSafeInteger(number) && number > 0
+    ? number : null;
+}
+
+function sortBySourceOrder(items: CatalogPublicQuestion[]): CatalogPublicQuestion[] {
+  const groups = new Map<string, CatalogPublicQuestion[]>();
+  for (const question of items) {
+    const key = homeExamGroupKey(question);
+    const group = groups.get(key) ?? [];
+    group.push(question);
+    groups.set(key, group);
+  }
+  // Keep separate exams together, with the most recently published exam first.
+  const orderedGroups = [...groups.entries()].sort(([keyA, rowsA], [keyB, rowsB]) => {
+    const newestA = Math.max(...rowsA.map(newest));
+    const newestB = Math.max(...rowsB.map(newest));
+    return newestB - newestA || keyA.localeCompare(keyB, "fa");
+  });
+  return orderedGroups.flatMap(([, rows]) => rows.sort((a, b) => {
+    const numberA = originalQuestionNumber(a);
+    const numberB = originalQuestionNumber(b);
+    if (numberA !== null && numberB !== null && numberA !== numberB) return numberA - numberB;
+    if (numberA === null && numberB !== null) return 1;
+    if (numberB === null && numberA !== null) return -1;
+    return newest(b) - newest(a) || a._id.localeCompare(b._id);
+  }));
+}
+
 export function sortHomeQuestions(items: CatalogPublicQuestion[], order: HomeSort): CatalogPublicQuestion[] {
+  if (order === "source_order") return sortBySourceOrder(items);
   return [...items].sort((a, b) => {
     if (order === "recommended") {
       const difference = (b.recommendationCount ?? 0) - (a.recommendationCount ?? 0);

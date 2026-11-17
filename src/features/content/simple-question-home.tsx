@@ -23,7 +23,7 @@ export default function SimpleQuestionHome() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filters, setFilters] = useState(initialHomeFilters);
-  const [sortBy, setSortBy] = useState<HomeSort>("newest");
+  const [sortBy, setSortBy] = useState<HomeSort>("source_order");
   const [recommending, setRecommending] = useState("");
   const [recommendationMessage, setRecommendationMessage] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
@@ -229,7 +229,7 @@ export default function SimpleQuestionHome() {
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-slate-500">فیلترهای مقطع تا مبحث به‌صورت مرحله‌ای به هم وابسته‌اند.</p>
             <button type="button" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm hover:bg-slate-50"
-              onClick={() => { setFilters(initialHomeFilters()); setSortBy("newest"); setCatalogFilter(""); setSelected([]); }}>
+              onClick={() => { setFilters(initialHomeFilters()); setSortBy("source_order"); setCatalogFilter(""); setSelected([]); }}>
               <RotateCcw size={16} aria-hidden /> پاک کردن فیلترها
             </button>
           </div>
@@ -244,6 +244,7 @@ export default function SimpleQuestionHome() {
                 مرتب‌سازی
                 <select aria-label="مرتب‌سازی نتایج" className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-base"
                   value={sortBy} onChange={(e) => setSortBy(e.target.value as HomeSort)}>
+                  <option value="source_order">بر اساس آزمون و شماره مرجع</option>
                   <option value="newest">جدیدترین</option>
                   <option value="easiest">ساده‌ترین</option>
                   <option value="hardest">سخت‌ترین</option>
@@ -287,7 +288,7 @@ export default function SimpleQuestionHome() {
               <label className="mb-3 flex cursor-pointer items-center gap-3 text-base font-semibold text-blue-900">
                 <input type="checkbox" className="size-5" checked={selected.includes(q._id)}
                   onChange={(e) => setSelected((prev) => e.target.checked ? [...new Set([...prev, q._id])] : prev.filter((id) => id !== q._id))} />
-                انتخاب سؤال {(i + 1).toLocaleString("fa-IR")}
+                انتخاب سؤال {q.source?.questionNumber ? `شماره ${q.source.questionNumber.toLocaleString("fa-IR")} در مرجع` : (i + 1).toLocaleString("fa-IR")}
               </label>
               <QuestionPresentation statement={q.statement} options={q.type === "choice" ? q.options : undefined}
                 optionImages={q.optionImages} visuals={q.visuals} visualLayout={q.visualLayout} />
@@ -310,7 +311,7 @@ export default function SimpleQuestionHome() {
             {chosen.map((q, i) => (
               <article key={q._id} className="pdf-question">
                 <div className="pdf-question-head">
-                  <span className="pdf-number">{(i + 1).toLocaleString("fa-IR")}ـ</span>
+                  <span className="pdf-number">{(q.source?.questionNumber ?? (i + 1)).toLocaleString("fa-IR")}ـ</span>
                   <div className="pdf-statement"><MathText text={q.statement} /></div>
                   <span className="pdf-source">{sourceSummary(q.source)}</span>
                 </div>
