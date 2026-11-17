@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BookOpen, FileDown, Search, RotateCcw, ChevronDown, X, Check, Minus, Square } from "lucide-react";
+import { BookOpen, FileDown, Search, RotateCcw, X } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
 import { QuestionPresentation, MathText, QuestionVisualView } from "@/components/question-presentation";
 import { api } from "@/lib/api";
 import { sourceCategories, sourceCategory, sourceSummary } from "@/lib/question-source";
-import { examCatalog, examCatalogSections, type ExamCatalogEntry } from "@/lib/exam-catalog";
-import { catalogStatuses, publicQuestionCatalogIds, type CatalogCoverageRecord, type CatalogPublicQuestion } from "@/lib/exam-catalog-coverage";
+import { validExamCoverageId } from "@/lib/exam-catalog";
+import { publicQuestionCatalogIds, publicExamEvents, type CatalogPublicQuestion } from "@/lib/exam-catalog-coverage";
 import { printQuestions } from "@/lib/print-questions";
 
 /**
@@ -17,10 +17,7 @@ import { printQuestions } from "@/lib/print-questions";
  */
 export default function SimpleQuestionHome() {
   const [questions, setQuestions] = useState<CatalogPublicQuestion[]>([]);
-  const [coverage, setCoverage] = useState<CatalogCoverageRecord[]>([]);
-  const [catalogOpen, setCatalogOpen] = useState(false);
   const [catalogFilter, setCatalogFilter] = useState("");
-  const catalogMenuRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -36,6 +33,11 @@ export default function SimpleQuestionHome() {
   const printable = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const selectedExam = new URLSearchParams(window.location.search).get("exam") ?? "";
+    if (selectedExam && validExamCoverageId(selectedExam)) setCatalogFilter(selectedExam);
+  }, []);
+
+  useEffect(() => {
     let active = true;
     api<CatalogPublicQuestion[]>("/questions/public")
       .then((rows) => { if (active) setQuestions(rows); })
@@ -43,36 +45,10 @@ export default function SimpleQuestionHome() {
         if (active) setError(cause instanceof Error ? cause.message : "دریافت سؤال‌ها ممکن نشد.");
       })
       .finally(() => { if (active) setLoading(false); });
-    api<CatalogCoverageRecord[]>("/exam-catalog/coverage")
-      .then((rows) => { if (active) setCoverage(rows); })
-      .catch(() => { if (active) setCoverage([]); });
+
     return () => { active = false; };
   }, []);
 
-  useEffect(() => {
-    if (!catalogOpen) return;
-    const outside = (event: PointerEvent) => {
-      if (!catalogMenuRef.current?.contains(event.target as Node)) setCatalogOpen(false);
-    };
-    const keyboard = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setCatalogOpen(false);
-    };
-    document.addEventListener("pointerdown", outside);
-    document.addEventListener("keydown", keyboard);
-    return () => {
-      document.removeEventListener("pointerdown", outside);
-      document.removeEventListener("keydown", keyboard);
-    };
-  }, [catalogOpen]);
-
-  const statuses = useMemo(() => catalogStatuses(questions, coverage), [questions, coverage]);
-  function chooseExam(item: ExamCatalogEntry) {
-    setCatalogFilter(item.id);
-    setCatalogOpen(false);
-    setSearch(""); setGrade(""); setBook(""); setCategory("");
-    setTrack(""); setYear(""); setDifficulty(""); setSelected([]);
-    requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
-  }
   const options = (key: "grade" | "book") =>
     [...new Set(questions.map((q) => q.taxonomy?.[key] ?? "").filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, "fa"));
@@ -87,7 +63,9 @@ export default function SimpleQuestionHome() {
       (!track || q.source?.group === track || q.source?.track === (track === "mathematics" ? "ریاضی و فیزیک" : "علوم تجربی")) &&
       (!year || String(q.year ?? q.source?.academicYear ?? "") === year) &&
       (!difficulty || q.difficulty === difficulty) &&
-      (!catalogFilter || publicQuestionCatalogIds(q).includes(catalogFilter));
+      (!catalogFilter || (catalogFilter.startsWith("event-")
+        ? publicExamEvents([q]).some((item) => item.id === catalogFilter)
+        : publicQuestionCatalogIds(q).includes(catalogFilter)));
   }), [questions, search, grade, book, category, track, year, difficulty, catalogFilter]);
 
   const chosen = selected.length
@@ -112,73 +90,11 @@ export default function SimpleQuestionHome() {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <Brand />
-          <div className="relative" ref={catalogMenuRef}>
-            <button
-              type="button"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-teal-100 bg-teal-50 px-4 py-2 text-xs font-semibold text-teal-800 hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
-              aria-controls="hodhod-exam-catalog"
-              aria-expanded={catalogOpen}
-              onClick={() => setCatalogOpen((open) => !open)}
-            >
-              بانک سؤال رایگان
-              <ChevronDown size={15} aria-hidden className={catalogOpen ? "rotate-180" : ""} />
-            </button>
-            {catalogOpen && (
-              <div id="hodhod-exam-catalog" role="region" aria-label="فهرست تمام آزمون‌ها"
-                className="absolute left-0 top-full z-50 mt-3 max-h-[min(75vh,680px)] w-[min(92vw,690px)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl sm:p-5">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <h2 className="text-base font-bold text-slate-900">فهرست آزمون‌های هدهد</h2>
-                  <button type="button" aria-label="بستن فهرست آزمون‌ها"
-                    onClick={() => setCatalogOpen(false)}
-                    className="flex size-9 items-center justify-center rounded-lg hover:bg-slate-100">
-                    <X size={18} aria-hidden />
-                  </button>
-                </div>
-                <div className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-600">
-                  <span className="flex items-center gap-1.5"><Check size={16} className="text-emerald-700" aria-hidden /> کامل و تأییدشده</span>
-                  <span className="flex items-center gap-1.5"><Minus size={16} className="text-amber-700" aria-hidden /> بخشی از سؤال‌ها موجود</span>
-                  <span className="flex items-center gap-1.5"><Square size={16} className="text-slate-400" aria-hidden /> هنوز سؤالی ثبت نشده</span>
-                </div>
-                {loading ? (
-                  <p role="status" className="py-6 text-sm text-slate-600">در حال بررسی سؤال‌های موجود…</p>
-                ) : error ? (
-                  <p role="alert" className="py-6 text-sm text-rose-700">فهرست موجودی سؤال‌ها دریافت نشد. دوباره صفحه را باز کنید.</p>
-                ) : examCatalogSections.map((section) => (
-                  <section key={section.id} className="mb-4 rounded-xl border border-slate-100 p-3 last:mb-0">
-                    <h3 className="mb-3 text-sm font-bold text-blue-900">{section.label}</h3>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {examCatalog.filter((item) => item.section === section.id).map((item) => {
-                        const availability = statuses.get(item.id);
-                        const state = availability?.status ?? "empty";
-                        return (
-                          <button type="button" key={item.id} onClick={() => chooseExam(item)}
-                            className="flex min-h-11 items-center gap-2 rounded-lg border border-slate-100 px-2.5 py-2 text-right text-sm hover:border-blue-200 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-700"
-                            title={`${item.label} · ${availability?.count ?? 0} سؤال عمومی`}>
-                            <span aria-label={state === "complete" ? "کامل" : state === "partial" ? "ناقص" : "خالی"}
-                              className={`inline-flex size-6 shrink-0 items-center justify-center rounded-md border ${state === "complete" ? "border-emerald-600 bg-emerald-50 text-emerald-700" : state === "partial" ? "border-amber-500 bg-amber-50 text-amber-700" : "border-slate-300 text-slate-400"}`}>
-                              {state === "complete" ? <Check size={16} strokeWidth={2.5} aria-hidden />
-                                : state === "partial" ? <Minus size={16} strokeWidth={2.5} aria-hidden />
-                                : null}
-                            </span>
-                            <span className="min-w-0 flex-1">{item.label}</span>
-                            {(availability?.count ?? 0) > 0 && (
-                              <span className="text-[11px] tabular-nums text-slate-500">
-                                {availability!.count.toLocaleString("fa-IR")}
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </section>
-                ))}
-                <p className="mt-2 text-xs leading-6 text-slate-500">
-                  ✓ فقط پس از تأیید تعداد کل سؤال‌های آزمون نمایش داده می‌شود؛
-                  داشتن چند سؤال به‌تنهایی نشانهٔ کامل‌بودن آزمون نیست.
-                </p>
-              </div>
-            )}
-          </div>
+          <a href="/exam-catalog"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-teal-100 bg-teal-50 px-4 py-2 text-xs font-semibold text-teal-800 hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
+            بانک سؤال رایگان
+            <BookOpen size={16} aria-hidden />
+          </a>
           {/*
             ورود/ثبت‌نام، منوی پنل معلم، داشبوردها و سایر مسیرها
             برای نسخه تک‌صفحه‌ای فعلاً در رابط غیرفعال‌اند؛
@@ -260,7 +176,7 @@ export default function SimpleQuestionHome() {
               {catalogFilter && (
                 <button type="button" onClick={() => { setCatalogFilter(""); setSelected([]); }}
                   className="inline-flex min-h-9 items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 text-xs text-blue-900">
-                  {examCatalog.find((item) => item.id === catalogFilter)?.label}
+                  {catalogFilter.startsWith("event-") ? "آزمون انتخاب‌شده" : "دستهٔ آزمون انتخاب‌شده"}
                   <X size={14} aria-hidden />
                 </button>
               )}
