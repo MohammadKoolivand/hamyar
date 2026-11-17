@@ -102,6 +102,18 @@ export const examCatalog: readonly ExamCatalogEntry[] = [
   ...konkurYears.flatMap((year) => tracks.flatMap((track) => [
     ...nationalKonkurRows(year, track),
     ...azadKonkurRows(year, track),
+    ...(year >= 1403 ? [
+      {
+        id: `konkur-farhangian-${year}-${track}-general`, section: "konkur" as const,
+        provider: "farhangian", year, track, stage: "general",
+        label: `آزمون اختصاصی دانشجو‌معلم (فرهنگیان) ${faYear(year)} · ${groupNames[track]}`,
+      },
+      {
+        id: `konkur-farhangian-${year}-${track}-booklet`, section: "konkur" as const,
+        provider: "farhangian", year, track, stage: "booklet",
+        label: `دفترچه اختصاصی فرهنگیان ${faYear(year)} · ${groupNames[track]}`,
+      },
+    ] : []),
   ])),
   ...grades.flatMap((grade) =>
     (Object.entries(sessionNames) as [keyof typeof sessionNames, string][]).map(([stage, label]) => ({
