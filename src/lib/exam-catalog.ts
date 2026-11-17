@@ -51,7 +51,7 @@ function nationalKonkurRows(year: number, track: "mathematics" | "experimental")
   const name = `کنکور سراسری ${faYear(year)} · ${groupNames[track]}`;
   const base = `konkur-${year}-${track}`;
   const row = (part: string, label: string, stage: string): ExamCatalogEntry => ({
-    id: `${base}-${part}`, section: "konkur", year, track, stage,
+    id: `${base}-${part}`, section: "konkur", year, track, grade: "12", stage,
     provider: "sarasari", label: `${name} · ${label}`,
   });
   const items: ExamCatalogEntry[] = [
@@ -83,17 +83,17 @@ function azadKonkurRows(year: number, track: "mathematics" | "experimental"): Ex
   const prefix = `کنکور دانشگاه آزاد ${faYear(year)} · ${groupNames[track]}`;
   if (year >= 1392) return [{
     id: `${base}-shared`, section: "konkur", provider: "azad-shared",
-    year, track, stage: "shared", linkedCatalogId: `konkur-${year}-${track}-general`,
+    year, track, grade: "12", stage: "shared", linkedCatalogId: `konkur-${year}-${track}-general`,
     label: `${prefix} · آزمون مشترک با سراسری (بدون دفترچه مستقل)`,
   }];
   return [
     { id: `${base}-general`, section: "konkur", provider: "azad",
-      year, track, stage: "general", label: `${prefix} · آزمون مستقل` },
+      year, track, grade: "12", stage: "general", label: `${prefix} · آزمون مستقل` },
     // Morning/afternoon are archival sublabels; actual rows are only marked
     // present when matching approved source records are entered.
     ...(["morning", "afternoon"] as const).map((stage) => ({
       id: `${base}-${stage}`, section: "konkur" as const, provider: "azad",
-      year, track, stage,
+      year, track, grade: "12", stage,
       label: `${prefix} · آرشیو شیفت ${stage === "morning" ? "صبح" : "عصر"}`,
     })),
   ];
@@ -105,12 +105,12 @@ export const examCatalog: readonly ExamCatalogEntry[] = [
     ...(year >= 1403 ? [
       {
         id: `konkur-farhangian-${year}-${track}-general`, section: "konkur" as const,
-        provider: "farhangian", year, track, stage: "general",
+        provider: "farhangian", year, track, grade: "12", stage: "general",
         label: `آزمون اختصاصی دانشجو‌معلم (فرهنگیان) ${faYear(year)} · ${groupNames[track]}`,
       },
       {
         id: `konkur-farhangian-${year}-${track}-booklet`, section: "konkur" as const,
-        provider: "farhangian", year, track, stage: "booklet",
+        provider: "farhangian", year, track, grade: "12", stage: "booklet",
         label: `دفترچه اختصاصی فرهنگیان ${faYear(year)} · ${groupNames[track]}`,
       },
     ] : []),
