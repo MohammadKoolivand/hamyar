@@ -1,0 +1,47 @@
+[
+  {
+    "id": "konkur-riazi-1404-tir-q1-option2-ratio",
+    "pdf": "/private/exams/konkur-riazi-1404-tir-booklet1.pdf",
+    "page": 2,
+    "crop": {
+      "x": 62.1,
+      "y": 29.2,
+      "width": 4.2,
+      "height": 3.4
+    },
+    "referenceLatex": "\\frac{1}{a}",
+    "sourceUrl": "https://dl.aligebra.com/PACKAGES/27/485/1.pdf",
+    "referenceReviewed": false,
+    "notes": "Candidate crop transcribed from visual screenshot of PDF page 2; requires pixel-boundary and reference validation before benchmark."
+  },
+  {
+    "id": "konkur-riazi-1404-tir-q2-fraction",
+    "pdf": "/private/exams/konkur-riazi-1404-tir-booklet1.pdf",
+    "page": 2,
+    "crop": {
+      "x": 51.9,
+      "y": 32.5,
+      "width": 27.1,
+      "height": 5.1
+    },
+    "referenceLatex": "\\frac{24x^{3}+36x^{2}+18x+3}{(4x^{2}+4x+1)^{2}}",
+    "sourceUrl": "https://dl.aligebra.com/PACKAGES/27/485/1.pdf",
+    "referenceReviewed": false,
+    "notes": "Candidate transcription; visually verify numerals, exponents and crop in original PDF first."
+  },
+  {
+    "id": "konkur-riazi-1404-tir-q5-answer-fraction",
+    "pdf": "/private/exams/konkur-riazi-1404-tir-booklet1.pdf",
+    "page": 2,
+    "crop": {
+      "x": 80.4,
+      "y": 57.1,
+      "width": 4.3,
+      "height": 3.4
+    },
+    "referenceLatex": "\\frac{13}{4}",
+    "sourceUrl": "https://dl.aligebra.com/PACKAGES/27/485/1.pdf",
+    "referenceReviewed": false,
+    "notes": "Candidate answer-choice fraction, not independently verified."
+  }
+]

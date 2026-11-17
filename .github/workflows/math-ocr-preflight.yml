@@ -1,0 +1,70 @@
+name: Math OCR staging preflight (read only)
+on:
+  workflow_dispatch:
+  push:
+    branches: [staging]
+    paths:
+      - ".github/workflows/math-ocr-preflight.yml"
+      - "src/server/imports/math-ocr.ts"
+      - "scripts/math-ocr-pix2tex.py"
+permissions:
+  contents: read
+concurrency:
+  group: math-ocr-preflight
+  cancel-in-progress: true
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - name: Prepare pinned SSH identity
+        env:
+          DEPLOY_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_KEY" && test -n "$KNOWN_HOSTS"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/staging_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/staging_key ~/.ssh/known_hosts
+      - name: Inspect available resources and Math OCR dependencies (no mutation)
+        env:
+          HOST: ${{ vars.STAGING_HOST }}
+          USER: ${{ vars.STAGING_USER }}
+          PORT: ${{ vars.STAGING_PORT }}
+        run: |
+          set -euo pipefail
+          [[ "$HOST" =~ ^[A-Za-z0-9.-]+$ && "$USER" =~ ^[a-z_][a-z0-9_-]*$ && "$PORT" =~ ^[0-9]+$ ]]
+          SSH_ARGS=(-i "$HOME/.ssh/staging_key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=12)
+          ssh "${SSH_ARGS[@]}" -p "$PORT" "$USER@$HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          echo "MATH_OCR_PREFLIGHT_BEGIN"
+          echo "ARCH=$(uname -m)"
+          awk '/MemAvailable:/{printf "MEM_AVAILABLE_MIB=%d\n", $2/1024}' /proc/meminfo
+          df -Pm /var/lib/hodhod | awk 'NR==2 {printf "APP_DISK_FREE_MIB=%s\n", $4}'
+          if command -v python3 >/dev/null; then
+            echo "SYSTEM_PYTHON_AVAILABLE=true"
+            python3 --version
+          else echo "SYSTEM_PYTHON_AVAILABLE=false"; fi
+          if [ -x /opt/hodhod/math-ocr-venv/bin/python ]; then
+            echo "MATH_VENV_PRESENT=true"
+            if /opt/hodhod/math-ocr-venv/bin/python -c 'from pix2tex.cli import LatexOCR; import torch' >/dev/null 2>&1; then
+              echo "MATH_PACKAGE_IMPORTS=true"
+            else echo "MATH_PACKAGE_IMPORTS=false"; fi
+          else
+            echo "MATH_VENV_PRESENT=false"
+            echo "MATH_PACKAGE_IMPORTS=false"
+          fi
+          if [ -s /etc/hodhod/math-ocr/config.yaml ]; then
+            echo "MATH_CONFIG_PRESENT=true"
+          else echo "MATH_CONFIG_PRESENT=false"; fi
+          if [ -s /etc/hodhod/math-ocr/weights.pth ]; then
+            echo "MATH_CHECKPOINT_PRESENT=true"
+          else echo "MATH_CHECKPOINT_PRESENT=false"; fi
+          echo "MATH_OCR_PREFLIGHT_END"
+          REMOTE
+      - name: Remove SSH material
+        if: always()
+        run: rm -rf ~/.ssh/staging_key ~/.ssh/known_hosts
