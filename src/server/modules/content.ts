@@ -48,6 +48,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       { $match: {
         "current.visibility": "public",
         "current.verifiedAt": { $exists: true },
+        archivedAt: { $exists: false },
         "current.sourceExamId": { $type: "string" },
         $expr: { $eq: ["$ownerId", "$current.ownerId"] },
       } },
@@ -297,6 +298,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
     });
     const current = version ? await c("questions").findOne({
       _id: version.questionId, currentVersionId: vid, ownerId: version.ownerId,
+      archivedAt: { $exists: false },
     }) : null;
     if (!current) ctx.fail(404, "سؤال عمومی پیدا نشد");
     // One durable recommendation per account and question across revisions.
