@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowRight, Check, GitMerge, RefreshCcw, Search, Trash2 } from "lucide-react";
+import { ArrowRight, GitMerge, RefreshCcw, Search, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { PagedList } from "@/components/ui/paged-list";
 import { QuestionPresentation } from "@/components/question-presentation";
