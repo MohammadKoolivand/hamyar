@@ -1,5 +1,6 @@
 "use client";
 import { normalizeQuestionTextFields } from "@/lib/persian-question-text";
+import { MathOcrReview } from "./math-ocr-review";
 import { HistoricalExamSources, historicalExamLabel } from "./historical-exam-sources";
 import type { HistoricalExamAsset } from "@/lib/historical-exam-sources";
 import { QuestionTextInput } from "@/components/question-text-input";
@@ -1359,6 +1360,20 @@ function ReviewItem({
               پیش‌نمایش پایین نمایش داده می‌شود.
             </p>
           </Field>
+          {sourcePages.length > 0 && (
+            <MathOcrReview
+              examId={item.examId}
+              itemId={item._id}
+              pages={[...new Set(sourcePages.map((p) => p.page))]}
+              onInsert={(latex) => {
+                setQ((current) => ({
+                  ...current,
+                  statement: current.statement.trimEnd() + " $" + latex + "$",
+                }));
+                setConfirmed(false);
+              }}
+            />
+          )}
           <Field title={`شماره سؤال در دفترچه ${index + 1} (اختیاری)`}>
             <input
               type="number"
