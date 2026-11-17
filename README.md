@@ -1,5 +1,7 @@
 > برای توسعه سریع و به‌روزرسانی سادهٔ Staging، راهنمای [MVP_SIMPLE_WORKFLOW.md](MVP_SIMPLE_WORKFLOW.md) را ببینید.
 
+> **آرشیو آزمون‌ها و بانک سؤال:** [فهرست لینک‌دار PDF دفترچه و کلید](docs/EXAM_ARCHIVE_LINKS.md) | [فهرست کامل پوشش سال‌ها](src/data/exam-archive.csv) | [فایل‌مانيفست دفترچه‌ها](src/data/exam-source-files.csv). فعلاً ۲۶ ردیف با لینک PDF وجود دارد؛ استخراج OCR/بازبینی/ورود به بانک هنوز انجام نشده است. [مستندات و کمبودها](docs/EXAM_ARCHIVE.md).
+
 # هدهد — HodHod
 
 Next.js تمام‌استک، TypeScript، Tailwind CSS و MongoDB. رابط فارسی RTL؛ Poppins محلی و IRANSans دارای لایسنس دستگاه با next/font/local و fallback فارسی. یک برنامه Node.js، یک پایگاه داده، بدون monorepo یا سرور API جدا.
