@@ -53,6 +53,16 @@ type AdminImportedExam = {
   status: CatalogAvailability;
   complete: boolean;
 };
+type PublicImportedExam = {
+  id: string;
+  title: string;
+  categoryIds: string[];
+  approved: number;
+  expectedQuestionCount: number | null;
+  expectedCountConfidence: "key_complete" | "numbering_estimate" | "unknown";
+  percent: number | null;
+  status: CatalogAvailability;
+};
 type CatalogGroup = { key: string; title: string; rows: ExamCatalogEntry[] };
 function groupRows(items: readonly ExamCatalogEntry[]): CatalogGroup[] {
   const groups = new Map<string, CatalogGroup>();
@@ -80,6 +90,7 @@ export default function ExamCatalogPage() {
   const [error, setError] = useState("");
   const [admin, setAdmin] = useState(false);
   const [imports, setImports] = useState<AdminImportedExam[]>([]);
+  const [publishedImports, setPublishedImports] = useState<PublicImportedExam[]>([]);
   const [saving, setSaving] = useState("");
   const [section, setSection] = useState<(typeof examCatalogSections)[number]["id"]>("konkur");
   const [provider, setProvider] = useState("");
@@ -95,7 +106,10 @@ export default function ExamCatalogPage() {
     Promise.all([
       api<CatalogPublicQuestion[]>("/questions/public"),
       api<CatalogCoverageRecord[]>("/exam-catalog/coverage"),
-    ]).then(([q, c]) => { if (mounted) { setQuestions(q); setCoverage(c); } })
+      api<PublicImportedExam[]>("/exam-catalog/public-progress").catch(() => []),
+    ]).then(([q, c, published]) => {
+      if (mounted) { setQuestions(q); setCoverage(c); setPublishedImports(published); }
+    })
       .catch((cause: unknown) => { if (mounted) setError(cause instanceof Error ? cause.message : "دریافت اطلاعات آزمون‌ها ممکن نشد"); })
       .finally(() => { if (mounted) setLoading(false); });
     api<{ role: string }>("/auth/me").then((me) => {
@@ -117,6 +131,13 @@ export default function ExamCatalogPage() {
 
   const statuses = useMemo(() => catalogStatuses(questions, coverage), [questions, coverage]);
   const events = useMemo(() => publicExamEvents(questions), [questions]);
+  const publishedByCategory = useMemo(() => {
+    const map = new Map<string, PublicImportedExam[]>();
+    for (const entry of publishedImports)
+      for (const categoryId of entry.categoryIds)
+        map.set(categoryId, [...(map.get(categoryId) ?? []), entry]);
+    return map;
+  }, [publishedImports]);
   const eventMap = useMemo(() => {
     const entries = new Map<string, PublicExamEvent[]>();
     for (const event of events) entries.set(event.parentId, [...(entries.get(event.parentId) ?? []), event]);
@@ -281,6 +302,35 @@ export default function ExamCatalogPage() {
                             {status.status === "complete" ? "لغو تأیید" : "تأیید تکمیل ✓"}
                           </button>}
                       </div>
+                      {(publishedByCategory.get(item.id) ?? []).map((entry) => (
+                        <div key={entry.id} className="mr-7 mt-3 grid gap-2 rounded-lg border border-sky-100 bg-sky-50/50 p-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <StatusIcon status={entry.status} />
+                            <strong className="min-w-0 flex-1 text-xs leading-6 text-slate-700">
+                              آزمون منتشرشده: {entry.title}
+                            </strong>
+                            <span className="text-xs font-semibold tabular-nums text-blue-900">
+                              {entry.expectedQuestionCount === null
+                                ? `${faNumber(entry.approved)} سؤال موجود · تعداد کل نامشخص`
+                                : `${faNumber(entry.approved)} از ${faNumber(entry.expectedQuestionCount)} سؤال (${faNumber(entry.percent ?? 0)}٪)`}
+                            </span>
+                          </div>
+                          {entry.expectedQuestionCount !== null && (
+                            <div role="progressbar" aria-label={`موجودی سؤال‌های عمومی ${entry.title}`}
+                              aria-valuemin={0} aria-valuemax={entry.expectedQuestionCount}
+                              aria-valuenow={Math.min(entry.approved, entry.expectedQuestionCount)}
+                              className="h-2 overflow-hidden rounded-full bg-slate-200">
+                              <div className={`h-full rounded-full ${entry.status === "complete" ? "bg-emerald-600" : "bg-blue-700"}`}
+                                style={{ width: `${entry.percent ?? 0}%` }} />
+                            </div>
+                          )}
+                          {entry.expectedCountConfidence === "numbering_estimate" && (
+                            <p className="text-xs text-amber-800">
+                              تعداد کل برآوردی است و تیک کامل قطعی صادر نمی‌شود.
+                            </p>
+                          )}
+                        </div>
+                      ))}
                       {admin && imports.filter((entry) => entry.categoryIds.includes(item.id)).map((entry) => {
                         const denominator = entry.expectedQuestionCount;
                         const progressLabel = denominator === null
