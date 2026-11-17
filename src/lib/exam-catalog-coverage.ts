@@ -2,7 +2,11 @@ import { examCatalog, detailedExamCatalog, mockExamProviders, type ExamCatalogEn
 import type { PublicBankQuestion } from "./public-bank";
 
 /** Only released questions contribute to public exam availability. */
-export type CatalogPublicQuestion = PublicBankQuestion & { catalogIds?: string[] };
+export type CatalogPublicQuestion = PublicBankQuestion & {
+  catalogIds?: string[];
+  publishedAt?: string | null;
+  recommendationCount?: number;
+};
 export type CatalogCoverageRecord = { categoryId: string; expectedQuestionCount: number };
 export type CatalogAvailability = "complete" | "partial" | "empty";
 export type CatalogStatus = { count: number; status: CatalogAvailability };
