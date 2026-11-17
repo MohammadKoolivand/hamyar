@@ -5,7 +5,7 @@ import type { CatalogPublicQuestion } from "../../src/lib/exam-catalog-coverage"
 
 function question(id: string, extra: Partial<CatalogPublicQuestion> = {}): CatalogPublicQuestion {
   return {
-    _id: id, statement: "مساحت مستطیل چقدر است؟", type: "short",
+    _id: id, statement: "مساحت مستطیل چقدر است؟", type: "short", options: [],
     taxonomy: { level: "متوسطه دوم", grade: "دوازدهم", book: "ریاضی", chapter: "تابع", topic: "دامنه" },
     year: 1403, difficulty: "medium",
     source: { family: "konkur" }, ...extra,
