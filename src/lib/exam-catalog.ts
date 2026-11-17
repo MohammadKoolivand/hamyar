@@ -207,7 +207,7 @@ export function examCatalogValidIds(ids: readonly string[]): boolean {
   if (entries.some((entry) => !entry)) return false;
   const scoped = entries.filter((entry): entry is ExamCatalogEntry => Boolean(entry));
   if (!scoped.length) return true;
-  const sameValue = (field: "section" | "grade" | "year" | "track") =>
+  const sameValue = (field: "section" | "grade" | "year" | "track" | "provider") =>
     new Set(scoped.map((entry) => entry[field]).filter((value) => value !== undefined)).size <= 1;
-  return (["section", "grade", "year", "track"] as const).every(sameValue);
+  return (["section", "grade", "year", "track", "provider"] as const).every(sameValue);
 }
