@@ -1,5 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { routeRoles } from "../../src/lib/access";
 import {
   inferExpectedQuestionCount, countUniqueApprovedQuestions,
   calculateExamProgress, estimateLegacyQuestionCount,
@@ -80,4 +82,23 @@ test("old exam imports automatically recover a conservative estimated denominato
   assert.equal(estimateLegacyQuestionCount({
     keyEntries: 150, hasAnswerFile: true, failedAnswerPages: 1,
   }).expectedQuestionCount, null);
+});
+
+test("public exam progress endpoint is read-only and counts only verified published questions", () => {
+  assert.equal(routeRoles("GET", "/api/exam-catalog/public-progress"), null);
+  const server = readFileSync("src/server/modules/content.ts", "utf8");
+  assert.match(server, /app\.get\("\/api\/exam-catalog\/public-progress"/);
+  assert.match(server, /"current\.visibility": "public"/);
+  assert.match(server, /"current\.verifiedAt": \{ \$exists: true \}/);
+  assert.match(server, /"current\.sourceExamId": \{ \$type: "string" \}/);
+  const screen = readFileSync("src/features/content/exam-catalog-page.tsx", "utf8");
+  assert.match(screen, /publishedByCategory/);
+  assert.match(screen, /entry\.expectedQuestionCount/);
+  assert.match(screen, /role="progressbar"/);
+});
+
+test("exam import approval preserves detected original numbering", () => {
+  const server = readFileSync("src/server/modules/exam-imports.ts", "utf8");
+  assert.match(server, /approvedOriginalNumber = b\.originalNumber \?\? item!\.originalNumber \?\? item!\.extraction\?\.detectedNumber/);
+  assert.match(server, /approvedKeys: \{/);
 });
