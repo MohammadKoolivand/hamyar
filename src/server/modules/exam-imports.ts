@@ -11,7 +11,7 @@ import {
 } from "../../lib/exam-import";
 import { enqueueExam, retentionDays, sourceBytes } from "../imports/jobs";
 import { normalized } from "../imports/layout";
-import { calculateExamProgress } from "../../lib/exam-import-progress";
+import { calculateExamProgress, estimateLegacyQuestionCount } from "../../lib/exam-import-progress";
 import { questionSchema } from "../domain";
 import { persistQuestion, validateQuestion } from "./authoring";
 const params = z.object({ eid: z.string().uuid() });
@@ -60,7 +60,7 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
     const rows = await c("examImports").find(
       { archivedAt: { $exists: false } },
       { projection: { _id: 1, title: 1, year: 1, grade: 1, track: 1,
-        categoryIds: 1, source: 1, state: 1, statistics: 1, createdAt: 1 } },
+        categoryIds: 1, source: 1, state: 1, statistics: 1, files: 1, createdAt: 1 } },
     ).sort({ createdAt: -1 }).limit(500).toArray();
     if (!rows.length) return [];
     // Distinct source question numbers prevent double counting duplicate
@@ -92,11 +92,18 @@ export function registerExamImports(app: FastifyInstance, ctx: Context) {
       const count = byId.get(row._id);
       const total = count?.total ?? 0;
       const approved = (count?.approvedKeys ?? []).filter((value: unknown) => value !== null).length;
+      const historical = estimateLegacyQuestionCount({
+        keyEntries: row.statistics?.keys ?? 0,
+        hasAnswerFile: Boolean(row.files?.answer),
+        failedAnswerPages: row.statistics?.failedPages?.filter(
+          (page: { kind: string }) => page.kind === "answer",
+        ).length ?? 0,
+      });
       const progress = calculateExamProgress({
         approved,
         extracted: total,
-        expectedQuestionCount: row.statistics?.expectedQuestionCount ?? null,
-        expectedCountConfidence: row.statistics?.expectedCountConfidence ?? "unknown",
+        expectedQuestionCount: row.statistics?.expectedQuestionCount ?? historical.expectedQuestionCount,
+        expectedCountConfidence: row.statistics?.expectedCountConfidence ?? historical.expectedCountConfidence,
       });
       return {
         _id: row._id, title: row.title, year: row.year, grade: row.grade,
