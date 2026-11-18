@@ -1,4 +1,5 @@
 import { imageToPdf } from "../imports/image-pdf";
+import { registerRawExamReviewImport } from "./raw-exam-review";
 import { suggestMathLatex, mathOcrReady } from "../imports/math-ocr";
 import type { FastifyInstance } from "fastify";
 import { Binary } from "mongodb";
@@ -18,6 +19,7 @@ import { questionSchema } from "../domain";
 import { persistQuestion, validateQuestion } from "./authoring";
 const params = z.object({ eid: z.string().uuid() });
 export function registerExamImports(app: FastifyInstance, ctx: Context) {
+  registerRawExamReviewImport(app, ctx);
   const { c, id, now, owned, user, fail } = ctx;
   app.addContentTypeParser(
     ["application/pdf", "application/octet-stream", "image/png", "image/jpeg", "image/webp"],
