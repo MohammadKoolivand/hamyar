@@ -141,6 +141,7 @@ export interface Node {
   tracks?: string[];
 }
 export interface Question {
+  lifecycleStatus?: "active" | "disabled" | "deleted" | "archived";
   visibility?: "private" | "public";
   importEvidence?: {
     answerBasis: "published_key" | "independent_review";

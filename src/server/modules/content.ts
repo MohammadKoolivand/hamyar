@@ -21,7 +21,7 @@ import { questionSchema } from "../domain";
 import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
-import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
+import { duplicateInputFromStoredQuestion, findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
 import { examCatalogEntry, validExamCoverageId } from "../../lib/exam-catalog";
 import { calculateExamProgress, estimateLegacyQuestionCount } from "../../lib/exam-import-progress";
 export function registerContent(app: FastifyInstance, ctx: Context) {
@@ -662,6 +662,20 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           },
         },
         { $unwind: "$version" },
+        { $addFields: {
+          "version.lifecycleStatus": {
+            $cond: [
+              { $eq: ["$archiveReason", "disabled"] }, "disabled",
+              { $cond: [
+                { $eq: ["$archiveReason", "deleted"] }, "deleted",
+                { $cond: [
+                  { $ne: [{ $type: "$archivedAt" }, "missing"] }, "archived",
+                  "active",
+                ] },
+              ] },
+            ],
+          },
+        } },
         { $replaceRoot: { newRoot: "$version" } },
       ])
       .toArray();
@@ -710,12 +724,71 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       };
     });
   });
+  // Archive rather than physically delete: existing missions, attempts and
+  // historical question versions must keep resolving to their original IDs.
+  const lifecycleInput = z.object({
+    action: z.enum(["disable", "enable", "delete", "restore"]),
+  }).strict();
+  app.post("/api/questions/:vid/lifecycle", async (r) => {
+    const actor = await user(r, "teacher");
+    const { vid } = z.object({ vid: z.string().uuid() }).parse(r.params);
+    const input = lifecycleInput.parse(r.body);
+    return ctx.atomic(r, actor._id, "question-lifecycle:" + vid, input, async (session) => {
+      const version = await c("questionVersions").findOne({ _id: vid, ownerId: actor._id }, { session });
+      if (!version) ctx.fail(404, "سؤال پیدا نشد");
+      const current = await c("questions").findOne({
+        _id: version!.questionId, ownerId: actor._id, currentVersionId: vid,
+      }, { session });
+      if (!current) ctx.fail(409, "نسخه سؤال تغییر کرده است؛ بانک را تازه کنید");
+      const reason = current!.archiveReason;
+      const archived = Boolean(current!.archivedAt);
+      if (archived && reason !== "disabled" && reason !== "deleted")
+        ctx.fail(409, "این سؤال قبلاً در فرایند دیگری آرشیو شده است");
+      if (input.action === "disable" && archived)
+        ctx.fail(409, "برای غیرفعال‌کردن، سؤال باید فعال باشد");
+      if (input.action === "delete" && reason === "deleted")
+        ctx.fail(409, "سؤال قبلاً حذف شده است");
+      if (input.action === "enable" && reason !== "disabled")
+        ctx.fail(409, "فقط سؤال غیرفعال را می‌توان فعال کرد");
+      if (input.action === "restore" && reason !== "deleted")
+        ctx.fail(409, "فقط سؤال حذف‌شده را می‌توان بازیابی کرد");
+      const activating = input.action === "enable" || input.action === "restore";
+      if (activating) {
+        // Reclaim the public fingerprint; restoration must not create an exact duplicate.
+        if (version!.visibility === "public")
+          await reservePublicQuestionFingerprint(ctx, duplicateInputFromStoredQuestion(version!), current!._id, actor._id, session);
+      }
+      const filter = {
+        _id: current!._id, ownerId: actor._id, currentVersionId: vid,
+        ...(archived ? { archiveReason: reason, archivedAt: current!.archivedAt } :
+          { archivedAt: { $exists: false } }),
+      };
+      const change = activating
+        ? { $unset: { archivedAt: "", archivedBy: "", archiveReason: "" } }
+        : { $set: { archivedAt: ctx.now(), archivedBy: actor._id,
+          archiveReason: input.action === "delete" ? "deleted" : "disabled" } };
+      const updated = await c("questions").updateOne(filter, change, { session });
+      if (!updated.modifiedCount) ctx.fail(409, "وضعیت سؤال هم‌زمان تغییر کرده است؛ دوباره تلاش کنید");
+      if (!activating && version!.publicFingerprint) {
+        await c("publicQuestionFingerprints").deleteOne({
+          _id: version!.publicFingerprint, questionId: current!._id,
+        }, { session });
+      }
+      await c("auditLogs").insertOne({
+        _id: id(), actorId: actor._id, action: "question_lifecycle_" + input.action,
+        resourceId: current!._id, questionVersionId: vid, createdAt: ctx.now(),
+      }, { session });
+      return { questionId: current!._id, versionId: vid,
+        status: activating ? "active" : input.action === "delete" ? "deleted" : "disabled" };
+    });
+  });
+
   // One-click migration for the signed-in teacher's CURRENT question bank only.
   // The public catalog projection continues to omit answer references and hints.
   app.post("/api/questions/publish-all", async (r) => {
     const actor = await user(r, "teacher");
     return ctx.atomic(r, actor._id, "publish-all-owned-questions", { scope: "current-owned" }, async (session) => {
-      const current = await c("questions").find({ ownerId: actor._id }, { session })
+      const current = await c("questions").find({ ownerId: actor._id, archivedAt: { $exists: false } }, { session })
         .project({ _id: 1, currentVersionId: 1 }).toArray();
       const currentIds = current.map((row) => row.currentVersionId)
         .filter((value): value is string => typeof value === "string");
@@ -776,7 +849,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
     if (!total || total > MAX_MISSION_QUESTIONS)
       ctx.fail(400, `مجموع تعداد باید بین ۱ و ${MAX_MISSION_QUESTIONS} باشد`);
     const current = await c("questions")
-      .find({ ownerId: u._id, currentVersionId: { $in: b.candidateIds } })
+      .find({ ownerId: u._id, archivedAt: { $exists: false }, currentVersionId: { $in: b.candidateIds } })
       .project({ currentVersionId: 1 })
       .toArray();
     const candidates = await c("questionVersions")

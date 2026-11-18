@@ -50,6 +50,7 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
       _id: question!.questionId,
       ownerId: teacher._id,
       currentVersionId: qid,
+      archivedAt: { $exists: false },
     });
     if (!current) fail(409, "فقط نسخهٔ فعلی سؤال قابل انتشار است");
     const selector = {
@@ -174,7 +175,7 @@ export function registerLibrary(app: FastifyInstance, ctx: Context) {
       })
       .toArray();
     const current = await c("questions")
-      .find({ currentVersionId: { $in: versions.map((v) => v._id) } })
+      .find({ currentVersionId: { $in: versions.map((v) => v._id) }, archivedAt: { $exists: false } })
       .project({ currentVersionId: 1, ownerId: 1 })
       .toArray();
     const currentIds = new Set(
