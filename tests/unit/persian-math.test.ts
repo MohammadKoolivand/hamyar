@@ -85,4 +85,4 @@ test("ASCII numerals in KaTeX display as Persian without changing source annotat
   for (const path of markup.matchAll(/\bd="([^"]+)"/g)) {
     assert.doesNotMatch(path[1], /[۰-۹]/);
   }
-}
+});
