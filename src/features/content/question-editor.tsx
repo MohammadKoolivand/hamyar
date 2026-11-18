@@ -309,8 +309,9 @@ export function QuestionEditor({
                                 j === i ? e.target.value : o,
                               ),
                               reference:
-                                value.reference === option
-                                  ? e.target.value
+                                (value.reference === option ||
+                                (value.optionImages?.[i] && !option.trim() && value.reference === `تصویر گزینه ${i + 1}`))
+                                  ? (e.target.value || (value.optionImages?.[i] ? `تصویر گزینه ${i + 1}` : ""))
                                   : value.reference,
                             })
                           }
@@ -343,7 +344,10 @@ export function QuestionEditor({
                               ...value,
                               optionImages: value.options.map((_, j) => j === i ? image : (value.optionImages?.[j] ?? null)),
                               options: value.options.map((text, j) => j === i ? nextText : text),
-                              reference: value.reference === oldText ? nextText : value.reference,
+                              reference: value.reference === oldText ||
+                                (value.reference === `تصویر گزینه ${i + 1}` && !oldText.trim())
+                                  ? nextText
+                                  : value.reference,
                             });
                           }}
                         />
