@@ -230,6 +230,46 @@ export function ExamImportScreen({
           </AppLink>
         )}
       </div>
+      {superAdmin && (
+        <section className="rounded-2xl border border-amber-300 bg-amber-50 p-4">
+          <h3 className="font-semibold text-amber-950">ورود موقت دادهٔ خام برای بازبینی</h3>
+          <p className="mt-2 text-sm leading-7 text-amber-900">
+            فایل JSON بستهٔ ۱۲۹ سؤال کنکور تجربی ۱۴۰۵ (۵۷ تا ۱۸۵) را انتخاب کنید.
+            تنها پیش‌نویس‌های در انتظار بازبینی ساخته می‌شوند؛ هیچ سؤالی خودکار تأیید یا منتشر نمی‌شود.
+            بارگذاری مجدد، تغییرات بازبین را بازنویسی نمی‌کند.
+          </p>
+          <label className="mt-3 block text-sm font-medium text-amber-950">
+            انتخاب فایل خام JSON
+            <input
+              type="file"
+              accept=".json,application/json"
+              disabled={busy}
+              className="mt-2 block w-full text-sm"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.target.value = "";
+                if (!file) return;
+                void run(async () => {
+                  if (file.size > 12 * 1024 * 1024)
+                    throw new Error("حجم فایل خام بیشتر از حد مجاز است");
+                  if (!window.confirm("۱۲۹ سؤال فقط در بخش بازبینی ثبت شوند؟"))
+                    return;
+                  const response = await fetch("/api/admin/exam-imports/raw-review", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: await file.text(),
+                  });
+                  const result = await response.json();
+                  if (!response.ok) throw new Error(result.message ?? "ورود خام ناموفق بود");
+                  await loadList();
+                  await load(result.examId);
+                  setNotice(`ورود خام انجام شد: ${result.added} سؤال جدید، ${result.skipped} سؤال تکراری؛ همه در وضعیت بازبینی.`);
+                });
+              }}
+            />
+          </label>
+        </section>
+      )}
       <details className="rounded-2xl border border-slate-200 bg-white">
         <summary className="cursor-pointer p-4 font-semibold text-indigo-900">
           انتخاب از آرشیو آزمون‌های سال‌های گذشته (PDF سؤال و کلید)
