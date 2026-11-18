@@ -9,7 +9,7 @@ test("Persian-number LaTeX preserves fraction, root, exponent and renders Persia
   assert.match(markup, /<mn>۱۲<\/mn>/);
   assert.match(markup, /<mn>۳<\/mn>/);
   assert.doesNotMatch(markup, /<mn>[0-9]+<\/mn>/);
-  assert.match(mathMarkup("x^{2}"), /<mn>2<\/mn>/);
+  assert.match(mathMarkup("x^{2}"), /<mn>۲<\/mn>/);
   assert.throws(() => mathMarkup("\\href{https://example.com}{۱۲}"));
 });
 
@@ -64,4 +64,23 @@ test("ordinary fractions also render KaTeX HTML rather than relying on cramped n
   const markup = mathMarkup(String.raw`\frac{x}{y}`, false);
   assert.match(markup, /class="katex-html" aria-hidden="true"/);
   assert.match(markup, /<mfrac>/);
+});
+
+test("question and option digits are Persian at display time, while URL and math source remain unchanged", async () => {
+  const { questionDisplayText } = await import("../../src/lib/math-render");
+  assert.equal(questionDisplayText("گزینه 1 و عدد 23.5 و ٤٢"), "گزینه ۱ و عدد ۲۳.۵ و ۴۲");
+  assert.equal(questionDisplayText("3 cm و $x^{2}$ و https://example.com/2026"),
+    "۳ cm و $x^{2}$ و https://example.com/2026");
+});
+
+test("ASCII numerals in KaTeX are displayed as Persian without modifying source annotations or SVG geometry", () => {
+  const markup = mathMarkup(String.raw\`\\sqrt{12}+\\frac{3}{4}\`, false);
+  assert.match(markup, /<mn>۱۲<\\/mn>/);
+  assert.match(markup, /<mn>۳<\\/mn>/);
+  assert.match(markup, /<mn>۴<\\/mn>/);
+  assert.match(markup, /class="hy-math-number">[۰-۹]/);
+  assert.match(markup, /<annotation[^>]*>\\\\sqrt\\{12\\}\\+\\\\frac\\{3\\}\\{4\\}<\\/annotation>/);
+  for (const path of markup.matchAll(/\\bd="([^"]+)"/g)) {
+    assert.doesNotMatch(path[1], /[۰-۹]/);
+  }
 });
