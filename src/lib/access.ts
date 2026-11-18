@@ -155,6 +155,7 @@ const registeredRouteMethods: Readonly<Record<string, readonly string[]>> = {
     "/api/questions/select",
     "/api/questions/difficulty-batch",
     "/api/questions/:vid/revise",
+    "/api/questions/:vid/lifecycle",
     "/api/questions/:vid/propose-public",
     "/api/questions/duplicates/check",
     "/api/admin/public-question-submissions/:qid/review",
