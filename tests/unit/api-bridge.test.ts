@@ -70,3 +70,45 @@ test("Next API bridge retains 64 KiB limit on ordinary requests", async () => {
     await app.close();
   }
 });
+
+test("Next API bridge forwards raw-review JSON larger than 64 KiB", async () => {
+  const app = Fastify({ bodyLimit: 65536 });
+  app.post("/api/admin/exam-imports/raw-review", { bodyLimit: 12 * 1024 * 1024 }, async (request) => {
+    const input = request.body as { data: string };
+    return { accepted: input.data.length };
+  });
+  try {
+    const data = "x".repeat(90 * 1024);
+    const response = await forwardApiRequest(new Request(
+      "http://localhost:5174/api/admin/exam-imports/raw-review", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ data }),
+      }), app);
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { accepted: data.length });
+  } finally {
+    await app.close();
+  }
+});
+
+test("Next API bridge keeps raw-review payloads limited to 12 MiB", async () => {
+  const app = Fastify();
+  let calls = 0;
+  app.post("/api/admin/exam-imports/raw-review", async () => {
+    calls++;
+    return { ok: true };
+  });
+  try {
+    const response = await forwardApiRequest(new Request(
+      "http://localhost:5174/api/admin/exam-imports/raw-review", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ data: "x".repeat(12 * 1024 * 1024) }),
+      }), app);
+    assert.equal(response.status, 413);
+    assert.equal(calls, 0);
+  } finally {
+    await app.close();
+  }
+});
