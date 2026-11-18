@@ -142,8 +142,12 @@ export function homeExamGroupKey(q: CatalogPublicQuestion): string {
   );
   if (!identifiable) return "unattributed:" + q._id;
   return JSON.stringify([
-    category, title, year, source.organizer ?? "", source.group ?? "",
-    source.track ?? "", source.location ?? "", session, examDate,
+    category, title.replace(/\\s+/g, " "), year,
+    // A named exam's optional organizer/track fields can be missing in an
+    // individual newly added question. They must not split one sitting.
+    title ? "" : (source.organizer ?? ""),
+    source.group ?? "", title ? "" : (source.track ?? ""),
+    source.location ?? "", session, examDate,
     source.administration ?? "", source.schoolStage ?? "",
     subject, category === "final" ? homeQuestionTaxonomy(q, "grade") : "",
   ]);
@@ -155,10 +159,29 @@ function originalQuestionNumber(q: CatalogPublicQuestion): number | null {
     ? number : null;
 }
 
+/**
+ * Some textbook/reference questions have an original question number but no
+ * exam title/date. Keep their exam identities unattributed, yet display
+ * numbered questions from the same lesson/grade in numeric source order,
+ * instead of placing the most recently published item (e.g. 31) before 1.
+ */
+function homeSourceSortGroupKey(q: CatalogPublicQuestion): string {
+  const examKey = homeExamGroupKey(q);
+  if (!examKey.startsWith("unattributed:") || originalQuestionNumber(q) === null)
+    return examKey;
+  const book = homeQuestionTaxonomy(q, "book").trim();
+  if (!book) return examKey;
+  return JSON.stringify([
+    "numbered-reference", sourceCategory(q.source), homeQuestionTrack(q),
+    homeQuestionTaxonomy(q, "level"), homeQuestionTaxonomy(q, "grade"),
+    book, homeQuestionYear(q), q.source?.practice ?? "",
+  ]);
+}
+
 function sortBySourceOrder(items: CatalogPublicQuestion[]): CatalogPublicQuestion[] {
   const groups = new Map<string, CatalogPublicQuestion[]>();
   for (const question of items) {
-    const key = homeExamGroupKey(question);
+    const key = homeSourceSortGroupKey(question);
     const group = groups.get(key) ?? [];
     group.push(question);
     groups.set(key, group);

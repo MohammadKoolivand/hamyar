@@ -125,3 +125,52 @@ test("generic math lessons never establish a math Konkur track without an explic
   const legacy = question("legacy", { source: { family: "konkur", track: "علوم تجربی" } });
   assert.equal(homeQuestionTrack(legacy), "تجربی");
 });
+
+test("newly published science question 31 follows original questions without exam identity", () => {
+  const science = (number: number, recent = false) => question(`science-${number}`, {
+    year: 1405,
+    taxonomy: { level: "ابتدایی", grade: "ششم", book: "علوم", chapter: "انرژی", topic: "آزمایش" },
+    source: { family: "practice", practice: "textbook", questionNumber: number },
+    publishedAt: recent ? "2026-11-18T13:00:00Z" : "2026-10-01T13:00:00Z",
+  });
+  const rows = [science(31, true), science(2), science(1), science(30)];
+  const sorted = sortHomeQuestions(rows, "source_order").map((q) => q._id);
+  assert.deepEqual(sorted, ["science-1", "science-2", "science-30", "science-31"]);
+  assert.deepEqual(rows.map((q) => q._id), ["science-31", "science-2", "science-1", "science-30"]);
+  assert.equal(sortHomeQuestions(rows, "newest")[0]._id, "science-31");
+});
+
+test("reference ordering stays scoped to lesson and grade", () => {
+  const base = { family: "practice" as const, practice: "textbook" as const };
+  const science = (id: string, num: number, book: string, grade: string) =>
+    question(id, {
+      year: 1405,
+      source: { ...base, questionNumber: num },
+      taxonomy: { level: "ابتدایی", grade, book, chapter: "", topic: "" },
+      publishedAt: "2026-10-01",
+    });
+  const rows = [
+    science("science31", 31, "علوم", "ششم"),
+    science("math2", 2, "ریاضی", "ششم"),
+    science("science1", 1, "علوم", "ششم"),
+    science("science5", 5, "علوم", "پنجم"),
+    science("math1", 1, "ریاضی", "ششم"),
+  ];
+  const sorted = sortHomeQuestions(rows, "source_order").map((q) => q._id);
+  assert.ok(sorted.indexOf("science1") < sorted.indexOf("science31"));
+  assert.equal(Math.abs(sorted.indexOf("math1") - sorted.indexOf("math2")), 1);
+  assert.ok(sorted.indexOf("math1") < sorted.indexOf("math2"));
+  assert.notEqual(sorted.indexOf("science5"), sorted.indexOf("science1"));
+});
+
+test("optional organizer and track do not split the same titled sitting when question 31 is added", () => {
+  const base = { family: "school" as const, administration: "internal" as const,
+    sourceTitle: "آزمون علوم ششم", academicYear: "۱۴۰۵", subject: "علوم" };
+  const rows = [
+    question("new31", { source: { ...base, questionNumber: 31, organizer: "مدرسه جدید", track: "علوم" }, publishedAt: "2026-11-18" }),
+    question("first1", { source: { ...base, questionNumber: 1, organizer: "مدرسه قبلی" }, publishedAt: "2026-09-01" }),
+    question("first30", { source: { ...base, questionNumber: 30 }, publishedAt: "2026-09-01" }),
+  ];
+  assert.deepEqual(sortHomeQuestions(rows, "source_order").map((q) => q._id),
+    ["first1", "first30", "new31"]);
+});
