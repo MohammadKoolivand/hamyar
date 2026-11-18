@@ -13,7 +13,7 @@ const stableId = (value: string) => {
 const importItemSchema = z.object({
   number: z.number().int().min(57).max(185),
   state: z.literal("pending"),
-  subject: z.enum(["فیزیک", "شیمی", "ریاضی", "زمین‌شناسی", "ویژه بهیاری"]),
+  subject: z.enum(["فیزیک", "شیمی", "ریاضی", "زمین‌شناسی", "بهیاری"]),
   statement: z.string().min(3).max(5000),
   suggestedTopic: z.string().min(2).max(300),
   correctOption: z.number().int().min(1).max(4),
@@ -34,7 +34,7 @@ const subjectFor = (number: number) =>
   number <= 75 ? "فیزیک" :
   number <= 110 ? "شیمی" :
   number <= 140 ? "ریاضی" :
-  number <= 155 ? "زمین‌شناسی" : "ویژه بهیاری";
+  number <= 155 ? "زمین‌شناسی" : "بهیاری";
 const bookletFor = (number: number) => number <= 110 ? 2 : number <= 155 ? 3 : 4;
 
 export function registerRawExamReviewImport(app: FastifyInstance, ctx: Context) {
