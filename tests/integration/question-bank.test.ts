@@ -88,3 +88,44 @@ test("question bank stores optional year/difficulty and free questions, validate
     await f.close();
   }
 });
+
+test("teachers can disable, delete and restore current questions without losing historic versions", async () => {
+  const f = await fixture();
+  try {
+    const q = await f.post("/api/questions", {
+      classification: "free",
+      statement: "سؤال مخصوص بررسی وضعیت در بانک",
+      type: "numeric",
+      reference: "9",
+    }, f.teacher, "lifecycle-create");
+    const path = `/api/questions/${q._id}/lifecycle`;
+    const bank = async () => (await f.request("/api/questions", undefined, f.teacher)).json() as Array<{
+      _id: string; lifecycleStatus: string;
+    }>;
+    const publicBank = async () => (await f.request("/api/questions/public")).json() as Array<{ _id: string }>;
+    assert.equal((await bank()).find((row) => row._id === q._id)?.lifecycleStatus, "active");
+    assert.ok((await publicBank()).some((row) => row._id === q._id));
+    assert.equal((await f.request(path, { action: "disable" }, f.student)).statusCode, 403);
+    assert.equal((await f.request(path, { action: "disable" })).statusCode, 401);
+    await f.post(path, { action: "disable" }, f.teacher, "lifecycle-disable");
+    assert.equal((await bank()).find((row) => row._id === q._id)?.lifecycleStatus, "disabled");
+    assert.ok(!(await publicBank()).some((row) => row._id === q._id));
+    assert.equal((await f.request(path, { action: "disable" }, f.teacher)).statusCode, 409);
+    await f.post(path, { action: "enable" }, f.teacher, "lifecycle-enable");
+    assert.equal((await bank()).find((row) => row._id === q._id)?.lifecycleStatus, "active");
+    assert.ok((await publicBank()).some((row) => row._id === q._id));
+    await f.post(path, { action: "delete" }, f.teacher, "lifecycle-delete");
+    assert.equal((await bank()).find((row) => row._id === q._id)?.lifecycleStatus, "deleted");
+    assert.ok(!(await publicBank()).some((row) => row._id === q._id));
+    assert.ok(await f.c("questionVersions").findOne({ _id: q._id }));
+    assert.equal((await f.request(path, { action: "enable" }, f.teacher)).statusCode, 409);
+    await f.post(path, { action: "restore" }, f.teacher, "lifecycle-restore");
+    assert.equal((await bank()).find((row) => row._id === q._id)?.lifecycleStatus, "active");
+    assert.ok((await publicBank()).some((row) => row._id === q._id));
+    assert.equal((await f.c("auditLogs").countDocuments({
+      resourceId: q.questionId, action: /^question_lifecycle_/,
+    })), 4);
+  } finally {
+    await f.close();
+  }
+});
