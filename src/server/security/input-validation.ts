@@ -13,10 +13,13 @@ const MAX_KEY_LENGTH = 100;
 const MAX_STRING_LENGTH = 16000;
 const MAX_NODES = 5000;
 
-export function assertSafeApiInput(value: unknown): void {
+export function assertSafeApiInput(
+  value: unknown,
+  options: { allowRawReviewImages?: boolean } = {},
+): void {
   let nodes = 0;
   const seen = new WeakSet<object>();
-  function walk(input: unknown, depth: number): void {
+  function walk(input: unknown, depth: number, path: readonly (string | number)[]): void {
     if (++nodes > MAX_NODES || depth > MAX_DEPTH) throw new InvalidApiInput();
     if (input === null || typeof input === "boolean") return;
     if (typeof input === "number") {
@@ -24,7 +27,16 @@ export function assertSafeApiInput(value: unknown): void {
       return;
     }
     if (typeof input === "string") {
-      if (input.length > MAX_STRING_LENGTH) throw new InvalidApiInput();
+      // Only the admin raw-review endpoint may carry larger Base64 images.
+      // The path must be exactly items[index].imageBase64.
+      const isRawReviewImage =
+        options.allowRawReviewImages === true &&
+        path.length === 3 &&
+        path[0] === "items" &&
+        typeof path[1] === "number" &&
+        path[2] === "imageBase64";
+      if (input.length > (isRawReviewImage ? 400000 : MAX_STRING_LENGTH))
+        throw new InvalidApiInput();
       return;
     }
     if (typeof input !== "object") throw new InvalidApiInput();
@@ -32,7 +44,7 @@ export function assertSafeApiInput(value: unknown): void {
     seen.add(input);
     if (Array.isArray(input)) {
       if (input.length > MAX_ARRAY) throw new InvalidApiInput();
-      for (const element of input) walk(element, depth + 1);
+      for (let i = 0; i < input.length; i++) walk(input[i], depth + 1, [...path, i]);
       return;
     }
     const prototype = Object.getPrototypeOf(input);
@@ -44,10 +56,10 @@ export function assertSafeApiInput(value: unknown): void {
       // never accepted as user-supplied object keys.
       if (!key || key.length > MAX_KEY_LENGTH || key.startsWith("$") || key.includes(".") || BAD_KEYS.has(key))
         throw new InvalidApiInput();
-      walk((input as Record<string, unknown>)[key], depth + 1);
+      walk((input as Record<string, unknown>)[key], depth + 1, [...path, key]);
     }
   }
-  walk(value, 0);
+  walk(value, 0, []);
 }
 
 /** Explicit allowlist for query parameters: none unless a route opts in. */
