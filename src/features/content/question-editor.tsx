@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { QuestionInput } from "@/server/domain";
 import { normalizeQuestionTextFields } from "@/lib/persian-question-text";
+import { normalizeImageOnlyChoices } from "@/lib/question-option-images";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -134,7 +135,13 @@ export function QuestionEditor({
               setBusy(true);
               setError("");
               try {
-                await api(`/questions/${versionId}/revise`, value);
+                const normalized = normalizeImageOnlyChoices(value);
+                const missingOption = normalized.options.findIndex((option) => !option.trim());
+                if (normalized.type === "choice" && missingOption !== -1) {
+                  setError(`گزینه ${missingOption + 1} باید متن یا تصویر داشته باشد`);
+                  return;
+                }
+                await api(`/questions/${versionId}/revise`, normalized);
                 setSaved(true);
                 setDirty(false);
                 await onSaved();
@@ -345,10 +352,10 @@ export function QuestionEditor({
                         <input
                           type="radio"
                           name="correct-answer"
-                          checked={value.reference === option}
+                          checked={value.reference === (option.trim() || (value.optionImages?.[i] ? `تصویر گزینه ${i + 1}` : option))}
                           required
                           onChange={() =>
-                            change({ ...value, reference: option })
+                            change({ ...value, reference: option.trim() || (value.optionImages?.[i] ? `تصویر گزینه ${i + 1}` : option) })
                           }
                         />
                         پاسخ صحیح
