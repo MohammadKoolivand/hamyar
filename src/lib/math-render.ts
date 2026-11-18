@@ -1,9 +1,15 @@
 import katex from "katex";
 import { normalizePersianQuestionText } from "./persian-question-text";
+import { toPersianDigits } from "./presentation";
 export function questionDisplayText(text: string) {
   // The bundled print font mis-shapes combining hamza above final heh.
   // Use the explicit Persian ezafe spelling for display, preserving stored text.
-  return normalizePersianQuestionText(text).replace(/هٔ|ۀ/g, "ه‌ی");
+  // Localize prose only: URLs and inline LaTeX are source, not visible prose.
+  return normalizePersianQuestionText(text)
+    .replace(/هٔ|ۀ/g, "ه‌ی")
+    .split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+\$|\\\([\s\S]*?\\\)|https?:\/\/[^\s<>]+)/g)
+    .map((part, i) => (i % 2 ? part : toPersianDigits(part)))
+    .join("");
 }
 export function mathMarkup(latex: string, displayMode = true) {
   if (
@@ -33,28 +39,17 @@ export function mathMarkup(latex: string, displayMode = true) {
       macros: {},
     },
   );
-  const localized = /[۰-۹]/.test(latex)
-    ? markup.replace(
-        /(<mn\b[^>]*>)([^<]*)(<\/mn>)/g,
-        (_match, open, value, close) =>
-          open +
-          value.replace(/[0-9]/g, (digit: string) =>
-            String.fromCharCode(0x06f0 + Number(digit)),
-          ) +
-          close,
-      )
-    : markup;
-  if (!/[۰-۹]/.test(latex)) return localized;
-  // Localize only HTML text nodes: SVG path coordinates must remain untouched.
+  // KaTeX must parse ASCII, but visible MathML numerals and HTML number
+  // glyphs should always be Persian, regardless of the source digit script.
+  // Never rewrite markup attributes, SVG coordinates or LaTeX annotations.
+  const localized = markup.replace(
+    /(<mn\b[^>]*>)([^<]*)(<\/mn>)/g,
+    (_match, open: string, value: string, close: string) =>
+      open + toPersianDigits(value) + close,
+  );
   return localized.replace(
-    /(<span\b[^>]*>)([0-9.]+)(<\/span>)/g,
-    (_match, open, value, close) =>
-      open +
-      '<span class="hy-math-number">' +
-      value.replace(/[0-9]/g, (digit: string) =>
-        String.fromCharCode(0x06f0 + Number(digit)),
-      ) +
-      "</span>" +
-      close,
+    /(<span\b[^>]*>)([0-9٠-٩۰-۹.]+)(<\/span>)/g,
+    (_match, open: string, value: string, close: string) =>
+      open + '<span class="hy-math-number">' + toPersianDigits(value) + "</span>" + close,
   );
 }
