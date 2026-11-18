@@ -19,6 +19,9 @@ import {
   SlidersHorizontal,
   Pencil,
   Globe,
+  Trash2,
+  EyeOff,
+  RotateCcw,
 } from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { QuestionPresentation } from "@/components/question-presentation";
@@ -92,6 +95,32 @@ export function QuestionBank({
   }
   const [cropOpen, setCropOpen] = useState(false);
   const [editing, setEditing] = useState<string>();
+  const [lifecycleFilter, setLifecycleFilter] = useState("active");
+  const [lifecycleBusy, setLifecycleBusy] = useState("");
+  const [lifecycleError, setLifecycleError] = useState("");
+  const [lifecycleNotice, setLifecycleNotice] = useState("");
+  async function changeLifecycle(q: Question, action: "disable" | "enable" | "delete" | "restore") {
+    const label = action === "disable" ? "غیرفعال" : action === "delete" ? "حذف" :
+      action === "enable" ? "فعال" : "بازیابی";
+    const description = action === "delete"
+      ? "این سؤال از بانک فعال و نتایج عمومی حذف می‌شود، اما برای حفظ آزمون‌ها و پاسخ‌های قبلی سوابق آن باقی می‌ماند. از فیلتر «حذف‌شده» امکان بازیابی وجود دارد."
+      : action === "disable"
+        ? "این سؤال از نمایش عمومی و انتخاب برای آزمون‌های جدید خارج می‌شود و بعداً قابل فعال‌سازی است."
+        : "این سؤال دوباره در بانک فعال و نتایج عمومی قرار می‌گیرد.";
+    if (!window.confirm(`سؤال را ${label} می‌کنی؟\n\n${description}`)) return;
+    setLifecycleBusy(q._id);
+    setLifecycleError("");
+    setLifecycleNotice("");
+    try {
+      await api(`/questions/${q._id}/lifecycle`, { action });
+      await onSaved();
+      setLifecycleNotice(`وضعیت سؤال با موفقیت به «${action === "disable" ? "غیرفعال" : action === "delete" ? "حذف‌شده" : "فعال"}» تغییر کرد.`);
+    } catch (error) {
+      setLifecycleError((error as Error).message || "تغییر وضعیت سؤال انجام نشد.");
+    } finally {
+      setLifecycleBusy("");
+    }
+  }
   const [guidedOnly, setGuidedOnly] = useState(false);
   const [search, setSearch] = useState("");
   const [grade, setGrade] = useState("");
@@ -147,6 +176,9 @@ export function QuestionBank({
   const visible = questions.filter((q) => {
     const c = q.topicId ? byTopic.get(q.topicId) : undefined;
     return (
+      (lifecycleFilter === "all" || (lifecycleFilter === "active"
+        ? !q.lifecycleStatus || q.lifecycleStatus === "active"
+        : q.lifecycleStatus === lifecycleFilter)) &&
       (!guidedOnly || (!!q.hints?.length && !!q.skillIds?.length)) &&
       (!search.trim() ||
         `${q.statement} ${c?.topic.title ?? ""}`.includes(search.trim())) &&
@@ -180,6 +212,7 @@ export function QuestionBank({
   const active = [
     search,
     guidedOnly,
+    lifecycleFilter !== "active" ? lifecycleFilter : "",
     examCategory,
     ...Object.values(examFilters),
     grade,
@@ -195,6 +228,7 @@ export function QuestionBank({
   function clear() {
     setSearch("");
     setGuidedOnly(false);
+    setLifecycleFilter("active");
     setExamCategory("");
     setExamFilters({});
     setGrade("");
@@ -245,6 +279,7 @@ export function QuestionBank({
           </Link>
         </div>
       </section>
+      {(lifecycleNotice || lifecycleError) && <p role={lifecycleError ? "alert" : "status"} className={lifecycleError ? "rounded-xl bg-rose-50 p-3 text-sm text-rose-800" : "rounded-xl bg-teal-50 p-3 text-sm text-teal-900"}>{lifecycleError || lifecycleNotice}</p>}
       {(publishNotice || publishError) && <p role={publishError ? "alert" : "status"} className={publishError ? "rounded-xl bg-rose-50 p-3 text-sm text-rose-800" : "rounded-xl bg-teal-50 p-3 text-sm text-teal-900"}>{publishError || publishNotice}</p>}
       <section className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 sm:p-5" aria-label="انتشار امن در کتابخانه">
         <h3 className="font-bold text-[#17305e]">اشتراک سؤال‌ها در کتابخانه‌ی درس</h3>
@@ -530,6 +565,16 @@ export function QuestionBank({
           </Field>
         </div>
       </section>
+      <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
+        <Field title="وضعیت سؤال‌ها">
+          <select className={selectStyle} value={lifecycleFilter} onChange={(e) => setLifecycleFilter(e.target.value)}>
+            <option value="active">فعال (پیش‌فرض)</option>
+            <option value="disabled">غیرفعال</option>
+            <option value="deleted">حذف‌شده</option>
+            <option value="all">همه وضعیت‌ها</option>
+          </select>
+        </Field>
+      </div>
       <section className="grid min-w-0 gap-4" aria-label="نتایج بانک سؤال">
         <div className="flex items-center justify-between px-1">
           <h3 className="font-bold text-slate-700">سؤال‌ها</h3>
@@ -569,7 +614,7 @@ export function QuestionBank({
                 key={q._id}
                 className="relative grid min-w-0 gap-4 rounded-2xl border border-slate-200/70 bg-white/85 p-5 sm:p-6"
               >
-                <div className="flex flex-wrap items-center gap-2 pl-12 text-xs">
+                <div className="flex flex-wrap items-center gap-2 pl-12 text-xs">\n                  <span className={q.lifecycleStatus === "disabled" ? "rounded-lg bg-amber-100 px-3 py-1.5 text-amber-900" : q.lifecycleStatus === "deleted" ? "rounded-lg bg-rose-100 px-3 py-1.5 text-rose-900" : "rounded-lg bg-emerald-50 px-3 py-1.5 text-emerald-800"}>{q.lifecycleStatus === "disabled" ? "غیرفعال" : q.lifecycleStatus === "deleted" ? "حذف‌شده" : q.lifecycleStatus === "archived" ? "آرشیوشده" : "فعال"}</span>
                   <span className="rounded-lg bg-blue-50 px-3 py-1.5 font-medium text-[#233B8F]">
                     سؤال {fa(i + 1)}
                   </span>
@@ -614,20 +659,56 @@ export function QuestionBank({
                   className="w-fit rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800 disabled:opacity-50">
                   {libraryBusy === `${libraryCourse}:${q._id}` ? "در حال ثبت…" : published.has(`${libraryCourse}:${q._id}`) ? "حذف از کتابخانه‌ی این درس" : "انتشار در کتابخانه‌ی این درس"}
                 </button>}
-                <div className="absolute left-4 top-4">
+                <div className="flex flex-wrap items-center gap-2">
                   <Button
                     type="button"
                     variant="outline"
                     aria-label="ویرایش سؤال"
                     title="ویرایش سؤال"
-                    className="size-9 min-h-9 rounded-lg p-0"
+                    disabled={!!lifecycleBusy || q.lifecycleStatus === "deleted" || q.lifecycleStatus === "archived"}
+                    className="min-h-9 gap-2 rounded-lg px-3 py-1.5 text-xs"
                     onClick={() => {
                       setCropOpen(false);
                       setEditing(q._id);
                     }}
                   >
-                    <Pencil size={16} />
+                    <Pencil size={15} /> ویرایش
                   </Button>
+                  {(!q.lifecycleStatus || q.lifecycleStatus === "active") && (
+                    <>
+                      <Button type="button" variant="outline" disabled={!!lifecycleBusy}
+                        className="min-h-9 gap-2 rounded-lg px-3 py-1.5 text-xs text-amber-800"
+                        onClick={() => void changeLifecycle(q, "disable")}>
+                        <EyeOff size={15} /> {lifecycleBusy === q._id ? "در حال ثبت…" : "غیرفعال کردن"}
+                      </Button>
+                      <Button type="button" variant="outline" disabled={!!lifecycleBusy}
+                        className="min-h-9 gap-2 rounded-lg px-3 py-1.5 text-xs text-rose-700"
+                        onClick={() => void changeLifecycle(q, "delete")}>
+                        <Trash2 size={15} /> حذف سؤال
+                      </Button>
+                    </>
+                  )}
+                  {q.lifecycleStatus === "disabled" && (
+                    <>
+                      <Button type="button" variant="outline" disabled={!!lifecycleBusy}
+                        className="min-h-9 gap-2 rounded-lg px-3 py-1.5 text-xs text-emerald-800"
+                        onClick={() => void changeLifecycle(q, "enable")}>
+                        <RotateCcw size={15} /> فعال‌سازی دوباره
+                      </Button>
+                      <Button type="button" variant="outline" disabled={!!lifecycleBusy}
+                        className="min-h-9 gap-2 rounded-lg px-3 py-1.5 text-xs text-rose-700"
+                        onClick={() => void changeLifecycle(q, "delete")}>
+                        <Trash2 size={15} /> حذف سؤال
+                      </Button>
+                    </>
+                  )}
+                  {q.lifecycleStatus === "deleted" && (
+                    <Button type="button" variant="outline" disabled={!!lifecycleBusy}
+                      className="min-h-9 gap-2 rounded-lg px-3 py-1.5 text-xs text-emerald-800"
+                      onClick={() => void changeLifecycle(q, "restore")}>
+                      <RotateCcw size={15} /> بازیابی سؤال
+                    </Button>
+                  )}
                 </div>
                 {q.origin === "human_revised" && (
                   <p className="text-xs text-amber-700">
