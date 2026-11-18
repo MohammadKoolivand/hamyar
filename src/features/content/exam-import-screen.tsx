@@ -254,16 +254,41 @@ export function ExamImportScreen({
                     throw new Error("حجم فایل خام بیشتر از حد مجاز است");
                   if (!window.confirm("۱۲۹ سؤال فقط در بخش بازبینی ثبت شوند؟"))
                     return;
-                  const response = await fetch("/api/admin/exam-imports/raw-review", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: await file.text(),
-                  });
-                  const result = await response.json();
-                  if (!response.ok) throw new Error(result.message ?? "ورود خام ناموفق بود");
+                  const manifest: unknown = JSON.parse(await file.text());
+                  if (!manifest || typeof manifest !== "object" ||
+                    !("format" in manifest) || manifest.format !== "hamyar-raw-review-v1" ||
+                    !("items" in manifest) || !Array.isArray(manifest.items) ||
+                    manifest.items.length !== 129 ||
+                    new Set(manifest.items.map((item: { number?: number }) => item?.number)).size !== 129 ||
+                    manifest.items.some((item: { number?: number }) =>
+                      !Number.isInteger(item?.number) || item.number! < 57 || item.number! > 185))
+                    throw new Error("بستهٔ خام باید دقیقاً شامل سؤال‌های ۵۷ تا ۱۸۵ باشد");
+                  const items = [...manifest.items].sort(
+                    (a: { number: number }, b: { number: number }) => a.number - b.number,
+                  );
+                  let added = 0;
+                  let skipped = 0;
+                  let examId = "";
+                  for (let offset = 0; offset < items.length; offset += 10) {
+                    const chunk = items.slice(offset, offset + 10);
+                    setNotice(`در حال ثبت سؤال‌های ${offset + 1} تا ${offset + chunk.length} از ۱۲۹…`);
+                    const response = await fetch("/api/admin/exam-imports/raw-review", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ format: "hamyar-raw-review-v1", items: chunk }),
+                      signal: AbortSignal.timeout(45000),
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(
+                      `بستهٔ ${Math.floor(offset / 10) + 1}: ${result.message ?? "ورود خام ناموفق بود"}؛ می‌توانید همین فایل را دوباره انتخاب کنید`,
+                    );
+                    examId = result.examId;
+                    added += result.added;
+                    skipped += result.skipped;
+                  }
                   await loadList();
-                  await load(result.examId);
-                  setNotice(`ورود خام انجام شد: ${result.added} سؤال جدید، ${result.skipped} سؤال تکراری؛ همه در وضعیت بازبینی.`);
+                  await load(examId);
+                  setNotice(`ورود خام تکمیل شد: ${added} سؤال جدید، ${skipped} سؤال موجود؛ همه در وضعیت بازبینی.`);
                 });
               }}
             />

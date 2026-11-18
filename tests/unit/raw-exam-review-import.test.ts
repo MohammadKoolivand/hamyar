@@ -10,7 +10,7 @@ function subject(number: number) {
 function validPayload() {
   return {
     format: "hamyar-raw-review-v1",
-    items: Array.from({length: 129}, (_, index) => {
+    items: Array.from({length: 10}, (_, index) => {
       const number = index + 57;
       return {
         number, state: "pending", subject: subject(number),
@@ -25,7 +25,7 @@ function validPayload() {
   };
 }
 
-test("the 129-question 1405 experimental review payload parses", () => {
+test("a 10-question raw review batch parses", () => {
   assert.equal(rawReviewPayloadSchema.safeParse(validPayload()).success, true);
 });
 
@@ -35,8 +35,14 @@ test("the raw import schema rejects missing or invalid answer keys", () => {
   assert.equal(rawReviewPayloadSchema.safeParse(payload).success, false);
 });
 
-test("the raw import schema rejects incomplete sets", () => {
+test("the raw import schema rejects batches larger than 10", () => {
   const payload = validPayload();
-  payload.items.pop();
+  payload.items.push({ ...payload.items[0], number: 67 });
+  assert.equal(rawReviewPayloadSchema.safeParse(payload).success, false);
+});
+
+test("the raw import schema rejects an empty batch", () => {
+  const payload = validPayload();
+  payload.items = [];
   assert.equal(rawReviewPayloadSchema.safeParse(payload).success, false);
 });
