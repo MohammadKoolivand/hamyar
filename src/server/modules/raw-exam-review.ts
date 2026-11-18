@@ -125,7 +125,7 @@ export function registerRawExamReviewImport(app: FastifyInstance, ctx: Context) 
           confidence: null,
           warnings: [...item.warnings, `مبحث پیشنهادی: ${item.suggestedTopic} — انتخاب مبحث از برنامه درسی الزامی است`],
           answerMatch: {
-            status: "matched", option: item.correctOption,
+            status: "needs_review", option: item.correctOption,
             matches: [{page: item.source.bookletNumber === 4 ? 2 : 1,
               number: item.number, option: item.correctOption}], warnings: [],
           },
