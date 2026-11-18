@@ -13,6 +13,7 @@ import { QuestionTextInput } from "@/components/question-text-input";
 import { VisualEditor } from "./visual-editor";
 import { OptionImageInput } from "./option-image-input";
 import { TopicSelector } from "./topic-selector";
+import { SourceEditor } from "./source-editor";
 import type { Node } from "@/lib/types";
 const style = "glass-field min-h-11 w-full p-3 text-sm";
 export function QuestionEditor({
@@ -237,6 +238,50 @@ export function QuestionEditor({
                   />
                 </Field>
               </div>
+              <section className="grid gap-3 rounded-2xl border border-slate-200 p-4">
+                <Field title="شماره سؤال در دفترچه / مرجع اصلی">
+                  <input
+                    className={style}
+                    type="number"
+                    min={1}
+                    max={10000}
+                    step={1}
+                    inputMode="numeric"
+                    placeholder="مثلاً ۳۲"
+                    value={value.source?.questionNumber ?? ""}
+                    disabled={!value.source}
+                    onChange={(e) =>
+                      change({
+                        ...value,
+                        source: value.source
+                          ? {
+                              ...value.source,
+                              questionNumber: e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
+                            }
+                          : undefined,
+                      })
+                    }
+                  />
+                </Field>
+                <p className="text-xs leading-6 text-slate-500">
+                  این شماره، جای سؤال را در مرتب‌سازی بانک بر اساس ترتیب دفترچه تعیین می‌کند.
+                  برای حذف شماره، کادر را خالی بگذار.
+                </p>
+                {!value.source && (
+                  <>
+                    <p className="text-xs text-amber-800">
+                      این سؤال هنوز منبع ندارد. ابتدا نوع منبع را تعیین کن تا شماره دفترچه قابل ویرایش شود.
+                    </p>
+                    <SourceEditor
+                      value={value.source}
+                      onChange={(source) => change({ ...value, source })}
+                      compact
+                    />
+                  </>
+                )}
+              </section>
               {value.type === "choice" ? (
                 <fieldset className="grid gap-3 rounded-2xl border border-slate-200 p-4">
                   <legend>گزینه‌ها و پاسخ صحیح</legend>

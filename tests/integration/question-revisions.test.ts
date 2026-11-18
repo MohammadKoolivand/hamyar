@@ -105,3 +105,45 @@ test("image crop metadata is bounded and cannot escape original image", () => {
       false,
     );
 });
+
+test("editing the booklet question number creates a new version without altering the original", async () => {
+  const f = await fixture();
+  try {
+    const source = {
+      family: "konkur" as const,
+      group: "experimental" as const,
+      academicYear: "۱۴۰۵",
+      sourceTitle: "کنکور تجربی ۱۴۰۵",
+      questionNumber: 32,
+    };
+    const original = await f.post("/api/questions", {
+      topicId: f.question.topicId,
+      statement: "شماره سؤال در دفترچه را بررسی کنید",
+      type: "numeric",
+      reference: "2",
+      source,
+    }, f.teacher, "booklet-number-original");
+    const revised = await f.post(
+      `/api/questions/${original._id}/revise`,
+      {
+        ...original,
+        source: { ...source, questionNumber: 35 },
+      },
+      f.teacher,
+      "booklet-number-revised",
+    );
+    assert.equal(revised.source.questionNumber, 35);
+    assert.equal(revised.questionId, original.questionId);
+    const previous = (await f.request(`/api/questions/${original._id}`, undefined, f.teacher)).json();
+    assert.equal(previous.source.questionNumber, 32);
+    const current = (await f.request(`/api/questions/${revised._id}`, undefined, f.teacher)).json();
+    assert.equal(current.source.questionNumber, 35);
+    const bank = (await f.request("/api/questions", undefined, f.teacher)).json() as Array<{
+      _id: string; source?: { questionNumber?: number };
+    }>;
+    assert.equal(bank.find((q) => q._id === revised._id)?.source?.questionNumber, 35);
+    assert.ok(!bank.some((q) => q._id === original._id));
+  } finally {
+    await f.close();
+  }
+});
