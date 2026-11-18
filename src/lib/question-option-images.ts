@@ -3,8 +3,8 @@ export function normalizeImageOnlyChoices<
   T extends { options: string[]; optionImages?: (unknown | null)[]; reference: string },
 >(question: T): T {
   const options = question.options.map((option, index) =>
-    option.trim() || question.optionImages?.[index]
-      ? option.trim() || `تصویر گزینه ${index + 1}`
+    !option.trim() && question.optionImages?.[index]
+      ? `تصویر گزینه ${index + 1}`
       : option,
   );
   const imageOnlyIndices = question.options.flatMap((option, index) =>
