@@ -28,7 +28,7 @@ const importItemSchema = z.object({
 }).passthrough();
 export const rawReviewPayloadSchema = z.object({
   format: z.literal("hamyar-raw-review-v1"),
-  items: z.array(importItemSchema).length(129),
+  items: z.array(importItemSchema).min(1).max(10),
 }).strict();
 const subjectFor = (number: number) =>
   number <= 75 ? "فیزیک" :
@@ -40,15 +40,17 @@ const bookletFor = (number: number) => number <= 110 ? 2 : number <= 155 ? 3 : 4
 export function registerRawExamReviewImport(app: FastifyInstance, ctx: Context) {
   app.post("/api/admin/exam-imports/raw-review", {
     bodyLimit: 12 * 1024 * 1024,
-    config: { rateLimit: { max: 2, timeWindow: "1 hour" } },
+    config: { rateLimit: { max: 100, timeWindow: "1 hour" } },
   }, async (request) => {
     const admin = await ctx.user(request, "super_admin");
     const payload = rawReviewPayloadSchema.parse(request.body);
     const sorted = [...payload.items].sort((a, b) => a.number - b.number);
-    if (sorted.some((item, index) => item.number !== index + 57 ||
+    if (sorted.some((item, index) => item.number < 57 || item.number > 185 ||
       item.subject !== subjectFor(item.number) ||
       item.source.bookletNumber !== bookletFor(item.number)))
       return ctx.fail(400, "شماره، درس یا دفترچه در بستهٔ خام تطبیق ندارد");
+    if (new Set(sorted.map((item) => item.number)).size !== sorted.length)
+      return ctx.fail(400, "شماره سؤال در بسته تکراری است");
     if (new Set(sorted.map((item) => item.source.sourceFileSha256)).size !== 1)
       return ctx.fail(400, "منبع PDF سؤال‌ها یکسان نیست");
     const fingerprint = sorted[0].source.sourceFileSha256;
@@ -137,7 +139,7 @@ export function registerRawExamReviewImport(app: FastifyInstance, ctx: Context) 
       _id: ctx.id(), actorId: admin._id, action: "raw_exam_review_import",
       resourceId: packageId, count: sorted.length, added, createdAt: ctx.now(),
     });
-    return { examId: packageId, total: sorted.length, added,
+    return { examId: packageId, processed: sorted.length, added,
       skipped: sorted.length - added, state: "review" };
   });
 }
