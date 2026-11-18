@@ -35,3 +35,14 @@ test("legitimate nested answers, metadata and empty query are accepted", () => {
   assert.doesNotThrow(() => assertSafeApiInput({ questionId: "abc", answer: "x", metadata: { level: 2, tags: ["a", "b"] } }));
   assert.doesNotThrow(() => assertAllowedQuery({}));
 });
+
+test("raw-review images larger than 16 KiB pass only at the exact image field", () => {
+  const image = "A".repeat(52000);
+  const payload = { format: "hamyar-raw-review-v1", items: [{ number: 57, imageBase64: image }] };
+  invalid(payload);
+  assert.doesNotThrow(() => assertSafeApiInput(payload, { allowRawReviewImages: true }));
+  assert.throws(() => assertSafeApiInput({ items: [{ notes: image }] }, { allowRawReviewImages: true }));
+  assert.throws(() => assertSafeApiInput({ items: [{ imageBase64: image, "$where": "return true" }] }, { allowRawReviewImages: true }));
+  assert.throws(() => assertSafeApiInput({ items: [{ imageBase64: "A".repeat(400001) }] }, { allowRawReviewImages: true }));
+  assert.throws(() => assertSafeApiInput({ elsewhere: [{ imageBase64: image }] }, { allowRawReviewImages: true }));
+});
