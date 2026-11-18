@@ -17,7 +17,7 @@ import {
   importCatalog,
   trackLabels,
 } from "../curriculum-catalog";
-import { questionSchema } from "../domain";
+import { questionSchema, type QuestionInput } from "../domain";
 import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
