@@ -3,6 +3,7 @@ import { Check, Crop } from "lucide-react";
 import Image from "next/image";
 import { useId, useEffect, useRef, useState } from "react";
 import { mathMarkup, questionDisplayText } from "@/lib/math-render";
+import { toPersianDigits } from "@/lib/presentation";
 import {
   questionVisualSchema,
   type QuestionVisual,
@@ -151,10 +152,10 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
                         stroke="#e2e8f0"
                       />
                       <text x={x(xv)} y={278} textAnchor="middle">
-                        {Number(xv.toPrecision(4))}
+                        {toPersianDigits(Number(xv.toPrecision(4)))}
                       </text>
                       <text x="56" y={y(yv) + 4} textAnchor="end">
-                        {Number(yv.toPrecision(4))}
+                        {toPersianDigits(Number(yv.toPrecision(4)))}
                       </text>
                     </g>
                   );
@@ -187,10 +188,10 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
                   textAnchor="middle"
                   fill="#334155"
                 >
-                  {v.xLabel}
+                  {questionDisplayText(v.xLabel)}
                 </text>
                 <text x="65" y="22" fontSize="13" fill="#334155">
-                  {v.yLabel}
+                  {questionDisplayText(v.yLabel)}
                 </text>
               </svg>
               <div className="flex flex-wrap justify-center gap-3 text-xs">
@@ -199,7 +200,7 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
                     <svg width="16" height="4" aria-hidden="true">
                       <path d="M0 2 H16" stroke={colors[i]} strokeWidth="3" />
                     </svg>
-                    {s.name}
+                    {questionDisplayText(s.name)}
                   </span>
                 ))}
               </div>
@@ -245,7 +246,7 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
                 fontSize="4"
                 fill="#334155"
               >
-                {s.label}
+                {questionDisplayText(s.label)}
               </text>
             </g>
           ))}
@@ -260,7 +261,7 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
                 fill="none"
               />
               <text x={p.x} y={100 - p.y} fontSize="4">
-                {p.label}
+                {questionDisplayText(p.label)}
               </text>
             </g>
           ))}
@@ -268,7 +269,7 @@ export function QuestionVisualView({ visual }: { visual: QuestionVisual }) {
             <g key={i}>
               <circle cx={p.x} cy={100 - p.y} r="1" fill="#233B8F" />
               <text x={p.x + 2} y={100 - p.y - 2} fontSize="4" fill="#334155">
-                {p.label}
+                {questionDisplayText(p.label)}
               </text>
             </g>
           ))}
