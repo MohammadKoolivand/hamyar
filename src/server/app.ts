@@ -168,7 +168,9 @@ export async function buildApp(
       // Binary import endpoints are separately restricted by the proxy's
       // upload limit and their content-type-specific validation.
       if (Buffer.isBuffer(r.body)) return;
-      assertSafeApiInput(r.body);
+      assertSafeApiInput(r.body, {
+        allowRawReviewImages: r.routeOptions.url === "/api/admin/exam-imports/raw-review",
+      });
     }
   });
   app.get("/api/health", async () => {
