@@ -29,9 +29,11 @@ function questionGrade(q: CatalogPublicQuestion) {
   return match ? Number(match[0]) : undefined;
 }
 function questionTrack(q: CatalogPublicQuestion) {
+  if (q.source?.group === "mathematics") return "mathematics";
+  if (q.source?.group === "experimental") return "experimental";
   const text = q.source?.track ?? "";
-  if (q.source?.group === "mathematics" || /ریاضی/.test(text)) return "mathematics";
-  if (q.source?.group === "experimental" || /تجربی/.test(text)) return "experimental";
+  if (/تجربی/.test(text)) return "experimental";
+  if (/ریاضی/.test(text)) return "mathematics";
   return undefined;
 }
 function normalizeSource(value: string): string {

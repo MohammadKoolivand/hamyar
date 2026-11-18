@@ -44,9 +44,18 @@ export function homeBookName(value: string): string {
 }
 
 export function homeQuestionTrack(q: CatalogPublicQuestion): string {
-  const text = [q.source?.track, q.taxonomy?.book, q.source?.subject].filter(Boolean).join(" ");
-  if (q.source?.group === "mathematics" || /ریاضی(?:\s*فیزیک)?/.test(text)) return "ریاضی";
-  if (q.source?.group === "experimental" || /تجربی/.test(text)) return "تجربی";
+  // The exam's declared group is authoritative. A physics/math lesson can be
+  // shared by both groups and must never override «علوم تجربی» metadata.
+  if (q.source?.group === "mathematics") return "ریاضی";
+  if (q.source?.group === "experimental") return "تجربی";
+  const track = q.source?.track?.trim() ?? "";
+  if (/تجربی/.test(track)) return "تجربی";
+  if (/ریاضی(?:\\s*(?:و\\s*)?فیزیک)?/.test(track)) return "ریاضی";
+  // Legacy sources without an explicit group may encode it in the book name.
+  // A bare «ریاضی» lesson is NOT sufficient to infer the math exam track.
+  const context = [q.taxonomy?.book, q.source?.subject].filter(Boolean).join(" ");
+  if (/علوم\\s*تجربی|رشته\\s*تجربی/.test(context)) return "تجربی";
+  if (/ریاضی\\s*(?:و\\s*)?فیزیک|رشته\\s*ریاضی/.test(context)) return "ریاضی";
   return "";
 }
 

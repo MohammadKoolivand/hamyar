@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { homeBookName, homeQuestionYear, initialHomeFilters, matchesHomeQuestion, sortHomeQuestions } from "../../src/lib/home-question-filters";
+import { homeBookName, homeQuestionTrack, homeQuestionYear, initialHomeFilters, matchesHomeQuestion, sortHomeQuestions } from "../../src/lib/home-question-filters";
 import type { CatalogPublicQuestion } from "../../src/lib/exam-catalog-coverage";
 
 function question(id: string, extra: Partial<CatalogPublicQuestion> = {}): CatalogPublicQuestion {
@@ -98,4 +98,30 @@ test("different exam sessions and final subjects are never interleaved", () => {
   const sorted = sortHomeQuestions(finals, "source_order").map((q) => q._id);
   assert.equal(Math.abs(sorted.indexOf("chem1") - sorted.indexOf("chem2")), 1);
   assert.ok(sorted.indexOf("chem1") < sorted.indexOf("chem2"));
+});
+
+test("explicit experimental Konkur group overrides a math lesson or conflicting track text", () => {
+  const experimental = question("tajrobi-46", {
+    taxonomy: { level: "متوسطه دوم", grade: "دوازدهم", book: "ریاضی", chapter: "موج", topic: "طول موج" },
+    source: { family: "konkur", group: "experimental", track: "ریاضی", questionNumber: 46 },
+  });
+  assert.equal(homeQuestionTrack(experimental), "تجربی");
+  assert.equal(matchesHomeQuestion(experimental, { ...initialHomeFilters(), track: "ریاضی" }), false);
+  assert.equal(matchesHomeQuestion(experimental, { ...initialHomeFilters(), track: "تجربی" }), true);
+
+  const mathematics = question("riazi-46", {
+    taxonomy: { level: "متوسطه دوم", grade: "دوازدهم", book: "فیزیک - علوم تجربی", chapter: "موج", topic: "نور" },
+    source: { family: "konkur", group: "mathematics", questionNumber: 46 },
+  });
+  assert.equal(homeQuestionTrack(mathematics), "ریاضی");
+  assert.equal(matchesHomeQuestion(mathematics, { ...initialHomeFilters(), track: "تجربی" }), false);
+  assert.equal(matchesHomeQuestion(mathematics, { ...initialHomeFilters(), track: "ریاضی" }), true);
+});
+
+test("generic math lessons never establish a math Konkur track without an explicit source", () => {
+  const generic = question("generic", { source: { family: "konkur" } });
+  assert.equal(homeQuestionTrack(generic), "");
+  assert.equal(matchesHomeQuestion(generic, { ...initialHomeFilters(), track: "ریاضی" }), false);
+  const legacy = question("legacy", { source: { family: "konkur", track: "علوم تجربی" } });
+  assert.equal(homeQuestionTrack(legacy), "تجربی");
 });
