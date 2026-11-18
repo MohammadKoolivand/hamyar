@@ -48,8 +48,10 @@ export async function forwardApiRequest(request: Request, app: FastifyInstance) 
           },
         });
     }
+    const rawReview = request.method === "POST" &&
+      url.pathname === "/api/admin/exam-imports/raw-review";
     const body = !["GET", "HEAD"].includes(request.method)
-      ? await payload(request, pdfChunk ? PDF_LIBRARY_UPLOAD_CHUNK_BYTES : large ? 20 * 1024 * 1024 : 65536)
+      ? await payload(request, rawReview ? 12 * 1024 * 1024 : pdfChunk ? PDF_LIBRARY_UPLOAD_CHUNK_BYTES : large ? 20 * 1024 * 1024 : 65536)
       : undefined;
     const headers = Object.fromEntries(request.headers.entries());
     const response = await app.inject({
