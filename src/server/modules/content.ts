@@ -17,11 +17,11 @@ import {
   importCatalog,
   trackLabels,
 } from "../curriculum-catalog";
-import { questionSchema, type QuestionInput } from "../domain";
+import { questionSchema } from "../domain";
 import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
-import { findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
+import { duplicateInputFromStoredQuestion, findPublicQuestionMatches, reservePublicQuestionFingerprint } from "../question-duplicates";
 import { examCatalogEntry, validExamCoverageId } from "../../lib/exam-catalog";
 import { calculateExamProgress, estimateLegacyQuestionCount } from "../../lib/exam-import-progress";
 export function registerContent(app: FastifyInstance, ctx: Context) {
@@ -756,7 +756,7 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
       if (activating) {
         // Reclaim the public fingerprint; restoration must not create an exact duplicate.
         if (version!.visibility === "public")
-          await reservePublicQuestionFingerprint(ctx, version! as QuestionInput, current!._id, actor._id, session);
+          await reservePublicQuestionFingerprint(ctx, duplicateInputFromStoredQuestion(version!), current!._id, actor._id, session);
       }
       const filter = {
         _id: current!._id, ownerId: actor._id, currentVersionId: vid,
