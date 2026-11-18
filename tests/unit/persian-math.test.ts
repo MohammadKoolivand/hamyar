@@ -10,6 +10,7 @@ test("Persian-number LaTeX preserves fraction, root, exponent and renders Persia
   assert.match(markup, /<mn>۳<\/mn>/);
   assert.doesNotMatch(markup, /<mn>[0-9]+<\/mn>/);
   assert.match(mathMarkup("x^{2}"), /<mn>۲<\/mn>/);
+  assert.doesNotMatch(mathMarkup("x^{2}"), /<mn>2<\/mn>/);
   assert.throws(() => mathMarkup("\\href{https://example.com}{۱۲}"));
 });
 
