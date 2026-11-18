@@ -26,7 +26,7 @@ const importItemSchema = z.object({
     sourceFileSha256: z.string().regex(/^[a-f0-9]{64}$/),
   }).passthrough(),
 }).passthrough();
-const payloadSchema = z.object({
+export const rawReviewPayloadSchema = z.object({
   format: z.literal("hamyar-raw-review-v1"),
   items: z.array(importItemSchema).length(129),
 }).strict();
@@ -43,7 +43,7 @@ export function registerRawExamReviewImport(app: FastifyInstance, ctx: Context) 
     config: { rateLimit: { max: 2, timeWindow: "1 hour" } },
   }, async (request) => {
     const admin = await ctx.user(request, "super_admin");
-    const payload = payloadSchema.parse(request.body);
+    const payload = rawReviewPayloadSchema.parse(request.body);
     const sorted = [...payload.items].sort((a, b) => a.number - b.number);
     if (sorted.some((item, index) => item.number !== index + 57 ||
       item.subject !== subjectFor(item.number) ||
@@ -113,6 +113,10 @@ export function registerRawExamReviewImport(app: FastifyInstance, ctx: Context) 
         },
         suggestedTopic: item.suggestedTopic,
         topicAssignmentStatus: "needs_curriculum_id_review",
+        rawSource: item.source,
+        rawAnswerSource: item.answerSource ?? null,
+        rawKeyOption: item.correctOption,
+        rawReviewWarnings: item.warnings,
         extractedTextForReview: item.extractedTextForReview ?? "",
         extraction: {
           detectedNumber: item.number,
