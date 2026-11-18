@@ -45,7 +45,7 @@ export function registerRawExamReviewImport(app: FastifyInstance, ctx: Context) 
     const admin = await ctx.user(request, "super_admin");
     const payload = rawReviewPayloadSchema.parse(request.body);
     const sorted = [...payload.items].sort((a, b) => a.number - b.number);
-    if (sorted.some((item, index) => item.number < 57 || item.number > 185 ||
+    if (sorted.some((item) => item.number < 57 || item.number > 185 ||
       item.subject !== subjectFor(item.number) ||
       item.source.bookletNumber !== bookletFor(item.number)))
       return ctx.fail(400, "شماره، درس یا دفترچه در بستهٔ خام تطبیق ندارد");
