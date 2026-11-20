@@ -174,3 +174,17 @@ test("optional organizer and track do not split the same titled sitting when que
   assert.deepEqual(sortHomeQuestions(rows, "source_order").map((q) => q._id),
     ["first1", "first30", "new31"]);
 });
+
+test("home numbered textbook questions stay ordered when a later question has a source title", () => {
+  const base = { family: "practice" as const, practice: "textbook" as const };
+  const textbook = (id: string, number: number, sourceTitle?: string) =>
+    question(id, {
+      year: 1405,
+      taxonomy: { level: "ابتدایی", grade: "ششم", book: "علوم", chapter: "انرژی", topic: "آزمایش" },
+      source: { ...base, questionNumber: number, ...(sourceTitle ? { sourceTitle } : {}) },
+      publishedAt: number === 31 ? "2026-11-20T10:00:00Z" : "2026-10-20T10:00:00Z",
+    });
+  const rows = [textbook("q31", 31, "علوم ششم"), textbook("q1", 1), textbook("q2", 2)];
+  assert.deepEqual(sortHomeQuestions(rows, "source_order").map((q) => q._id), ["q1", "q2", "q31"]);
+  assert.equal(sortHomeQuestions(rows, "newest")[0]._id, "q31");
+});
