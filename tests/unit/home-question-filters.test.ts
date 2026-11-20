@@ -174,3 +174,37 @@ test("optional organizer and track do not split the same titled sitting when que
   assert.deepEqual(sortHomeQuestions(rows, "source_order").map((q) => q._id),
     ["first1", "first30", "new31"]);
 });
+
+
+test("Konkur questions stay ordered when organizer is present on only one question", () => {
+  const base = { family: "konkur" as const, group: "experimental" as const,
+    location: "domestic" as const, session: "نوبت اول", academicYear: "۱۴۰۵" };
+  const rows = [
+    question("q31", { source: { ...base, organizer: "سازمان سنجش", questionNumber: 31 },
+      publishedAt: "2026-11-18" }),
+    question("q1", { source: { ...base, questionNumber: 1 }, publishedAt: "2026-10-01" }),
+    question("q2", { source: { ...base, questionNumber: 2 }, publishedAt: "2026-10-01" }),
+  ];
+  assert.deepEqual(sortHomeQuestions(rows, "source_order").map((q) => q._id),
+    ["q1", "q2", "q31"]);
+});
+
+test("Konkur source ordering does not merge different sessions or locations", () => {
+  const base = { family: "konkur" as const, group: "experimental" as const,
+    academicYear: "۱۴۰۵" };
+  const rows = [
+    question("first31", { source: { ...base, session: "نوبت اول",
+      location: "domestic", questionNumber: 31 }, publishedAt: "2026-10-01" }),
+    question("second1", { source: { ...base, session: "نوبت دوم",
+      location: "domestic", questionNumber: 1 }, publishedAt: "2026-11-01" }),
+    question("abroad1", { source: { ...base, session: "نوبت اول",
+      location: "international", questionNumber: 1 }, publishedAt: "2026-09-01" }),
+    question("first1", { source: { ...base, session: "نوبت اول",
+      location: "domestic", organizer: "سازمان سنجش", questionNumber: 1 },
+      publishedAt: "2026-10-01" }),
+  ];
+  const ids = sortHomeQuestions(rows, "source_order").map((q) => q._id);
+  assert.equal(ids.indexOf("first1") + 1, ids.indexOf("first31"));
+  assert.equal(ids.indexOf("second1") === ids.indexOf("first1") + 1, false);
+  assert.equal(ids.indexOf("abroad1") === ids.indexOf("first1") + 1, false);
+});

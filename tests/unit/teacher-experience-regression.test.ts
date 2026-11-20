@@ -26,6 +26,13 @@ test("question authoring is public-only and bulk publication is available", () =
   assert.match(api, /\/api\/questions\/publish-all/);
 });
 
+test("question editor allows changing the exam source title", () => {
+  const editor = file("src/features/content/question-editor.tsx");
+  assert.match(editor, /title="مرجع آزمون"/);
+  assert.match(editor, /value\.source\.sourceTitle/);
+  assert.match(editor, /sourceTitle: e\.target\.value \|\| undefined/);
+});
+
 test("bank removes global difficulty bulk action and preserves current page when editing", () => {
   const bank = file("src/features/content/question-bank.tsx");
   const list = file("src/components/ui/paged-list.tsx");

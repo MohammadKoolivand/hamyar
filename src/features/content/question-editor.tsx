@@ -266,21 +266,22 @@ export function QuestionEditor({
                   />
                 </Field>
                 <p className="text-xs leading-6 text-slate-500">
-                  این شماره، جای سؤال را در مرتب‌سازی بانک بر اساس ترتیب دفترچه تعیین می‌کند.
-                  برای حذف شماره، کادر را خالی بگذار.
+                  شماره اصلی سؤال را برای مرتب‌سازی بر اساس دفترچه وارد کن.
                 </p>
-                {!value.source && (
-                  <>
-                    <p className="text-xs text-amber-800">
-                      این سؤال هنوز منبع ندارد. ابتدا نوع منبع را تعیین کن تا شماره دفترچه قابل ویرایش شود.
-                    </p>
-                    <SourceEditor
-                      value={value.source}
-                      onChange={(source) => change({ ...value, source })}
-                      compact
-                    />
-                  </>
-                )}
+                <details className="rounded-xl border border-slate-200 p-3" open={!value.source}>
+                  <summary className="cursor-pointer text-sm font-semibold text-[#233B8F]">
+                    {value.source ? "ویرایش یا تغییر مرجع آزمون" : "افزودن مرجع آزمون"}
+                  </summary>
+                  <p className="my-3 text-xs leading-6 text-slate-600">
+                    سال، رشته، نوبت و محل برگزاری را دقیق وارد کن؛
+                    شباهت نام دو مرجع لزوماً به معنی یکسان بودن آزمون نیست.
+                  </p>
+                  <SourceEditor
+                    value={value.source}
+                    onChange={(source) => change({ ...value, source })}
+                    hideQuestionNumber
+                  />
+                </details>
               </section>
               {value.type === "choice" ? (
                 <fieldset className="grid gap-3 rounded-2xl border border-slate-200 p-4">

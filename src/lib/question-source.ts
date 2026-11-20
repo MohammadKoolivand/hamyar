@@ -40,6 +40,7 @@ export const questionSourceSchema = z
     grade: z.string().trim().max(100).optional(),
     track: z.string().trim().max(100).optional(),
     sourceTitle: z.string().trim().min(1).max(200).optional(),
+    examKey: z.string().trim().max(400).optional(),
     examDate: z
       .string()
       .regex(
@@ -226,11 +227,44 @@ export function sourceSummary(s?: QuestionSource) {
   const title =
     sourceCategories.find((c) => c.id === category)?.label ?? "دسته‌بندی نشده";
   const details = sourceFields
-    .filter((f) => f.categories.includes(category))
+    .filter((f) => f.categories.includes(category) && !(category === "konkur" && f.key === "organizer" && /^سازمان\s*سنجش$/u.test(s.organizer?.trim() ?? "")))
     .flatMap((f) => {
       const value = s[f.key];
       if (!value) return [];
       return [f.options?.find((o) => o[0] === value)?.[1] ?? String(value)];
     });
   return [title, ...details].join(" · ");
+}
+
+/**
+ * Stable identity for an identifiable Konkur sitting, independent of its
+ * optional organizer. The identifier is derived from exam facts, not labels.
+ * Unknown date/session is kept distinct from a known one; titles are retained
+ * when there is no precise date/session to distinguish otherwise ambiguous
+ * exams. Never infer "inside Iran" or a sitting number from missing data.
+ */
+export function konkurExamKey(source: QuestionSource | undefined, year: number | null | undefined): string | undefined {
+  if (source?.family !== "konkur") return undefined;
+  const yearValue = String(year ?? source.academicYear ?? "")
+    .replace(/[۰-۹]/g, d => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+    .replace(/[٠-٩]/g, d => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+  const parsedYear = Number(yearValue.match(/(?:13|14)\d{2}/)?.[0] ?? 0);
+  if (!parsedYear) return undefined;
+  const group = source.group ?? (
+    /تجربی/u.test(source.track ?? "") ? "experimental" :
+    /ریاضی/u.test(source.track ?? "") ? "mathematics" :
+    /انسانی/u.test(source.track ?? "") ? "humanities" : undefined
+  );
+  if (!group || !source.location) return undefined;
+  const clean = (text?: string) => (text ?? "")
+    .replace(/[ي]/g, "ی").replace(/[ك]/g, "ک")
+    .replace(/\s+/g, " ").trim().toLowerCase();
+  const session = clean(source.session);
+  const date = clean(source.examDate);
+  const stage = clean(source.stage);
+  const title = clean(source.sourceTitle);
+  // If no sitting discriminator was supplied, preserve the nonempty title.
+  // This avoids silently equating "single sitting" with another named sitting.
+  return JSON.stringify(["konkur", parsedYear, group, source.location,
+    session, date, stage, session || date ? "" : title]);
 }
