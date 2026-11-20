@@ -54,6 +54,7 @@ export function AiAuthoring({
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
+  const [jsonImportText, setJsonImportText] = useState("");
   const [batchCount, setBatchCount] = useState(1);
   const [targetDifficulty, setTargetDifficulty] = useState("medium");
   const [authoringModel, setAuthoringModel] = useState("");
@@ -84,6 +85,70 @@ export function AiAuthoring({
         اصلاح کنید؛ پیش از تأیید شما هیچ پیش‌نویسی وارد بانک یا مأموریت نمی‌شود.
         مدل تولید سؤال را در تنظیمات AvvalAI انتخاب کنید.
       </p>
+      <section className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4" aria-label="ورود JSON به پیش‌نویس‌ها">
+        <h3 className="font-bold text-[#17305e]">ورود دسته‌ای JSON به پیش‌نویس‌ها</h3>
+        <p className="text-sm leading-7 text-slate-600">
+          فایل JSON استخراج‌شده از PDF سؤال و پاسخ را انتخاب کنید یا متن JSON را بچسبانید.
+          قالب ورودی باید یک شیء با کلید questions و آرایه‌ای از سؤال‌های مطابق
+          فرمت همیار باشد. سؤال‌ها فقط برای بازبینی ذخیره می‌شوند؛ انتشار خودکار ندارند.
+          برای سؤال چندگزینه‌ای reference باید متن گزینه صحیح باشد.
+          برای سؤال مبحثی topicId باید شناسه مبحث معتبرِ متعلق به شما باشد؛
+          سؤال بدون مبحث را با classification برابر free مشخص کنید.
+        </p>
+        <label className="grid gap-1 text-sm font-medium">
+          انتخاب فایل JSON
+          <input
+            type="file"
+            accept=".json,application/json"
+            disabled={busy}
+            className={input}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (!file) return;
+              if (file.size > 1024 * 1024) {
+                setError("حجم فایل JSON نباید از یک مگابایت بیشتر باشد.");
+                return;
+              }
+              void file.text().then(setJsonImportText).catch(() => setError("فایل JSON خوانده نشد."));
+            }}
+          />
+        </label>
+        <label className="grid gap-1 text-sm font-medium">
+          متن JSON
+          <textarea
+            dir="ltr"
+            rows={6}
+            className={input}
+            value={jsonImportText}
+            disabled={busy}
+            onChange={(event) => setJsonImportText(event.target.value)}
+            placeholder={'{"questions":[{"classification":"free","statement":"صورت سؤال","type":"choice","options":["الف","ب"],"reference":"الف","hints":[],"skillIds":[]}]}'}
+          />
+        </label>
+        <Button
+          type="button"
+          disabled={busy || !jsonImportText.trim()}
+          onClick={() => void run(async () => {
+            let parsed: unknown;
+            try {
+              parsed = JSON.parse(jsonImportText);
+            } catch {
+              throw new Error("ساختار JSON معتبر نیست.");
+            }
+            if (!parsed || typeof parsed !== "object" || !("questions" in parsed) ||
+                !Array.isArray(parsed.questions) || parsed.questions.length === 0 ||
+                parsed.questions.length > 100) {
+              throw new Error("فایل باید دارای آرایه questions با ۱ تا ۱۰۰ سؤال باشد.");
+            }
+            const result = await api<{ imported: number }>("/question-drafts/import-json", parsed);
+            setNotice(`${result.imported} سؤال به پیش‌نویس‌ها اضافه شد و نیاز به بازبینی دارد.`);
+            setJsonImportText("");
+            await refresh();
+          })}
+        >
+          {busy ? "در حال ثبت..." : "ورود JSON به پیش‌نویس‌ها"}
+        </Button>
+      </section>
       <p className="text-xs text-slate-500">
         مدل انتخاب‌شده:{" "}
         <span dir="ltr">{authoringModel || "هنوز انتخاب نشده"}</span>
