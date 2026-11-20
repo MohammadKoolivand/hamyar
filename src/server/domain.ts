@@ -1,5 +1,5 @@
 import { normalizePersianQuestionText } from "../lib/persian-question-text";
-import { questionSourceSchema } from "../lib/question-source";
+import { questionSourceSchema, konkurExamKey } from "../lib/question-source";
 import { questionOptionImageSchema, questionVisualsSchema, visualKind } from "../lib/question-visuals";
 import { mathMarkup } from "../lib/math-render";
 import { z } from "zod";
@@ -114,6 +114,13 @@ export const questionSchema = z
       (!q.options.includes(q.reference) || q.options.length < 2)
     )
       c.addIssue({ code: "custom", message: "پاسخ باید یکی از گزینه‌ها باشد" });
+  }).transform((q) => {
+    if (!q.source) return q;
+    const examKey = konkurExamKey(q.source, q.year ?? Number((q.source.academicYear ?? "").replace(/[۰-۹]/g, d => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d))).match(/1[34]\\d{2}/)?.[0] ?? 0));
+    const source = { ...q.source };
+    if (examKey) source.examKey = examKey;
+    else delete source.examKey;
+    return { ...q, source };
   });
 export type QuestionInput = z.infer<typeof questionSchema>;
 export { normalize, numericValue } from "./evaluation/numeric";
