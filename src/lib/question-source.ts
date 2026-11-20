@@ -227,7 +227,7 @@ export function sourceSummary(s?: QuestionSource) {
   const title =
     sourceCategories.find((c) => c.id === category)?.label ?? "دسته‌بندی نشده";
   const details = sourceFields
-    .filter((f) => f.categories.includes(category) && !(category === "konkur" && f.key === "organizer" && /^سازمان\\s*سنجش$/u.test(s.organizer?.trim() ?? "")))
+    .filter((f) => f.categories.includes(category) && !(category === "konkur" && f.key === "organizer" && /^سازمان\s*سنجش$/u.test(s.organizer?.trim() ?? "")))
     .flatMap((f) => {
       const value = s[f.key];
       if (!value) return [];
