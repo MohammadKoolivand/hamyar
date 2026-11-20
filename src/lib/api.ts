@@ -15,6 +15,7 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
       path === "/questions" ||
       /^\/student\/library\/[^/]+\/start$/.test(path) ||
       /^\/questions\/[^/]+\/revise$/.test(path) ||
+      path === "/question-drafts/import-json" ||
       path === "/question-drafts/generate" ||
       /\/question-drafts\/[^/]+\/(approve|reject)$/.test(path) ||
       /\/assignments\/[^/]+\/(attempts|hints|complete)$/.test(path) ||
