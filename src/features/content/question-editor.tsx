@@ -13,6 +13,7 @@ import { QuestionTextInput } from "@/components/question-text-input";
 import { VisualEditor } from "./visual-editor";
 import { OptionImageInput } from "./option-image-input";
 import { TopicSelector } from "./topic-selector";
+import { SourceEditor } from "./source-editor";
 import type { Node } from "@/lib/types";
 const style = "glass-field min-h-11 w-full p-3 text-sm";
 export function QuestionEditor({
@@ -237,30 +238,51 @@ export function QuestionEditor({
                   />
                 </Field>
               </div>
-              {value.source && (
-                <Field title="مرجع آزمون">
+              <section className="grid gap-3 rounded-2xl border border-slate-200 p-4">
+                <Field title="شماره سؤال در دفترچه / مرجع اصلی">
                   <input
                     className={style}
-                    type="text"
-                    maxLength={200}
-                    placeholder="مثلاً: کنکور سراسری تجربی ۱۴۰۵"
-                    value={value.source.sourceTitle ?? ""}
+                    type="number"
+                    min={1}
+                    max={10000}
+                    step={1}
+                    inputMode="numeric"
+                    placeholder="مثلاً ۳۲"
+                    value={value.source?.questionNumber ?? ""}
+                    disabled={!value.source}
                     onChange={(e) =>
                       change({
                         ...value,
-                        source: {
-                          ...value.source!,
-                          sourceTitle: e.target.value || undefined,
-                        },
+                        source: value.source
+                          ? {
+                              ...value.source,
+                              questionNumber: e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
+                            }
+                          : undefined,
                       })
                     }
                   />
-                  <p className="mt-2 text-xs leading-6 text-slate-500">
-                    این عنوان به‌عنوان منبع سؤال در بانک و فیلترهای آزمون نمایش
-                    داده می‌شود.
-                  </p>
                 </Field>
-              )}
+                <p className="text-xs leading-6 text-slate-500">
+                  شماره اصلی سؤال را برای مرتب‌سازی بر اساس دفترچه وارد کن.
+                </p>
+                <details className="rounded-xl border border-slate-200 p-3" open={!value.source}>
+                  <summary className="cursor-pointer text-sm font-semibold text-[#233B8F]">
+                    {value.source ? "ویرایش یا تغییر مرجع آزمون" : "افزودن مرجع آزمون"}
+                  </summary>
+                  <p className="my-3 text-xs leading-6 text-slate-600">
+                    سال، رشته، نوبت و محل برگزاری را دقیق وارد کن؛
+                    شباهت نام دو مرجع لزوماً به معنی یکسان بودن آزمون نیست.
+                  </p>
+                  <SourceEditor
+                    value={value.source}
+                    onChange={(source) => change({ ...value, source })}
+                    hideQuestionNumber
+                  />
+                </details>
+              </section>
               {value.type === "choice" ? (
                 <fieldset className="grid gap-3 rounded-2xl border border-slate-200 p-4">
                   <legend>گزینه‌ها و پاسخ صحیح</legend>
