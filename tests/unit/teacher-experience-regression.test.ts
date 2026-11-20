@@ -26,11 +26,16 @@ test("question authoring is public-only and bulk publication is available", () =
   assert.match(api, /\/api\/questions\/publish-all/);
 });
 
-test("question editor allows changing the exam source title", () => {
+test("question editor allows changing the exam source title and exam metadata", () => {
   const editor = file("src/features/content/question-editor.tsx");
-  assert.match(editor, /title="مرجع آزمون"/);
-  assert.match(editor, /value\.source\.sourceTitle/);
-  assert.match(editor, /sourceTitle: e\.target\.value \|\| undefined/);
+  const sourceEditor = file("src/features/content/source-editor.tsx");
+  assert.match(editor, /import \{ SourceEditor \} from "\.\/source-editor"/);
+  assert.match(editor, /ویرایش یا تغییر مرجع آزمون/);
+  assert.match(editor, /<SourceEditor/);
+  assert.match(editor, /value=\{value\.source\}/);
+  assert.match(editor, /onChange=\{\(source\) => change\(\{ \.\.\.value, source \}\)\}/);
+  assert.match(sourceEditor, /\["sourceTitle", "عنوان منبع"\]/);
+  assert.match(sourceEditor, /update\(key as keyof QuestionSource, e\.target\.value\)/);
 });
 
 test("bank removes global difficulty bulk action and preserves current page when editing", () => {
