@@ -244,7 +244,12 @@ export function sourceSummary(s?: QuestionSource) {
  * exams. Never infer "inside Iran" or a sitting number from missing data.
  */
 export function konkurExamKey(source: QuestionSource | undefined, year: number | null | undefined): string | undefined {
-  if (source?.family !== "konkur" || !year || !Number.isInteger(year)) return undefined;
+  if (source?.family !== "konkur") return undefined;
+  const yearValue = String(year ?? source.academicYear ?? "")
+    .replace(/[۰-۹]/g, d => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+    .replace(/[٠-٩]/g, d => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+  const parsedYear = Number(yearValue.match(/(?:13|14)\d{2}/)?.[0] ?? 0);
+  if (!parsedYear) return undefined;
   const group = source.group ?? (
     /تجربی/u.test(source.track ?? "") ? "experimental" :
     /ریاضی/u.test(source.track ?? "") ? "mathematics" :
@@ -260,6 +265,6 @@ export function konkurExamKey(source: QuestionSource | undefined, year: number |
   const title = clean(source.sourceTitle);
   // If no sitting discriminator was supplied, preserve the nonempty title.
   // This avoids silently equating "single sitting" with another named sitting.
-  return JSON.stringify(["konkur", year, group, source.location,
+  return JSON.stringify(["konkur", parsedYear, group, source.location,
     session, date, stage, session || date ? "" : title]);
 }
