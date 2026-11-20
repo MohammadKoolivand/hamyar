@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   sourceCategory,
+  konkurExamKey,
   initialSource,
   sourceSummary,
   questionSourceSchema,
@@ -61,4 +62,26 @@ test("eight UI source views keep final separate from coordinated national exams;
       source: { family: "olympiad", subject: "فیزیک", stage: "مرحله اختصاصی" },
     }).success,
   );
+});
+
+test("national Konkur organizer is provenance, not a separate exam identity", () => {
+  const base = { family: "konkur" as const, group: "experimental" as const,
+    location: "domestic" as const, session: "نوبت اول" };
+  const withOrganizer = { ...base, organizer: "سازمان سنجش" };
+  assert.equal(konkurExamKey(base, 1405), konkurExamKey(withOrganizer, 1405));
+  assert.equal(sourceSummary(base), sourceSummary(withOrganizer));
+  assert.notEqual(konkurExamKey(base, 1405),
+    konkurExamKey({ ...base, session: "نوبت دوم" }, 1405));
+  assert.notEqual(konkurExamKey(base, 1405),
+    konkurExamKey({ ...base, location: "international" }, 1405));
+  assert.equal(konkurExamKey(base, 1405),
+    konkurExamKey({ ...base, academicYear: "۱۴۰۵" }, undefined));
+  assert.equal(konkurExamKey({ family: "konkur", group: "experimental" }, 1405), undefined);
+  const input = { classification: "free" as const,
+    statement: "این سؤال برای آزمون تجربی است", type: "short" as const, reference: "بله",
+    year: 1405, source: withOrganizer };
+  const saved = questionSchema.parse(input);
+  assert.equal(saved.source?.examKey, konkurExamKey(base, 1405));
+  const changed = questionSchema.parse({ ...saved, source: { ...saved.source, session: "نوبت دوم" } });
+  assert.notEqual(changed.source?.examKey, saved.source?.examKey);
 });
