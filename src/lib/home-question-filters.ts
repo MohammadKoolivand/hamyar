@@ -1,5 +1,5 @@
 import type { CatalogPublicQuestion } from "./exam-catalog-coverage";
-import { sourceCategory } from "./question-source";
+import { sourceCategory, konkurExamKey } from "./question-source";
 
 export type HomeFilterKey = "level" | "grade" | "book" | "chapter" | "topic";
 export type HomeFilters = Record<HomeFilterKey, string> & {
@@ -131,6 +131,8 @@ export function homeExamGroupKey(q: CatalogPublicQuestion): string {
   if (!source) return "unattributed:" + q._id;
   const category = sourceCategory(source);
   const year = homeQuestionYear(q);
+  const knownKonkurExam = konkurExamKey(source, year);
+  if (knownKonkurExam) return knownKonkurExam;
   const title = source.sourceTitle?.trim() ?? "";
   const examDate = source.examDate ?? "";
   const session = source.session ?? "";
