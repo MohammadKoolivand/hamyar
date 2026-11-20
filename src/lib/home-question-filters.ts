@@ -1,5 +1,5 @@
 import type { CatalogPublicQuestion } from "./exam-catalog-coverage";
-import { sourceCategory } from "./question-source";
+import { sourceCategory, konkurExamKey } from "./question-source";
 
 export type HomeFilterKey = "level" | "grade" | "book" | "chapter" | "topic";
 export type HomeFilters = Record<HomeFilterKey, string> & {
@@ -131,6 +131,8 @@ export function homeExamGroupKey(q: CatalogPublicQuestion): string {
   if (!source) return "unattributed:" + q._id;
   const category = sourceCategory(source);
   const year = homeQuestionYear(q);
+  const knownKonkurExam = konkurExamKey(source, year);
+  if (knownKonkurExam) return knownKonkurExam;
   const title = source.sourceTitle?.trim() ?? "";
   const examDate = source.examDate ?? "";
   const session = source.session ?? "";
@@ -145,7 +147,10 @@ export function homeExamGroupKey(q: CatalogPublicQuestion): string {
     category, title.replace(/\\s+/g, " "), year,
     // A named exam's optional organizer/track fields can be missing in an
     // individual newly added question. They must not split one sitting.
-    title ? "" : (source.organizer ?? ""),
+    // The Konkur organizer is descriptive, not an exam identity. A missing
+    // «سازمان سنجش» label must not split a known year/group/session sitting.
+    // Other exam categories may genuinely use the organizer to distinguish exams.
+    category === "konkur" ? "" : title ? "" : (source.organizer ?? ""),
     source.group ?? "", title ? "" : (source.track ?? ""),
     source.location ?? "", session, examDate,
     source.administration ?? "", source.schoolStage ?? "",
