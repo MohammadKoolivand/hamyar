@@ -8,6 +8,7 @@ import {
   sourceFields,
 } from "@/lib/question-source";
 import { QuestionEditor } from "./question-editor";
+import { JsonDraftImport } from "./json-draft-import";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
@@ -53,6 +54,7 @@ export function QuestionBank({
   courses: Course[];
   onSaved: () => Promise<unknown> | void;
 }) {
+  const [jsonImportOpen, setJsonImportOpen] = useState(false);
   const [libraryCourse, setLibraryCourse] = useState("");
   const [published, setPublished] = useState(new Set<string>());
   const [libraryBusy, setLibraryBusy] = useState("");
@@ -270,6 +272,9 @@ export function QuestionBank({
           >
             ورود آزمون از PDF
           </Link>
+          <Button type="button" variant="outline" onClick={() => setJsonImportOpen((current) => !current)}>
+            {jsonImportOpen ? "بستن ورود JSON" : "ورود JSON"}
+          </Button>
           <Link
             href="/content-new"
             className="flex items-center gap-2 rounded-xl bg-[#233B8F] px-5 py-3 text-sm font-medium text-white shadow-lg shadow-blue-900/10"
@@ -279,6 +284,7 @@ export function QuestionBank({
           </Link>
         </div>
       </section>
+      {jsonImportOpen && <JsonDraftImport />}
       {(lifecycleNotice || lifecycleError) && <p role={lifecycleError ? "alert" : "status"} className={lifecycleError ? "rounded-xl bg-rose-50 p-3 text-sm text-rose-800" : "rounded-xl bg-teal-50 p-3 text-sm text-teal-900"}>{lifecycleError || lifecycleNotice}</p>}
       {(publishNotice || publishError) && <p role={publishError ? "alert" : "status"} className={publishError ? "rounded-xl bg-rose-50 p-3 text-sm text-rose-800" : "rounded-xl bg-teal-50 p-3 text-sm text-teal-900"}>{publishError || publishNotice}</p>}
       <section className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 sm:p-5" aria-label="انتشار امن در کتابخانه">
