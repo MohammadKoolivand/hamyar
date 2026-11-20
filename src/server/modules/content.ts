@@ -18,6 +18,7 @@ import {
   trackLabels,
 } from "../curriculum-catalog";
 import { questionSchema } from "../domain";
+import { konkurExamKey } from "../../lib/question-source";
 import { assertActiveAssignmentCourse } from "../course-access";
 import { assertLibraryAssignmentAccess } from "../library-access";
 import { addDiscoveryPath } from "../discovery-settings";
@@ -280,7 +281,9 @@ export function registerContent(app: FastifyInstance, ctx: Context) {
           (value): value is string => typeof value === "string" && Boolean(examCatalogEntry(value)),
         ))]
         : [];
-      return { ...publicRow, catalogIds, taxonomy,
+      return { ...publicRow,
+        source: row.source ? { ...row.source, examKey: konkurExamKey(row.source, row.year) ?? row.source.examKey } : undefined,
+        catalogIds, taxonomy,
         publishedAt: _verifiedAt ?? null,
         recommendationCount: recommendationCounts.get(_questionId) ?? 0,
       };
