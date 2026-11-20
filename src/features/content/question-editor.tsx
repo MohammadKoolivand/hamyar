@@ -269,18 +269,21 @@ export function QuestionEditor({
                   این شماره، جای سؤال را در مرتب‌سازی بانک بر اساس ترتیب دفترچه تعیین می‌کند.
                   برای حذف شماره، کادر را خالی بگذار.
                 </p>
-                {!value.source && (
-                  <>
-                    <p className="text-xs text-amber-800">
-                      این سؤال هنوز منبع ندارد. ابتدا نوع منبع را تعیین کن تا شماره دفترچه قابل ویرایش شود.
-                    </p>
-                    <SourceEditor
-                      value={value.source}
-                      onChange={(source) => change({ ...value, source })}
-                      compact
-                    />
-                  </>
-                )}
+                <details className="rounded-xl border border-slate-200 p-3" open={!value.source}>
+                  <summary className="cursor-pointer text-sm font-semibold text-[#233B8F]">
+                    {value.source ? "ویرایش یا تغییر مرجع آزمون" : "افزودن مرجع آزمون"}
+                  </summary>
+                  <p className="my-3 text-xs leading-6 text-slate-600">
+                    برای اصلاح مرجع، مشخصات آزمون را تغییر بده و سپس «ذخیره نسخه جدید» را بزن.
+                    سال، رشته، نوبت و محل برگزاری را دقیق وارد کن؛ دو مرجع با نام‌های مشابه
+                    لزوماً یک آزمون نیستند. «برگزارکننده» صرفاً مشخصه منبع است.
+                  </p>
+                  <SourceEditor
+                    value={value.source}
+                    onChange={(source) => change({ ...value, source })}
+                    hideQuestionNumber
+                  />
+                </details>
               </section>
               {value.type === "choice" ? (
                 <fieldset className="grid gap-3 rounded-2xl border border-slate-200 p-4">
