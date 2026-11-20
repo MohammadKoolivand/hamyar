@@ -116,7 +116,7 @@ export const questionSchema = z
       c.addIssue({ code: "custom", message: "پاسخ باید یکی از گزینه‌ها باشد" });
   }).transform((q) => {
     if (!q.source) return q;
-    const examKey = konkurExamKey(q.source, q.year ?? Number((q.source.academicYear ?? "").replace(/[۰-۹]/g, d => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d))).match(/1[34]\\d{2}/)?.[0] ?? 0));
+    const examKey = konkurExamKey(q.source, q.year);
     const source = { ...q.source };
     if (examKey) source.examKey = examKey;
     else delete source.examKey;
