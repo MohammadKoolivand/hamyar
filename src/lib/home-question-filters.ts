@@ -145,7 +145,10 @@ export function homeExamGroupKey(q: CatalogPublicQuestion): string {
     category, title.replace(/\\s+/g, " "), year,
     // A named exam's optional organizer/track fields can be missing in an
     // individual newly added question. They must not split one sitting.
-    title ? "" : (source.organizer ?? ""),
+    // The Konkur organizer is descriptive, not an exam identity. A missing
+    // «سازمان سنجش» label must not split a known year/group/session sitting.
+    // Other exam categories may genuinely use the organizer to distinguish exams.
+    category === "konkur" ? "" : title ? "" : (source.organizer ?? ""),
     source.group ?? "", title ? "" : (source.track ?? ""),
     source.location ?? "", session, examDate,
     source.administration ?? "", source.schoolStage ?? "",
