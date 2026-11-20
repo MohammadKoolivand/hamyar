@@ -167,10 +167,15 @@ function originalQuestionNumber(q: CatalogPublicQuestion): number | null {
  */
 function homeSourceSortGroupKey(q: CatalogPublicQuestion): string {
   const examKey = homeExamGroupKey(q);
-  if (!examKey.startsWith("unattributed:") || originalQuestionNumber(q) === null)
-    return examKey;
+  if (originalQuestionNumber(q) === null) return examKey;
   const book = homeQuestionTaxonomy(q, "book").trim();
   if (!book) return examKey;
+  // Textbook practice questions may have sourceTitle on newly imported rows,
+  // while older rows only have a book/grade. The title is not an exam identity.
+  // Keep them in their reference-number sequence instead of a newest-first group.
+  const textbook = q.source?.family === "practice" &&
+    q.source?.practice === "textbook";
+  if (!textbook && !examKey.startsWith("unattributed:")) return examKey;
   return JSON.stringify([
     "numbered-reference", sourceCategory(q.source), homeQuestionTrack(q),
     homeQuestionTaxonomy(q, "level"), homeQuestionTaxonomy(q, "grade"),
