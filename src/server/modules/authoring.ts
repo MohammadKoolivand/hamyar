@@ -95,6 +95,40 @@ export function registerAuthoring(
       .sort({ createdAt: -1 })
       .toArray();
   });
+  // Import already-extracted JSON as private review drafts, never published questions.
+  app.post(
+    "/api/question-drafts/import-json",
+    { config: { rateLimit: { max: 10, timeWindow: "1 minute" } } },
+    async (r) => {
+      const u = await ctx.user(r, "teacher");
+      const b = z.object({
+        questions: z.array(questionSchema).min(1).max(100),
+      }).strict().parse(r.body);
+      for (const question of b.questions)
+        await validateQuestion(ctx, u._id, question);
+      return ctx.atomic(
+        r,
+        u._id,
+        "import-question-drafts-json",
+        b,
+        async (session) => {
+          const at = ctx.now();
+          const rows = b.questions.map((question) => ({
+            _id: ctx.id(),
+            ownerId: u._id,
+            state: "pending_review",
+            question,
+            validationIssues: [],
+            provider: "json_import",
+            origin: "json_import",
+            createdAt: at,
+          }));
+          await ctx.c("questionDrafts").insertMany(rows, { session });
+          return { imported: rows.length, draftIds: rows.map((row) => row._id) };
+        },
+      );
+    },
+  );
   app.post(
     "/api/question-drafts/generate",
     { config: { rateLimit: { max: 6, timeWindow: "1 minute" } } },
